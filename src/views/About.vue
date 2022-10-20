@@ -1,17 +1,16 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <hot-table :data="data" :rowHeaders="true" :colHeaders="true" :licenseKey="licenseKey"></hot-table>
 </template>
 <script>
-import { HotTable } from '@handsontable/vue3';
+import { HotTable} from '@handsontable/vue3';
 import 'handsontable/dist/handsontable.full.css';//解决样式没有的问题
 import { registerAllModules } from 'handsontable/registry';
+
 
 registerAllModules();
 
 export default {
-  name: 'App',
+  name: 'About',
   components: {
     HotTable
   },
