@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  培养目标
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Target"
+
 }
 </script>
 

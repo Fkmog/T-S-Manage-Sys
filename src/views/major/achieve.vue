@@ -1,15 +1,10 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  达成度
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Achieve"
 }
 </script>
 

@@ -1,5 +1,14 @@
-//引入createApp工厂函数
 import { createApp } from 'vue'
 import App from './App.vue'
-// 创建实例对象app并挂载
-createApp(App).mount('#app')
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import router from './router'
+import store from './store'
+
+createApp(App)
+    .use(store)
+    .use(router)
+    .use(ElementPlus)
+    .mount('#app')
+
+

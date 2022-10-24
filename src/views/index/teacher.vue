@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  教师
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Teacher"
+
 }
 </script>
 

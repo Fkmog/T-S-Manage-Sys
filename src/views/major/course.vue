@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  课程体系
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Course"
+
 }
 </script>
 

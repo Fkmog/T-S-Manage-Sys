@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  设置
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Setting"
+
 }
 </script>
 

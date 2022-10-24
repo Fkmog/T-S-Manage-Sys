@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <router-view/>
-  </div>
+  管理
 </template>
 
 <script>
-
-
 export default {
-  name: 'App',
- 
+name:"Manage"
+
 }
 </script>
 
