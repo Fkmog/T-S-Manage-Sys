@@ -11,7 +11,10 @@
     "@handsontable/vue3": "^12.1.3",
     "core-js": "^3.6.5",
     "element-plus": "^2.2.18",
+    "exceljs": "^4.3.0",
+    "file-saver": "^2.0.5",
     "handsontable": "^12.1.3",
+    "luckyexcel": "^1.0.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"

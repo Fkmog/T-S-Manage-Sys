@@ -27,13 +27,17 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
-    <div class="hot-table-container" layout="column" flex layout-align="start center" >
-      <hot-table :settings="hotSettings"  width="650" style="line-height: 100px;text-align: center;margin:auto">
-          <hot-column  title="工号" width="200" height="20"></hot-column>
-          <hot-column  title="姓名" width="200" height="20"></hot-column>
-          <hot-column  title="邮箱" width="200" height="20"></hot-column>
-      </hot-table>
-    </div>
+      <div class="hot-table-container" layout="column" flex layout-align="start center" >
+        <!-- <hot-table :settings="hotSettings"  width="650" style="line-height: 100px;text-align: center;margin:auto">
+            <hot-column  title="工号" width="200" height="20"></hot-column>
+            <hot-column  title="姓名" width="200" height="20"></hot-column>
+            <hot-column  title="邮箱" width="200" height="20"></hot-column>
+        </hot-table> -->
+        <!-- <LuckySheet /> -->
+      </div>
+
+   
+
    </div>
   </div>
   
@@ -46,11 +50,13 @@ import { ref}from 'vue';
 import { HotTable,HotColumn } from '@handsontable/vue3';
 import { registerAllModules } from 'handsontable/registry';
 import { ElTooltip,ElIcon } from 'element-plus'
-
+import LuckySheet from '../components/LuckySheet.vue'
     
 import { Back , FolderChecked, InfoFilled, Loading} from '@element-plus/icons-vue'
 
 import 'element-plus/dist/index.css'
+
+import '../assets/style.css'
 
 import 'handsontable/dist/handsontable.full.css';//解决样式没有的问题
 
@@ -86,29 +92,18 @@ export default {
       return {hotSettings}
     },
   components: {
-    HotTable,HotColumn,ElTooltip,ElIcon,Back,FolderChecked,InfoFilled,Loading
+    HotTable,HotColumn,ElTooltip,ElIcon,Back,FolderChecked,InfoFilled,Loading,LuckySheet
   },
   methods:{
     onClickClose (ev) {
-      // var result = toPostData(); // Note: do not use isValid() here
-      // if (!result || postData.teachers.length > 0) { // has unsaved data: invalid or valid
-      //   $mdDialog.show(confirm).then(function() {
-      //     RouteService.goBack();
-      //   });
-      // } else {
-      //   RouteService.goBack();
-      // }
-      // if (fromCourseBatchAdd) {
-      //   $state.go('course.batchadd', $stateParams);
-      // } else {
-      //   RouteService.goBack();
-      // }
+      
       console.log('返回')
     },
     save(){
-      console.log('保存')
+      console.log('保存1')
     }
   }
 }
+
 </script>
 

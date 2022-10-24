@@ -3,7 +3,8 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link> |
     <router-link to="/HT01">HT01</router-link> |
-    <router-link to="/HT02">HT02</router-link>
+    <router-link to="/HT02">HT02</router-link> |
+    <router-link to="/HT03">HT03</router-link>
   </div>
   <!-- router-view 这个标签是一个占位符，理解为一个窗口，可以放某一个组件
       那么到底是哪一个组件？  看浏览器地址上的路径 和 router文件夹下的index.js中的routes数组
