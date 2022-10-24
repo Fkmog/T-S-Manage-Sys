@@ -1,6 +1,4 @@
 <template>
-
-
 <div layout="column" flex class="ng-scope layout-column flex">
     <div class="submenu no-select layout-align-center-center layout-row" layout="row" layout-align="center center" style="justify-content: left">
       <el-tooltip content="返回">
@@ -19,38 +17,45 @@
           <Loading />
         </el-icon>
       </el-button>
+
+      
+        
+
+        <!-- <input id="uploadBtn" type="file" @change="loadExcel" /> -->
+        
+          <!-- <el-input placeholder="选择execl文件" :suffix-icon="DocumentAdd" id="uploadBtn" type="file" @change="loadExcel" v-model="input1"/> -->
+          <div class="el-input">
+              <input type="file" @change="loadExcel" class="el-input__inner" />
+          </div>
+        
+          <div class="s-v-bar">&nbsp;</div>
+        <el-tooltip content="下载">
+          <el-button class="md-icon-button" aria-label="下载" @click="downloadExcel" link>
+            <el-icon><Download /></el-icon>
+          </el-button>  
+        </el-tooltip>
+        <!-- <select v-model="selected" @change="selectExcel">
+          <option disabled value="">Choose</option>
+          <option v-for="option in options" :key="option.text" :value="option.value">
+            {{ option.text }}
+          </option>
+        </select> -->
+
+        <!-- <a href="javascript:void(0)" @click="downloadExcel">Download source xlsx file</a> -->
+      
       <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link>
         <el-icon><InfoFilled /></el-icon>
       </el-button>
       <div layout="row" layout-align="center center">
         <span>可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
       </div>
+
       <div flex></div>
-      <div style="position: absolute; top: 0">
-        <input id="uploadBtn" type="file" @change="loadExcel" />
-
-        <span>Or Load remote xlsx file:</span>
-
-        <select v-model="selected" @change="selectExcel">
-          <option disabled value="">Choose</option>
-          <option v-for="option in options" :key="option.text" :value="option.value">
-            {{ option.text }}
-          </option>
-        </select>
-
-        <a href="javascript:void(0)" @click="downloadExcel">Download source xlsx file</a>
-      </div>
     </div>
 
     <div layout="row" flex class="md-padding" >
-      <div class="hot-table-container" layout="column" flex layout-align="start center" >
-        <!-- <hot-table :settings="hotSettings"  width="650" style="line-height: 100px;text-align: center;margin:auto">
-            <hot-column  title="工号" width="200" height="20"></hot-column>
-            <hot-column  title="姓名" width="200" height="20"></hot-column>
-            <hot-column  title="邮箱" width="200" height="20"></hot-column>
-        </hot-table> -->
-        <!-- <LuckySheet /> -->
-        <div id="luckysheet"></div>
+      <div class="luckysheetfield" layout="column" flex layout-align="start center" >
+        <div id="luckysheet" class="luckysheetborder"></div>
         <div v-show="isMaskShow" id="tip">Downloading</div>
       </div>
     </div>
@@ -73,14 +78,14 @@ import LuckyExcel from 'luckyexcel'
 
 import { HotTable,HotColumn } from '@handsontable/vue3';
 import { registerAllModules } from 'handsontable/registry';
-import { ElTooltip,ElIcon } from 'element-plus'
+import { ElTooltip,ElIcon,ElInput } from 'element-plus'
 
 import '../assets/style.css'
 import 'element-plus/dist/index.css'
 import 'handsontable/dist/handsontable.full.css'
 
 
-import { Back , FolderChecked, InfoFilled, Loading} from '@element-plus/icons-vue'
+import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
 
 import 'element-plus/dist/index.css'
 
@@ -120,6 +125,7 @@ const options = ref([
     value: 'https://minio.cnbabylon.com/public/luckysheet/Blue%20mileage%20and%20expense%20report.xlsx'
   }
 ])
+const input1 = ref('')
 
 const loadExcel = (evt) => {
   const files = evt.target.files
@@ -201,6 +207,12 @@ const downloadExcel = () => {
   // elemIF.src = value;
   exportExcel(luckysheet.getAllSheets(), '下载')
 }
+const onClickClose = () =>{
+  console.log("返回")
+}
+const save = () => {
+  console.log('保存')
+}
 
 // !!! create luckysheet after mounted
 onMounted(() => {
@@ -241,18 +253,33 @@ onMounted(() => {
 </script>
 
 <style  scoped>
+.ng-scope layout-column flex{
+display: flex;
+flex-direction: column;
+}
+
+
 #luckysheet {
   margin: 0px;
   padding: 0px;
-  position: absolute;
+  border:1px aquamarine;
+  /* position: absolute; */
   width: 100%;
-  left: 0px;
-  top: 30px;
+  height: 750px;
+  /* left: 0px; */
+  margin-top: 20px;
+  /* top: 30px; */
   bottom: 0px;
+}
+.luckysheetborder{
+  border: 1px aquamarine;
 }
 
 #uploadBtn {
   font-size: 16px;
+}
+.el-input{
+  width: 30%;
 }
 
 #tip {
