@@ -6,21 +6,25 @@
         v-model="form.queryString"
         class="elinput"
         placeholder="搜索姓名、工号"
+        :suffix-icon="Close"
         v-on:keyup.enter="onSubmit"
       />
-     
-        <el-icon class="closeicon" @click="clearqueryString" v-show="checkqueryString"><Close /></el-icon>
+        <el-icon class="closeicon" @click="clearqueryString" v-show="closeShow"><Close /></el-icon>
+        <!-- v-show="checkqueryString" -->
 
-      
-      
+        <el-tooltip content="添加教师">
+          <el-button class="md-icon-button button-back"   @click="go" link >
+            <el-icon  class="closeicon"><Plus /></el-icon>
+          </el-button>
+        </el-tooltip>
     </div>
 
     <div layout="row" flex class="md-padding" >
       <div class="hot-table-container" layout="column" flex layout-align="start center" >
-        <hot-table :settings="hotSettings"  width="650" style="line-height: 100px;text-align: center;margin:auto">
-            <hot-column  title="工号" width="200" height="20"></hot-column>
-            <hot-column  title="姓名" width="200" height="20"></hot-column>
-            <hot-column  title="邮箱" width="200" height="20"></hot-column>
+        <hot-table :settings="hotSettings" :data="data" width="650" style="line-height: 100px;text-align: center;margin:auto">
+            <hot-column  title="工号" width="200" height="20" data="ID"></hot-column>
+            <hot-column  title="姓名" width="200" height="20" data="name"></hot-column>
+            <hot-column  title="邮箱" width="200" height="20" data="email"></hot-column>
         </hot-table>
         <!-- <LuckySheet /> -->
       </div>
@@ -33,15 +37,17 @@
 
 <script>
 import { ref,reactive}from 'vue';
+import { useRouter } from 'vue-router';
 import { HotTable,HotColumn } from '@handsontable/vue3';
 import { registerAllModules } from 'handsontable/registry';
 import { ElTooltip,ElIcon,ElInput,ElForm, ElButton } from 'element-plus'
 
     
-import { Back , FolderChecked, InfoFilled, Loading, Search, Close} from '@element-plus/icons-vue'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus} from '@element-plus/icons-vue'
 
 import 'element-plus/dist/index.css'
 
+import '@/assets/style.css'
 
 import 'handsontable/dist/handsontable.full.css';//解决样式没有的问题
 
@@ -73,29 +79,44 @@ export default {
               }
           }
         },};
+      const data=ref([
+        {
+          ID:'222050308',
+          name:'尼古拉斯',
+          email:'1073638314@qq.com'
+        }
+      ]);
+      
       // let fromCourseBatchAdd = ref(false);
       const searchteacherdata = ref('');
+      const closeShow = ref(false);
       const form = reactive({
        queryString:''
       });
       const onSubmit = () => {
-        alert('submit!')
+        alert(form.queryString)
       };
       const clearqueryString = () => {
         form.queryString=''
+        checkqueryString
       };
-      const checkqueryString = () => {
+      function checkqueryString (){
         if(form.queryString!=''){
-          return true
+          closeShow=true
         }
-        else
-          return false
-      };
+        else{
+          closeShow=false
+        }
+      }
+      const $router = useRouter();
+      function go(){
 
-      return {hotSettings,searchteacherdata,form,onSubmit,clearqueryString,checkqueryString}
+        $router.push({ path:'/addTeacher'})  //没有this
+      }   
+      return {hotSettings,searchteacherdata,form,onSubmit,clearqueryString,checkqueryString,go,data,closeShow}
     },
   components: {
-    HotTable,HotColumn,ElTooltip,ElIcon,Back,FolderChecked,InfoFilled,Loading,Search,ElInput,ElForm,Close,ElButton
+    HotTable,HotColumn,ElTooltip,ElIcon,Back,FolderChecked,InfoFilled,Loading,Search,ElInput,ElForm,Close,ElButton,Plus
   },
   methods:{
     onClickClose (ev) {

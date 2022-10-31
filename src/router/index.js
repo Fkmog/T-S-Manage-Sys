@@ -14,6 +14,7 @@ import BaseCourse from '@/views/index/baseCourse.vue'
 import Class from '@/views/index/class.vue'
 import Major from '@/views/index/major.vue'
 import Teacher from '@/views/index/teacher.vue'
+import AddTeacher from '@/views/teacher/addTeacher.vue'
 import userLogin from '@/components/userLogin/index.vue'
 
 export default createRouter({
@@ -37,7 +38,7 @@ export default createRouter({
                     component:Class
                 }, {
                     path:'/teacher',
-                    component:Teacher
+                    component:Teacher,
                 }, {
                     path:'/major',
                     component:Major,
@@ -48,6 +49,10 @@ export default createRouter({
                     //     },
                     // ]
                 }, 
+                {
+                    path:'/addTeacher',
+                    component:AddTeacher
+                }
             ]
         },
        

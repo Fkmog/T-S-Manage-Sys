@@ -4,7 +4,7 @@
 
 <script>
 
-import LuckySheet from '../components/teacher/LuckySheet.vue'
+import LuckySheet from '@/components/teacher/LuckySheet.vue'
 
 export default{
     setup(){
