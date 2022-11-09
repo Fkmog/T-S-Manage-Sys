@@ -4,7 +4,7 @@
 
 <script>
 export default {
-name:"Target"
+name:"Goal"
 
 }
 </script>

@@ -54,5 +54,16 @@ ul{
 .pageNav a:hover::after{
     transform: scaleX(1);
 }
+.pageNav a:focus{
+     display: block;
+    position: relative;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: #fff;
+    font-size: 16px;
+    line-height: 30px;
+    font-size: 18px;
+    text-decoration: none;
+}
 
 </style>

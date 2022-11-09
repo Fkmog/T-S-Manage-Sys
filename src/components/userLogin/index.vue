@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { login } from "@/api/login/login";
 import { User, Lock } from "@element-plus/icons-vue";
 export default {
@@ -83,6 +84,7 @@ export default {
           login(this.loginForm.userName, this.loginForm.passWord).then(res=>{
             console.log(res);
             if(res.code == 200){
+            Cookies.set('Admin-Token',res.token)
             this.$router.replace("/index");
             }
             if(res.code != 200) {
