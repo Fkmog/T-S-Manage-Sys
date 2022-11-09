@@ -54,6 +54,7 @@
 <script>
 import { login } from "@/api/login/login";
 import { User, Lock } from "@element-plus/icons-vue";
+import Cookies from 'js-cookie'
 export default {
   name: "userLogin",
   components: {
@@ -83,7 +84,9 @@ export default {
           login(this.loginForm.userName, this.loginForm.passWord).then(res=>{
             console.log(res);
             if(res.code == 200){
-            this.$router.replace("/index");
+              Cookies.set('Admin-Token',res.token)
+              this.$router.replace("/index");
+
             }
             if(res.code != 200) {
             alert("用户名密码不正确！请重新登陆");
