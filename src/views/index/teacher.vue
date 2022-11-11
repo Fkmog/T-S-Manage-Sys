@@ -250,7 +250,7 @@ export default{
     }
 </script>
 
-<style>
+<style scoped>
 body {
     font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
     background-color: #f2f2f2;
@@ -441,10 +441,7 @@ html {
 .layout-row>.flex {
     min-width: 0;
 }
-.el-button{
-  line-height:0;
-  
-}
+
 /* .el-button {
     
         display: inline-block;

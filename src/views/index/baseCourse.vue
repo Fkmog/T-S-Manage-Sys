@@ -1,6 +1,6 @@
 <template>
   <div layout="row" flex class="md-padding" >
-    <el-button type="primary" :icon="Edit" circle />
+    <el-button  class="addCourseButton"  circle @click="addBaseCourse"><el-icon class="addIcon"><Plus /></el-icon></el-button>
     <div class="el-table-container" layout="column" flex layout-align="start center" >
       <el-table :data="tableData" stripe style="width: 100%">
         <el-table-column prop="courseName" label="课程名" width="180" />
@@ -12,6 +12,28 @@
       </el-table>
    </div>
   </div>
+
+  <el-dialog v-model="dialogFormVisible" title="Shipping address">
+    <el-form :model="form">
+      <el-form-item label="Promotion name" :label-width="formLabelWidth">
+        <el-input v-model="form.name" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="Zones" :label-width="formLabelWidth">
+        <el-select v-model="form.region" placeholder="Please select a zone">
+          <el-option label="Zone No.1" value="shanghai" />
+          <el-option label="Zone No.2" value="beijing" />
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">
+          Confirm
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
    
   
      
@@ -29,6 +51,9 @@
 </template>
 
 <script>
+import request from '@/utils/request/request'
+import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog } from 'element-plus'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete} from '@element-plus/icons-vue'
 export default {
 name:"BaseCourse",
 data(){
@@ -57,119 +82,20 @@ data(){
     courseTeacher:'冯·诺依曼 (19031228)',
     openCourseNumber:'2011',
     semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
-  {
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },{
-    courseName: '测试课程',
-    courseCode: 'B10031',
-    courseYear: '2018~2019',
-    courseTeacher:'冯·诺依曼 (19031228)',
-    openCourseNumber:'2011',
-    semester:'上学期'
-  },
+  }
 ],
+dialogFormVisible:ref(false),
+formLabelWidth : '140px',
+form : reactive({
+  name: '',
+  region: '',
+  date1: '',
+  date2: '',
+  delivery: false,
+  type: [],
+  resource: '',
+  desc: '',
+})
   }
 }, 
 methods: 
@@ -179,16 +105,36 @@ methods:
   },
   handleCurrentChange(val) {
     console.log(`当前页: ${val}`);
+   
+  },
+  currentPage(val){
+    console.log(`当前页: ${val}`);
+  },
+  addBaseCourse(){
+
+  },
+  getBaseCourse(){
+    return request({
+            url:'/baseCourse/list',
+            method:'get',
+        }).then(function(res){
+          console.log(res);
+        })
   }
 },
+mounted:function(){
+  let that = this;
+  that.getBaseCourse();
+},
 components:{
-  
+  request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
+  Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog
 }
 
 }
 </script>
 
-<style>
+<style scoped>
 body {
     font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
     background-color: #f2f2f2;
@@ -207,6 +153,30 @@ html {
     -webkit-box-direction: normal;
     -ms-flex-direction: row;
     flex-direction: row;
+}
+
+.addIcon{
+  color: white;
+  width: 24px;
+  height: 24px;
+  top: 3px;
+}
+.addCourseButton{
+  background-color:rgb(33,150,243);
+  min-height: 56px;
+  min-width: 56px;
+  float: right;
+  top: -34px;
+  right: 40px;
+}
+.el-icon svg{
+  width: 20px;
+  height: 20px;
+
+}
+.addCourseButton:hover{
+  background-color:rgb(41,98,255);
+  transition: all .3s cubic-bezier(.55,0,.55,.2);
 }
 
 .el-table-container{
@@ -283,9 +253,5 @@ html {
 }
 .layout-row>.flex {
     min-width: 0;
-}
-.el-button{
-  line-height:0;
-  
 }
 </style>
