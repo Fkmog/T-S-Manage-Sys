@@ -6,24 +6,12 @@
       </div>
       <div v-if="!$route.meta.isMajor" class="headPlaceholder"></div>
       <div>
-        <!-- major应该动态获取 -->
-        <div class="major">计算机学院</div>
-        <!--  navigatorList 内容要根据权限给-->
-        <div v-if="!$route.meta.isMajor" class="navigatorList">
-          <HeaderNav
-            class="navigator"
-            v-for="info in infos1"
-            :key="info.index"
-            :msg="info"
-          ></HeaderNav>
+        <div class="major" v-if="!$route.meta.isMajor">计算机学院</div>
+        <div class="major" v-if="$route.meta.isMajor">
+          {{ $store.state.major.majorName }}
         </div>
-        <div v-if="$route.meta.isMajor" class="navigatorList">
-          <HeaderNav
-            class="navigator"
-            v-for="info in infos2"
-            :key="info.index"
-            :msg="info"
-          ></HeaderNav>
+        <div class="navigatorList">
+          <HeaderNav></HeaderNav>
         </div>
       </div>
       <div>
@@ -47,51 +35,6 @@ export default {
   },
   data() {
     return {
-      isMajor: false,
-      infos1: [
-        {
-          value: "专 业",
-          path: "./major",
-        },
-        {
-          value: "课程库",
-          path: "./baseCourse",
-        },
-        {
-          value: "教学班",
-          path: "./class",
-        },
-        {
-          value: "教 师",
-          path: "./teacher",
-        },
-      ],
-      infos2: [
-        {
-          value: "培养目标",
-          path: "./goal",
-        },
-        {
-          value: "课程体系",
-          path: "./courses",
-        },
-        {
-          value: "达成度",
-          path: "./achieve",
-        },
-        {
-          value: "学 生",
-          path: "./student",
-        },
-        {
-          value: "管 理",
-          path: "./manage",
-        },
-        {
-          value: "设 置",
-          path: "./setting",
-        },
-      ],
     };
   },
   methods: {
@@ -139,10 +82,10 @@ export default {
   margin-right: 10px;
   margin-top: 5px;
 }
-.headPlaceholder{
+.headPlaceholder {
   margin-right: 10px;
   margin-top: 5px;
-  width:60px
+  width: 60px;
 }
 </style>
 

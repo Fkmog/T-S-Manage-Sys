@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Student from '../views/major/student.vue'
 import Achieve from '../views/major/achieve.vue'
 import Courses from '../views/major/course.vue'
-import Goal from '../views/major/target.vue'
+import Goal from '../views/major/goal.vue'
 import Manage from '../views/major/manage.vue'
 import Setting from '../views/major/setting.vue'
 
@@ -37,13 +37,19 @@ export default createRouter({
                 //主视图下路由
                 {
                     path: '/baseCourse',
-                    component: BaseCourse
+                    component: BaseCourse,
+                    meta: { isMajor: false }
+
                 }, {
                     path: '/class',
-                    component: Class
+                    component: Class,
+                    meta: { isMajor: false }
+
                 }, {
                     path: '/teacher',
                     component: Teacher,
+                    meta: { isMajor: false }
+
                 }, {
                     path: '/major',
                     component: Major,

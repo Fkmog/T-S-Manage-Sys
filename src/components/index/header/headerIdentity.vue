@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="info" @click="show">
-      demo@1njoy.com | 信息学院（清华大学）管理员
+      {{$store.state.userInfo.userName}}  | {{$store.state.userInfo.roleInfo[0].roleName}}
       <el-icon v-show="showDown" class="infoIconDown" size="14px">
         <CaretBottom />
       </el-icon>
@@ -22,7 +22,7 @@
         </div>
       </div>
     </template>
-    <div class="identity" style="margin-top: 0px">角色A</div>
+    <div class="identity">角色A1</div>
     <div class="identity">角色B</div>
   </el-card>
 </template>
@@ -30,7 +30,6 @@
 <script>
 import Cookies from "js-cookie";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { getUserInfo } from "@/api/userInfo/getUserInfo";
 import { CaretBottom, CaretTop } from "@element-plus/icons-vue";
 export default {
   name: "HeaderIdentity",
@@ -45,9 +44,7 @@ export default {
     CaretTop,
   },
   mounted() {
-    getUserInfo().then((res) => {
-      console.log("userInfo", res);
-    });
+   
   },
   methods: {
     // 控制角色信息卡片

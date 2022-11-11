@@ -6,7 +6,7 @@
       class="card"
       v-for="major in majorList"
       :key="major.majorId"
-      @click="toMajor()"
+      @click="toMajor(major)"
     >
       <el-tooltip
         class="box-item"
@@ -88,9 +88,10 @@ export default {
       });
     },
     //跳转专业视图
-    toMajor() {
+    toMajor(major) {
+      this.$store.commit('major/setMajorName',major.majorName)
+      this.$store.commit('major/setMajorId',major. majorId)
       this.$router.push({ name: "Goal" });
-      console.log("toMajor");
     },
     //增加专业
     addMajor() {
