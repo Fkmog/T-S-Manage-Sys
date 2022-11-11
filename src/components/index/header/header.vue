@@ -1,53 +1,46 @@
 <template>
-<div class="headerBgd">
-<div class="content">
-    <div>
-        <!-- major应该动态获取 -->
-        <div class="major">计算机科学与技术</div>
-        <!--  navigatorList 内容要根据权限给-->
-        <div class="navigatorList">
-            <HeaderNav class="navigator" v-for="info in infos" :key="info.index" :msg="info"></HeaderNav>
+  <div class="headerBgd">
+    <div class="content">
+      <div v-if="$route.meta.isMajor" class="headIcon" @click="backIndex()">
+        <el-icon :size="60"><HomeFilled /></el-icon>
+      </div>
+      <div v-if="!$route.meta.isMajor" class="headPlaceholder"></div>
+      <div>
+        <div class="major" v-if="!$route.meta.isMajor">计算机学院</div>
+        <div class="major" v-if="$route.meta.isMajor">
+          {{ $store.state.major.majorName }}
         </div>
-    </div>
-    <div>
+        <div class="navigatorList">
+          <HeaderNav></HeaderNav>
+        </div>
+      </div>
+      <div>
         <HeaderIdentity></HeaderIdentity>
+      </div>
     </div>
-</div>
-</div>
-
+  </div>
 </template>
 
 <script>
 import HeaderNav from "./headerNav.vue";
 import HeaderIdentity from "./headerIdentity.vue";
+import { HomeFilled } from "@element-plus/icons-vue";
 
 export default {
   name: "MainHeader",
   components: {
     HeaderNav,
     HeaderIdentity,
+    HomeFilled,
   },
   data() {
     return {
-      infos: [
-        {
-          value: "专 业",
-          path: "./major",
-        },
-        {
-          value: "课程库",
-          path: "./baseCourse",
-        },
-        {
-          value: "教学班",
-          path: "./class",
-        },
-        {
-          value: "教 师",
-          path: "./teacher",
-        },
-      ],
     };
+  },
+  methods: {
+    backIndex() {
+      this.$router.replace({ path: "/major" });
+    },
   },
 };
 </script>
@@ -66,12 +59,15 @@ export default {
     2.5px 1.8px 4.2px rgba(0, 0, 0, 0.107), 11px 8px 19px rgba(0, 0, 0, 0.18);
 }
 .major {
+  pointer-events: auto;
   color: white;
   font-size: 25px;
   font-weight: bold;
+  cursor: Default;
 }
 .content {
-  margin-left: 40px;
+  pointer-events: auto;
+  margin-left: 20px;
   margin-top: 20px;
   display: flex;
   flex-direction: row;
@@ -79,6 +75,17 @@ export default {
 .navigatorList {
   display: flex;
   flex-direction: row;
+}
+.headIcon {
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 5px;
+}
+.headPlaceholder {
+  margin-right: 10px;
+  margin-top: 5px;
+  width: 60px;
 }
 </style>
 

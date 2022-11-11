@@ -1,51 +1,63 @@
 <template>
   <div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <script>
-
-
+import Cookies from "js-cookie";
 export default {
-  name: 'App',
- 
-}
+  name: "App",
+  data() {
+    return {
+      gap_time: 0,
+      beforeUnload_time: 0,
+    };
+  },
+  methods: {
+    //关闭浏览器窗口时清除cookie
+    beforeunloadHandler() {
+      this.beforeUnload_time = new Date().getTime();
+    },
+    unloadHandler() {
+      this.gap_time = new Date().getTime() - this.beforeUnload_time;
+      //判断是窗口关闭还是刷新
+      if (this.gap_time <= 5) {
+       Cookies.remove("Admin-Token")
+
+      } else {
+      }
+    },
+  },
+  unmounted() {
+    // 移除监听
+    window.removeEventListener("beforeunload", () => this.beforeunloadHandler());
+    window.removeEventListener("unload", () => this.unloadHandler());
+  },
+  mounted() {
+    // 监听浏览器关闭
+    window.addEventListener("beforeunload", () => this.beforeunloadHandler());
+    window.addEventListener("unload", () => this.unloadHandler());
+  },
+  created() {
+    //实现vuex信息持久化存储
+    if (sessionStorage.getItem("store")) {
+      this.$store.replaceState(
+        Object.assign(
+          {},
+          this.$store.state,
+          JSON.parse(sessionStorage.getItem("store"))
+        )
+      );
+      console.log("this.$store.state", this.$store.state);
+    }
+    //在页面刷新时保存vuex信息
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.setItem("store", JSON.stringify(this.$store.state));
+    });
+  },
+};
 </script>
 
 <style>
-
-  /* <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/HT01">HT01</router-link> |
-    <router-link to="/HT02">HT02</router-link>
-  </div>
-  <!-- router-view 这个标签是一个占位符，理解为一个窗口，可以放某一个组件
-      那么到底是哪一个组件？  看浏览器地址上的路径 和 router文件夹下的index.js中的routes数组
-  -->
-  <router-view/>
-</template>
-
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-} */
 </style>

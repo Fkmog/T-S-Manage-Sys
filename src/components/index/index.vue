@@ -10,7 +10,8 @@ export default {
   name: 'Index',
   components: {
     MainHeader,
-  }
+  },
+  
 }
 </script>
 
