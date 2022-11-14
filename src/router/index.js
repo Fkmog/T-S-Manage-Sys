@@ -56,11 +56,9 @@ export default createRouter({
                     meta: { isMajor: false }
 
                 },
-
-
                 {
                     path: '/addTeacher',
-                    component: AddTeacher
+                    component: AddTeacher,
                 },
                 //专业视图下路由
                 {
@@ -103,6 +101,12 @@ export default createRouter({
                     meta: { isMajor: true }
 
                 },
+                {
+                    path:'/addTeacher',
+                    component:AddTeacher
+                },
+                
+                
             ]
         },
 

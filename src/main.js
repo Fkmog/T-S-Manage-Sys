@@ -5,6 +5,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import router from './router'
 import store from './store'
+// import 'default-passive-events'
 
 createApp(App)
     .use(store)
