@@ -85,7 +85,7 @@ export default{
         }]),
         multipleSelection: [],
         numSelected:0,
-
+        teacherId:[],
         closeShow : ref(false),
         clickState:0,
         form : reactive({
@@ -142,6 +142,11 @@ export default{
       handleSelectionChange(val) {
         
         this.multipleSelection = val;
+        var teacherId = [];
+        val.forEach(function(teacher){
+          let res = teacher.teacherId;
+          teacherId.push(res);
+        });
         console.log('选中的信息：',val);
         this.numSelected = this.multipleSelection.length;
         if(this.clickState != 1){
@@ -153,7 +158,8 @@ export default{
           this.clickState=0;
             this.closeShow = !this.closeShow;
         }
-        
+        this.teacherId = teacherId;
+        console.log('teacherId:',this.teacherId);
       },
       onSubmit () {
         alert(this.form.queryString)
