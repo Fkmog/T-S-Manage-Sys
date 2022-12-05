@@ -52,7 +52,9 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
 import { login } from "@/api/login/login";
+import { getUserInfo } from "@/api/userInfo/getUserInfo";
 import { User, Lock } from "@element-plus/icons-vue";
 export default {
   name: "userLogin",
@@ -80,18 +82,49 @@ export default {
     userLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          login(this.loginForm.userName, this.loginForm.passWord).then(res=>{
-            console.log(res);
-            if(res.code == 200){
-            this.$router.replace("/index");
+          login(this.loginForm.userName, this.loginForm.passWord).then(
+            (res) => {
+              console.log(res);
+              if (res.code == 200) {
+                //存储token -> cookie
+                Cookies.set("Admin-Token", res.token);
+                //存用户信息 ->vuex
+                getUserInfo().then((res) => {
+                  console.log("userInfo", res);
+                  this.$store.commit("userInfo/setUserName", res.user.userName);
+                  this.$store.commit("userInfo/setUserId", res.user.userId);
+                  this.$store.commit("userInfo/setRoleInfo", res.user.roles);
+                  this.$store.commit("userInfo/setIdentity", res.roles);
+                  //设置默认当前学院，学校等信息
+                  if (res.roles.length !== 0) {
+                    this.$store.commit(
+                      "currentInfo/setDepartmentName",
+                      res.roles[0].departmentName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setDepartmentId",
+                      res.roles[0].departmentId
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolName",
+                      res.roles[0].schoolName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolId",
+                      res.roles[0].schoolId
+                    );
+                  }
+
+                  this.$router.replace("/major");
+                });
+              }
+              if (res.code != 200) {
+                alert("用户名密码不正确！请重新登陆");
+                this.loginForm.userName = "";
+                this.loginForm.passWord = "";
+              }
             }
-            if(res.code != 200) {
-            alert("用户名密码不正确！请重新登陆");
-            this.loginForm.userName=''
-            this.loginForm.passWord=''
-        }
-          });
-         
+          );
         } else {
           alert("请输入正确信息");
           return false;
