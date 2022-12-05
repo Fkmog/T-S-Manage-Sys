@@ -5,6 +5,7 @@ import Student from '../views/major/student.vue'
 import Achieve from '../views/major/achieve.vue'
 import Courses from '../views/major/course.vue'
 import Goal from '../views/major/goal.vue'
+import GoalEdit from '../views/major/goalEdit.vue'
 import Manage from '../views/major/manage.vue'
 import Setting from '../views/major/setting.vue'
 
@@ -70,8 +71,15 @@ export default createRouter({
                     name: "Goal",
                     path: '/goal',
                     component: Goal,
-                    meta: { isMajor: true }
+                    meta: { isMajor: true },
+                  
                 },
+                {
+                    path:'/edit',
+                    component:GoalEdit,
+                    meta: { isMajor: true }
+
+                }, 
                 {
                     name: "Courses",
                     path: '/courses',
@@ -96,7 +104,7 @@ export default createRouter({
                     name: "Manage",
                     path: '/manage',
                     component: Manage,
-                    meta: { isMajor: true }
+                    meta: { isMajor: false }
 
                 },
                 {

@@ -13,6 +13,8 @@
           @change="sendMessage"
         />
       </div>
+      <!-- 右侧时间选择插槽 -->
+      <slot name="rightTime" class="rightSlot"></slot>
     </div>
   </div>
 </template>
@@ -22,27 +24,26 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  props:["msg"],
   components: {
     Search,
   },
   data() {
     return {
-      searchInput:'',
-    }
+      searchInput: "",
+    };
   },
-  methods:{
-    sendMessage(){
-      this.msg(this.searchInput);
-    }
-  }
+  methods: {},
 };
 </script>
 
 <style scoped>
 .Block {
+  position: absolute;
+  top:110px;
+  left: 0px;
   height: 55px;
-  border: 1px solid rgb(189, 189, 189);
+  border-bottom:  1px solid rgb(189, 189, 189);
+  width: 100%;
 }
 .iconSearch {
   margin-top: 10px;
@@ -79,4 +80,5 @@ export default {
   width: 220px;
   outline: 0;
 }
+
 </style>

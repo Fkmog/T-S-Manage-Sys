@@ -1,3 +1,4 @@
+
 <template>
   <div layout="column" flex class="ng-scope layout-column flex">
     <div class="searchBar" v-show="!closeShow">
@@ -68,19 +69,13 @@ import   Action  from 'element-plus'
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete} from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import request from '@/utils/request/request'
-
 import 'handsontable/dist/handsontable.full.css';//解决样式没有的问题
-
 registerAllModules();
 export default{
   data() {
       return {
         departmentId:'',
         schoolId:'',
-
-
-
-
         tableData: reactive([ {
           teacherId: 2022030508,
           teacherName: '王小虎',
@@ -152,7 +147,6 @@ export default{
         }
       },
       getCurrentRows(){
-
       },
       handleSelectionChange(val) {
         
@@ -214,7 +208,6 @@ export default{
         }).then(function(res){
           let localres = res;
           console.log('localres',localres);
-
           if(res.code == '200'){
             ElMessageBox.alert(res.msg, 'Code:'+res.code, {
             // if you want to disable its autofocus
@@ -274,8 +267,6 @@ export default{
       this.activate();
       this.getTeacherList();
       
-
-
     }
     }
 </script>
@@ -350,15 +341,9 @@ body {
     font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
    
 }
-
-
-
-
 html {
     font-family: 'Roboto Slab', serif;
 }
-
-
 [layout=row] {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
@@ -430,7 +415,6 @@ html {
   --el-checkbox-input-height:20px;
   --el-checkbox-input-width:20px;
 }
-
 .searchicon{
   margin: 0 6px;
   height: 40px;
@@ -449,7 +433,6 @@ html {
   height: 20px;
   width: 20px;
 }
-
 .el-icon svg{
   height: 20px;
   width: 20px;
@@ -466,7 +449,6 @@ html {
 .searchform{
   width: 100%;
 }
-
 .submenu {
     color: #3f51b5;
     font-size: 14px;
@@ -480,17 +462,9 @@ html {
     border-bottom: 1px solid #d0d0d0;
     background-color: transparent;
 }
-
-
-
-
-
-
-
 .layout-column {
     flex-direction: column;
 }
-
 .flex {
     flex: 1;
 }

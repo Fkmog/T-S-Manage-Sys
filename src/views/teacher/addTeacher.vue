@@ -1,5 +1,5 @@
 <template>
-    <LuckySheet></LuckySheet>
+    <LuckySheet />
 </template>
 
 <script>

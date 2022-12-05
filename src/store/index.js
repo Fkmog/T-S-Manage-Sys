@@ -59,7 +59,8 @@ export default createStore({
         departmentName: "",
         departmentId: "",
         schoolName: "",
-        schoolId: ""
+        schoolId: "",
+        year:'',
       },
       getters: {},
       mutations: {
@@ -74,26 +75,14 @@ export default createStore({
         },
         setSchoolId(state, newVal) {
           state.schoolId = newVal
-
+        },
+        setYear(state, newVal) {
+          state.year = newVal
         }
       },
       actions: {},
       modules: {}
     },
-    program: {
-      namespaced: true,
-      state: {
-       year:Number,
-      },
-      getters: {},
-      mutations: {
-        setYear(state, newVal) {
-          state.year = newVal
-
-        }
-      },
-      actions: {},
-      modules: {}
-    }
+   
   }
 })
