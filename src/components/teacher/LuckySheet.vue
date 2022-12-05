@@ -1,32 +1,33 @@
 <template>
 <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
     <div class="submenu no-select layout-align-center-center layout-row" layout="row" layout-align="center center" style="justify-content: left">
-      <el-tooltip content="返回">
+      <el-tooltip content="返回" style="float:left;">
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
         <el-icon><Back /></el-icon>
       </el-button>
       </el-tooltip>
-      <div class="s-v-bar">&nbsp;</div>
-      <el-tooltip content="保存">
+      <div class="s-v-bar" style="float:left;">&nbsp;</div>
+      <el-tooltip content="保存" style="float:left;">
         <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
           <el-icon><FolderChecked /></el-icon>
         </el-button>  
       </el-tooltip>
       <!--  -->
-          <div class="s-v-bar">&nbsp;</div>
-      <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link>
-        <el-icon><InfoFilled /></el-icon>
-      </el-button>
-      <div layout="row" layout-align="center center">
+          <div class="s-v-bar" style="float:left;">&nbsp;</div>
+      <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link >
+        <el-icon style="float:left;"><InfoFilled /></el-icon>
+        <div layout="row" layout-align="center center" style="float:right;">
         <span>可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
       </div>
+      </el-button>
+      
       <div flex></div>
     </div>
 
     <div layout="row" flex class="md-padding" >
       <div class="hot-table-container" layout="column" flex layout-align="start center" >
         
-          <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" >
+          <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
             <hot-column  data="teacherNumber" title="工号" width="200" height="20" ></hot-column>
             <hot-column  data="teacherName" title="姓名" width="200" height="20" ></hot-column>
             <hot-column  data="email" title="邮箱" width="200" height="20" validator="emailcheck" ></hot-column>
@@ -56,7 +57,7 @@ import Handsontable from 'handsontable';
 import request from '@/utils/request/request'
 import '@/components/teacher/addTeacher.js'
 
-import '@/assets/style.css'
+
 import 'element-plus/dist/index.css'
 import 'handsontable/dist/handsontable.full.css'
 
@@ -74,6 +75,11 @@ export default{
   data(){
     let self = this;
     return{
+      departmentId:'',
+      schoolId:'',
+
+
+
       isRouterAlive:true,
       dirty:false,
       saving:false,
@@ -143,6 +149,10 @@ export default{
     Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
   },
   methods:{
+    activate(){
+            this.departmentId = this.$store.state.currentInfo.departmentId;
+            this.schoolId = this.$store.state.currentInfo.schoolId;
+        },
   isValid(){
     var result = this.toPostData();
       if (!result) {
@@ -221,6 +231,7 @@ export default{
   
 },
   toPostData(){
+    let that = this;
     this.postData.teachers.length = 0; // clean array
     var res = this.postData.teachers;
       var valid = true;
@@ -241,7 +252,9 @@ export default{
           var distTeacher = {
             'teacherNumber':teacher.teacherNumber,
             'email':teacher.email,
-            'teacherName':teacher.teacherName
+            'teacherName':teacher.teacherName,
+            'departmentId':that.departmentId,
+            'schoolId':that.schoolId
           }
           res.push(distTeacher);
         }
@@ -295,7 +308,7 @@ addTeacher(postData){
   var localres;
   console.log('postData:',postData);
   return request({
-            url:'/teacher/addTeacher',
+            url:'/teacher/addTeachers',
             method:'post',
             data:postData
         }).then(function(res){
@@ -306,8 +319,8 @@ addTeacher(postData){
 },
 
   },
-  onMounted:{
-    
+  mounted:function(){
+    this.activate();
   },
  
 
@@ -322,11 +335,32 @@ addTeacher(postData){
 </script>
 
 <style  scoped>
+.hotTable{
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
+.md-padding{
+  margin-top: 10px;
+}
 .ng-scope layout-column flex{
 display: flex;
 flex-direction: column;
 }
-
+.submenu{
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    height: 48px;
+    min-height: 48px;
+    line-height: 1em;
+    margin: 0;
+    position: relative;
+    padding: 6px 96px 5px 32px;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: transparent;
+}
+.md-icon-button{
+  padding: 20px;
+}
 
 #luckysheet {
   margin: 0px;
@@ -340,16 +374,11 @@ flex-direction: column;
   /* top: 30px; */
   bottom: 0px;
 }
-.luckysheetborder{
-  border: 1px aquamarine;
-}
 
 #uploadBtn {
   font-size: 16px;
 }
-.el-input{
-  width: 30%;
-}
+
 
 #tip {
   position: absolute;

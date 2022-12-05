@@ -56,7 +56,6 @@ import Cookies from "js-cookie";
 import { login } from "@/api/login/login";
 import { getUserInfo } from "@/api/userInfo/getUserInfo";
 import { User, Lock } from "@element-plus/icons-vue";
-
 export default {
   name: "userLogin",
   components: {
@@ -95,6 +94,27 @@ export default {
                   this.$store.commit("userInfo/setUserName", res.user.userName);
                   this.$store.commit("userInfo/setUserId", res.user.userId);
                   this.$store.commit("userInfo/setRoleInfo", res.user.roles);
+                  this.$store.commit("userInfo/setIdentity", res.roles);
+                  //设置默认当前学院，学校等信息
+                  if (res.roles.length !== 0) {
+                    this.$store.commit(
+                      "currentInfo/setDepartmentName",
+                      res.roles[0].departmentName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setDepartmentId",
+                      res.roles[0].departmentId
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolName",
+                      res.roles[0].schoolName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolId",
+                      res.roles[0].schoolId
+                    );
+                  }
+
                   this.$router.replace("/major");
                 });
               }

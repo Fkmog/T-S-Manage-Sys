@@ -1,30 +1,68 @@
 <template>
-
-
-
-
-<div class="submenu  " layout="row" 
-layout-align="center center" style="justify-content: left" v-show="!closeShow">
-  <el-icon class="searchicon"><Search /></el-icon>
+<div class="searchBar" v-show="!closeShow">
+  <HeaderSearch class="headerSearch" ></HeaderSearch>
 </div>
 
-<div v-show="closeShow" class="submenu ">
-      <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected">取消选择</el-button>
+<div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
+      <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
       <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
       <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
 </div>
 
   <div layout="row" flex class="md-padding" >
-    <el-button  class="addCourseButton"  circle @click="dialogFormVisible = true"><el-icon class="addIcon"><Plus /></el-icon></el-button>
+    
+    <addBtn @click="dialogFormVisible = true"></addBtn>
     <div class="el-table-container" layout="column" flex layout-align="start center" >
       <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-        <el-table-column  type="selection" width="55" />
-        <el-table-column prop="courseName" label="课程名" width="180" />
-        <el-table-column prop="courseCode" label="课程号" width="180" />
-        <el-table-column prop="courseType" label="课程类型" width="180" />
-        <el-table-column prop="courseNature" label="课程性质" width="180" />
-        <el-table-column prop="credit" label="学分" width="180" />
-        <el-table-column prop="remark" label="备注"  />
+        <!-- <el-table-column  type="selection" width="55" /> -->
+        <el-table-column  label="课程名" width="180" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseName }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="课程号" width="180" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseCode }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="课程类型" width="180" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseType }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="课程性质" width="180" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseNature }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="学分" width="180" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.credit }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="Operations" width="200">
+          <template #default="scope">
+            <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注" >
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.remark }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        
       </el-table>
    </div>
   </div>
@@ -120,7 +158,7 @@ layout-align="center center" style="justify-content: left" v-show="!closeShow">
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         class="pagination"
-        :page-sizes="[10, 20]"
+        :page-sizes="[10, 15]"
         :page-size="10"
         layout="total,sizes,prev, pager, next, jumper"
         :total="result.total">
@@ -134,6 +172,8 @@ layout-align="center center" style="justify-content: left" v-show="!closeShow">
 
 <script>
 import request from '@/utils/request/request'
+import HeaderSearch from "@/components/general/headerSearch.vue";
+import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive,}from 'vue';
 import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog } from 'element-plus'
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit} from '@element-plus/icons-vue'
@@ -153,6 +193,7 @@ data(){
     numSelected:0,
     clickState:0,
     courseId:ref([]),
+
     tableData: reactive([
   {
     courseName:'',
@@ -165,9 +206,12 @@ data(){
   },]),
   pageSize:ref(10),
   pageNum:ref(1),
-dialogFormVisible:ref(false),
-dialogFormVisible1:ref(false),
+  departmentId:'',
+  schoolId:'',
+  dialogFormVisible:ref(false),
+  dialogFormVisible1:ref(false),
 formLabelWidth : '140px',
+
 form : reactive({
   courseName: '',
   courseCode: '',
@@ -178,6 +222,7 @@ form : reactive({
   remark: '',
   
 }),
+
 preform:reactive({
   courseName: '',
   courseCode: '',
@@ -188,12 +233,23 @@ preform:reactive({
   remark: '',
   
 }),
+
 result:reactive({}),
 
   }
 }, 
 methods: 
 {
+  clearForm(){
+    this.form.courseId = '';
+    this.form.courseName= '';
+    this.form.courseCode = '';
+    this.form.courseType= '';
+    this.form.courseNature= '';
+    this.form.credit='';
+    this.form.courseYear='';
+    this.form.remark = '';
+  },
   toggleSelection(rows) {
         if (rows) {
           rows.forEach(row => {
@@ -279,7 +335,7 @@ methods:
               // that.reload();
             },
             });
-            
+            that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
           else{
@@ -295,6 +351,7 @@ methods:
                 // that.reload();
               },
             });
+            that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
         })
@@ -303,37 +360,95 @@ methods:
   getBaseCourse(pageSize,pageNum){
     console.log('pageSize:',pageSize,' pageNum:',pageNum);
     let that = this;
+    let courses = []
     return request({
             url:'/baseCourse/list',
             method:'get',
-            params:{'pageSize':pageSize,'pageNum':pageNum}
+            params:{
+            'pageSize':pageSize,
+            'pageNum':pageNum,
+            'departmentId':that.departmentId,
+            'schoolId':that.schoolId}
         }).then(function(res){
           console.log('courseDetails:',res);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId);
           res.rows.forEach(function(course){
+            
+            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
+            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+            course.credit=course.credit;
+            course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
+            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
+            course.semester=(course.semester == '0') ? '上学期' : '下学期';
 
-            that.dataTransfrom(course);
-            // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
-            // course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-            // course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            // course.credit=course.credit;
-            // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-            // course.semester=(course.semester == '0') ? '上学期' : '下学期';
-
-            // res.rows.push(course);
+            courses.push(course);
+            
+            
+            
           });
-          that.tableData = res.rows;
+          that.tableData = courses;
           that.result = res;
         });
   },
-  deleteBaseCourse(){
-    console.log('deleteCourse');
+  deleteBaseCourse(index, row){
+    console.log('deleteCourse',row.courseId);
     let that = this;
-    return request({
-      url:'/baseCourse',
-      method:'post',
-      data: this.courseId
+
+    ElMessageBox.confirm(
+    '将要删除基础课程，是否确定删除？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      return request({
+      url:'/baseCourse'+'/'+row.courseId,
+      method:'delete',
+      
+    }).then(function(res){
+      console.log(res);
+      if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: 'OK',
+            callback: function(action) {
+              ElMessage({
+                type: 'success',
+                message: `删除成功`,
+              });
+              // that.reload();
+            },
+            });
+            
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+          else{
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              callback: function(action)  {
+                ElMessage({
+                  type: 'error',
+                  message: `删除失败`,
+                });
+                // that.reload();
+              },
+            });
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
     })
+    })
+    .catch(() => {
+      
+    })
+    
   },
   editTrigger(val){
     console.log('选中的信息：',val.courseId);
@@ -394,7 +509,8 @@ methods:
   },
   formTopostData(form){
     let postData = {};
-    
+    postData.departmentId=this.departmentId;
+    postData.schoolId = this.schoolId;
     postData.courseName=form.courseName;
     postData.courseCode=form.courseCode;
     postData.courseType=form.courseType;
@@ -427,22 +543,75 @@ methods:
 
     return course;
 
-  }
+  },
+  activate(){
+            this.departmentId = this.$store.state.currentInfo.departmentId;
+            this.schoolId = this.$store.state.currentInfo.schoolId;
+        },
 },
 mounted:function(){
   let that = this;
+  this.activate();
   that.getBaseCourse(that.pageSize,that.pageNum);
 },
 components:{
   request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
   Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
-  ref,reactive,Delete,Edit
+  ref,reactive,Delete,Edit,HeaderSearch, addBtn
 }
 
 }
 </script>
 
 <style scoped>
+.clearSelected{
+  min-height:36px; 
+  color: #3f51b5;
+  float: left;
+  display: inline-block;
+    position: relative;
+    cursor: pointer;
+    min-height: 36px;
+    min-width: 88px;
+    line-height: 36px;
+    vertical-align: middle;
+    align-items: center;
+    text-align: center;
+    border-radius: 2px;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    outline: none;
+    border: 0;
+    padding: 0 6px;
+    margin: 0;
+    background: transparent;
+    
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 14px;
+    font-style: inherit;
+    font-variant: inherit;
+    font-family: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+}
+.headerSearch{
+  border: 0;
+  float: left;
+  width: 50%;
+}
+.searchBar{
+  display: inline-block;
+  width: 100%;
+  border: 1px solid rgb(189, 189, 189);
+}
+.md-padding {
+  margin-top: 10px;
+}
 body {
     font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
     background-color: #f2f2f2;
@@ -467,6 +636,7 @@ html {
 }
 .pagination-container{
   width: 100%;
+  margin-top: 10px;
 }
 .deleteButton, .editButton{
   min-width: 60px;
@@ -505,30 +675,27 @@ html {
 .el-table-container{
   width: 80%;
   margin-left: 10%;
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {
     color: #3f51b5;
     font-size: 14px;
     font-weight: 500;
-    height: 36px;
-    min-height: 36px;
+    height: 44px;
+    min-height: 44px;
     line-height: 3em;
-    margin: 0;
+    margin-bottom: 13px;
     position: relative;
     padding: 6px 96px 5px 32px;
     border-bottom: 1px solid #d0d0d0;
-    background-color: #f2f2f2;
+    background-color: transparent;
+   
 }
 
-.submenu .s-v-bar {
-    background: #d0d0d0;
-    cursor: default;
-    height: 24px;
-    margin: 0 6px;
-    width: 1px;
-}
 .deleteButton{
   margin-right: 100px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .numSelectedTeacher{
   min-height:36px; 
@@ -551,7 +718,7 @@ html {
     outline: none;
     border: 0;
     padding: 0 6px;
-    margin: 6px 8px;
+    margin: 0;
     background: transparent;
     
     white-space: nowrap;

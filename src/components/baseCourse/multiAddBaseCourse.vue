@@ -1,13 +1,13 @@
 <template>
-    <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+    <div layout="column" flex class="ng-scope layout-column flex" >
         <div class="submenu no-select layout-align-center-center layout-row" layout="row" layout-align="center center" style="justify-content: left">
-          <el-tooltip content="返回">
-            <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
+          <el-tooltip content="返回" style="float:left;">
+            <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goBaseCourse" link>
             <el-icon><Back /></el-icon>
           </el-button>
           </el-tooltip>
-          <div class="s-v-bar">&nbsp;</div>
-          <el-tooltip content="保存">
+          <div class="s-v-bar" style="float:left;">&nbsp;</div>
+          <el-tooltip content="保存" style="float:left;">
             <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
               <el-icon><FolderChecked /></el-icon>
             </el-button>  
@@ -24,19 +24,19 @@
         </div>
     
         <div layout="row" flex class="md-padding" >
-          <div class="hot-table-container" layout="column" flex layout-align="start center" >
+            <!-- id="courseHot" -->
+          <div class="hot-table-container" layout="column" flex layout-align="start center" id="courseHot"  >
             
-              <hot-table :settings="hotSettings" v-model:data="db.items"  style="line-height: 100px;text-align: center;margin:auto" >
+                <!-- <hot-table :settings="hotSettings" v-model:data="db.items" id="courseHot" style="line-height: 100px;text-align: center;margin:auto" >
                 <hot-column  data="courseName" title="课程名" width="200" height="20" ></hot-column>
                 <hot-column  data="courseCode" title="课程号" width="200" height="20" ></hot-column>
-                <hot-column  data="courseType" title="课程类型" width="200" height="20" validator="emailcheck" ></hot-column>
-                <hot-column  data="courseNature" title="课程性质" width="200" height="20" ></hot-column>
+                <hot-column  data="courseType" title="课程类型" width="200" height="20" :source="courseTypeSource" ></hot-column>
+                <hot-column  data="courseNature" title="课程性质" width="200" height="20" :source="courseNatureSource"></hot-column>
                 <hot-column  data="credit" title="学分" width="200" height="20"></hot-column>
-                <!-- <hot-column  data="courseYear" title="学年" width="200" height="20" ></hot-column>
-                <hot-column  data="semester" title="学期" width="200" height="20" validator="emailcheck" ></hot-column> -->
-                
-            </hot-table>
-            <!-- <LuckySheet /> -->
+                <hot-column  data="courseYear" title="学年" width="200" height="20" ></hot-column>
+                <hot-column  data="semester" title="学期" width="200" height="20" validator="emailcheck" ></hot-column>
+                </hot-table>
+             -->
           </div>
         </div>
     
@@ -59,9 +59,9 @@
     import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
     import Handsontable from 'handsontable';
     import request from '@/utils/request/request'
-    import '@/components/teacher/addTeacher.js'
+   
     
-    import '@/assets/style.css'
+   
     import 'element-plus/dist/index.css'
     import 'handsontable/dist/handsontable.full.css'
     import 'handsontable/dist/handsontable.full.min.css';
@@ -71,34 +71,44 @@
     
     export default{
       name:'multiAddBaseCourse',
-      inject:['reload'], 
-      provide(){
-          return{
-            reload:this.reload
-          }
-        },
+    //   inject:['reload'], 
+    //   provide(){
+    //       return{
+    //         reload:this.reload
+    //       }
+    //     },
       data(){
         let self = this;
         return{
-          isRouterAlive:true,
+        //   isRouterAlive:true,
+
           dirty:false,
           saving:false,
-          department:'',
-          school:'',
+
+          departmentId:'',
+          schoolId:'',
+
+          courseTypeSource:['学科基础课','还未确定'],//课程类型
+          courseNatureSource:['专业任选','还未确定'],//课程性质
+
           count:0,
           localres:{},
+
           postData: { courses: [] },
           db: { items: [] },
-          departmentId:0,
+    
           fromCourseBatchAdd:false,
+          hotInstance:undefined,
+          
+
         columns : [
       { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
       // { data: 'teacher', title: '任课教师', width: 80, height: 20, type: 'autocomplete', strict: false, validator: validTeacher, allowEmpty: true },  // Foreign names,
     //   { data: 'teacher', title: '任课教师工号', width: 80, height: 20, validator: /^(.){1,50}$/, allowEmpty: true },
       { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-      { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:['学科基础课','还未确定'], allowEmpty: false },
+      { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:self.courseTypeSource, allowEmpty: false },
       // { data: 'credit', title: '学分', width: 40, height: 20, type: 'numeric', format: '0[.]0', validator: validCredit, allowEmpty: true},  // allowEmpty: false
-      { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',type: 'dropdown', source:['专业任选','还未确定'], allowEmpty: false },
+      { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',type: 'dropdown', source:self.courseNaturesSource, allowEmpty: false },
       { data: 'credit', title: '学分', width: 40, height: 20, type: 'numeric', format: '0[.]0', allowEmpty: true},//需要添加validator
     //   { data: 'courseYear', title: '学年', width: 120, height: 20, type: 'dropdown', _key: 'courseYears', source:['2021-2022','2022-2023'],allowEmpty: false },
      
@@ -107,43 +117,114 @@
       // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
     //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
     ],
-          hotSettings:{
-            // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
+        //   hotSettings:{
+        //     // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
             
-            licenseKey: 'non-commercial-and-evaluation',
-            colHeaders: true,
-            rowHeaders: true,
-            columns: [
-            { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-            { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-            { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:['学科基础课','还未确定'], allowEmpty: false },
-            { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',type: 'dropdown', source:['专业任选','还未确定'], allowEmpty: false },
-            { data: 'credit', title: '学分', width: 40, height: 20, type: 'numeric', format: '0[.]0', allowEmpty: true},//需要添加validator
-            ],
-            minSpareRows: 2,
-            preventOverflow: 'horizontal',
-            manualColumnMove: true,
-            // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-            // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
-            // contextMenu: ['row_above', 'row_below', 'remove_row'],
-            // columns:[
-            //   {type: 'numeric',},
-            //   {type:'text'},
-            //   {allowInvalid: false}
-            // ],
-            contextMenu: {
-              items:{
-                  'row_above': {
-                      name: '在上方插入行'
-                  },
-                  'row_below': {
-                      name: '在下方插入行'
-                  },
-                  'remove_row': {
-                      name: '删除行'
-                  }
-              }
+        //     licenseKey: 'non-commercial-and-evaluation',
+        //     colHeaders: true,
+        //     rowHeaders: true,
+            
+        //     columns: [
+        //     { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
+        //     { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
+        //     { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
+        //     { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
+        //     { data: 'credit', title: '学分', width: 80, height: 20,  allowEmpty: false},//需要添加validator
+        //     ],
+        //     minSpareRows: 2,
+        //     preventOverflow: 'horizontal',
+        //     manualColumnMove: true,
+        //     // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
+        //     // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
+        //     // contextMenu: ['row_above', 'row_below', 'remove_row'],
+        //     // columns:[
+        //     //   {type: 'numeric',},
+        //     //   {type:'text'},
+        //     //   {allowInvalid: false}
+        //     // ],
+        //     contextMenu: {
+        //       items:{
+        //           'row_above': {
+        //               name: '在上方插入行'
+        //           },
+        //           'row_below': {
+        //               name: '在下方插入行'
+        //           },
+        //           'remove_row': {
+        //               name: '删除行'
+        //           }
+        //       }
+        //     },
+        //     afterChange(changes, source) {
+        //       if (source === 'loadData') { 
+        //         console.log('same');
+        //         return;
+        //       } else { 
+        //         if(self.count==0){
+        //           self.dirty=false;
+        //           console.log('console:',self.count);
+        //           console.log('different',self.dirty);
+        //         }
+        //         else{
+        //           self.dirty=true;
+        //           console.log('console:',self.count);
+        //           console.log('different',self.dirty);
+        //         }
+        //         self.count++;
+        //         console.log('console:',self.count);
+                
+        //         }
+        //     }},
+             
+    
+        }
+      },
+      components:{
+        ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
+        ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
+        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
+      },
+      methods:{
+        activate(){
+            this.departmentId = this.$store.state.currentInfo.departmentId;
+            this.schoolId = this.$store.state.currentInfo.schoolId;
+            let self = this;
+            // let hotInstance = this.$refs.courseHot;
+            // console.log('hotInstance:',hotInstance);
+            // let hotRegisterer = new Handsontable();
+            // let hotInstance = hotRegisterer.getInstance(courseHot);
+
+            
+            // console.log('ColHeader:',hotInstance.hotInstance.getColHeader(2));
+            let container = document.querySelector('#courseHot');
+            let hotRegisterer = new Handsontable(container,{
+                data:this.db.items,
+                licenseKey: 'non-commercial-and-evaluation',
+                colHeaders: true,
+                rowHeaders: true,
+                minSpareRows: 2,
+                preventOverflow: 'horizontal',
+                manualColumnMove: true,
+                contextMenu: {
+                items:{
+                    'row_above': {
+                        name: '在上方插入行'
+                    },
+                    'row_below': {
+                        name: '在下方插入行'
+                    },
+                    'remove_row': {
+                        name: '删除行'
+                    }
+                },
             },
+            columns: [
+                { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
+                { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
+                { data: 'courseType', title: '课程类型', width: 180, height: 20,validator: /^(.){1,50}$/,type: 'dropdown', source:this.courseTypeSource, allowEmpty: false },
+                { data: 'courseNature', title: '课程性质', width: 120, height: 20, validator: /^(.){1,50}$/,type: 'dropdown', source:this.courseNatureSource, allowEmpty: false },
+                { data: 'credit', title: '学分',width:120, height: 20,  allowEmpty: false},//需要添加validator
+                ],
             afterChange(changes, source) {
               if (source === 'loadData') { 
                 console.log('same');
@@ -163,23 +244,17 @@
                 console.log('console:',self.count);
                 
                 }
-            }},
-             
-    
-        }
-      },
-      components:{
-        ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
-        ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
-      },
-      methods:{
+            }
+            });
+            this.hotInstance = hotRegisterer;
+        },
       isValid(){
         var result = this.toPostData();
+        
           if (!result) {
             return false;
           } else {
-            return this.postData.teachers.length > 0;
+            return this.postData.courses.length > 0;
           }
       },
       isNotDirty(){
@@ -194,26 +269,21 @@
             return;
           }
        
-        if (!this.postData.teachers || this.postData.teachers.length <= 0) {
+        if (!this.postData.courses || this.postData.courses.length <= 0) {
               return $q.reject('工号或姓名不能为空');
             }
             // var postData = {
             //   teachers:  this.postData.teachers,
             //   // departmentId: this.departmentId
             // };
-            var teacherList = [];
-    
-            this.postData.teachers.forEach(function(teacher){
-              teacherList.push(teacher);
-            });
-            console.log('teacherList:',teacherList);
+           
             // return service.post(postData).then(function(res) {
             //   return res;
             // });
             let that =this;
             
             
-            this.addTeacher(teacherList).then(function(res){
+            this.addBaseCourses(this.postData.courses).then(function(res){
               console.log('res:',res);
               
               if(res.code == '200'){
@@ -229,8 +299,9 @@
                   
                 },
               });
-                that.isNotDirty();
-                that.goBackandClean();}
+                
+                that.goBackandClean();
+                that.isNotDirty();}
              else{
               ElMessageBox.alert(res.msg, 'Code:'+res.code, {
                 // if you want to disable its autofocus
@@ -243,7 +314,9 @@
                   })
                 },
               });
+              
               that.goBackandClean();
+              that.isNotDirty();
         }
             });
     
@@ -252,29 +325,41 @@
       
     },
       toPostData(){
-        this.postData.teachers.length = 0; // clean array
-        var res = this.postData.teachers;
+        this.postData.courses.length = 0; // clean array
+        let that = this;
+        
+        var res = this.postData.courses;
           var valid = true;
-          this.db.items.forEach(function (teacher) {
-            teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
+          this.db.items.forEach(function (course) {
+            course.courseCode = (_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseName = (_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
+            course.courseType = (_.isEmpty(course.courseType)) ? '' : course.courseType.trim();//that.courseTypeSource.map(item => item).indexOf(course.courseType)
+            course.courseNature = (_.isEmpty(course.courseNature)) ? '' : course.courseNature.trim();
+            course.credit = (_.isEmpty(course.credit)) ? '' : course.credit.trim();
+
             
-            teacher.teacherName = (_.isEmpty(teacher.teacherName)) ? '' : teacher.teacherName.trim();
-            teacher.email = (_.isEmpty(teacher.email)) ? '' : teacher.email.trim();
-    
-            if (_.isEmpty(teacher.teacherNumber) || _.isEmpty(teacher.teacherName) || _.isEmpty(teacher.email)) {
-              if (_.isEmpty(teacher.teacherNumber) && _.isEmpty(teacher.teacherName) && _.isEmpty(teacher.email)) {
+            if (_.isEmpty(course.courseCode) || _.isEmpty(course.courseName) || _.isEmpty(course.courseType) 
+            || _.isEmpty(course.courseNature) || _.isEmpty(course.credit)) {
+              if (_.isEmpty(course.courseCode) && _.isEmpty(course.courseName) && _.isEmpty(course.courseType) 
+            && _.isEmpty(course.courseNature) && _.isEmpty(course.credit)) {
+
                 return;
               } else {  // either name OR teacherNo is empty, but not both
                 valid = false;
                 return;
               }
             } else {  // both are not empty: post
-              var distTeacher = {
-                'teacherNumber':teacher.teacherNumber,
-                'email':teacher.email,
-                'teacherName':teacher.teacherName
+              var distCourse = {
+                'departmentId': that.departmentId,
+                'schoolId':that.schoolId,
+                'courseName':course.courseName,
+                'courseCode':course.courseCode,
+                'courseType':that.courseTypeSource.map(item => item).indexOf(course.courseType),
+                'courseNature':that.courseNatureSource.map(item => item).indexOf(course.courseNature),
+                'credit':course.credit
               }
-              res.push(distTeacher);
+              
+              res.push(distCourse);
             }
           });
     
@@ -282,23 +367,25 @@
       },
     goBackandClean(){
       this.db.items = [];
-      this.postData.teachers = [];
+      this.postData.courses = [];
       
-      console.log('datas:', this.db.items,this.postData.teachers);
-      this.reload();
-      
-    },
-    reload(){
-      this.isRouterAlive = false;
-      this.count = 0;
-      this.$nextTick(function () {
-        this.isRouterAlive = true;
+      console.log('datas has cleaned:', this.db.items,this.postData.course);
+      this.hotInstance.updateSettings({
+        data:this.db.items
       });
+    //   this.reload();
+      
     },
-    goTeacher(){
-      console.log('goteacher:'+this.saving+this.dirty);
-      
-      
+    // reload(){
+    //   this.isRouterAlive = false;
+    //   this.count = 0;
+    //   this.$nextTick(function () {
+    //     this.isRouterAlive = true;
+    //   });
+    // },
+    goBaseCourse(){
+        //如果dirty是true 或者saving是false并且dirty是true需要询问
+      console.log('gobasecourse:'+this.saving+this.dirty);
       if(this.dirty == true || this.saving== false&&this.dirty == true ){
         ElMessageBox.confirm(
         '数据还未保存，是否仍然关闭？',
@@ -322,23 +409,42 @@
       
       }
     },
-    addTeacher(postData){
+    addBaseCourses(postData){
       var localres;
-      console.log('postData:',postData);
+      var courseList = [];
+    
+      this.postData.courses.forEach(function(course){
+      courseList.push(course);
+    });
+    console.log('courseList:',courseList);
+    
       return request({
-                url:'/teacher/addTeacher',
+                url:'/baseCourse/addCourses',
                 method:'post',
-                data:postData
+                data:courseList
             }).then(function(res){
               localres = res;
               console.log('localres',localres);
               return localres;
             });
     },
+    getCourseTypeDict(){
+        return request({
+                url:'/dict/data/school/type',
+                method:'get',
+                pramas:this.schoolId,
+            }).then(function(res){
+              
+              console.log('dict:',res);
+              return res;
+            });
+    }
     
       },
-      onMounted:{
-        
+      mounted(){
+        this.activate();
+        this.getCourseTypeDict();
+
       },
      
     
@@ -347,12 +453,13 @@
     
     
     }
-    
-    
      
     </script>
     
     <style  scoped>
+    .md-padding {
+      margin-top: 10px;
+    }
     .ng-scope layout-column flex{
     display: flex;
     flex-direction: column;
@@ -360,8 +467,25 @@
 
     .hot-table-container{
         margin-left: 20%;
+        width: 50%;
+        box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
     }
-    
+    .submenu{
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    height: 48px;
+    min-height: 48px;
+    line-height: 1em;
+    margin: 0;
+    position: relative;
+    padding: 6px 96px 5px 32px;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: transparent;
+}
+.md-icon-button{
+  padding: 20px;
+}
     
     #luckysheet {
       margin: 0px;

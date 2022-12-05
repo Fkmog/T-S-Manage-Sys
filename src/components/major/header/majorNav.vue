@@ -13,7 +13,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* 设置所有字体为微软雅黑 */
 *{
     font-family: Microsoft Yahei;;

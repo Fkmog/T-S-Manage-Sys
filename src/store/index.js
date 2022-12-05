@@ -11,9 +11,10 @@ export default createStore({
     userInfo: {
       namespaced: true,
       state: {
-        userName:'',
-        userId:Number,
-        roleInfo:[],
+        userName: '',
+        userId: Number,
+        roleInfo: [],
+        identity: [],
       },
       getters: {},
       mutations: {
@@ -23,8 +24,12 @@ export default createStore({
         setUserId(state, newVal) {
           state.userId = newVal
         },
-        setRoleInfo(state,newVal){
+        setRoleInfo(state, newVal) {
           state.roleInfo = newVal
+        },
+        setIdentity(state, newVal) {
+          state.identity = newVal
+
         }
       },
       actions: {},
@@ -43,6 +48,48 @@ export default createStore({
         },
         setMajorId(state, newVal) {
           state.majorId = newVal
+        }
+      },
+      actions: {},
+      modules: {}
+    },
+    currentInfo: {
+      namespaced: true,
+      state: {
+        departmentName: "",
+        departmentId: "",
+        schoolName: "",
+        schoolId: ""
+      },
+      getters: {},
+      mutations: {
+        setDepartmentName(state, newVal) {
+          state.departmentName = newVal
+        },
+        setDepartmentId(state, newVal) {
+          state.departmentId = newVal
+        },
+        setSchoolName(state, newVal) {
+          state.schoolName = newVal
+        },
+        setSchoolId(state, newVal) {
+          state.schoolId = newVal
+
+        }
+      },
+      actions: {},
+      modules: {}
+    },
+    program: {
+      namespaced: true,
+      state: {
+       year:Number,
+      },
+      getters: {},
+      mutations: {
+        setYear(state, newVal) {
+          state.year = newVal
+
         }
       },
       actions: {},
