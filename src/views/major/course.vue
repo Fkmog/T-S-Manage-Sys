@@ -18,7 +18,6 @@
       :value="item.value"
     /></el-select>
   </div>
-
 </div>
 <div v-show="closeShow" class="submenu" style="height: 45px;min-height: 45px;">
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
