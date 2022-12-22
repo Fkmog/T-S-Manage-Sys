@@ -20,6 +20,16 @@ import BatchCourseAdd from '@/views/baseCourse/batchCourseAdd.vue'
 import BaseCourseDetail from '@/views/baseCourse/baseCourseDetail.vue'
 import userLogin from '@/components/userLogin/index.vue'
 
+//教师端组件
+import TeacherIndex from '@/views/teacherSide/teacherIndex.vue'
+import TeacherClasses from '@/views/teacherSide/teacherClasses.vue'
+import TeacherClass from '@/views/teacherSide/teacherClass.vue'
+import Students from '@/views/teacherSide/students/students.vue'
+import Score from '@/views/teacherSide/score/score.vue'
+import Objectives from '@/views/teacherSide/objectives/objectives.vue'
+
+
+
 export default createRouter({
     //history配置暂未定
     history: createWebHistory(),
@@ -33,6 +43,7 @@ export default createRouter({
             path: '/login',
             component: userLogin
         },
+        //非教师端的路由
         {
             path: '/index',
             component: Index,
@@ -42,7 +53,6 @@ export default createRouter({
                     path: '/baseCourse',
                     component: BaseCourse,
                     meta: { isMajor: false }
-
                 }, {
                     path: '/class',
                     component: Class,
@@ -78,7 +88,13 @@ export default createRouter({
                     path: '/goal',
                     component: Goal,
                     meta: { isMajor: true },
-                  
+
+                },
+                {
+                    path: '/edit',
+                    component: GoalEdit,
+                    meta: { isMajor: true }
+
                 },
                 {
                     path:'/edit',
@@ -121,15 +137,41 @@ export default createRouter({
 
                 },
                 {
-                    path:'/addTeacher',
-                    component:AddTeacher
+                    path: '/addTeacher',
+                    component: AddTeacher
                 },
-                
-                
             ]
         },
-        
-
-
-    ]
+        // 教师端路由
+        {
+            path: '/teacherIndex',
+            component: TeacherIndex,
+            children: [
+                {
+                    name:"TeacherClasses",
+                    path: '/teacherClasses',
+                    component: TeacherClasses
+                },
+                {
+                    name: "TeacherClass",
+                    path: '/teacherClass',
+                    component: TeacherClass,
+                },
+                {
+                    name: "Students",
+                    path: '/students',
+                    component: Students,
+                },
+                {
+                    name: "Score",
+                    path: '/score',
+                    component: Score,
+                },
+                {
+                    name: "Objectives",
+                    path: '/objectives',
+                    component: Objectives,
+                },
+            ]
+        }]
 })

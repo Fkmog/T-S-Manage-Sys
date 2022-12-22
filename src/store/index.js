@@ -29,7 +29,6 @@ export default createStore({
         },
         setIdentity(state, newVal) {
           state.identity = newVal
-
         }
       },
       actions: {},
@@ -60,9 +59,20 @@ export default createStore({
         departmentId: "",
         schoolName: "",
         schoolId: "",
-        year:'',
+        year: '',
+        role: {},
+        isTeacher: false,
+        // 教师端变量
+        teacherSideClassInfo:{}
       },
-      getters: {},
+      getters: {
+        changeIsTeacher(state) {
+          if (state.role.roleName == "教师") {
+            state.isTeacher = true
+          } else { state.isTeacher = false }
+          return state.isTeacher
+        }
+      },
       mutations: {
         setDepartmentName(state, newVal) {
           state.departmentName = newVal
@@ -78,11 +88,17 @@ export default createStore({
         },
         setYear(state, newVal) {
           state.year = newVal
+        },
+        setRole(state, newVal) {
+          state.role = newVal
+        },
+        setTeacherSideClassInfo(state,newVal){
+          state.teacherSideClassInfo = newVal
         }
       },
       actions: {},
       modules: {}
     },
-   
+
   }
 })

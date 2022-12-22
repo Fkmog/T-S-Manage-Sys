@@ -130,14 +130,14 @@
     class="classesTable"
     :data="classTable"
     style="width: 70%"
-    :header-cell-style="{ 'text-align': 'center', 'font-size': '16px' }"
-    :cell-style="{ 'text-align': 'center' }"
+    :header-cell-style="{ 'padding-left':'20px', 'font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
+    :cell-style="{  'padding-left':'20px','font-size': '16px','height':'60px' }"
     highlight-current-row
   >
     <el-table-column prop="className" label="课程名" />
     <el-table-column prop="teacherName" label="任课教师" />
     <el-table-column prop="courseCode" label="课程号" />
-    <el-table-column prop="identifier" label="开课号" />
+    <el-table-column prop="identifier" label="开课号"  width="240px"/>
     <el-table-column prop="chosenYear" label="学年" />
     <el-table-column prop="chosenSemester" label="学期" />
     <el-table-column prop="remark" label="备注" />
@@ -287,7 +287,7 @@ export default {
 }
 .selects {
   display: flex;
-  flex-direction: row;
+ flex-direction: row;
 }
 
 .selecter {

@@ -27,7 +27,7 @@
       class="identity"
       v-for="(identity, index) in $store.state.userInfo.identity"
       :key="index"
-      @click="changeCurrentInfo(identity)"
+      @click="changeCurrentInfo(identity,index)"
     >
       {{ identity.departmentName }}--{{ identity.roleName }}
     </div>
@@ -76,7 +76,7 @@ export default {
         .catch(() => {});
     },
     //修改当前专业/学院等信息
-    changeCurrentInfo(identity) {
+    changeCurrentInfo(identity,index) {
       console.log("identity", identity);
       this.$store.commit(
         "currentInfo/setDepartmentName",
@@ -85,6 +85,7 @@ export default {
       this.$store.commit("currentInfo/setDepartmentId", identity.departmentId);
       this.$store.commit("currentInfo/setSchoolName", identity.schoolName);
       this.$store.commit("currentInfo/setSchoolId", identity.schoolId);
+      this.$store.commit("currentInfo/setRole",this.$store.state.userInfo.identity[index]);
     },
   },
 };
@@ -119,14 +120,14 @@ export default {
 
 .infoIconDown {
   color: white;
-  left: 3px;
-  top: 5px;
+  left: 2px;
+  top: 2px;
   position: relative;
 }
 .infoIconUp {
   color: white;
-  left: 3px;
-  top: 5px;
+  left: 2px;
+  top: 2px;
   position: relative;
 }
 .card-header {

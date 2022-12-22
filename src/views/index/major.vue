@@ -79,7 +79,7 @@ export default {
     this.currentDepartmentId =
       this.$store.state.userInfo.identity[0].departmentId;
     //获取专业列表
-    this.getMajorList();
+    // this.getMajorList();
     this.getMajorList(this.currentDepartmentId);
   },
 

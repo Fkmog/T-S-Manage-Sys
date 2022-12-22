@@ -1,8 +1,8 @@
 <template>
-<div layout="column" flex class="ng-scope" v-if="isRouterAlive">
-    <div class="submenu" layout="row" layout-align="center center" style="justify-content: left">
+<div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+    <div class="submenu no-select layout-align-center-center layout-row" layout="row" layout-align="center center" style="justify-content: left">
       <el-tooltip content="返回" style="float:left;">
-        <el-button class="md-icon-button" md-no-ink aria-label="返回" @click="goTeacher" link>
+        <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
         <el-icon><Back /></el-icon>
       </el-button>
       </el-tooltip>
@@ -32,7 +32,7 @@
             <hot-column  data="teacherName" title="姓名" width="200" height="20" ></hot-column>
             <hot-column  data="email" title="邮箱" width="200" height="20" validator="emailcheck" ></hot-column>
           </hot-table>
-        
+        <!-- <LuckySheet /> -->
       </div>
     </div>
 
@@ -58,9 +58,11 @@ import request from '@/utils/request/request'
 import '@/components/teacher/addTeacher.js'
 
 
-
+import 'element-plus/dist/index.css'
 import 'handsontable/dist/handsontable.full.css'
 
+
+import 'handsontable/dist/handsontable.full.css'
 
 
 
@@ -176,7 +178,10 @@ export default{
     if (!this.postData.teachers || this.postData.teachers.length <= 0) {
           return $q.reject('工号或姓名不能为空');
         }
-        
+        // var postData = {
+        //   teachers:  this.postData.teachers,
+        //   // departmentId: this.departmentId
+        // };
         var teacherList = [];
 
         this.postData.teachers.forEach(function(teacher){
@@ -345,9 +350,9 @@ flex-direction: column;
 .submenu{
     color: #3f51b5;
     font-size: 14px;
-    font-weight: bold;
-    height: 45px;
-    min-height: 45px;
+    font-weight: 500;
+    height: 48px;
+    min-height: 48px;
     line-height: 1em;
     margin: 0;
     position: relative;
@@ -356,13 +361,25 @@ flex-direction: column;
     background-color: transparent;
 }
 .md-icon-button{
-  padding: 20px !important;
+  padding: 20px;
 }
 
+#luckysheet {
+  margin: 0px;
+  padding: 0px;
+  border:1px aquamarine;
+  /* position: absolute; */
+  width: 100%;
+  height: 750px;
+  /* left: 0px; */
+  margin-top: 20px;
+  /* top: 30px; */
+  bottom: 0px;
+}
 
-
-
-
+#uploadBtn {
+  font-size: 16px;
+}
 
 
 </style>

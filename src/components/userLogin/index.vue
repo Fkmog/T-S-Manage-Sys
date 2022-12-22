@@ -84,7 +84,7 @@ export default {
         if (valid) {
           login(this.loginForm.userName, this.loginForm.passWord).then(
             (res) => {
-              console.log(res);
+              // console.log(res);
               if (res.code == 200) {
                 //存储token -> cookie
                 Cookies.set("Admin-Token", res.token);
@@ -113,9 +113,14 @@ export default {
                       "currentInfo/setSchoolId",
                       res.roles[0].schoolId
                     );
+                    this.$store.commit("currentInfo/setRole", res.roles[0]);
                   }
-
-                  this.$router.replace("/major");
+                  // console.log("vuex:", this.$store.state);
+                  this.$store.getters["currentInfo/changeIsTeacher"]
+                  if(this.$store.state.currentInfo.isTeacher ==false){
+                  this.$router.replace("/major");}
+                   if(this.$store.state.currentInfo.isTeacher ==true){
+                  this.$router.replace("teacherClasses");}
                 });
               }
               if (res.code != 200) {

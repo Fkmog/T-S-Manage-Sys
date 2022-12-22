@@ -10,7 +10,7 @@
       >
         <el-icon
           class="icon"
-          size="50px"
+          size="24px"
           color="rgb(137, 137, 137)"
           @click="backGoal()"
         >
@@ -20,7 +20,7 @@
       <div
         style="
           margin-top: 15px;
-          margin-left: 10px;
+          margin-left: 20px;
           height: 30px;
           border-left: 1px solid rgb(189, 189, 189);
         "
@@ -34,9 +34,10 @@
       >
         <el-icon
           class="icon"
-          size="50px"
+          size="24px"
           color="rgb(137, 137, 137)"
           @click="save()"
+          style="margin-left:20px"
         >
           <DocumentChecked />
         </el-icon>
@@ -46,7 +47,7 @@
   <div class="edit-body">
     <div class="card">
       <el-form :model="requirements" ref="requirements" label-position="top">
-        <el-col v-for="attribute in requirements" :key="attribute.orderNum">
+        <el-col v-for="attribute in requirements" :key="attribute.id">
           <el-col>
             <el-row>
               <el-col :span="2" class="two-digits">
@@ -60,11 +61,10 @@
               <el-col :span="22">
                 <el-form-item label="简称" class="title">
                   <el-input
-                    v-model="attribute.entry"
+                    v-model="attribute.name"
                     maxlength="20"
                     show-word-limit
                     placeholder="简称"
-                    @change="changeAttribute(attribute)"
                   />
                 </el-form-item>
                 <el-form-item label="描述" class="title">
@@ -74,7 +74,6 @@
                     type="textarea"
                     maxlength="1000"
                     placeholder="描述"
-                    @change="changeAttribute(attribute)"
                   />
                 </el-form-item>
               </el-col>
@@ -82,8 +81,8 @@
             <el-col>
               <div
                 class="attribute-detail"
-                v-for="detail in attribute.children"
-                :key="detail.orderNum"
+                v-for="detail in attribute.programIndicators"
+                :key="detail.id"
               >
                 <el-row>
                   <div class="detail-num">
@@ -92,7 +91,7 @@
                   <div class="detail-content" style="width: 700px">
                     <el-form-item label="简称" class="title">
                       <el-input
-                        v-model="detail.entry"
+                        v-model="detail.name"
                         maxlength="20"
                         show-word-limit
                         placeholder="简称"
@@ -122,7 +121,9 @@
                   新增指标点{{ newDetailId(attribute) }}
                 </el-button>
                 <el-button
-                  v-show="attribute.children.length == 0 ? false : true"
+                  v-show="
+                    attribute.programIndicators.length == 0 ? false : true
+                  "
                   type="danger"
                   text
                   @click="deleteDetail(attribute)"
@@ -153,7 +154,7 @@
 <script>
 import { ElMessageBox, ElMessage } from "element-plus";
 import { Back, DocumentChecked, Plus, Delete } from "@element-plus/icons-vue";
-import { checkRequirement, changeRequirement } from "@/api/requirement";
+import { checkProgramByProgramId, editProgram } from "@/api/program";
 export default {
   name: "GoalEdit",
   components: {
@@ -172,6 +173,7 @@ export default {
       currentSchoolId: "",
       currentDepartmentId: "",
       programId: "",
+      programInfo: {},
       requirements: [],
       attributeIdDelete: "",
       attributeIdNew: "",
@@ -185,23 +187,24 @@ export default {
     this.currentMajorName = this.$store.state.major.majorName;
     this.currentSchoolId = this.$store.state.currentInfo.schoolId;
     this.currentDepartmentId = this.$store.state.currentInfo.departmentId;
-
     this.checkRequirement();
   },
   methods: {
     // 删除指标点
     deleteDetailId(attribute) {
-      if (attribute.children.length > 0) {
-        return attribute.children[attribute.children.length - 1].serialNum;
+      if (attribute.programIndicators.length > 0) {
+        return attribute.programIndicators[
+          attribute.programIndicators.length - 1
+        ].serialNum;
       }
     },
     // 新增指标点
     newDetailId(attribute) {
-      if (attribute.children.length > 0) {
+      if (attribute.programIndicators.length > 0) {
         let detailId =
-          attribute.children[attribute.children.length - 1].serialNum.split(
-            "."
-          );
+          attribute.programIndicators[
+            attribute.programIndicators.length - 1
+          ].serialNum.split(".");
         detailId[1] = ++detailId[1];
         return detailId.join(".");
       } else {
@@ -224,45 +227,59 @@ export default {
     },
     //查询毕业要求
     checkRequirement() {
-      checkRequirement(this.programId).then((res) => {
-        this.requirements = res.data;
+      checkProgramByProgramId(this.programId).then((res) => {
+        this.programInfo = res.data;
+        console.log("programInfo", this.programInfo);
+        this.requirements = res.data.graduateAttributes;
         this.deleteAttributeId();
         this.newAttributeId();
         console.log("requirements", this.requirements);
       });
     },
+
     //新增指标点
     addDetail(attribute) {
       let currentObj = new Object();
       //处理内部字段
-      currentObj.entry = null;
+      currentObj.name = null;
       currentObj.description = null;
-      currentObj.isDeleted = 0;
-      currentObj.departmentId = this.currentDepartmentId;
-      //确定orderNum
-      if (attribute.children.length > 0) {
-        currentObj.orderNum =
-          attribute.children[attribute.children.length - 1].orderNum + 1;
-      }
-      if (attribute.children.length == 0) {
-        currentObj.orderNum = 1;
-      }
-      currentObj.programId = this.programId;
-      currentObj.requirementId = null;
-      currentObj.schoolId = this.currentSchoolId;
-      //确定serialNum
-      if (attribute.children.length > 0) {
+      currentObj.achievement = null;
+
+      //确定serialNum以及id
+      if (attribute.programIndicators.length > 0) {
         currentObj.serialNum =
-          attribute.children[attribute.children.length - 1].serialNum;
+          attribute.programIndicators[
+            attribute.programIndicators.length - 1
+          ].serialNum;
         let parent = currentObj.serialNum.split(".");
         ++parent[1];
+        //确定id
+        if (parent[0].length == 1 && parent[1].length == 1) {
+          currentObj.id = "0" + parent[0] + "0" + parent[1];
+        }
+        if (parent[0].length == 2 && parent[1].length == 1) {
+          currentObj.id = parent[0] + "0" + parent[1];
+        }
+        if (parent[0].length == 1 && parent[1].length == 2) {
+          currentObj.id = "0" + parent[0] + parent[1];
+        }
+        if (parent[0].length == 2 && parent[1].length == 2) {
+          currentObj.id = parent[0] + parent[1];
+        }
         currentObj.serialNum = parent.join(".");
-        this.requirements[parent[0] - 1].children.push(currentObj);
+        this.requirements[parent[0] - 1].programIndicators.push(currentObj);
       }
-      if (attribute.children.length == 0) {
+      if (attribute.programIndicators.length == 0) {
         currentObj.serialNum = attribute.serialNum + ".1";
+        //确定id
+        if (attribute.serialNum.length == 2) {
+          currentObj.id = attribute.serialNum;
+        }
+        if (attribute.serialNum.length == 1) {
+          currentObj.id = "0" + attribute.serialNum;
+        }
         let num = Number(attribute.serialNum);
-        this.requirements[num - 1].children.push(currentObj);
+        this.requirements[num - 1].programIndicators.push(currentObj);
       }
       console.log("addDetail", currentObj);
     },
@@ -278,32 +295,27 @@ export default {
         }
       ).then(() => {
         //复制到待删除数组中
-        this.deteleArray.push(
-          attribute.children[attribute.children.length - 1]
-        );
-        this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
-
-        attribute.children.pop();
+        // this.deteleArray.push(
+        //   attribute.programIndicators[attribute.programIndicators.length - 1]
+        // );
+        // this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
+        attribute.programIndicators.pop();
       });
     },
     //新增要求点
     addAttribute() {
       let currentObj = new Object();
       //处理内部字段
-      currentObj.entry = null;
+      currentObj.name = null;
       currentObj.description = null;
-      currentObj.children = [];
-      currentObj.isDeleted = 0;
-      currentObj.programId = this.programId;
-      currentObj.schoolId = this.currentSchoolId;
-      currentObj.requirementId = null;
-      currentObj.departmentId = this.currentDepartmentId;
-      //确定orderNum
-      if (this.requirements.length == 0) {
-        currentObj.orderNum = 1;
+      currentObj.programIndicators = [];
+      // 确定Id
+      let currentId =
+        Number(this.requirements[this.requirements.length - 1].id) + 1;
+      if (currentId < 10) {
+        currentObj.Id = "0" + currentId;
       } else {
-        currentObj.orderNum =
-          this.requirements[this.requirements.length - 1].orderNum + 1;
+        currentObj.Id = currentId.toString;
       }
       // 确定serialNum
       if (this.requirements.length == 0) {
@@ -334,45 +346,56 @@ export default {
         }
       ).then(() => {
         //复制到待删除数组中
-        this.deteleArray.push(this.requirements[this.requirements.length - 1]);
-        this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
+        // this.deteleArray.push(this.requirements[this.requirements.length - 1]);
+        // this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
         this.requirements.pop();
         //更新对应新增删除的要求点的数字
         this.deleteAttributeId();
         this.newAttributeId();
       });
     },
-    //标注要求的修改
-    changeAttribute(attribute) {
-      attribute.isDeleted = 1;
-    },
-    //标注指标点的修改
-    changeDetail(detail) {
-      detail.isDeleted = 1;
-    },
+    // //标注要求的修改
+    // changeAttribute(attribute) {
+    //   attribute.isDeleted = 1;
+    // },
+    // //标注指标点的修改
+    // changeDetail(detail) {
+    //   detail.isDeleted = 1;
+    // },
     //保存毕业要求修改情况 要不要弄个消息弹窗？!!todo
     save() {
       for (let n = 0; n < this.requirements.length; n++) {
-        if (this.requirements[n].children.length > 0) {
-          for (let m = 0; m < this.requirements[n].children.length; m++) {
-            if (this.requirements[n].children[m].description == null||this.requirements[n].children[m].description == '') {
+        if (this.requirements[n].programIndicators.length > 0) {
+          for (
+            let m = 0;
+            m < this.requirements[n].programIndicators.length;
+            m++
+          ) {
+            if (
+              this.requirements[n].programIndicators[m].description == null ||
+              this.requirements[n].programIndicators[m].description == ""
+            ) {
               //要不要弄个消息弹窗？!!
               return;
             }
           }
         }
-        if (this.requirements[n].description == null||this.requirements[n].description == '') {
+        if (
+          this.requirements[n].description == null ||
+          this.requirements[n].description == ""
+        ) {
           return;
         }
       }
-      this.requirements = this.requirements.concat(this.deteleArray);
-      console.log("save", this.requirements);
-      changeRequirement(this.requirements).then((res) => {
+      // this.requirements = this.requirements.concat(this.deteleArray);
+      this.programInfo.graduateAttributes = this.requirements;
+      console.log("save", this.programInfo);
+      editProgram(this.programInfo).then((res) => {
         console.log(res);
         ElMessage({
           type: "success",
           message: `保存成功`,
-          duration:1000,
+          duration: 1000,
         });
         this.backGoal();
       });
@@ -394,12 +417,13 @@ export default {
 .edit-body {
   display: flex;
   justify-content: center;
-  margin-top: 75px;
+  background-color: #f2f2f2;
 }
 .card {
   width: 800px;
   background: white;
   padding: 20px;
+  margin-top: 80px;
   margin-bottom: 30px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
 }
@@ -412,7 +436,7 @@ export default {
   width: 100%;
 }
 .icon {
-  margin-top: 5px;
+  margin-top: 15px;
   margin-left: 10px;
   cursor: pointer;
 }

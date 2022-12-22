@@ -19,43 +19,43 @@
         <span>待添加</span>
       </div>
       <div v-show="hasAttribute">
-      <div
-        class="graduate-attribute"
-        v-for="attribute in requirements"
-        :key="attribute.requirementId"
-      >
-        <div class="attribute">
-          <div class="two-digits">
-            <section class="num-title">
-              <section class="num-wrap">
-                <span class="title-text">{{ attribute.serialNum }}</span>
-              </section>
-              <section class="rotate-bar"></section>
-            </section>
-          </div>
-          <div class="attribute-content">
-            <div class="name">
-              {{ attribute.entry }}
-            </div>
-            <div class="desc">
-              {{ attribute.description }}
-            </div>
-          </div>
-        </div>
         <div
-          class="attribute-detail"
-          v-for="detail in attribute.children"
-          :key="detail.requirementId"
+          class="graduate-attribute"
+          v-for="attribute in requirements"
+          :key="attribute.id"
         >
-          <div class="detail-num">
-            {{ detail.serialNum }}
+          <div class="attribute">
+            <div class="two-digits">
+              <section class="num-title">
+                <section class="num-wrap">
+                  <span class="title-text">{{ attribute.serialNum }}</span>
+                </section>
+                <section class="rotate-bar"></section>
+              </section>
+            </div>
+            <div class="attribute-content">
+              <div class="name">
+                {{ attribute.name }}
+              </div>
+              <div class="desc">
+                {{ attribute.description }}
+              </div>
+            </div>
           </div>
-          <div class="detail-content">
-            <div class="name">{{ detail.entry }}</div>
-            <div class="desc">{{ detail.description }}</div>
+          <div
+            class="attribute-detail"
+            v-for="detail in attribute.programIndicators"
+            :key="detail.id"
+          >
+            <div class="detail-num">
+              {{ detail.serialNum }}
+            </div>
+            <div class="detail-content">
+              <div class="name">{{ detail.name }}</div>
+              <div class="desc">{{ detail.description }}</div>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -66,8 +66,14 @@
     <div style="display: flex; justify-content: center; color: grey">
       请先点击右上角圆形按钮创建培养方案
     </div>
-   
-    <addBtn @click=" this.addProgramForm.enrollyear = this.$store.state.currentInfo.year;dialogFormVisible = true;"> </addBtn>
+
+    <addBtn
+      @click="
+        this.addProgramForm.enrollyear = this.$store.state.currentInfo.year;
+        dialogFormVisible = true;
+      "
+    >
+    </addBtn>
     <!-- 弹出表单-新增培养方案 -->
     <el-dialog
       v-model="dialogFormVisible"
@@ -107,7 +113,6 @@
 <script>
 import { EditPen } from "@element-plus/icons-vue";
 import { checkProgram, addProgram } from "@/api/program";
-import { checkRequirement } from "@/api/requirement";
 import addBtn from "@/components/general/addBtn.vue";
 export default {
   name: "Goal",
@@ -118,7 +123,7 @@ export default {
   data() {
     return {
       hasProgram: Boolean,
-      hasAttribute:Boolean,
+      hasAttribute: Boolean,
       currentMajorId: Number,
       currentMajorName: "",
       currentSchoolId: "",
@@ -169,15 +174,23 @@ export default {
     },
     //查询有无培养计划
     checkProgram() {
-      checkProgram(this.currentMajorId, this.$store.state.currentInfo.year).then((res) => {
+      checkProgram(
+        this.currentMajorId,
+        this.$store.state.currentInfo.year
+      ).then((res) => {
         console.log("checkProgram", res);
         if (res.msg == "未查到" && res.code == 200) {
           this.hasProgram = false;
         }
         if (res.msg == "操作成功" && res.code == 200) {
           this.programId = res.data.programId;
-          this.checkRequirement();
-          this.hasProgram = true;
+          this.requirements = res.data.graduateAttributes;
+          console.log("requirements", this.requirements);
+          if (this.requirements.length == 0) {
+            this.hasAttribute = false;
+          } else {
+            this.hasAttribute = true;
+          }
         }
       });
     },
@@ -194,21 +207,19 @@ export default {
         this.checkProgram();
       });
     },
-    //查询毕业要求
-    checkRequirement() {
-      checkRequirement(this.programId).then((res) => {
-        console.log("checkRequirement", res);
-        this.requirements = res.data;
-        console.log("requirements", this.requirements);
-        if(this.requirements.length == 0){
-          this.hasAttribute = false
-        }
-        else{
-          this.hasAttribute = true
-
-        }
-      });
-    },
+    // //查询毕业要求
+    // checkRequirement() {
+    //   checkRequirement(this.programId).then((res) => {
+    //     console.log("checkRequirement", res);
+    //     this.requirements = res.data;
+    //     console.log("requirements", this.requirements);
+    //     if (this.requirements.length == 0) {
+    //       this.hasAttribute = false;
+    //     } else {
+    //       this.hasAttribute = true;
+    //     }
+    //   });
+    // },
   },
 };
 </script>
@@ -217,16 +228,17 @@ export default {
 .body-check {
   display: flex;
   justify-content: center;
+  background-color: #f2f2f2;
 }
 .no-program {
   display: flex;
   flex-direction: column;
 }
-.noAttribute{
-  height:100px;
+.noAttribute {
+  height: 100px;
   text-align: center;
-  margin-top:80px;
-  color:rgb(143, 142, 142);
+  margin-top: 80px;
+  color: rgb(143, 142, 142);
   font-size: 16px;
 }
 .card {
