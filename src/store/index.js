@@ -11,9 +11,10 @@ export default createStore({
     userInfo: {
       namespaced: true,
       state: {
-        userName:'',
-        userId:Number,
-        roleInfo:[],
+        userName: '',
+        userId: Number,
+        roleInfo: [],
+        identity: [],
       },
       getters: {},
       mutations: {
@@ -23,8 +24,11 @@ export default createStore({
         setUserId(state, newVal) {
           state.userId = newVal
         },
-        setRoleInfo(state,newVal){
+        setRoleInfo(state, newVal) {
           state.roleInfo = newVal
+        },
+        setIdentity(state, newVal) {
+          state.identity = newVal
         }
       },
       actions: {},
@@ -47,6 +51,54 @@ export default createStore({
       },
       actions: {},
       modules: {}
-    }
+    },
+    currentInfo: {
+      namespaced: true,
+      state: {
+        departmentName: "",
+        departmentId: "",
+        schoolName: "",
+        schoolId: "",
+        year: '',
+        role: {},
+        isTeacher: false,
+        // 教师端变量
+        teacherSideClassInfo:{}
+      },
+      getters: {
+        changeIsTeacher(state) {
+          if (state.role.roleName == "教师") {
+            state.isTeacher = true
+          } else { state.isTeacher = false }
+          return state.isTeacher
+        }
+      },
+      mutations: {
+        setDepartmentName(state, newVal) {
+          state.departmentName = newVal
+        },
+        setDepartmentId(state, newVal) {
+          state.departmentId = newVal
+        },
+        setSchoolName(state, newVal) {
+          state.schoolName = newVal
+        },
+        setSchoolId(state, newVal) {
+          state.schoolId = newVal
+        },
+        setYear(state, newVal) {
+          state.year = newVal
+        },
+        setRole(state, newVal) {
+          state.role = newVal
+        },
+        setTeacherSideClassInfo(state,newVal){
+          state.teacherSideClassInfo = newVal
+        }
+      },
+      actions: {},
+      modules: {}
+    },
+
   }
 })

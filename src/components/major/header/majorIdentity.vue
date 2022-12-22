@@ -12,7 +12,7 @@ name:"MajorIdentity"
 }
 </script>
 
-<style>
+<style scoped>
 .info{
   font-family: Microsoft Yahei;
   color: white;

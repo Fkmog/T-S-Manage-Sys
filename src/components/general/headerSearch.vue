@@ -1,8 +1,9 @@
 // 顶部搜索栏
 <template>
   <div class="Block">
-    <div class="searchBlock">
-      <el-icon class="iconSearch" size="35px" color="rgb(137, 137, 137)">
+    <div class="bar">
+      <div class="searchBlock">
+      <el-icon class="iconSearch" size="24px" color="rgb(137, 137, 137)">
         <Search />
       </el-icon>
       <div class="searchLine">
@@ -10,8 +11,12 @@
           class="searchInput"
           v-model="searchInput"
           placeholder="搜索专业名称"
+          @change="sendMessage"
         />
       </div>
+      </div>
+      <!-- 右侧时间选择插槽 -->
+      <slot name="rightTime" class="rightSlot"></slot>
     </div>
   </div>
 </template>
@@ -21,25 +26,29 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  // props:["msg"],
   components: {
     Search,
   },
   data() {
     return {
-      searchInput:''
-    }
+      searchInput: "",
+    };
   },
+  methods: {},
 };
 </script>
 
 <style scoped>
 .Block {
+  position: absolute;
+  top:110px;
+  left: 0px;
   height: 55px;
-  border: 1px solid rgb(189, 189, 189);
+  border-bottom:  1px solid rgb(189, 189, 189);
+  width: 100%;
 }
 .iconSearch {
-  margin-top: 10px;
+  margin-top: 15px;
   margin-left: 50px;
 }
 .searchInput {
@@ -53,6 +62,11 @@ export default {
   border-bottom-width: 1px;
   opacity: 0;
   background: rgba(0, 0, 0, 0);
+}
+.bar{
+   width: 400px;
+  display: flex;
+  flex-direction: row;
 }
 .searchBlock {
   width: 400px;
@@ -73,4 +87,5 @@ export default {
   width: 220px;
   outline: 0;
 }
+
 </style>

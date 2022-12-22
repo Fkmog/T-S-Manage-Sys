@@ -72,31 +72,52 @@ export default {
       //addMajor
       addMajorName: "",
       majorList: [],
+      currentDepartmentId: Number,
     };
   },
   mounted() {
+    this.currentDepartmentId =
+      this.$store.state.userInfo.identity[0].departmentId;
     //获取专业列表
-    this.getMajorList();
+    // this.getMajorList();
+    this.getMajorList(this.currentDepartmentId);
+  },
+
+  computed: {
+    currentChange() {
+      return this.$store.state.currentInfo;
+    },
+  },
+
+  watch: {
+    // 监视currentInfo
+    currentChange: {
+      deep: true,
+      handler(value) {
+        this.currentDepartmentId = this.$store.state.currentInfo.departmentId;
+        this.getMajorList(this.currentDepartmentId);
+      },
+    },
   },
 
   methods: {
     //获取专业列表
     getMajorList() {
-      getMajor().then((res) => {
+      getMajor(this.currentDepartmentId).then((res) => {
         this.majorList = res.rows;
         console.log("majorList", res);
       });
     },
     //跳转专业视图
     toMajor(major) {
-      this.$store.commit('major/setMajorName',major.majorName)
-      this.$store.commit('major/setMajorId',major. majorId)
+      this.$store.commit("major/setMajorName", major.majorName);
+      this.$store.commit("major/setMajorId", major.majorId);
       this.$router.push({ name: "Goal" });
     },
     //增加专业
     addMajor() {
       ElMessageBox.prompt("专业名称：", "新建专业", {
-        confirmButtonText: "确定",
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         //校验规则
         inputPattern: /^.+$/,
@@ -107,8 +128,9 @@ export default {
           ElMessage({
             type: "success",
             message: `成功新建专业:${value}`,
+            duration: 1000,
           });
-          addMajor(addMajorName).then((res) => {
+          addMajor(addMajorName, this.currentDepartmentId).then((res) => {
             console.log("addMajor", res);
             this.getMajorList();
           });
@@ -117,6 +139,7 @@ export default {
           ElMessage({
             type: "info",
             message: "取消增加专业",
+            duration: 1000,
           });
         });
     },
@@ -130,10 +153,11 @@ export default {
         deleteMajor(majorId)
           .then((res) => {
             console.log("deleteMajor", res);
-            this.getMajorList();
+            this.getMajorList(this.currentDepartmentId);
             ElMessage({
               type: "success",
               message: "删除成功",
+              duration: 1000,
             });
           })
           .catch(() => {});
@@ -142,7 +166,7 @@ export default {
     //修改专业
     changeMajor(majorId) {
       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
-        confirmButtonText: "确定",
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         //校验规则
         inputPattern: /^.+$/,
@@ -153,16 +177,20 @@ export default {
           ElMessage({
             type: "success",
             message: `成功修改专业名称:${value}`,
+            duration: 1000,
           });
-          changeMajor(changeMajorName, majorId).then((res) => {
-            console.log("changeMajor", res);
-            this.getMajorList();
-          });
+          changeMajor(changeMajorName, majorId, this.currentDepartmentId).then(
+            (res) => {
+              console.log("changeMajor", res);
+              this.getMajorList();
+            }
+          );
         })
         .catch(() => {
           ElMessage({
             type: "info",
             message: "取消修改专业",
+            duration: 1000,
           });
         });
     },
@@ -178,6 +206,7 @@ export default {
   width: 80%;
   margin-left: 10%;
   flex-wrap: wrap;
+  margin-top: 55px;
 }
 /* 卡片盒子顶层icon */
 .deleteIcon {

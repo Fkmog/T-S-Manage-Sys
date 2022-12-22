@@ -84,7 +84,7 @@ export default {
         if (valid) {
           login(this.loginForm.userName, this.loginForm.passWord).then(
             (res) => {
-              console.log(res);
+              // console.log(res);
               if (res.code == 200) {
                 //存储token -> cookie
                 Cookies.set("Admin-Token", res.token);
@@ -94,7 +94,33 @@ export default {
                   this.$store.commit("userInfo/setUserName", res.user.userName);
                   this.$store.commit("userInfo/setUserId", res.user.userId);
                   this.$store.commit("userInfo/setRoleInfo", res.user.roles);
-                  this.$router.replace("/major");
+                  this.$store.commit("userInfo/setIdentity", res.roles);
+                  //设置默认当前学院，学校等信息
+                  if (res.roles.length !== 0) {
+                    this.$store.commit(
+                      "currentInfo/setDepartmentName",
+                      res.roles[0].departmentName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setDepartmentId",
+                      res.roles[0].departmentId
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolName",
+                      res.roles[0].schoolName
+                    );
+                    this.$store.commit(
+                      "currentInfo/setSchoolId",
+                      res.roles[0].schoolId
+                    );
+                    this.$store.commit("currentInfo/setRole", res.roles[0]);
+                  }
+                  // console.log("vuex:", this.$store.state);
+                  this.$store.getters["currentInfo/changeIsTeacher"]
+                  if(this.$store.state.currentInfo.isTeacher ==false){
+                  this.$router.replace("/major");}
+                   if(this.$store.state.currentInfo.isTeacher ==true){
+                  this.$router.replace("teacherClasses");}
                 });
               }
               if (res.code != 200) {

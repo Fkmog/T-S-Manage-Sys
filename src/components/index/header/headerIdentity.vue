@@ -1,7 +1,8 @@
 <template>
   <div>
     <span class="info" @click="show">
-      {{$store.state.userInfo.userName}}  | {{$store.state.userInfo.roleInfo[0].roleName}}
+      {{ $store.state.userInfo.userName }} |
+      {{ $store.state.userInfo.roleInfo[0].roleName }}
       <el-icon v-show="showDown" class="infoIconDown" size="14px">
         <CaretBottom />
       </el-icon>
@@ -22,8 +23,14 @@
         </div>
       </div>
     </template>
-    <div class="identity">角色A1</div>
-    <div class="identity">角色B</div>
+    <div
+      class="identity"
+      v-for="(identity, index) in $store.state.userInfo.identity"
+      :key="index"
+      @click="changeCurrentInfo(identity,index)"
+    >
+      {{ identity.departmentName }}--{{ identity.roleName }}
+    </div>
   </el-card>
 </template>
 
@@ -43,9 +50,7 @@ export default {
     CaretBottom,
     CaretTop,
   },
-  mounted() {
-   
-  },
+  mounted() {},
   methods: {
     // 控制角色信息卡片
     show() {
@@ -63,11 +68,24 @@ export default {
           ElMessage({
             type: "success",
             message: "已退出登录！",
+            duration: 1000,
           });
           Cookies.remove("Admin-Token");
           this.$router.push("/login");
         })
         .catch(() => {});
+    },
+    //修改当前专业/学院等信息
+    changeCurrentInfo(identity,index) {
+      console.log("identity", identity);
+      this.$store.commit(
+        "currentInfo/setDepartmentName",
+        identity.departmentName
+      );
+      this.$store.commit("currentInfo/setDepartmentId", identity.departmentId);
+      this.$store.commit("currentInfo/setSchoolName", identity.schoolName);
+      this.$store.commit("currentInfo/setSchoolId", identity.schoolId);
+      this.$store.commit("currentInfo/setRole",this.$store.state.userInfo.identity[index]);
     },
   },
 };
@@ -89,7 +107,7 @@ export default {
   top: 80px;
   width: 350px;
   animation: animate 0.5s ease;
-  z-index:100;
+  z-index: 100;
 }
 @keyframes animate {
   0% {
@@ -102,14 +120,14 @@ export default {
 
 .infoIconDown {
   color: white;
-  left: 3px;
-  top: 5px;
+  left: 2px;
+  top: 2px;
   position: relative;
 }
 .infoIconUp {
   color: white;
-  left: 3px;
-  top: 5px;
+  left: 2px;
+  top: 2px;
   position: relative;
 }
 .card-header {

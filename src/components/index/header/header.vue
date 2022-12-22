@@ -1,15 +1,42 @@
 <template>
-  <div class="headerBgd">
+  <!-- 教师端页面 -->
+  <div v-show="$store.state.currentInfo.isTeacher" class="headerBgd">
+    <HeaderIdentity></HeaderIdentity>
+  </div>
+  <!-- 非教师端页面 -->
+  <div v-show="!$store.state.currentInfo.isTeacher" class="headerBgd">
     <div class="content">
       <div v-if="$route.meta.isMajor" class="headIcon" @click="backIndex()">
-        <el-icon :size="60"><HomeFilled /></el-icon>
+        <el-icon :size="24"><HomeFilled /></el-icon>
       </div>
+      <!-- 左侧icon的占位 -->
       <div v-if="!$route.meta.isMajor" class="headPlaceholder"></div>
       <div>
-        <div class="major" v-if="!$route.meta.isMajor">计算机学院</div>
-        <div class="major" v-if="$route.meta.isMajor">
-          {{ $store.state.major.majorName }}
+        <div style="display: flex; flex-direction: row">
+          <div class="major" v-if="!$route.meta.isMajor">
+            {{ $store.state.currentInfo.departmentName }}
+          </div>
+          <div class="major" v-if="$route.meta.isMajor">
+            {{ $store.state.major.majorName }}
+          </div>
+          <!-- 学年选择 -->
+          <div v-if="$route.meta.isMajor" class="year">
+            <el-select
+              v-model="year"
+              class="m-2"
+              placeholder="年份"
+              @change="changeYear()"
+            >
+              <el-option
+                v-for="item in yearOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
         </div>
+
         <div class="navigatorList">
           <HeaderNav></HeaderNav>
         </div>
@@ -35,11 +62,31 @@ export default {
   },
   data() {
     return {
+      //现在直接给默认值，之后浏览器session拿 !todo
+      year: "2021",
+      yearOptions: [
+        {
+          value: "2021",
+          label: "2021级",
+        },
+        {
+          value: "2022",
+          label: "2022级",
+        },
+      ],
     };
   },
+  mounted() {
+    this.$store.commit("currentInfo/setYear", this.year);
+  },
+
   methods: {
     backIndex() {
       this.$router.replace({ path: "/major" });
+    },
+    changeYear() {
+      console.log("changeYear", this.year);
+      this.$store.commit("currentInfo/setYear", this.year);
     },
   },
 };
@@ -79,13 +126,19 @@ export default {
 .headIcon {
   color: white;
   cursor: pointer;
-  margin-right: 10px;
-  margin-top: 5px;
+  width:60px;
+  padding-left:18px;
+  margin-top: 28px;
 }
 .headPlaceholder {
   margin-right: 10px;
   margin-top: 5px;
   width: 60px;
+}
+.m-2 {
+  background-color: #5c6bc0;
+  width: 100px;
+  margin-left: 40px;
 }
 </style>
 
