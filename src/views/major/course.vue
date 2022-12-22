@@ -1,25 +1,31 @@
 <template>
-  
-<div class="searchBar" v-show="!closeShow">
-  <HeaderSearch class="headerSearch" ></HeaderSearch>
-  <div class="selectionBar">
-    <el-select v-model="option1.value" class="m-2" clearable placeholder="更新时间⬇" size="large" @change="selectionOption1" >
-    <el-option
-      v-for="item in option1"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value"
-    /></el-select>
-    <el-select v-model="option2.value" class="m-3" clearable placeholder="全部" size="large" @change="selectionOption2" >
-    <el-option
-      v-for="item in option2"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value"
-    /></el-select>
-  </div>
+  <HeaderSearch v-show="!closeShow">
+    <template #rightTime>
+        <div class="selectionBar">
+          
+              <el-select v-model="option1.value" class="m-2" clearable placeholder="更新时间⬇" size="large" @change="selectionOption1" >
+              <el-option
+                v-for="item in option1"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                class="option"
+              /></el-select>
+            <el-select v-model="option2.value" class="m-3" clearable placeholder="全部" size="large" @change="selectionOption2" >
+          <el-option
+            v-for="item in option2"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          /></el-select>
+         
+          
+        </div>
+    </template>
+  </HeaderSearch>
+ 
 
-</div>
+
 <div v-show="closeShow" class="submenu" style="height: 45px;min-height: 45px;">
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
@@ -133,7 +139,28 @@
   <el-drawer v-model="drawer" :direction="direction" >
     <template #title>
       <h4 style="width:100px;">基础课程</h4>
-     
+      <el-select
+        v-model="currentVersion"
+        class="m-3"
+        
+        placeholder="Please enter a keyword"
+        
+        @change="getCourseByYear(currentVersion)"
+      >
+      <!-- 远程搜索version -->
+      <!-- remote-show-suffix
+        remote
+        filterable
+        reserve-keyword
+        :remote-method="remoteMethod"
+        :loading="loading" -->
+        <el-option
+          v-for="item in versions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
     </template>
 
     <template #default ><!-- 具体basecourse页面，分页 可搜索-->
@@ -145,7 +172,7 @@
       </div>
       <HeaderSearch style="border: 0;" :msg="searchCourse"></HeaderSearch>
       <div class="drawerBlock" flex>
-        <div class="el-table-container"  >
+        <div class="el-table-container">
           <el-table :data="tableData"  ref="drawermultipleTable" style="width: 100%" @selection-change="drawerchandleSelectionChange" @row-dblclick="editTrigger">
             <el-table-column  type="selection" width="55" />
             <el-table-column prop="courseName" label="课程名" width="180" />
@@ -158,7 +185,14 @@
         </div>
       </div>
 
-      <div class="pagination-container" flex>
+     
+      
+    </template>
+    <template #footer>
+      <div style="flex: auto" class="drawerFooter">
+       
+        
+        <div class="pagination-container" flex>
         <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -169,12 +203,6 @@
             :total="result.total">
         </el-pagination>
       </div>
-      
-    </template>
-    <template #footer>
-      <div style="flex: auto">
-        <el-button @click="cancelClick">cancel</el-button>
-        <el-button type="primary" @click="confirmClick">confirm</el-button>
       </div>
     </template>
   </el-drawer>
@@ -293,10 +321,46 @@ data(){
   },
 
 
+  currentVersion:'2016级',
+  currentVersionValue:1,
+  versions:[{
+      label:'2016级',
+      value:1
+    },
+    {
+      label:'2017级',
+      value:2
+    },
+    {
+      value:3,
+      label:'2018级'
+    },
+    {
+      value:4,
+      label:'2019级'
+    },
+    {
+      value:5,
+      label:'2020级'
+    },
+    {
+      value:6,
+      label:'2021级'
+    },
+    {
+      value:7,
+      label:'2022级'
+    },
+    {
+      value:8,
+      label:'2023级'
+    },
+    ],
+
+
   
 
 result:reactive({}),
-
     option1 : [
   {
     value: '更新时间',
@@ -332,6 +396,10 @@ result:reactive({}),
   }
 },
 methods:{
+  getCourseByYear(label){
+    this.currentVersionValue = label;
+    this.getBaseCourse(this.pageSize,this.pageNum);
+  },
   // getProgramCourse(){
   //   this.programId = 3;
   //   return request({
@@ -590,19 +658,23 @@ methods:{
       data: this.courseId
     })
   },
+  //添加basecourseDetail关联major 没有实现批量添加
   addBaseCourseInProgram(){
     var postData = [];
     let that = this;
     this.drawercourseId.forEach(function(courseId){
       var programCoursedict = {
-        programId:that.programId,
+        schoolId:that.schoolId,
+        departmentId:that.departmentId,
+        majorId:that.majorId,
+        vesionId:that.currentVersionValue,
         courseId:courseId
       }
       postData.push(programCoursedict);
     });
     console.log('addCourse:',postData);
     return request({
-      url:'/baseCourse/program/add',
+      url:'/detail',
       method:'post',
       data:postData,
     }).then(function(res){
@@ -773,21 +845,20 @@ methods:{
           
         }
     },
-  getBaseCourse(pageSize,pageNum,programId){
+  getBaseCourse(pageSize,pageNum,majorId){
     let that = this;
     let courses = [];
     let realurl ='';
-    console.log('programtype:',typeof(programId));
-    if(programId){
-      realurl = '/baseCourse/program';
+    
+    if(majorId){
+      realurl = '/detailMajor/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       
       return request({
-            url:realurl+'/'+this.programId,
+            url:realurl+'?'+'majorId='+this.majorId,
             method:'get',
-           
         }).then(function(res){
           console.log('courseDetails:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'programId:',programId);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
           res.rows.forEach(function(course){
             
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
@@ -811,7 +882,7 @@ methods:{
         });
     }
     else{
-      realurl = '/baseCourse/list';
+      realurl = '/baseCourse/list';//根据获取到的已经添加过的courseId来排除搜索到的detail，两个限制vesionId和couseId
       
       return request({
             url:realurl,
@@ -820,23 +891,27 @@ methods:{
             'pageSize':pageSize,
             'pageNum':pageNum,
             'departmentId':that.departmentId,
+            'versionId':that.currentVersionValue,
             'schoolId':that.schoolId,
-            'majorId':that.majorId,
+            
             },
         }).then(function(res){
           console.log('courseDetails:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'programId:',programId);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,);
           res.rows.forEach(function(course){
-            
+            if(course.versionId == that.currentVersionValue){
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
             course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.credit=course.credit;
+            
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
 
             courses.push(course);
+            }
+            
+
           });
           
           
@@ -861,7 +936,7 @@ methods:{
 mounted:function(){
   this.activate();
   this.getBaseCourse(this.pageSize,this.pageNum);
-  this.getBaseCourse(this.pageSize,this.pageNum,this.programId);
+  this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
   // this.getProgramCourse();
 }
 
@@ -869,6 +944,15 @@ mounted:function(){
 </script>
 
 <style scoped> 
+.drawerFooter{
+  padding-bottom: 100px;
+}
+.pagination-container{
+  bottom: 10px;
+}
+#rightTime{
+  color: #3f51b5;
+}
 
 .drawerBlock{
   position: relative;
@@ -988,7 +1072,7 @@ mounted:function(){
    
 }
 .md-padding {
-  margin-top: 10px;
+  margin-top: 85px;
 }
 
 .searchBar{
@@ -1002,19 +1086,24 @@ mounted:function(){
   width: 50%;
 }
 .selectionBar{
-  float: right;
-  width: 50%;
+  
+  position: absolute;
+  right: 10%;
+  width: 700px;
+  
 }
 .m-2{
-  left: 200px;
+  
+  left: 10%;
   float: left;
   top: 6px;
   
 }
 .m-3{
+  
   float: right;
   top: 6px;
-  right: 300px;
+  right: 10%;
 }
 .addCourseButton{
   background-color:rgb(33,150,243);

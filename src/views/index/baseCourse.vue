@@ -1,18 +1,48 @@
 <template>
-<div class="searchBar" v-show="!closeShow">
-  <HeaderSearch class="headerSearch" ></HeaderSearch>
+<div  v-show="!closeShow">
+  <HeaderSearch >
+    <template #rightTime>
+      <div class="selectionBar">
+        <el-select
+        v-model="currentVersion"
+        class="m-3"
+        
+        placeholder="Please enter a keyword"
+        
+        @change="getCourseByYear(currentVersion)"
+      >
+      <!-- 远程搜索version -->
+      <!-- remote-show-suffix
+        remote
+        filterable
+        reserve-keyword
+        :remote-method="remoteMethod"
+        :loading="loading" -->
+        <el-option
+          v-for="item in versions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+      </div>
+     
+    </template>
+  </HeaderSearch>
 </div>
 
-<div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
+<!-- <div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
       <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
       <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
-</div>
+</div> -->
 
   <div layout="row" flex class="md-padding" >
     
     <addBtn @click="dialogFormVisible = true"></addBtn>
+    
     <div class="el-table-container" layout="column" flex layout-align="start center" >
+      
       <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
         <!-- <el-table-column  type="selection" width="55" /> -->
         <el-table-column  label="课程名" width="180" >
@@ -50,16 +80,27 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column  label="Operations" width="200">
-          <template #default="scope">
-            <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="remark" label="备注" >
+        
+       
+        <el-table-column prop="remark" label="备注" width="150">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.remark }}</span>
             </div>
+          </template>
+        </el-table-column>
+        <el-table-column  label="操作" >
+          <template #default="scope">
+            <el-tooltip content="删除">
+              <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+            </el-tooltip>
+            <el-tooltip content="修改">
+              <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
+            </el-tooltip>
+            <el-tooltip content="添加/查看信息">
+              <el-button @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link ><el-icon ><MoreFilled /></el-icon></el-button>
+            </el-tooltip>
+           <span>{{scope.row.versionId}}</span>
           </template>
         </el-table-column>
         
@@ -174,9 +215,9 @@
 import request from '@/utils/request/request'
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
-import { ref,reactive,}from 'vue';
-import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit} from '@element-plus/icons-vue'
+import { ref,reactive, version,}from 'vue';
+import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown } from 'element-plus'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown} from '@element-plus/icons-vue'
 export default {
 name:"BaseCourse",
 // inject:['reload'], 
@@ -187,6 +228,49 @@ name:"BaseCourse",
 //     },
 data(){
   return{
+    //select
+    currentVersion:'2016级',
+    currentVersionVale:1,
+    loading:ref(false),
+    options:[],
+    versions:[{
+      label:'2016级',
+      value:1
+    },
+    {
+      label:'2017级',
+      value:2
+    },
+    {
+      value:3,
+      label:'2018级'
+    },
+    {
+      value:4,
+      label:'2019级'
+    },
+    {
+      value:5,
+      label:'2020级'
+    },
+    {
+      value:6,
+      label:'2021级'
+    },
+    {
+      value:7,
+      label:'2022级'
+    },
+    {
+      value:8,
+      label:'2023级'
+    },
+    ],
+    versionLabel:[
+    '2016级','2017级','2018级',
+    '2019级','2020级','2021级','2022级','2023级'
+    ],
+
     // isRouterAlive:true,
     closeShow : ref(false),
     multipleSelection: [],
@@ -203,6 +287,7 @@ data(){
     credit:'',
     courseYear:'',
     remark:'',
+    versionId:'',
   },]),
   pageSize:ref(10),
   pageNum:ref(1),
@@ -220,7 +305,7 @@ form : reactive({
   credit: '',
   courseYear: '',
   remark: '',
-  
+  versionId:'',
 }),
 
 preform:reactive({
@@ -231,7 +316,7 @@ preform:reactive({
   credit: '',
   courseYear: '',
   remark: '',
-  
+  versionId:'',
 }),
 
 result:reactive({}),
@@ -240,6 +325,26 @@ result:reactive({}),
 }, 
 methods: 
 {
+  remoteMethod(version){
+    let that = this;
+    if (version) {
+    this.loading = true
+    setTimeout(() => {
+      that.loading = false
+      that.options = that.versionLabel.filter((item) => {
+        return item.includes(version)
+      })
+    }, 200)
+  } else {
+    that.options = []
+  }
+
+  },
+  getCourseByYear(label){
+    this.currentVersionVale = label;
+    
+    this.getBaseCourse(this.pageSize,this.pageNum);
+  },
   clearForm(){
     this.form.courseId = '';
     this.form.courseName= '';
@@ -358,7 +463,7 @@ methods:
 
   },
   getBaseCourse(pageSize,pageNum){
-    console.log('pageSize:',pageSize,' pageNum:',pageNum);
+    console.log('pageSize:',pageSize,' pageNum:',pageNum,'versionId',this.currentVersionVale);
     let that = this;
     let courses = []
     return request({
@@ -367,6 +472,7 @@ methods:
             params:{
             'pageSize':pageSize,
             'pageNum':pageNum,
+            'versionId':that.currentVersionVale,
             'departmentId':that.departmentId,
             'schoolId':that.schoolId}
         }).then(function(res){
@@ -382,11 +488,9 @@ methods:
             course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            course.versionId = (course.versionId== that.currentVersionVale) ? '已有版本信息' : '没有版本信息';
 
             courses.push(course);
-            
-            
-            
           });
           that.tableData = courses;
           that.result = res;
@@ -449,6 +553,26 @@ methods:
       
     })
     
+  },
+  goBaseCourseDetail(index, row){
+    console.log('goBaseCourseDetail',row);
+    let versionName = this.versions[this.currentVersionVale-1].label;
+    this.$router.push({
+      path:'/baseCourseDetail',
+      query:{
+        versionName:versionName,
+        versionFlag:row.versionId,
+        versionId:this.currentVersionVale,
+        courseId:row.courseId,
+        courseName: row.courseName,
+        courseCode: row.courseCode,
+        courseType: row.courseType,
+        courseNature: row.courseNature,
+        credit: row.credit,
+        courseYear: row.courseYear,
+        remark: row.remark,
+      },
+    })
   },
   editTrigger(val){
     console.log('选中的信息：',val.courseId);
@@ -553,17 +677,38 @@ mounted:function(){
   let that = this;
   this.activate();
   that.getBaseCourse(that.pageSize,that.pageNum);
+  console.log('vesions:',this.versions);
 },
 components:{
   request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
   Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
-  ref,reactive,Delete,Edit,HeaderSearch, addBtn
+  ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown
 }
 
 }
 </script>
 
 <style scoped>
+.selectionBar{
+  
+  position: absolute;
+  right: 10%;
+  width: 700px;
+  
+}
+.m-3{
+  
+  float: right;
+  top: 6px;
+  right: 10%;
+}
+.el-icon--right{
+  color: white;
+}
+.dropDown{
+  margin-left: 1%;
+  width: 100px;
+}
 .clearSelected{
   min-height:36px; 
   color: #3f51b5;
@@ -610,27 +755,10 @@ components:{
   border: 1px solid rgb(189, 189, 189);
 }
 .md-padding {
-  margin-top: 10px;
-}
-body {
-    font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
-    background-color: #f2f2f2;
+  margin:0 auto;
+  margin-top: 85px;
 }
 
-
-
-
-html {
-    font-family: 'Roboto Slab', serif;
-}
-
-
-[layout=row] {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: row;
-    flex-direction: row;
-}
 .pagination{
   margin-left: 40%;
 }
@@ -639,7 +767,7 @@ html {
   margin-top: 10px;
 }
 .deleteButton, .editButton{
-  min-width: 60px;
+  min-width: 10px;
   padding: 0;
   margin: 0;
 }
@@ -693,7 +821,7 @@ html {
 }
 
 .deleteButton{
-  margin-right: 100px;
+  margin-right: 10px;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -733,31 +861,15 @@ html {
     transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
 }
 
-.layout, .layout-column, .layout-row {
-    box-sizing: border-box;
-    display: flex;
-}
 
-.layout-align-center-center, .layout-align-end-center, .layout-align-space-around-center, .layout-align-space-between-center, .layout-align-start-center {
-    align-items: center;
-    align-content: center;
-    max-width: 100%;
-}
 
-.layout-align-center, .layout-align-center-center, .layout-align-center-end, .layout-align-center-start, .layout-align-center-stretch {
-    justify-content: center;
-}
 
-.layout-column {
-    flex-direction: column;
-}
 
-.flex {
-    flex: 1;
-}
-.layout-row>.flex {
-    min-width: 0;
-}
+
+
+
+
+
 
 
 

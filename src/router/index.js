@@ -17,6 +17,7 @@ import Major from '@/views/index/major.vue'
 import Teacher from '@/views/index/teacher.vue'
 import AddTeacher from '@/views/teacher/addTeacher.vue'
 import BatchCourseAdd from '@/views/baseCourse/batchCourseAdd.vue'
+import BaseCourseDetail from '@/views/baseCourse/baseCourseDetail.vue'
 import userLogin from '@/components/userLogin/index.vue'
 
 export default createRouter({
@@ -65,6 +66,11 @@ export default createRouter({
                 {
                     path: '/batchCourseAdd',
                     component: BatchCourseAdd,
+                },
+                {
+                    path:'/baseCourseDetail',
+                    
+                    component:BaseCourseDetail,
                 },
                 //专业视图下路由
                 {
@@ -122,6 +128,7 @@ export default createRouter({
                 
             ]
         },
+        
 
 
     ]

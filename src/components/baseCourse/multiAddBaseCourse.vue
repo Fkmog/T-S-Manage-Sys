@@ -487,42 +487,11 @@
   padding: 20px;
 }
     
-    #luckysheet {
-      margin: 0px;
-      padding: 0px;
-      border:1px aquamarine;
-      /* position: absolute; */
-      width: 100%;
-      height: 750px;
-      /* left: 0px; */
-      margin-top: 20px;
-      /* top: 30px; */
-      bottom: 0px;
-    }
-    .luckysheetborder{
-      border: 1px aquamarine;
-    }
     
-    #uploadBtn {
-      font-size: 16px;
-    }
-    .el-input{
-      width: 30%;
-    }
     
-    #tip {
-      position: absolute;
-      z-index: 1000000;
-      left: 0px;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-      background: rgba(255, 255, 255, 0.8);
-      text-align: center;
-      font-size: 40px;
-      align-items: center;
-      justify-content: center;
-      display: flex;
-    }
+    
+    
+    
+    
     </style>
     

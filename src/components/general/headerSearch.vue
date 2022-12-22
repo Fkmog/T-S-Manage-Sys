@@ -7,7 +7,7 @@
       </el-icon>
       <div class="searchLine">
         <input
-          class="searchInput"
+          class='searchInput'
           v-model="searchInput"
           placeholder="搜索专业名称"
           @change="sendMessage"
@@ -24,15 +24,21 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
+  props:['msg'],
   components: {
     Search,
   },
   data() {
     return {
       searchInput: "",
+      isActive:true,
     };
   },
-  methods: {},
+  methods: {
+    sendMessage(){
+      this.msg(this.searchInput);
+    }
+  },
 };
 </script>
 
