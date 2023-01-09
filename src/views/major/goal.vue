@@ -184,6 +184,7 @@ export default {
         }
         if (res.msg == "操作成功" && res.code == 200) {
           this.programId = res.data.programId;
+          this.$store.commit("major/setProgramId", this.programId);
           this.requirements = res.data.graduateAttributes;
           console.log("requirements", this.requirements);
           if (this.requirements.length == 0) {

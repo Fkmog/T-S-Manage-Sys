@@ -1,34 +1,37 @@
 <template>
-  <div v-show="!closeShow">
-    <HeaderSearch>
-      <template #rightTime>
-        <div class="selectionBar">
-          <el-select
-            v-model="currentVersion"
-            class="m-3"
-            placeholder="Please enter a keyword"
-            @change="getCourseByYear(currentVersion)"
-          >
-            <!-- 远程搜索version -->
-            <!-- remote-show-suffix
+<div  v-show="!closeShow">
+  <HeaderSearch >
+    <template #rightTime>
+      <div class="selectionBar">
+        <el-select
+        v-model="currentVersion"
+        class="m-3"
+        
+        placeholder="Please enter a keyword"
+        
+        @change="getCourseByYear(currentVersion)"
+      >
+      <!-- 远程搜索version -->
+      <!-- remote-show-suffix
         remote
         filterable
         reserve-keyword
         :remote-method="remoteMethod"
         :loading="loading" -->
-            <el-option
-              v-for="item in versions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </div>
-      </template>
-    </HeaderSearch>
-  </div>
+        <el-option
+          v-for="item in versions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+      </div>
+     
+    </template>
+  </HeaderSearch>
+</div>
 
-  <!-- <div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
+<!-- <div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
       <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
       <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
@@ -36,22 +39,12 @@
 
   <div layout="row" flex class="md-padding">
     <addBtn @click="dialogFormVisible = true"></addBtn>
-
-    <div
-      class="el-table-container"
-      layout="column"
-      flex
-      layout-align="start center"
-    >
-      <el-table
-        :data="tableData"
-        ref="multipleTable"
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-        @row-dblclick="editTrigger"
-      >
+    
+    <div class="el-table-container" layout="column" flex layout-align="start center" >
+      
+      <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
         <!-- <el-table-column  type="selection" width="55" /> -->
-        <el-table-column label="课程名" width="180">
+        <el-table-column  label="课程名" width="250" >
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.courseName }}</span>
@@ -79,52 +72,46 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="学分" width="180">
+        <el-table-column  label="学分" width="80" >
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.credit }}</span>
             </div>
           </template>
         </el-table-column>
-
-        <el-table-column prop="remark" label="备注" width="150">
+        
+       
+        <!-- <el-table-column prop="remark" label="备注" width="150">
+          <template #default="scope">
+            <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注" >
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.remark }}</span>
             </div>
           </template>
-        </el-table-column>
-        <el-table-column label="操作">
+        </el-table-column> -->
+        <el-table-column  label="操作" >
           <template #default="scope">
             <el-tooltip content="删除">
-              <el-button
-                @click="deleteBaseCourse(scope.$index, scope.row)"
-                class="deleteButton"
-                link
-                style="color: #3f51b5"
-                ><el-icon><Delete /></el-icon
-              ></el-button>
+              <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
             </el-tooltip>
             <el-tooltip content="修改">
-              <el-button
-                @click="editTrigger(scope.row)"
-                class="deleteButton"
-                link
-                style="color: #3f51b5"
-                ><el-icon><Edit /></el-icon
-              ></el-button>
+              <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
             </el-tooltip>
             <el-tooltip content="添加/查看信息">
-              <el-button
-                @click="goBaseCourseDetail(scope.$index, scope.row)"
-                class="deleteButton"
-                link
-                ><el-icon><MoreFilled /></el-icon
-              ></el-button>
+              <el-button @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link ><el-icon ><MoreFilled /></el-icon></el-button>
             </el-tooltip>
-            <span>{{ scope.row.versionId }}</span>
+            
+            <el-icon v-show="scope.row.versionId" class="deleteButton"><Document /></el-icon>
+            
+           
+           <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
           </template>
         </el-table-column>
+        
       </el-table>
     </div>
   </div>
@@ -229,244 +216,294 @@
 import request from "@/utils/request/request";
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
-import { ref, reactive, version } from "vue";
-import {
-  ElTooltip,
-  ElIcon,
-  ElInput,
-  ElForm,
-  ElButton,
-  ElTable,
-  ElMessage,
-  ElMessageBox,
-  ElDialog,
-  ElDropdown,
-} from "element-plus";
-import {
-  Back,
-  FolderChecked,
-  InfoFilled,
-  Loading,
-  Search,
-  Close,
-  Plus,
-  Delete,
-  Edit,
-  MoreFilled,
-  ArrowDown,
-} from "@element-plus/icons-vue";
+import { ref,reactive, version,}from 'vue';
+import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown,ElTag } from 'element-plus'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document} from '@element-plus/icons-vue'
+
+
+
+
+
 export default {
-  name: "BaseCourse",
-  // inject:['reload'],
-  // provide(){
-  //       return{
-  //         reload:this.reload
-  //       }
-  //     },
-  data() {
-    return {
-      //select
-      currentVersion: "2016级",
-      currentVersionVale: 1,
-      loading: ref(false),
-      options: [],
-      versions: [
-        {
-          label: "2016级",
-          value: 1,
-        },
-        {
-          label: "2017级",
-          value: 2,
-        },
-        {
-          value: 3,
-          label: "2018级",
-        },
-        {
-          value: 4,
-          label: "2019级",
-        },
-        {
-          value: 5,
-          label: "2020级",
-        },
-        {
-          value: 6,
-          label: "2021级",
-        },
-        {
-          value: 7,
-          label: "2022级",
-        },
-        {
-          value: 8,
-          label: "2023级",
-        },
-      ],
-      versionLabel: [
-        "2016级",
-        "2017级",
-        "2018级",
-        "2019级",
-        "2020级",
-        "2021级",
-        "2022级",
-        "2023级",
-      ],
+name:"BaseCourse",
+// inject:['reload'], 
+// provide(){
+//       return{
+//         reload:this.reload
+//       }
+//     },
+data(){
+  return{
+    //from Route
+    routeVersionId:'',
+    routeCourseId:'',
 
-      // isRouterAlive:true,
-      closeShow: ref(false),
-      multipleSelection: [],
-      numSelected: 0,
-      clickState: 0,
-      courseId: ref([]),
+    //select
+    currentVersion:'2016级',
+    currentVersionValue:1,
+    loading:ref(false),
+    options:[],
+    versions:[{
+      label:'2016级',
+      value:1
+    },
+    {
+      label:'2017级',
+      value:2
+    },
+    {
+      value:3,
+      label:'2018级'
+    },
+    {
+      value:4,
+      label:'2019级'
+    },
+    {
+      value:5,
+      label:'2020级'
+    },
+    {
+      value:6,
+      label:'2021级'
+    },
+    {
+      value:7,
+      label:'2022级'
+    },
+    {
+      value:8,
+      label:'2023级'
+    },
+    ],
+    versionLabel:[
+    '2016级','2017级','2018级',
+    '2019级','2020级','2021级','2022级','2023级'
+    ],
 
-      tableData: reactive([
-        {
-          courseName: "",
-          courseCode: "",
-          courseType: "",
-          courseNature: "",
-          credit: "",
-          courseYear: "",
-          remark: "",
-          versionId: "",
-        },
-      ]),
-      pageSize: ref(10),
-      pageNum: ref(1),
-      departmentId: "",
-      schoolId: "",
-      dialogFormVisible: ref(false),
-      dialogFormVisible1: ref(false),
-      formLabelWidth: "140px",
+    // isRouterAlive:true,
+    closeShow : ref(false),
+    multipleSelection: [],
+    numSelected:0,
+    clickState:0,
+    courseId:ref([]),
 
-      form: reactive({
-        courseName: "",
-        courseCode: "",
-        courseType: "",
-        courseNature: "",
-        credit: "",
-        courseYear: "",
-        remark: "",
-        versionId: "",
-      }),
+    tableData: reactive([
+  {
+    courseName:'',
+    courseCode:'',
+    courseType:'',
+    courseNature:'',
+    credit:'',
+    courseYear:'',
+    remark:'',
+    versionId:'',
+  },]),
+  pageSize:ref(10),
+  pageNum:ref(1),
+  departmentId:'',
+  schoolId:'',
+  dialogFormVisible:ref(false),
+  dialogFormVisible1:ref(false),
+formLabelWidth : '140px',
 
-      preform: reactive({
-        courseName: "",
-        courseCode: "",
-        courseType: "",
-        courseNature: "",
-        credit: "",
-        courseYear: "",
-        remark: "",
-        versionId: "",
-      }),
+form : reactive({
+  courseName: '',
+  courseCode: '',
+  courseType: '',
+  courseNature: '',
+  credit: '',
+  courseYear: '',
+  remark: '',
+  versionId:'',
+}),
 
-      result: reactive({}),
-    };
+preform:reactive({
+  courseName: '',
+  courseCode: '',
+  courseType: '',
+  courseNature: '',
+  credit: '',
+  courseYear: '',
+  remark: '',
+  versionId:'',
+}),
+
+result:reactive({}),
+
+  }
+}, 
+methods: 
+{
+  getRouter(){
+    this.routeVersionId = this.$route.query.versionId;
+    this.routeCourseId = this.$route.query.courseId;
+    console.log('routeVersion:',this.routeVersionId)
+    console.log('routeCourse:',this.routeCourseId )
   },
-  methods: {
-    remoteMethod(version) {
-      let that = this;
-      if (version) {
-        this.loading = true;
-        setTimeout(() => {
-          that.loading = false;
-          that.options = that.versionLabel.filter((item) => {
-            return item.includes(version);
-          });
-        }, 200);
-      } else {
-        that.options = [];
-      }
-    },
-    getCourseByYear(label) {
-      this.currentVersionVale = label;
+  addBaseCourseDetail(row){
+    let that = this;
+    ElMessageBox.confirm(
+    '尚未添加版本信息是否添加？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    console.log('versionId',that.currentVersionValue,'CourseId',that.courseId);
 
-      this.getBaseCourse(this.pageSize, this.pageNum);
-    },
-    clearForm() {
-      this.form.courseId = "";
-      this.form.courseName = "";
-      this.form.courseCode = "";
-      this.form.courseType = "";
-      this.form.courseNature = "";
-      this.form.credit = "";
-      this.form.courseYear = "";
-      this.form.remark = "";
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach((row) => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-        if (this.clickState == 1) {
-          this.clickState = 0;
-          this.closeShow = !this.closeShow;
-        }
-      }
-    },
-    handleSelectionChange(val) {
-      var courseId = [];
-      this.multipleSelection = val;
-      console.log("选中的信息：", val);
-      val.forEach(function (course) {
-        let res = course.courseId;
-        courseId.push(res);
-      });
-      this.numSelected = this.multipleSelection.length;
-      if (this.clickState != 1) {
-        this.closeShow = !this.closeShow;
-        this.clickState = 1;
-      }
-      if (this.clickState == 1 && this.numSelected == 0) {
-        this.clickState = 0;
-        this.closeShow = !this.closeShow;
-      }
-      this.courseId = courseId;
-      console.log("courseId:", this.courseId);
-    },
-    handleSizeChange(val) {
-      this.pageSize = val;
-      console.log(`每页 ${val} 条`);
-      this.getBaseCourse(this.pageSize, this.pageNum);
-    },
-    handleCurrentChange(val) {
-      this.pageNum = val;
-      console.log(`当前页: ${val}`);
-      this.getBaseCourse(this.pageSize, this.pageNum);
-    },
-
-    // currentPage(val){
-    //   console.log(`当前页: ${val}`);
-    // },
-    addBaseCourse() {
-      this.dialogFormVisible = false;
-      console.log(this.form);
-
-      let that = this;
-      let postData = this.formTopostData(this.form);
-      console.log("postData:", postData);
-      // console.log('psotData:',postData);
-      // postData.courseName=this.form.courseName;
-      // postData.courseCode=this.form.courseCode;
-      // postData.courseType=this.form.courseType;
-      // postData.courseNature=this.form.courseNature;
-      // postData.credit=this.form.credit;
-      // postData.courseYear=this.form.courseYear;
-      // postData.semester=this.form.semester;
-      // console.log('postData:',postData);
       return request({
-        url: "/baseCourse/add",
-        method: "post",
-        data: postData,
-      }).then(function (res) {
-        if (res.code == "200") {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
+      url:'/detail',
+      method:'post',
+      data:{
+        'versionId':that.currentVersionValue,
+        'courseId':row.courseId,
+        'departmentId':that.departmentId,
+        'schoolId':that.schoolId
+      }
+    }).then(function(res){
+      console.log(res);
+      if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: 'OK',
+            callback: function(action) {
+              ElMessage({
+                type: 'success',
+                message: `新增成功`,
+              });
+              // that.reload();
+            },
+            });
+            //成功后根据vesionId和basecouseId获取详细信息
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+          else{
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              callback: function(action)  {
+                ElMessage({
+                  type: 'error',
+                  message: `新增失败`,
+                });
+                // that.reload();
+              },
+            });
+            //失败后退回basecouse页面
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+    })
+    })
+  },
+  remoteMethod(version){
+    let that = this;
+    if (version) {
+    this.loading = true
+    setTimeout(() => {
+      that.loading = false
+      that.options = that.versionLabel.filter((item) => {
+        return item.includes(version)
+      })
+    }, 200)
+  } else {
+    that.options = []
+  }
+
+  },
+  getCourseByYear(label){
+    this.currentVersionValue = label;
+    
+    this.getBaseCourse(this.pageSize,this.pageNum);
+  },
+  clearForm(){
+    this.form.courseId = '';
+    this.form.courseName= '';
+    this.form.courseCode = '';
+    this.form.courseType= '';
+    this.form.courseNature= '';
+    this.form.credit='';
+    this.form.courseYear='';
+    this.form.remark = '';
+  },
+  toggleSelection(rows) {
+        if (rows) {
+          rows.forEach(row => {
+            this.$refs.multipleTable.toggleRowSelection(row);
+          });
+        } else {
+          this.$refs.multipleTable.clearSelection();
+          if(this.clickState == 1){
+            this.clickState=0;
+            this.closeShow = !this.closeShow;
+          }
+          
+        }
+      },
+      handleSelectionChange(val) {
+        var courseId = [];
+        this.multipleSelection = val;
+        console.log('选中的信息：',val);
+        val.forEach(function(course){
+          let res = course.courseId;
+          courseId.push(res);
+        });
+        this.numSelected = this.multipleSelection.length;
+        if(this.clickState != 1){
+          this.closeShow = !this.closeShow;
+          this.clickState = 1;
+        }
+        if(this.clickState==1&&this.numSelected == 0)
+        {
+          this.clickState=0;
+            this.closeShow = !this.closeShow;
+        }
+        this.courseId = courseId;
+        console.log('courseId:',this.courseId);
+      },
+  handleSizeChange(val) {
+    this.pageSize = val;
+    console.log(`每页 ${val} 条`);
+    this.getBaseCourse(this.pageSize,this.pageNum);
+  },
+  handleCurrentChange(val) {
+    this.pageNum = val
+    console.log(`当前页: ${val}`);
+    this.getBaseCourse(this.pageSize,this.pageNum);
+   
+  },
+  
+  // currentPage(val){
+  //   console.log(`当前页: ${val}`);
+  // },
+  addBaseCourse(){
+    this.dialogFormVisible = false;
+    console.log(this.form);
+    
+    let that = this;
+    let postData = this.formTopostData(this.form);
+    console.log('postData:',postData);
+    // console.log('psotData:',postData);
+    // postData.courseName=this.form.courseName;
+    // postData.courseCode=this.form.courseCode;
+    // postData.courseType=this.form.courseType;
+    // postData.courseNature=this.form.courseNature;
+    // postData.credit=this.form.credit;
+    // postData.courseYear=this.form.courseYear;
+    // postData.semester=this.form.semester;
+    // console.log('postData:',postData);
+    return request({
+            url:'/baseCourse/add',
+            method:'post',
+            data:postData
+        }).then(function(res){
+          
+          if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
             // if you want to disable its autofocus
             // autofocus: false,
             confirmButtonText: "OK",
@@ -477,169 +514,163 @@ export default {
               });
               // that.reload();
             },
+            });
+            that.clearForm();
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+          else{
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              callback: function(action)  {
+                ElMessage({
+                  type: 'error',
+                  message: `添加失败`,
+                });
+                // that.reload();
+              },
+            });
+            that.clearForm();
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+        })
+
+  },
+  getBaseCourse(pageSize,pageNum){
+    console.log('pageSize:',pageSize,' pageNum:',pageNum,'versionId',this.currentVersionValue);
+    let that = this;
+    let courses = []
+    return request({
+            url:'/baseCourse/list',
+            method:'get',
+            params:{
+            'pageSize':pageSize,
+            'pageNum':pageNum,
+            'versionId':that.currentVersionValue,
+            'departmentId':that.departmentId,
+            'schoolId':that.schoolId}
+        }).then(function(res){
+          console.log('courseDetails:',res);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId);
+          res.rows.forEach(function(course){
+            
+            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
+            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+            course.credit=course.credit;
+            course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
+            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
+            course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
+
+            courses.push(course);
           });
-          that.clearForm();
-          that.getBaseCourse(that.pageSize, that.pageNum);
-        } else {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
+          that.tableData = courses;
+          that.result = res;
+        });
+  },
+  deleteBaseCourse(index, row){
+    console.log('deleteCourse',row.courseId);
+    let that = this;
+
+    ElMessageBox.confirm(
+    '将要删除基础课程，是否确定删除？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      return request({
+      url:'/baseCourse'+'/'+row.courseId,
+      method:'delete',
+      
+    }).then(function(res){
+      console.log(res);
+      if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
             // if you want to disable its autofocus
             // autofocus: false,
-            confirmButtonText: "OK",
-            callback: function (action) {
+            confirmButtonText: 'OK',
+            callback: function(action) {
               ElMessage({
-                type: "error",
-                message: `添加失败`,
+                type: 'success',
+                message: `删除成功`,
               });
               // that.reload();
             },
-          });
-          that.clearForm();
-          that.getBaseCourse(that.pageSize, that.pageNum);
-        }
-      });
-    },
-    getBaseCourse(pageSize, pageNum) {
-      console.log(
-        "pageSize:",
-        pageSize,
-        " pageNum:",
-        pageNum,
-        "versionId",
-        this.currentVersionVale
-      );
-      let that = this;
-      let courses = [];
-      return request({
-        url: "/baseCourse/list",
-        method: "get",
-        params: {
-          pageSize: pageSize,
-          pageNum: pageNum,
-          versionId: that.currentVersionVale,
-          departmentId: that.departmentId,
-          schoolId: that.schoolId,
-        },
-      }).then(function (res) {
-        console.log("courseDetails:", res);
-        console.log(
-          "department:",
-          that.departmentId,
-          "schoolId:",
-          that.schoolId
-        );
-        res.rows.forEach(function (course) {
-          // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-          // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
-          course.courseType =
-            course.courseType == "0" ? "学科基础课" : "还未确定";
-          course.courseNature =
-            course.courseNature == "0" ? "专业任选" : "还未确定";
-          course.credit = course.credit;
-          // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
-          course.courseYear = course.courseYear == "0" ? "2022" : "2023";
-          course.semester = course.semester == "0" ? "上学期" : "下学期";
-          course.versionId =
-            course.versionId == that.currentVersionVale
-              ? "已有版本信息"
-              : "没有版本信息";
-
-          courses.push(course);
-        });
-        that.tableData = courses;
-        that.result = res;
-      });
-    },
-    deleteBaseCourse(index, row) {
-      console.log("deleteCourse", row.courseId);
-      let that = this;
-
-      ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          return request({
-            url: "/baseCourse" + "/" + row.courseId,
-            method: "delete",
-          }).then(function (res) {
-            console.log(res);
-            if (res.code == "200") {
-              ElMessageBox.alert(res.msg, "Code:" + res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: "OK",
-                callback: function (action) {
-                  ElMessage({
-                    type: "success",
-                    message: `删除成功`,
-                  });
-                  // that.reload();
-                },
-              });
-
-              that.getBaseCourse(that.pageSize, that.pageNum);
-            } else {
-              ElMessageBox.alert(res.msg, "Code:" + res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: "OK",
-                callback: function (action) {
-                  ElMessage({
-                    type: "error",
-                    message: `删除失败`,
-                  });
-                  // that.reload();
-                },
-              });
-              that.getBaseCourse(that.pageSize, that.pageNum);
-            }
-          });
-        })
-        .catch(() => {});
-    },
-    goBaseCourseDetail(index, row) {
-      console.log("goBaseCourseDetail", row);
-      let versionName = this.versions[this.currentVersionVale - 1].label;
-      this.$router.push({
-        path: "/baseCourseDetail",
-        query: {
-          versionName: versionName,
-          versionFlag: row.versionId,
-          versionId: this.currentVersionVale,
-          courseId: row.courseId,
-          courseName: row.courseName,
-          courseCode: row.courseCode,
-          courseType: row.courseType,
-          courseNature: row.courseNature,
-          credit: row.credit,
-          courseYear: row.courseYear,
-          remark: row.remark,
-        },
-      });
-    },
-    editTrigger(val) {
-      console.log("选中的信息：", val.courseId);
-      this.postDataToform(val);
-      this.dialogFormVisible1 = true;
-      // return request({
-      //   url:'/baseCourse/edit',
-      //   method:'post',
-
-      // })
-    },
-    editBaseCourse() {
-      this.dialogFormVisible1 = false;
-      let that = this;
-      console.log("preform:", this.preform);
-      return request({
-        url: "/baseCourse/edit",
-        method: "post",
-        data: this.preform,
-      }).then(function (res) {
-        console.log("res:", res);
-        if (res.code == "200") {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
+            });
+            
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+          else{
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              callback: function(action)  {
+                ElMessage({
+                  type: 'error',
+                  message: `删除失败`,
+                });
+                // that.reload();
+              },
+            });
+            that.getBaseCourse(that.pageSize,that.pageNum);
+          }
+    })
+    })
+    .catch(() => {
+      
+    })
+    
+  },
+  goBaseCourseDetail(index, row){
+    console.log('goBaseCourseDetail',row);
+    let versionName = this.versions[this.currentVersionValue-1].label;
+    this.$router.push({
+      path:'/baseCourseDetail',
+      query:{
+        versionName:versionName,
+        versionFlag:row.versionId,
+        versionId:this.currentVersionValue,
+        courseId:row.courseId,
+        courseName: row.courseName,
+        courseCode: row.courseCode,
+        courseType: row.courseType,
+        courseNature: row.courseNature,
+        credit: row.credit,
+        courseYear: row.courseYear,
+        remark: row.remark,
+      },
+    })
+  },
+  editTrigger(val){
+    console.log('选中的信息：',val.courseId);
+    this.postDataToform(val);
+    this.dialogFormVisible1 = true;
+    // return request({
+    //   url:'/baseCourse/edit',
+    //   method:'post',
+      
+    // })
+  },
+  editBaseCourse(){
+    this.dialogFormVisible1 = false;
+    let that = this;
+    console.log('preform:',this.preform);
+    return request({
+      url:'/baseCourse/edit',
+      method:'post',
+      data: this.preform
+    }).then(function(res){
+      console.log('res:',res);
+      if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
             // if you want to disable its autofocus
             // autofocus: false,
             confirmButtonText: "OK",
@@ -711,71 +742,65 @@ export default {
       course.courseYear = course.courseYear == "0" ? "2022" : "2023";
       course.remark = _.isEmpty(course.remark) ? "" : course.remark.trim();
 
-      return course;
-    },
-    activate() {
-      this.departmentId = this.$store.state.currentInfo.departmentId;
-      this.schoolId = this.$store.state.currentInfo.schoolId;
-    },
+    return course;
+
   },
-  mounted: function () {
-    let that = this;
-    this.activate();
-    that.getBaseCourse(that.pageSize, that.pageNum);
-    console.log("vesions:", this.versions);
-  },
-  components: {
-    request,
-    ElTooltip,
-    ElIcon,
-    ElInput,
-    ElForm,
-    ElButton,
-    ElTable,
-    ElMessage,
-    ElMessageBox,
-    Back,
-    FolderChecked,
-    InfoFilled,
-    Loading,
-    Search,
-    Close,
-    Plus,
-    Delete,
-    ElDialog,
-    ref,
-    reactive,
-    Delete,
-    Edit,
-    HeaderSearch,
-    addBtn,
-    MoreFilled,
-    ElDropdown,
-    ArrowDown,
-  },
-};
+  activate(){
+            this.departmentId = this.$store.state.currentInfo.departmentId;
+            this.schoolId = this.$store.state.currentInfo.schoolId;
+        },
+},
+mounted:function(){
+  // let that = this;
+  // this.activate();
+  // that.getBaseCourse(that.pageSize,that.pageNum);
+  // console.log('vesions:',this.versions);
+},
+created(){
+  let that = this;
+  this.activate();
+  this.getRouter();
+  if(this.routeVersionId){
+    
+    this.currentVersionValue = this.routeVersionId;
+  }
+  
+  that.getBaseCourse(that.pageSize,that.pageNum);
+
+},
+components:{
+  request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
+  Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
+  ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
+  Document,ElTag
+}
+
+}
 </script>
 
 <style scoped>
-.selectionBar {
+.selectionBar{
+  
   position: absolute;
   right: 10%;
   width: 700px;
+  
 }
-.m-3 {
+.m-3{
+  
   float: right;
   top: 6px;
   right: 10%;
 }
-.el-icon--right {
+.el-icon--right{
   color: white;
 }
-.dropDown {
+.dropDown{
   margin-left: 1%;
   width: 100px;
 }
-.clearSelected {
-  min-height: 36px;
+.clearSelected{
+  min-height:36px; 
   color: #3f51b5;
   display: inline-block;
   position: relative;
@@ -809,30 +834,29 @@ export default {
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.headerSearch {
+.headerSearch{
   border: 0;
   float: left;
   width: 50%;
 }
-.searchBar {
+.searchBar{
   display: inline-block;
   width: 100%;
   border: 1px solid rgb(189, 189, 189);
 }
 .md-padding {
-  margin: 0 auto;
+  margin:0 auto;
   margin-top: 85px;
 }
 
-.pagination {
+.pagination{
   margin-left: 40%;
 }
 .pagination-container {
   width: 100%;
   margin-top: 10px;
 }
-.deleteButton,
-.editButton {
+.deleteButton, .editButton{
   min-width: 10px;
   padding: 0;
   margin: 0;
@@ -884,7 +908,7 @@ export default {
   background-color: transparent;
 }
 
-.deleteButton {
+.deleteButton{
   margin-right: 10px;
   margin-top: 0;
   margin-bottom: 0;
@@ -924,4 +948,6 @@ export default {
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+
 </style>
