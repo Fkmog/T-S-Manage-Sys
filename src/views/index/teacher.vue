@@ -461,6 +461,11 @@ export default {
 .elinput {
   width: 20%;
 }
+
+
+
+
+
 .elinput:hover {
   border-color: #5c6bc0 !important;
   color: #5c6bc0;

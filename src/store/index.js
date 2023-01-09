@@ -99,6 +99,24 @@ export default createStore({
       actions: {},
       modules: {}
     },
+    course:{
+      namespaced: true,
+      state: {
+        courseName:'',
+        detailId:Number,
+      },
+      getters: {},
+      mutations: {
+        setCourseName(state, newVal) {
+          state.courseName = newVal
+        },
+        setDetailId(state, newVal) {
+          state.detailId = newVal
+        },
+      },
+      actions: {},
+      modules: {}
+    }
 
   }
 })

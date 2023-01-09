@@ -62,6 +62,8 @@ import 'element-plus/dist/index.css'
 import 'handsontable/dist/handsontable.full.css'
 
 
+import 'handsontable/dist/handsontable.full.css'
+
 
 
 export default{
@@ -380,18 +382,4 @@ flex-direction: column;
 }
 
 
-#tip {
-  position: absolute;
-  z-index: 1000000;
-  left: 0px;
-  top: 0px;
-  bottom: 0px;
-  right: 0px;
-  background: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  font-size: 40px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
 </style>

@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 # T-S-Manage-Sys
 师生管理系统
-=======
 # vdemo
 
 ## Project setup
@@ -21,4 +19,3 @@ npm run build
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
->>>>>>> master
