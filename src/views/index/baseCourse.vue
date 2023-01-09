@@ -97,14 +97,13 @@
             <el-tooltip content="修改">
               <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
             </el-tooltip>
-            <el-tooltip content="添加/查看信息">
-              <el-button @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link ><el-icon ><MoreFilled /></el-icon></el-button>
+
+            <el-tooltip content="查看信息">
+              <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
             </el-tooltip>
-            
-            <el-icon v-show="scope.row.versionId" class="deleteButton"><Document /></el-icon>
-            
-           
-           <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+            <el-tooltip content="添加信息">
+            <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+          </el-tooltip>
           </template>
         </el-table-column>
         
