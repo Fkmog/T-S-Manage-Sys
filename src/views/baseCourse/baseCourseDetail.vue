@@ -411,7 +411,7 @@ created() {
 this.getRouter();
 
 let that = this;
-    if(this.versionFlag != '已有版本信息'){
+    if(this.versionFlag == false){
     ElMessageBox.confirm(
     '尚未添加版本信息是否添加？',
     '注意',

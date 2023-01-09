@@ -38,7 +38,8 @@ export default createStore({
       namespaced: true,
       state: {
         majorName: '',
-        majorId: ''
+        majorId: '',
+        programId:''
       },
       getters: {},
       mutations: {
@@ -47,6 +48,9 @@ export default createStore({
         },
         setMajorId(state, newVal) {
           state.majorId = newVal
+        },
+        setProgramId(state, newVal){
+          state.programId = newVal
         }
       },
       actions: {},

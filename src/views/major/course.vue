@@ -34,7 +34,7 @@
 
 <div layout="row" flex class="md-padding" >
     <!-- <el-button  class="addCourseButton"  circle @click="drawer = true"><el-icon class="addIcon"><Plus /></el-icon></el-button> -->
-    <addBtn @click="drawer = true"></addBtn>
+    <addBtn @click="drawer = true;this.getBaseCourse(this.pageSize,this.pageNum);"></addBtn>
     <div class="el-table-container">
       <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
         <el-table-column  type="selection" width="55" />
@@ -136,9 +136,9 @@
     </template>
   </el-dialog>
 
-  <el-drawer v-model="drawer" :direction="direction" >
+  <el-drawer v-model="drawer" :direction="direction" size="50%">
     <template #title>
-      <h4 style="width:100px;">基础课程</h4>
+      <h4 style="width:500px;">基础课程</h4>
       <el-select
         v-model="currentVersion"
         class="m-3"
@@ -166,17 +166,34 @@
     <template #default ><!-- 具体basecourse页面，分页 可搜索-->
       <div v-show="!drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;"></div>
       <div v-show="drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;">
-        <el-button @click="this.drawertoggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
+        <el-button @click="this.drawertoggleSelection()" style="float:left;" class="clearSelected" >取消选择</el-button>
         <div class="numSelectedTeacher" >已选中 {{drawernumSelected}} 节基础课程</div>
-        <el-button @click="addBaseCourseInProgram" style="float:right;" class="drawerdeleteButton" link><el-icon ><Plus class="iconSize" /></el-icon></el-button>
+        <el-button @click="this.getBCMId();" style="float:right;" class="drawerdeleteButton"><el-icon ><Plus class="iconSize" /></el-icon></el-button>
       </div>
       <HeaderSearch style="border: 0;" :msg="searchCourse"></HeaderSearch>
       <div class="drawerBlock" flex>
-        <div class="el-table-container">
+        <div >
           <el-table :data="tableData"  ref="drawermultipleTable" style="width: 100%" @selection-change="drawerchandleSelectionChange" @row-dblclick="editTrigger">
-            <el-table-column  type="selection" width="55" />
+            <el-table-column type="selection" :selectable="this.selectable" width="55">
+            <!-- <template #default="scope"> 
+             <el-table-column type="selection" :selectable="this.selectable(scope.row)" width="55"></el-table-column>
+              </template>  -->
+              
+            </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
+            <el-table-column  label="课程大纲" width="180">
+              <template #default="scope">
+                <el-icon v-show="!scope.row.versionId" class="deleteButton"><Document /></el-icon>
+                <el-tag v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="培养计划">
+              <!-- <span>培养计划</span> -->
+              <template #default="scope">
+                <span >{{ scope.row.remark }}</span>
+              </template>
+            </el-table-column>
             <!-- <el-table-column prop="courseType" label="课程类型" width="180" />
             <el-table-column prop="courseNature" label="课程性质" width="180" />
             <el-table-column prop="credit" label="学分" width="180" />
@@ -212,7 +229,7 @@
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive,}from 'vue';
-import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption } from 'element-plus'
+import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag } from 'element-plus'
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
 
@@ -221,10 +238,38 @@ export default {
 name:"Courses",
 components:{
   HeaderSearch,ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption
-  , Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, addBtn
+  , Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, addBtn,
+  ElTag
 },
 data(){
   return{
+    //programeInfo
+    programeInfo:[
+      {
+    "bcdmId": 0,
+    "courseId": 0,
+    "detailId": 0,
+    "groupId": 0,
+    "programId": 0
+      }
+    ],
+    //需要删除的信息
+    deleteProgrameInfo:[
+      {
+    "bcdmId": 0,
+    "courseId": 0,
+    "detailId": 0,
+    "groupId": 0,
+    "programId": 0
+      }
+    ],
+    //programe中已经添加的课程
+    programeCourseInfo:[
+      {
+        'courseId':0,
+        'versionId':0
+      }
+    ],
     //drawer
     drawer:false,
     direction:'ltr',
@@ -244,23 +289,23 @@ data(){
     courseYear:'',
     remark:'',
   },],
-    origintableData:[
-  {
-    courseName:'',
-    courseCode:'',
-    courseType:'',
-    courseNature:'',
-    credit:'',
-    courseYear:'',
-    remark:'',
-  },],
+  //   origintableData:[
+  // {
+  //   courseName:'',
+  //   courseCode:'',
+  //   courseType:'',
+  //   courseNature:'',
+  //   credit:'',
+  //   courseYear:'',
+  //   remark:'',
+  // },],
 
     //学校部门专业信息
     departmentId:'',
     schoolId:'',
     majorId:'',
     majorName:'',
-    programId:'3',
+    programId:'',
 
     
     closeShow : ref(false),
@@ -396,20 +441,129 @@ result:reactive({}),
   }
 },
 methods:{
+  //是否可选
+  selectable(row,index){
+    
+    return !row.remark;
+  },
+  //添加major与detail的关联得到bcdmId
+  addBCDMId(){
+    let that = this;
+    return request({
+      url:'/detailMajor',
+      method:'post',
+      data:{
+  "courseIndicators": [
+    {
+      "achievement": 0,
+      "id": "0101",
+      "numStudent": 0,
+      "supportMethods": [
+        {
+          "id": "string",
+          "weight": 0
+        }
+      ]
+    }
+  ],
+  "departmentId": that.departmentId,
+  "detailId": 17,
+  "majorId": that.majorId,
+  "schoolId": that.schoolId
+}
+    }).then(function(res){
+      console.log('addBCDMId :',res);
+    });
+  },
+  //根据version和courseId来确定detailId
+  getDetail(courseId){
+    let that = this;
+    let coursedetaiId = '';
+    return request({
+      url:'/detail/list'+'?vesionId='+this.currentVersionValue+'&courseId='+courseId,
+      method:'get'
+    }).then(
+      function(res){
+      console.log('getDetail:',res);
+      res.rows.forEach(function(detail){
+        if(detail.versionId == that.currentVersionValue){
+          console.log('detailId',detail.detailId);
+          coursedetaiId = detail.detailId;
+        }
+      });
+      return coursedetaiId;
+    }
+    )
+  },
+  addBaseCourseDetail(row){
+    let that = this;
+    console.log('route push '+'versionValue:',that.currentVersionValue,'courseId:',row.courseId)
+    ElMessageBox.confirm(
+    '尚未添加版本信息是否添加？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    this.$router.push({
+      path:'/baseCourse',
+      query:{
+        versionId:that.currentVersionValue,
+        courseId:row.courseId,
+      }
+  })
+    })
+  },
   getCourseByYear(label){
     this.currentVersionValue = label;
     this.getBaseCourse(this.pageSize,this.pageNum);
   },
-  // getProgramCourse(){
-  //   this.programId = 3;
-  //   return request({
-  //     url:'/baseCourse/program',
-  //     method:'post',
-  //     params:this.programId
-  //   }).then(function(res){
-  //     console.log('getProgramCourse:',res);
-  //   })
-  // },
+  getProgramCourse(){
+    let that = this;
+    that.drawertableData = [];
+    let courses = [];
+    let eachCourse = [];
+    console.log('programId:',this.programId);
+    return request({
+      url:'/baseCourse/program/'+this.programId,
+      method:'get',
+    }).then(function(res){
+      console.log('courseInPrograme:',res);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
+          if(res.total){
+            res.rows.forEach(function(course){
+            
+            let eachCourseId = '';
+            let eachVersionId = '';
+
+            eachCourseId = course.courseId;
+            eachVersionId = course.bcDetails[0].versionId;
+            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
+            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+            course.credit=course.credit;
+            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
+            course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            courses.push(course);
+            var courseDict = {
+              'courseId':eachCourseId,
+              'versionId':eachVersionId,
+            };
+            eachCourse.push(courseDict);
+          });
+          }
+          else{}
+
+          that.drawertableData = courses;
+          that.programeCourseInfo = eachCourse;
+          console.log('programeCourseInfo is ',that.programeCourseInfo);
+          // that.origintableData = courses;
+          that.drawerresult = res;
+    })
+  },
   selectionOption1(val){
     console.log(val,typeof(val));
     
@@ -548,15 +702,7 @@ methods:{
     let that = this;
     let postData = this.formTopostData(this.form);
     console.log('postData:',postData);
-    // console.log('psotData:',postData);
-    // postData.courseName=this.form.courseName;
-    // postData.courseCode=this.form.courseCode;
-    // postData.courseType=this.form.courseType;
-    // postData.courseNature=this.form.courseNature;
-    // postData.credit=this.form.credit;
-    // postData.courseYear=this.form.courseYear;
-    // postData.semester=this.form.semester;
-    // console.log('postData:',postData);
+    
     return request({
             url:'/baseCourse/add',
             method:'post',
@@ -650,33 +796,132 @@ methods:{
     this.$router.push({ path:'/courses'}) 
   },
   deleteBaseCourse(){
-    console.log('deleteCourse');
     let that = this;
+ElMessageBox.confirm(
+    '是否删除选中的培养计划课程？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
     return request({
-      url:'/baseCourse',
-      method:'post',
-      data: this.courseId
+      url:'/baseCourse/program/remove',
+      method:'delete',
+      data: that.deleteProgrameInfo,
+    }).then(function(res){
+      if(res.code == '200'){
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: 'OK',
+            callback: function(action) {
+              ElMessage({
+                type: 'success',
+                message: `删除成功`,
+              });
+              // that.reload();
+            },
+            });
+            // that.clearForm();
+            that.getProgramCourse();
+          }
+          else{
+            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: 'OK',
+              callback: function(action)  {
+                ElMessage({
+                  type: 'error',
+                  message: `删除失败`,
+                });
+                // that.reload();
+              },
+            });
+            // that.clearForm();
+            // that.getProgramCourse();
+          }
     })
+    }) 
   },
-  //添加basecourseDetail关联major 没有实现批量添加
-  addBaseCourseInProgram(){
+  //总步骤
+  getProgrameInfo(){
+    let that = this;
+    this.getBaseCourseDictforProgram();
+   
+  },
+  //组建向programe里添加课程信息的字典
+  getBaseCourseDictforProgram(){
     var postData = [];
     let that = this;
     this.drawercourseId.forEach(function(courseId){
+    let courseBCDMId = '';
+    let courseDetailId = '';
+    that.getDetail(courseId).then(function(res){
+      
+        if(res){
+          courseDetailId = res;
+        }
+        else{
+         
+          return console.log('detailId is null');
+        }
+      }).then(function(){
+        
       var programCoursedict = {
-        schoolId:that.schoolId,
-        departmentId:that.departmentId,
-        majorId:that.majorId,
-        vesionId:that.currentVersionValue,
-        courseId:courseId
-      }
-      postData.push(programCoursedict);
+       'bcmdId':courseBCDMId,
+       'detailId':courseDetailId,
+       'programId':that.programId,
+       'courseId':courseId
+     }
+     postData.push(programCoursedict);
+      }).then(function(){ 
+    that.programeInfo = postData;
+    console.log('getBaseCourseDictforProgram:',that.programeInfo);
+      })
+    }); 
+  },
+  getBCMId(){
+    let that = this;
+    this.programeInfo.forEach(function(courseInfo){
+      let courseBCDMId = '';
+      console.log('getBCMId:',courseInfo.detailId);
+      that.getBaseCourse(that.pageSize,that.pageNum,that.majorId,courseInfo.detailId).then(function(res){
+        
+            console.log('BCMId: ',res);
+            if(res){
+              console.log('bcdmId is :',res);
+              courseBCDMId = res;
+              courseInfo.bcmdId = courseBCDMId;
+            }
+            else{
+              console.log('bcdmId is null');
+            }
+          });
     });
-    console.log('addCourse:',postData);
+
+    ElMessageBox.confirm(
+    '是否删除选中的培养计划课程？',
+    '注意',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(function(){
+    that.addBaseCourseInProgram();
+  })
+
+  },
+  //向programe添加课程
+  addBaseCourseInProgram(){
+    let that = this; 
     return request({
-      url:'/detail',
+      url:'/baseCourse/program/add',
       method:'post',
-      data:postData,
+      data:this.programeInfo,
     }).then(function(res){
       if(res.code == '200'){
             ElMessageBox.alert(res.msg, 'Code:'+res.code, {
@@ -689,9 +934,12 @@ methods:{
                 message: `添加成功`,
               });
               // that.reload();
+              
             },
             });
             that.drawercourseId=[];
+            that.getProgramCourse();
+            that.getBaseCourse(that.pageSize,that.pageNum);
             that.$refs.drawermultipleTable.clearSelection();
             if(that.drawerclickState == 1){
               that.drawerclickState=0;
@@ -719,7 +967,7 @@ methods:{
               that.drawercloseShow = !that.drawercloseShow;
             };
           }
-    })
+    });
   },
   editTrigger(val){
     console.log('选中的信息：',val.courseId);
@@ -776,11 +1024,20 @@ methods:{
 
   },
   handleSelectionChange(val) {
+        let that = this;
         var courseId = [];
+        var deleteCourseInfo = [];
         this.multipleSelection = val;
         console.log('选中的信息：',val);
         val.forEach(function(course){
           let res = course.courseId;
+          let courseDetailId =course.bcDetails[0].detailId;
+          var eachCourseInfo = {
+            'courseId':res,
+            'programId':that.programId,
+            'detailId':courseDetailId
+          };
+          deleteCourseInfo.push(eachCourseInfo);
           courseId.push(res);
         });
         this.numSelected = this.multipleSelection.length;
@@ -794,7 +1051,10 @@ methods:{
             this.closeShow = !this.closeShow;
         }
         this.courseId = courseId;
+        this.deleteProgrameInfo = deleteCourseInfo;
         console.log('courseId:',this.courseId);
+        console.log('deleteProgrameInfo:',this.deleteProgrameInfo );
+        
       },
       drawerchandleSelectionChange(val) {
         var courseId = [];
@@ -816,6 +1076,7 @@ methods:{
         }
         this.drawercourseId = courseId;
         console.log('courseId:',this.drawercourseId);
+        this.getBaseCourseDictforProgram();
       },
   toggleSelection(rows) {
         if (rows) {
@@ -845,40 +1106,30 @@ methods:{
           
         }
     },
-  getBaseCourse(pageSize,pageNum,majorId){
+  getBaseCourse(pageSize,pageNum,majorId,detailId){
     let that = this;
     let courses = [];
     let realurl ='';
+    let courseBCDMId = '';
     
     if(majorId){
       realurl = '/detailMajor/list';//通过majorId来显示已经添加的detail，可以获取到courseId
-      
       return request({
             url:realurl+'?'+'majorId='+this.majorId,
             method:'get',
         }).then(function(res){
-          console.log('courseDetails:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
-          res.rows.forEach(function(course){
-            
-            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
-            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.credit=course.credit;
-            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-            course.semester=(course.semester == '0') ? '上学期' : '下学期';
-
-            courses.push(course);
+          
+          if(res.rows){
+            res.rows.forEach(function(course){
+              
+              if(course.detailId == detailId){
+                
+                courseBCDMId = course.bcdmId;
+              }
           });
-          
-          
-            that.drawertableData = courses;
-            that.origintableData = courses;
-            that.drawerresult = res;
-          
-          
-          
+          };
+
+          return courseBCDMId;
         });
     }
     else{
@@ -897,22 +1148,47 @@ methods:{
             },
         }).then(function(res){
           console.log('courseDetails:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionValue',that.currentVersionValue);
+          console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
-            if(course.versionId == that.currentVersionValue){
+            
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
             course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            
+            course.remark = '';
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
-
-            courses.push(course);
-            }
+            course.trueversionId = course.versionId;
+            course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
             
-
+            courses.push(course);
           });
+          
+          
+            that.programeCourseInfo.forEach(function(courseInfo){
+              try{
+                 
+              courses.forEach(function(course){
+                console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+                if(!course.remark){
+                  
+                if(courseInfo.courseId == course.courseId ){
+                    if(courseInfo.versionId == course.trueversionId){
+                      course.remark = true;
+                      throw new Error("remark")
+                    }
+                  }
+                  else{
+                    course.remark = false;
+                  }
+                }
+                
+              });
+          }catch(e){
+            if(e.message!='remark') throw e;
+          }
+          })
           
           
             that.tableData = courses;
@@ -929,21 +1205,23 @@ methods:{
             this.schoolId = this.$store.state.currentInfo.schoolId;
             this.majorId = this.$store.state.major.majorId;
             this.majorName = this.$store.state.major.majorName;
-
+            this.programId = this.$store.state.major.programId;
             console.log('schoolId+departmentId+majorId',this.schoolId,this.departmentId,this.majorId);
         },
 },
 mounted:function(){
   this.activate();
+  this.getProgramCourse();
   this.getBaseCourse(this.pageSize,this.pageNum);
-  this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
-  // this.getProgramCourse();
+  // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
+  
 }
 
 }
 </script>
 
 <style scoped> 
+
 .drawerFooter{
   padding-bottom: 100px;
 }
