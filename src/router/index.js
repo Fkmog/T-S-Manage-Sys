@@ -18,6 +18,10 @@ import Teacher from '@/views/index/teacher.vue'
 import AddTeacher from '@/views/teacher/addTeacher.vue'
 import BatchCourseAdd from '@/views/baseCourse/batchCourseAdd.vue'
 import BaseCourseDetail from '@/views/baseCourse/baseCourseDetail.vue'
+import baseCourseObjectives from '@/views/baseCourse/objectives.vue'
+import baseCourseActivities from '@/views/baseCourse/activities.vue'
+import baseCourseIndicators from '@/views/baseCourse/indicators.vue'
+
 import userLogin from '@/components/userLogin/index.vue'
 
 //教师端组件
@@ -57,7 +61,6 @@ export default createRouter({
                     path: '/class',
                     component: Class,
                     meta: { isMajor: false }
-
                 }, {
                     path: '/teacher',
                     component: Teacher,
@@ -67,7 +70,6 @@ export default createRouter({
                     path: '/major',
                     component: Major,
                     meta: { isMajor: false }
-
                 },
                 {
                     path: '/addTeacher',
@@ -78,9 +80,20 @@ export default createRouter({
                     component: BatchCourseAdd,
                 },
                 {
-                    path:'/baseCourseDetail',
-                    
+                    path:'/baseCourseDetail',    
                     component:BaseCourseDetail,
+                },
+                {
+                    path:'/baseCourseIndicators',    
+                    component:baseCourseIndicators,
+                },
+                {
+                    path:'/baseCourseObjectives',    
+                    component:baseCourseObjectives,
+                },
+                {
+                    path:'/baseCourseActivities',    
+                    component:baseCourseActivities,
                 },
                 //专业视图下路由
                 {
@@ -126,7 +139,7 @@ export default createRouter({
                     name: "Manage",
                     path: '/manage',
                     component: Manage,
-                    meta: { isMajor: false }
+                    meta: { isMajor: true }
 
                 },
                 {

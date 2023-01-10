@@ -9,6 +9,13 @@ export function getMajor(departmentId) {
     }
   })
 }
+//查询专业
+export function getMajorInfo(majorId) {
+  return request({
+    url: '/major/'+majorId ,
+    method: 'get',
+  })
+}
 //新增专业
 export function addMajor(majorName, departmentId) {
   return request({

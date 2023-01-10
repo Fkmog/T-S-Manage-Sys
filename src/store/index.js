@@ -103,6 +103,68 @@ export default createStore({
       actions: {},
       modules: {}
     },
+    course:{
+      namespaced: true,
+      state: {
+        courseName:'',
+        detailId:Number,
+        baseCourseVersionName:'',
+        baseCourseVersionFlag:'',
+        baseCourseVersionId:'',
+        baseCourseCourseId:'',
+        baseCourseCourseName: '',
+        baseCourseCourseCode: '',
+        baseCourseCourseType: '',
+        baseCourseCourseNature: '',
+        baseCourseCredit: '',
+        baseCourseCourseYear: '',
+        baseCourseRemark: '',
+      },
+      getters: {},
+      mutations: {
+        setCourseName(state, newVal) {
+          state.courseName = newVal
+        },
+        setDetailId(state, newVal) {
+          state.detailId = newVal
+        },
+        setbaseCourseVersionName(state, newVal) {
+          state.baseCourseVersionName = newVal
+        },
+        setbaseCourseVersionFlag(state, newVal) {
+          state.baseCourseVersionFlag = newVal
+        },
+        setbaseCourseVersionId(state, newVal) {
+          state.baseCourseVersionId = newVal
+        },
+        setbaseCourseCourseId(state, newVal) {
+          state.baseCourseCourseId = newVal
+        },
+        setbaseCourseCourseName(state, newVal) {
+          state.baseCourseCourseName = newVal
+        },
+        setbaseCourseCourseCode(state, newVal) {
+          state.baseCourseCourseCode = newVal
+        },
+        setbaseCourseCourseType(state, newVal) {
+          state.baseCourseCourseType = newVal
+        },
+        setbaseCourseCourseNature(state, newVal) {
+          state.baseCourseCourseNature = newVal
+        },
+        setbaseCourseCredit(state, newVal) {
+          state.baseCourseCredit = newVal
+        },
+        setbaseCourseCourseYear(state, newVal) {
+          state.baseCourseCourseYear = newVal
+        },
+        setbaseCourseRemark(state, newVal) {
+          state.baseCourseRemark = newVal
+        },
+      },
+      actions: {},
+      modules: {}
+    }
 
   }
 })
