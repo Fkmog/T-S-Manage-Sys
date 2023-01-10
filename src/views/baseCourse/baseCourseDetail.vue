@@ -335,17 +335,18 @@ export default {
     },
     //获取路由参数信息
     getRouter() {
-      this.versionName = this.$route.query.versionName;
-      this.versionId = this.$route.query.versionId;
-      this.versionFlag = this.$route.query.versionFlag;
-      this.courseId = this.$route.query.courseId;
-      this.form.courseName = this.$route.query.courseName;
-      this.form.courseCode = this.$route.query.courseCode;
-      this.form.courseType = this.$route.query.courseType;
-      this.form.courseNature = this.$route.query.courseNature;
-      this.form.credit = this.$route.query.credit;
-      this.form.courseYear = this.$route.query.courseYear;
-      this.form.remark = this.$route.query.remark;
+      this.versionName = this.$store.state.course.baseCourseVersionName;
+      this.versionId = this.$store.state.course.baseCourseVersionFlag;
+      this.versionFlag = this.$store.state.course.baseCourseVersionId;
+      this.courseId = this.$store.state.course.baseCourseCourseId;
+      this.form.courseName = this.$store.state.course.baseCourseCourseName;
+      this.form.courseCode = this.$store.state.course.baseCourseCourseCode;
+      this.form.courseType = this.$store.state.course.baseCourseCourseType;
+      this.form.courseNature = this.$store.state.course.baseCourseCourseNature;
+      this.form.credit = this.$store.state.course.baseCourseCredit;
+      this.form.courseYear = this.$store.state.course.baseCourseCourseYear;
+      this.form.remark = this.$store.state.course.baseCourseRemark;
+
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
     },

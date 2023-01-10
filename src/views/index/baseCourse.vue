@@ -634,21 +634,36 @@
     goBaseCourseDetail(index, row){
       console.log('goBaseCourseDetail',row);
       let versionName = this.versions[this.currentVersionValue-1].label;
+
+      this.$store.commit("course/setbaseCourseVersionName", versionName);
+      this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+      this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
+      this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+      this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+      this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+      this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+      this.$store.commit("course/setbaseCourseCourseNature", row.courseNature);
+      this.$store.commit("course/setbaseCourseCredit",  row.credit);
+      this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+      this.$store.commit("course/setbaseCourseRemark", row.remark);
+
+
+
       this.$router.push({
         path:'/baseCourseDetail',
-        query:{
-          versionName:versionName,
-          versionFlag:row.versionId,
-          versionId:this.currentVersionValue,
-          courseId:row.courseId,
-          courseName: row.courseName,
-          courseCode: row.courseCode,
-          courseType: row.courseType,
-          courseNature: row.courseNature,
-          credit: row.credit,
-          courseYear: row.courseYear,
-          remark: row.remark,
-        },
+        // query:{
+        //   versionName:versionName,
+        //   versionFlag:row.versionId,
+        //   versionId:this.currentVersionValue,
+        //   courseId:row.courseId,
+        //   courseName: row.courseName,
+        //   courseCode: row.courseCode,
+        //   courseType: row.courseType,
+        //   courseNature: row.courseNature,
+        //   credit: row.credit,
+        //   courseYear: row.courseYear,
+        //   remark: row.remark,
+        // },
       })
     },
     editTrigger(val){
