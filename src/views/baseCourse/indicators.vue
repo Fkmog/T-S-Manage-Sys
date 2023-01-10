@@ -23,11 +23,30 @@
     </el-row>
   </div>
   <div class="body">
-    <div class="card">
-     <span  style="color: grey; font-size: 14px;margin-top:20px"
-          >毕业要求指标点</span
-        >
-    </div>
+    <el-tabs class="major-tab">
+      <el-tab-pane
+        v-model="chosenMajor"
+        v-for="m in majorList"
+        :key="m.majorId"
+        :label="m.majorName"
+      >
+        <div class="card">
+          <span style="color: grey; font-size: 14px; margin-top: 20px"
+            >毕业要求指标点</span
+          >
+
+          <div class="attribute-detail" v-for="i in m.indicators" :key="i.id">
+            <div class="detail-num">
+              {{ i.serialNum }}
+            </div>
+            <div class="detail-content">
+              <div class="name">{{ i.name }}</div>
+              <div class="desc">{{ i.description }}</div>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
@@ -43,6 +62,7 @@ export default {
   },
   data() {
     return {
+      chosenMajor: "",
       course: {
         name: "",
         detailId: Number,
@@ -50,6 +70,7 @@ export default {
         schoolId: Number,
       },
       majorList: [],
+      programId: Number,
     };
   },
   mounted() {
@@ -57,6 +78,7 @@ export default {
     this.course.detailId = this.$store.state.course.detailId;
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
+    this.programId = this.$store.state.major.programId;
     console.log(this.course.name, this.course.detailId);
     this.checkMajors();
   },
@@ -80,13 +102,34 @@ export default {
     },
     //查询各专业对应的Indicators指标点
     checkIndicators() {
+      this.chosenMajor = this.majorList[0].majorName;
+      console.log("!", this.majorList[0].majorName, this.chosenMajor);
+
       for (let i = 0; i < this.majorList.length; i++) {
         getIndicators(
           this.majorList[i].bcdmId,
           this.course.departmentId,
-          this.course.schoolId
+          this.course.schoolId,
+          this.programId
         ).then((res) => {
-          console.log("getIndicators", res);
+          console.log("getIndicators:", i, res);
+          this.majorList[i].indicators = res.data;
+          //处理id->serialNum
+          for(let j = 0;j<this.majorList[i].indicators.length;j++){
+          let serialNum= []
+          if (this.majorList[i].indicators[j].id.charAt(0) == 0) {
+            serialNum[0] = this.majorList[i].indicators[j].id.charAt(1);
+          }else{
+            serialNum[0] = this.majorList[i].indicators[j].id.substring(0,2);
+          }
+           if (this.majorList[i].indicators[j].id.charAt(2) == 0) {
+            serialNum[1] = this.majorList[i].indicators[j].id.charAt(3);
+          }else{
+            serialNum[1] = this.majorList[i].indicators[j].id.substring(2,4);
+          }
+          this.majorList[i].indicators[j].serialNum = serialNum.join(".")
+          console.log("@@@", this.majorList[i].indicators[j].serialNum);
+          }
         });
       }
     },
@@ -94,7 +137,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .block {
   position: absolute;
   top: 110px;
@@ -121,15 +164,43 @@ export default {
   display: flex;
   justify-content: center;
 }
+.major-tab {
+  margin-top: 100px;
+}
 .card {
   display: flex;
   flex-direction: column;
   width: 750px;
   background: white;
-  padding: 0 0 10px 10px;
   margin-bottom: 20px;
-  margin-top: 100px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   padding: 0 0 20px 20px;
+}
+.el-tabs__content {
+  overflow: visible;
+}
+.detail-num {
+  color: #5c6bc0;
+  font-weight: bold;
+  margin-left: 25px;
+  margin-top: 20px;
+  font-size: 24px;
+}
+.name {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 20px;
+  white-space: nowrap;
+  margin-left: 30px;
+}
+.desc {
+  margin: 20px;
+  margin-left: 30px;
+  margin-top:25px
+}
+.attribute-detail {
+  display: flex;
+  flex-direction: row;
+  margin-top:20px
 }
 </style>
