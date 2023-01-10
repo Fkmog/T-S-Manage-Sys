@@ -36,20 +36,10 @@
 
   <div layout="row" flex class="md-padding">
     <addBtn @click="dialogFormVisible = true"></addBtn>
-
-    <div
-      class="el-table-container"
-      layout="column"
-      flex
-      layout-align="start center"
-    >
-      <el-table
-        :data="tableData"
-        ref="multipleTable"
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-        @row-dblclick="editTrigger"
-      >
+    
+    <div class="el-table-container" layout="column" flex layout-align="start center" >
+      
+      <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
         <!-- <el-table-column  type="selection" width="55" /> -->
         <el-table-column label="课程名" width="250">
           <template #default="scope">
@@ -97,22 +87,10 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-tooltip content="删除">
-              <el-button
-                @click="deleteBaseCourse(scope.$index, scope.row)"
-                class="deleteButton"
-                link
-                style="color: #3f51b5"
-                ><el-icon><Delete /></el-icon
-              ></el-button>
+              <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
             </el-tooltip>
             <el-tooltip content="修改">
-              <el-button
-                @click="editTrigger(scope.row)"
-                class="deleteButton"
-                link
-                style="color: #3f51b5"
-                ><el-icon><Edit /></el-icon
-              ></el-button>
+              <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
             </el-tooltip>
 
             <el-tooltip content="查看信息">
@@ -135,6 +113,7 @@
             </el-tooltip>
           </template>
         </el-table-column>
+        
       </el-table>
     </div>
   </div>
@@ -326,54 +305,53 @@ export default {
         "2023级",
       ],
 
-      // isRouterAlive:true,
-      closeShow: ref(false),
-      multipleSelection: [],
-      numSelected: 0,
-      clickState: 0,
-      courseId: ref([]),
+    // isRouterAlive:true,
+    closeShow : ref(false),
+    multipleSelection: [],
+    numSelected:0,
+    clickState:0,
+    courseId:ref([]),
 
-      tableData: reactive([
-        {
-          courseName: "",
-          courseCode: "",
-          courseType: "",
-          courseNature: "",
-          credit: "",
-          courseYear: "",
-          remark: "",
-          versionId: "",
-        },
-      ]),
-      pageSize: ref(10),
-      pageNum: ref(1),
-      departmentId: "",
-      schoolId: "",
-      dialogFormVisible: ref(false),
-      dialogFormVisible1: ref(false),
-      formLabelWidth: "140px",
+    tableData: reactive([
+  {
+    courseName:'',
+    courseCode:'',
+    courseType:'',
+    courseNature:'',
+    credit:'',
+    courseYear:'',
+    remark:'',
+    versionId:'',
+  },]),
+  pageSize:ref(10),
+  pageNum:ref(1),
+  departmentId:'',
+  schoolId:'',
+  dialogFormVisible:ref(false),
+  dialogFormVisible1:ref(false),
+formLabelWidth : '140px',
 
-      form: reactive({
-        courseName: "",
-        courseCode: "",
-        courseType: "",
-        courseNature: "",
-        credit: "",
-        courseYear: "",
-        remark: "",
-        versionId: "",
-      }),
+form : reactive({
+  courseName: '',
+  courseCode: '',
+  courseType: '',
+  courseNature: '',
+  credit: '',
+  courseYear: '',
+  remark: '',
+  versionId:'',
+}),
 
-      preform: reactive({
-        courseName: "",
-        courseCode: "",
-        courseType: "",
-        courseNature: "",
-        credit: "",
-        courseYear: "",
-        remark: "",
-        versionId: "",
-      }),
+preform:reactive({
+  courseName: '',
+  courseCode: '',
+  courseType: '',
+  courseNature: '',
+  credit: '',
+  courseYear: '',
+  remark: '',
+  versionId:'',
+}),
 
       result: reactive({}),
     };
@@ -609,15 +587,15 @@ export default {
           course.versionId =
             course.versionId == that.currentVersionValue ? true : false;
 
-          courses.push(course);
+            courses.push(course);
+          });
+          that.tableData = courses;
+          that.result = res;
         });
-        that.tableData = courses;
-        that.result = res;
-      });
-    },
-    deleteBaseCourse(index, row) {
-      console.log("deleteCourse", row.courseId);
-      let that = this;
+  },
+  deleteBaseCourse(index, row){
+    console.log('deleteCourse',row.courseId);
+    let that = this;
 
       ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
         confirmButtonText: "确定",
@@ -839,21 +817,23 @@ export default {
   position: absolute;
   right: 10%;
   width: 700px;
+  
 }
-.m-3 {
+.m-3{
+  
   float: right;
   top: 6px;
   right: 10%;
 }
-.el-icon--right {
+.el-icon--right{
   color: white;
 }
-.dropDown {
+.dropDown{
   margin-left: 1%;
   width: 100px;
 }
-.clearSelected {
-  min-height: 36px;
+.clearSelected{
+  min-height:36px; 
   color: #3f51b5;
   display: inline-block;
   position: relative;
@@ -887,30 +867,29 @@ export default {
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.headerSearch {
+.headerSearch{
   border: 0;
   float: left;
   width: 50%;
 }
-.searchBar {
+.searchBar{
   display: inline-block;
   width: 100%;
   border: 1px solid rgb(189, 189, 189);
 }
 .md-padding {
-  margin: 0 auto;
+  margin:0 auto;
   margin-top: 85px;
 }
 
-.pagination {
+.pagination{
   margin-left: 40%;
 }
 .pagination-container {
   width: 100%;
   margin-top: 10px;
 }
-.deleteButton,
-.editButton {
+.deleteButton, .editButton{
   min-width: 10px;
   padding: 0;
   margin: 0;
@@ -962,7 +941,7 @@ export default {
   background-color: transparent;
 }
 
-.deleteButton {
+.deleteButton{
   margin-right: 10px;
   margin-top: 0;
   margin-bottom: 0;
@@ -1002,4 +981,6 @@ export default {
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+
 </style>
