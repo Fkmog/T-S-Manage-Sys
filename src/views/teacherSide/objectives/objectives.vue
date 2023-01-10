@@ -29,7 +29,7 @@
         <span class="head-text" style="color: grey; font-size: 14px"
           >课程目标</span
         >
-      </div>
+      </div> 
       
     </div>
   </div>
