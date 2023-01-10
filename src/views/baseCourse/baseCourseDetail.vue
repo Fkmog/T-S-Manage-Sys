@@ -189,7 +189,7 @@ export default {
     this.$store.commit("course/setCourseName", this.form.courseName);
     let that = this;
     //如果没有版本信息，提示添加
-    if (this.versionFlag != "已有版本信息") {
+    if (!this.versionFlag) {
       ElMessageBox.confirm("尚未添加版本信息是否添加？", "注意", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",

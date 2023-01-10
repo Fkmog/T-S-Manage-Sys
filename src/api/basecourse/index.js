@@ -1,14 +1,4 @@
 import request from '@/utils/request/request'
-//查询教学班列表
-// export function getClass(academicYear) {
-//     return request({
-//       url: '/classes/list',
-//       method: 'get',
-//       params:{
-//         academicYear:academicYear,
-//       }
-//     })
-//   }
 //   //添加教学班列表
 // export function addClass(remark) {
 //   return request({
@@ -37,6 +27,13 @@ export function getIndicators(bcdmId, departmentId, schoolId,programId) {
 export function getMajors(detailId) {
     return request({
         url: '/detailMajor/list' + '?detailId=' + detailId,
+        method: 'get',
+    })
+}
+//通过bcdmId获得培养计划课程专业详情
+export function getDetailMajor(bcdmId) {
+    return request({
+        url: '/detailMajor/ '+ bcdmId,
         method: 'get',
     })
 }

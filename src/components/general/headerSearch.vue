@@ -27,6 +27,7 @@ import { Search } from "@element-plus/icons-vue";
 export default {
   name: "HeaderSearch",
   props:['msg'],
+  props:['msg'],
   components: {
     Search,
   },
@@ -34,7 +35,13 @@ export default {
     return {
       searchInput: "",
       isActive:true,
+      isActive:true,
     };
+  },
+  methods: {
+    sendMessage(){
+      this.msg(this.searchInput);
+    }
   },
   methods: {
     sendMessage(){

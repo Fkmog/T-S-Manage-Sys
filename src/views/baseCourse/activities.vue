@@ -8,6 +8,6 @@ name:'baseCourseActivities',
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

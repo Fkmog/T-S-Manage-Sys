@@ -11,11 +11,11 @@
           >
             <!-- 远程搜索version -->
             <!-- remote-show-suffix
-        remote
-        filterable
-        reserve-keyword
-        :remote-method="remoteMethod"
-        :loading="loading" -->
+          remote
+          filterable
+          reserve-keyword
+          :remote-method="remoteMethod"
+          :loading="loading" -->
             <el-option
               v-for="item in versions"
               :key="item.value"
@@ -29,10 +29,10 @@
   </div>
 
   <!-- <div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
-      <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
-      <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
-      <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
-</div> -->
+        <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
+        <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
+        <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
+  </div> -->
 
   <div layout="row" flex class="md-padding">
     <addBtn @click="dialogFormVisible = true"></addBtn>
@@ -51,7 +51,7 @@
         @row-dblclick="editTrigger"
       >
         <!-- <el-table-column  type="selection" width="55" /> -->
-        <el-table-column label="课程名" width="180">
+        <el-table-column label="课程名" width="250">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.courseName }}</span>
@@ -79,7 +79,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="学分" width="180">
+        <el-table-column label="学分" width="80">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <span>{{ scope.row.credit }}</span>
@@ -87,13 +87,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="remark" label="备注" width="150">
-          <template #default="scope">
-            <div style="display: flex; align-items: center">
-              <span>{{ scope.row.remark }}</span>
-            </div>
-          </template>
-        </el-table-column>
+        <!-- <el-table-column prop="remark" label="备注" width="150">
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <span>{{ scope.row.remark }}</span>
+              </div>
+            </template>
+          </el-table-column> -->
         <el-table-column label="操作">
           <template #default="scope">
             <el-tooltip content="删除">
@@ -114,15 +114,25 @@
                 ><el-icon><Edit /></el-icon
               ></el-button>
             </el-tooltip>
-            <el-tooltip content="添加/查看信息">
+
+            <el-tooltip content="查看信息">
               <el-button
+                v-show="scope.row.versionId"
                 @click="goBaseCourseDetail(scope.$index, scope.row)"
                 class="deleteButton"
                 link
-                ><el-icon><MoreFilled /></el-icon
+                style="color: #3f51b5"
+                ><el-icon><Document /></el-icon
               ></el-button>
             </el-tooltip>
-            <span>{{ scope.row.versionId }}</span>
+            <el-tooltip content="添加信息">
+              <el-tag
+                v-show="!scope.row.versionId"
+                type="danger"
+                @click="addBaseCourseDetail(scope.row)"
+                >无课程大纲</el-tag
+              >
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -224,8 +234,8 @@
     </el-pagination>
   </div>
 </template>
-
-<script>
+  
+  <script>
 import request from "@/utils/request/request";
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
@@ -241,6 +251,7 @@ import {
   ElMessageBox,
   ElDialog,
   ElDropdown,
+  ElTag,
 } from "element-plus";
 import {
   Back,
@@ -254,20 +265,20 @@ import {
   Edit,
   MoreFilled,
   ArrowDown,
+  Document,
 } from "@element-plus/icons-vue";
+
 export default {
   name: "BaseCourse",
-  // inject:['reload'],
-  // provide(){
-  //       return{
-  //         reload:this.reload
-  //       }
-  //     },
   data() {
     return {
+      //from Route
+      routeVersionId: "",
+      routeCourseId: "",
+
       //select
       currentVersion: "2016级",
-      currentVersionVale: 1,
+      currentVersionValue: 1,
       loading: ref(false),
       options: [],
       versions: [
@@ -368,6 +379,71 @@ export default {
     };
   },
   methods: {
+    getRouter() {
+      this.routeVersionId = this.$route.query.versionId;
+      this.routeCourseId = this.$route.query.courseId;
+      console.log("routeVersion:", this.routeVersionId);
+      console.log("routeCourse:", this.routeCourseId);
+    },
+    addBaseCourseDetail(row) {
+      let that = this;
+      ElMessageBox.confirm("尚未添加版本信息是否添加？", "注意", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        console.log(
+          "versionId",
+          that.currentVersionValue,
+          "CourseId",
+          that.courseId
+        );
+
+        return request({
+          url: "/detail",
+          method: "post",
+          data: {
+            versionId: that.currentVersionValue,
+            courseId: row.courseId,
+            departmentId: that.departmentId,
+            schoolId: that.schoolId,
+          },
+        }).then(function (res) {
+          console.log(res);
+          if (res.code == "200") {
+            ElMessageBox.alert(res.msg, "Code:" + res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: "OK",
+              callback: function (action) {
+                ElMessage({
+                  type: "success",
+                  message: `新增成功`,
+                });
+                // that.reload();
+              },
+            });
+            //成功后根据vesionId和basecouseId获取详细信息
+            that.getBaseCourse(that.pageSize, that.pageNum);
+          } else {
+            ElMessageBox.alert(res.msg, "Code:" + res.code, {
+              // if you want to disable its autofocus
+              // autofocus: false,
+              confirmButtonText: "OK",
+              callback: function (action) {
+                ElMessage({
+                  type: "error",
+                  message: `新增失败`,
+                });
+                // that.reload();
+              },
+            });
+            //失败后退回basecouse页面
+            that.getBaseCourse(that.pageSize, that.pageNum);
+          }
+        });
+      });
+    },
     remoteMethod(version) {
       let that = this;
       if (version) {
@@ -383,7 +459,7 @@ export default {
       }
     },
     getCourseByYear(label) {
-      this.currentVersionVale = label;
+      this.currentVersionValue = label;
 
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
@@ -441,9 +517,6 @@ export default {
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
 
-    // currentPage(val){
-    //   console.log(`当前页: ${val}`);
-    // },
     addBaseCourse() {
       this.dialogFormVisible = false;
       console.log(this.form);
@@ -451,15 +524,6 @@ export default {
       let that = this;
       let postData = this.formTopostData(this.form);
       console.log("postData:", postData);
-      // console.log('psotData:',postData);
-      // postData.courseName=this.form.courseName;
-      // postData.courseCode=this.form.courseCode;
-      // postData.courseType=this.form.courseType;
-      // postData.courseNature=this.form.courseNature;
-      // postData.credit=this.form.credit;
-      // postData.courseYear=this.form.courseYear;
-      // postData.semester=this.form.semester;
-      // console.log('postData:',postData);
       return request({
         url: "/baseCourse/add",
         method: "post",
@@ -505,7 +569,7 @@ export default {
         " pageNum:",
         pageNum,
         "versionId",
-        this.currentVersionVale
+        this.currentVersionValue
       );
       let that = this;
       let courses = [];
@@ -515,7 +579,7 @@ export default {
         params: {
           pageSize: pageSize,
           pageNum: pageNum,
-          versionId: that.currentVersionVale,
+          versionId: that.currentVersionValue,
           departmentId: that.departmentId,
           schoolId: that.schoolId,
         },
@@ -528,20 +592,22 @@ export default {
           that.schoolId
         );
         res.rows.forEach(function (course) {
-          // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-          // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+          // course.courseName = _.isEmpty(course.courseName)
+          //   ? ""
+          //   : course.courseName.trim();
+          // course.courseCode = _.isEmpty(course.courseCode)
+          //   ? ""
+          //   : course.courseCode.trim();
           course.courseType =
             course.courseType == "0" ? "学科基础课" : "还未确定";
           course.courseNature =
             course.courseNature == "0" ? "专业任选" : "还未确定";
           course.credit = course.credit;
-          // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
+          // course.remark = _.isEmpty(course.remark) ? "" : course.remark.trim();
           course.courseYear = course.courseYear == "0" ? "2022" : "2023";
           course.semester = course.semester == "0" ? "上学期" : "下学期";
           course.versionId =
-            course.versionId == that.currentVersionVale
-              ? "已有版本信息"
-              : "没有版本信息";
+            course.versionId == that.currentVersionValue ? true : false;
 
           courses.push(course);
         });
@@ -600,13 +666,13 @@ export default {
     },
     goBaseCourseDetail(index, row) {
       console.log("goBaseCourseDetail", row);
-      let versionName = this.versions[this.currentVersionVale - 1].label;
+      let versionName = this.versions[this.currentVersionValue - 1].label;
       this.$router.push({
         path: "/baseCourseDetail",
         query: {
           versionName: versionName,
           versionFlag: row.versionId,
-          versionId: this.currentVersionVale,
+          versionId: this.currentVersionValue,
           courseId: row.courseId,
           courseName: row.courseName,
           courseCode: row.courseCode,
@@ -698,18 +764,18 @@ export default {
       this.preform.remark = val.remark;
     },
     dataTransfrom(course) {
-      course.courseName = _.isEmpty(course.courseName)
-        ? ""
-        : course.courseName.trim();
-      course.courseCode = _.isEmpty(course.courseCode)
-        ? ""
-        : course.courseCode.trim();
+      // course.courseName = _.isEmpty(course.courseName)
+      //   ? ""
+      //   : course.courseName.trim();
+      // course.courseCode = _.isEmpty(course.courseCode)
+      //   ? ""
+      //   : course.courseCode.trim();
       course.courseType = course.courseType == "0" ? "学科基础课" : "还未确定";
       course.courseNature =
         course.courseNature == "0" ? "专业任选" : "还未确定";
       course.credit = course.credit;
       course.courseYear = course.courseYear == "0" ? "2022" : "2023";
-      course.remark = _.isEmpty(course.remark) ? "" : course.remark.trim();
+      // course.remark = _.isEmpty(course.remark) ? "" : course.remark.trim();
 
       return course;
     },
@@ -719,10 +785,20 @@ export default {
     },
   },
   mounted: function () {
+    // let that = this;
+    // this.activate();
+    // that.getBaseCourse(that.pageSize,that.pageNum);
+    // console.log('vesions:',this.versions);
+  },
+  created() {
     let that = this;
     this.activate();
+    this.getRouter();
+    if (this.routeVersionId) {
+      this.currentVersionValue = this.routeVersionId;
+    }
+
     that.getBaseCourse(that.pageSize, that.pageNum);
-    console.log("vesions:", this.versions);
   },
   components: {
     request,
@@ -752,11 +828,13 @@ export default {
     MoreFilled,
     ElDropdown,
     ArrowDown,
+    Document,
+    ElTag,
   },
 };
 </script>
-
-<style scoped>
+  
+  <style scoped>
 .selectionBar {
   position: absolute;
   right: 10%;
