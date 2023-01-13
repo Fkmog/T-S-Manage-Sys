@@ -1,5 +1,6 @@
 <template>
-  <HeaderSearch v-show="!closeShow">
+  <div v-show="hasProgram"> 
+    <HeaderSearch v-show="!closeShow">
     <template #rightTime>
         <div class="selectionBar">
           
@@ -26,72 +27,29 @@
  
 
 
-<div v-show="closeShow" class="submenu" style="height: 45px;min-height: 45px;">
+<div v-show="closeShow" class="submenu" >
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
-      <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
+      <el-button @click="this.deleteBaseCourse()" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
 </div>
 
 <div layout="row" flex class="md-padding" >
     <!-- <el-button  class="addCourseButton"  circle @click="drawer = true"><el-icon class="addIcon"><Plus /></el-icon></el-button> -->
-    <addBtn @click="drawer = true;this.getBaseCourse(this.pageSize,this.pageNum);"></addBtn>
+    <addBtn @click="this.drawerShow()"></addBtn>
     <div class="el-table-container">
-      <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
+      <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column  type="selection" width="55" />
         <el-table-column prop="courseName" label="课程名" width="180" />           
         <el-table-column prop="courseCode" label="课程号" width="180" />
         <el-table-column prop="courseType" label="课程类型" width="180" />
         <el-table-column prop="courseNature" label="课程性质" width="180" />
         <el-table-column prop="credit" label="学分" width="180" />
-        <el-table-column prop="remark" label="备注"  />
+        <el-table-column prop="versionName" label="版本"  />
       </el-table>
    </div>
   </div>
 
 
-  <!-- <el-dialog v-model="dialogFormVisible" title="添加基础课程">
-    <el-form :model="form">
-      <el-form-item label="课程名称" :label-width="formLabelWidth">
-        <el-input v-model="form.courseName" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="课程代码" :label-width="formLabelWidth">
-        <el-input v-model="form.courseCode" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="学分" :label-width="formLabelWidth">
-        <el-input v-model="form.credit" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="课程性质" :label-width="formLabelWidth">
-        <el-select v-model="form.courseNature" placeholder="请选择课程性质">
-          <el-option label="专业任选" value="0" />
-          <el-option label="还未确定" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="课程类型" :label-width="formLabelWidth">
-        <el-select v-model="form.courseType" placeholder="请选择课程类型">
-          <el-option label="学科基础课" value="0" />
-          <el-option label="还未确定" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="学年" :label-width="formLabelWidth">
-        <el-select v-model="form.courseYear" placeholder="请选择学年">
-          <el-option label="2022" value="0" />
-          <el-option label="2023" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="备注" :label-width="formLabelWidth">
-        <el-input v-model="form.remark" autocomplete="off" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="goAddBaseCourses">批量添加</el-button>
-        <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="addBaseCourse">
-          提交
-        </el-button>
-      </span>
-    </template>
-  </el-dialog> -->
    
   <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
     <el-form :model="preform">
@@ -164,40 +122,38 @@
     </template>
 
     <template #default ><!-- 具体basecourse页面，分页 可搜索-->
-      <div v-show="!drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;"></div>
+      
+      <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
       <div v-show="drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;">
-        <el-button @click="this.drawertoggleSelection()" style="float:left;" class="clearSelected" >取消选择</el-button>
-        <div class="numSelectedTeacher" >已选中 {{drawernumSelected}} 节基础课程</div>
-        <el-button @click="this.getBCMId();" style="float:right;" class="drawerdeleteButton"><el-icon ><Plus class="iconSize" /></el-icon></el-button>
+        <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div>
+        <div class="drawerdeleteButton">
+          <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
+        </div>
       </div>
-      <HeaderSearch style="border: 0;" :msg="searchCourse"></HeaderSearch>
+      
       <div class="drawerBlock" flex>
         <div >
-          <el-table :data="tableData"  ref="drawermultipleTable" style="width: 100%" @selection-change="drawerchandleSelectionChange" @row-dblclick="editTrigger">
-            <el-table-column type="selection" :selectable="this.selectable" width="55">
-            <!-- <template #default="scope"> 
-             <el-table-column type="selection" :selectable="this.selectable(scope.row)" width="55"></el-table-column>
-              </template>  -->
-              
+          <el-table 
+          :data="tableData"  
+          ref="drawermultipleTable" 
+          style="width: 100%;" 
+          @selection-change="drawerchandleSelectionChange" 
+         
+          >
+            <el-table-column width="55" type="selection" :selectable="selectable">
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
-            <el-table-column  label="课程大纲" width="180">
+            <el-table-column  label="课程大纲" width="180" >
               <template #default="scope">
-                <el-icon v-show="!scope.row.versionId" class="deleteButton"><Document /></el-icon>
-                <el-tag v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                <el-tooltip content="查看信息">
+                  <el-button v-show="!scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
+                </el-tooltip>
+                <el-tooltip content="添加信息">
+                  <el-tag v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column label="培养计划">
-              <!-- <span>培养计划</span> -->
-              <template #default="scope">
-                <span >{{ scope.row.remark }}</span>
-              </template>
-            </el-table-column>
-            <!-- <el-table-column prop="courseType" label="课程类型" width="180" />
-            <el-table-column prop="courseNature" label="课程性质" width="180" />
-            <el-table-column prop="credit" label="学分" width="180" />
-            <el-table-column prop="remark" label="备注"  /> -->
           </el-table>
         </div>
       </div>
@@ -223,15 +179,22 @@
       </div>
     </template>
   </el-drawer>
+  </div>
+  <div v-show="!hasProgram" class="no-program">
+    <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      未创建培养方案
+    </h2>
+  </div>
 </template>
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive,}from 'vue';
-import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit} from '@element-plus/icons-vue'
+import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag,ElCheckbox } from 'element-plus'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
+
 
 
 export default {
@@ -239,10 +202,15 @@ name:"Courses",
 components:{
   HeaderSearch,ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption
   , Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, addBtn,
-  ElTag
+  ElTag,ElCheckbox,Document
 },
 data(){
   return{
+    //是否有program
+    hasProgram:Boolean,
+    //checkbox
+    checkList:ref([' ']),
+
     //programeInfo
     programeInfo:[
       {
@@ -253,6 +221,10 @@ data(){
     "programId": 0
       }
     ],
+    programInfoCourseId:[0,0],
+    programInfoCourseCount:0,
+
+
     //需要删除的信息
     deleteProgrameInfo:[
       {
@@ -364,6 +336,7 @@ data(){
     option1:'',
     option2:'',
   },
+  searchCourseId:[0,0],
 
 
   currentVersion:'2016级',
@@ -441,39 +414,54 @@ result:reactive({}),
   }
 },
 methods:{
+  //跳转到详细页面
+  goBaseCourseDetail(index, row){
+    console.log('goBaseCourseDetail',row);
+    let versionName = this.versions[this.currentVersionValue-1].label;
+
+    this.$store.commit("course/setbaseCourseVersionName", versionName);
+    this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
+    this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+    this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+    this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+    this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+    this.$store.commit("course/setbaseCourseCourseNature", row.courseNature);
+    this.$store.commit("course/setbaseCourseCredit",  row.credit);
+    this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+    this.$store.commit("course/setbaseCourseRemark", row.remark);
+    this.$router.push({
+      path:'/baseCourseDetail',
+    })
+  },
+  //是否有program
+  async checkProgram(){
+    if(this.$store.state.major.programId){
+      this.hasProgram = true;
+    }
+    else{
+      this.hasProgram = false;
+    }
+  },
+  
+  //drawer show
+  drawerShow(){
+    let that = this;
+    console.log('drawerShow:');
+    this.drawer = true;
+    this.getBaseCourse(this.pageSize,this.pageNum)
+  },
   //是否可选
   selectable(row,index){
-    
-    return !row.remark;
-  },
-  //添加major与detail的关联得到bcdmId
-  addBCDMId(){
-    let that = this;
-    return request({
-      url:'/detailMajor',
-      method:'post',
-      data:{
-  "courseIndicators": [
-    {
-      "achievement": 0,
-      "id": "0101",
-      "numStudent": 0,
-      "supportMethods": [
-        {
-          "id": "string",
-          "weight": 0
-        }
-      ]
+    if(row.remark){
+      
+      return !row.remark;
     }
-  ],
-  "departmentId": that.departmentId,
-  "detailId": 17,
-  "majorId": that.majorId,
-  "schoolId": that.schoolId
-}
-    }).then(function(res){
-      console.log('addBCDMId :',res);
-    });
+    if(row.versionId){
+      
+      return !row.versionId;
+    }
+    else return true;
   },
   //根据version和courseId来确定detailId
   getDetail(courseId){
@@ -525,21 +513,23 @@ methods:{
     that.drawertableData = [];
     let courses = [];
     let eachCourse = [];
+    let CourseId = [];
     console.log('programId:',this.programId);
     return request({
       url:'/baseCourse/program/'+this.programId,
       method:'get',
     }).then(function(res){
       console.log('courseInPrograme:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
+      console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
+      that.programInfoCourseCount = res.total;
           if(res.total){
             res.rows.forEach(function(course){
             
             let eachCourseId = '';
-            let eachVersionId = '';
+            // let eachVersionId = '';
 
             eachCourseId = course.courseId;
-            eachVersionId = course.bcDetails[0].versionId;
+            
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
             course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
@@ -547,18 +537,23 @@ methods:{
             course.credit=course.credit;
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            course.versionId = course.bcDetails[0].versionId;
+            course.versionName = course.bcDetails[0].versionName;
             courses.push(course);
             var courseDict = {
               'courseId':eachCourseId,
-              'versionId':eachVersionId,
+              // 'versionId':eachVersionId,
             };
+            
             eachCourse.push(courseDict);
+            CourseId.push(eachCourseId);
           });
           }
           else{}
 
           that.drawertableData = courses;
           that.programeCourseInfo = eachCourse;
+          that.programInfoCourseId = CourseId;
           console.log('programeCourseInfo is ',that.programeCourseInfo);
           // that.origintableData = courses;
           that.drawerresult = res;
@@ -613,9 +608,14 @@ methods:{
     }
     
   },
+  //搜索一门课
   searchCourse(msg){
     let that = this;
-    let courses = []
+    let courses = [];
+    let count=0;
+    let countofSelected =0;//查找得到的课中，和已经添加过的课的交集数
+    let flag = Boolean;
+    let searchCourseId = [];
     console.log('searchMsg:',msg);
     return request({
       url:'baseCourse/list',
@@ -630,46 +630,84 @@ methods:{
       }
     }).then(function(res){
       if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: function(action) {
-              ElMessage({
+        flag = true;
+            ElMessage({
                 type: 'success',
                 message: `搜索成功`,
               });
-              // that.reload();
-            },
-            });
             res.rows.forEach(function(course){
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
             course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.credit=course.credit;
+            course.remark = '';
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            course.trueversionId = course.versionId;
+            course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
+            course.index = count;
             courses.push(course);
+            searchCourseId.push(course.courseId);
+            count++;
           });
+          that.searchCourseId = searchCourseId;
+          that.programeCourseInfo.forEach(function(courseInfo){
+              try{
+                 
+              courses.forEach(function(course){
+                console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+                if(!course.remark){
+                  
+                if(courseInfo.courseId == course.courseId ){
+                    
+                      course.remark = true;
+                      throw new Error("remark")
+                    
+                  }
+                  else{
+                    course.remark = false;
+                  }
+                }
+                
+              });
+          }catch(e){
+            if(e.message!='remark') throw e;
+          }
+          });
+
+          that.searchCourseId.forEach(function(courseId){
+            if(that.programInfoCourseId.includes(courseId)){
+              countofSelected++;
+            }
+          });
+
           that.tableData = courses;
+          that.programInfoCourseCount = countofSelected;
           that.result = res;
+
+
           }
           else{
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action)  {
-                ElMessage({
+            flag = false;
+            ElMessage({
                   type: 'error',
                   message: `搜索失败`,
                 });
-                // that.reload();
-              },
-            });
            
           }
+    }).then(function(){
+      if(flag){
+        that.tableData.forEach(function(data){
+      if(data.remark){
+        console.log('data.remark:',data.remark);
+        that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
+      }
+      else{
+        console.log('data.remark is null',data.remark);
+      }
+    })
+      }
+      
     });
   },
   confirmClick() {
@@ -710,34 +748,18 @@ methods:{
         }).then(function(res){
           
           if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: function(action) {
-              ElMessage({
+            ElMessage({
                 type: 'success',
                 message: `添加成功`,
               });
-              // that.reload();
-            },
-            });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
           else{
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action)  {
-                ElMessage({
+            ElMessage({
                   type: 'error',
                   message: `添加失败`,
                 });
-                // that.reload();
-              },
-            });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
@@ -812,40 +834,25 @@ ElMessageBox.confirm(
       data: that.deleteProgrameInfo,
     }).then(function(res){
       if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: function(action) {
-              ElMessage({
+        ElMessage({
                 type: 'success',
                 message: `删除成功`,
               });
-              // that.reload();
-            },
-            });
             // that.clearForm();
             that.getProgramCourse();
           }
           else{
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action)  {
-                ElMessage({
+            ElMessage({
                   type: 'error',
                   message: `删除失败`,
                 });
-                // that.reload();
-              },
-            });
             // that.clearForm();
             // that.getProgramCourse();
           }
     })
     }) 
   },
+  
   //总步骤
   getProgrameInfo(){
     let that = this;
@@ -859,28 +866,31 @@ ElMessageBox.confirm(
     this.drawercourseId.forEach(function(courseId){
     let courseBCDMId = '';
     let courseDetailId = '';
-    that.getDetail(courseId).then(function(res){
+    if(!that.programInfoCourseId.includes(courseId)){
+      that.getDetail(courseId).then(function(res){
       
-        if(res){
-          courseDetailId = res;
-        }
-        else{
-         
-          return console.log('detailId is null');
-        }
-      }).then(function(){
-        
-      var programCoursedict = {
-       'bcmdId':courseBCDMId,
-       'detailId':courseDetailId,
-       'programId':that.programId,
-       'courseId':courseId
-     }
-     postData.push(programCoursedict);
-      }).then(function(){ 
-    that.programeInfo = postData;
-    console.log('getBaseCourseDictforProgram:',that.programeInfo);
-      })
+      if(res){
+        courseDetailId = res;
+      }
+      else{
+       
+        return console.log('detailId is null');
+      }
+    }).then(function(){
+      
+    var programCoursedict = {
+     'bcmdId':courseBCDMId,
+     'detailId':courseDetailId,
+     'programId':that.programId,
+     'courseId':courseId
+   }
+   postData.push(programCoursedict);
+    }).then(function(){ 
+  that.programeInfo = postData;
+  console.log('getBaseCourseDictforProgram:',that.programeInfo);
+    })
+    }
+    
     }); 
   },
   getBCMId(){
@@ -903,7 +913,7 @@ ElMessageBox.confirm(
     });
 
     ElMessageBox.confirm(
-    '是否删除选中的培养计划课程？',
+    '是否添加选中的培养计划课程？',
     '注意',
     {
       confirmButtonText: '确定',
@@ -924,23 +934,15 @@ ElMessageBox.confirm(
       data:this.programeInfo,
     }).then(function(res){
       if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: function(action) {
-              ElMessage({
+        ElMessage({
                 type: 'success',
                 message: `添加成功`,
               });
-              // that.reload();
-              
-            },
-            });
             that.drawercourseId=[];
             that.getProgramCourse();
             that.getBaseCourse(that.pageSize,that.pageNum);
-            that.$refs.drawermultipleTable.clearSelection();
+            // that.$refs.drawermultipleTable.clearSelection();
+
             if(that.drawerclickState == 1){
               that.drawerclickState=0;
               that.drawercloseShow = !that.drawercloseShow;
@@ -948,18 +950,10 @@ ElMessageBox.confirm(
             
           }
           else{
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action)  {
-                ElMessage({
+            ElMessage({
                   type: 'error',
                   message: `添加失败`,
                 });
-                // that.reload();
-              },
-            });
             that.drawercourseId=[];
             that.$refs.drawermultipleTable.clearSelection();
             if(that.drawerclickState == 1){
@@ -971,6 +965,7 @@ ElMessageBox.confirm(
   },
   editTrigger(val){
     console.log('选中的信息：',val.courseId);
+    
     this.postDataToform(val);
     this.dialogFormVisible1 = true;
     // return request({
@@ -990,34 +985,18 @@ ElMessageBox.confirm(
     }).then(function(res){
       console.log('res:',res);
       if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: function(action) {
-              ElMessage({
+        ElMessage({
                 type: 'success',
                 message: `修改成功`,
               });
-              // that.reload();
-            },
-            });
             
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
           else{
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action)  {
-                ElMessage({
+            ElMessage({
                   type: 'error',
                   message: `修改失败`,
                 });
-                // that.reload();
-              },
-            });
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
     })
@@ -1094,9 +1073,7 @@ ElMessageBox.confirm(
       },
   drawertoggleSelection(rows) {
         if (rows) {
-          rows.forEach(row => {
-            this.$refs.drawermultipleTable.drawertoggleSelection(row);
-          });
+          
         } else {
           this.$refs.drawermultipleTable.clearSelection();
           if(this.drawerclickState == 1){
@@ -1106,11 +1083,12 @@ ElMessageBox.confirm(
           
         }
     },
-  getBaseCourse(pageSize,pageNum,majorId,detailId){
+   async getBaseCourse(pageSize,pageNum,majorId,detailId){
     let that = this;
     let courses = [];
     let realurl ='';
     let courseBCDMId = '';
+    let count=0;
     
     if(majorId){
       realurl = '/detailMajor/list';//通过majorId来显示已经添加的detail，可以获取到courseId
@@ -1161,8 +1139,9 @@ ElMessageBox.confirm(
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.trueversionId = course.versionId;
             course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
-            
+            course.index = count;
             courses.push(course);
+            count++;
           });
           
           
@@ -1174,10 +1153,10 @@ ElMessageBox.confirm(
                 if(!course.remark){
                   
                 if(courseInfo.courseId == course.courseId ){
-                    if(courseInfo.versionId == course.trueversionId){
+                    
                       course.remark = true;
                       throw new Error("remark")
-                    }
+                    
                   }
                   else{
                     course.remark = false;
@@ -1196,7 +1175,17 @@ ElMessageBox.confirm(
           
           
           
-        });
+        }).then(function(){
+      that.tableData.forEach(function(data){
+      if(data.remark){
+       
+        that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
+      }
+      else{
+        
+      }
+    })
+    });
     }
     
   },
@@ -1210,9 +1199,14 @@ ElMessageBox.confirm(
         },
 },
 mounted:function(){
-  this.activate();
-  this.getProgramCourse();
-  this.getBaseCourse(this.pageSize,this.pageNum);
+  this.checkProgram();
+  if(this.hasProgram){
+    this.activate();
+    this.getProgramCourse();
+  }
+  
+  // this.getBaseCourse(this.pageSize,this.pageNum);
+   
   // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
   
 }
@@ -1221,6 +1215,16 @@ mounted:function(){
 </script>
 
 <style scoped> 
+.el-checkbox__input.is-disabled{
+    background-color: #0e5cd0;
+}
+.el-table.tableColumn{
+  --el-table-tr-bg-color:rgb(189, 189, 189);
+}
+.el-table__body{
+  background-color: rgb(189, 189, 189);
+}
+
 
 .drawerFooter{
   padding-bottom: 100px;
@@ -1234,6 +1238,7 @@ mounted:function(){
 
 .drawerBlock{
   position: relative;
+  color: rgb(189, 189, 189);
 }
 .iconSize{
   top: 7px;
@@ -1243,11 +1248,18 @@ mounted:function(){
   
 }
 .deleteButton{
-  margin-right: 100px;
+  margin-right: 10%;
   margin-top: 0;
   margin-bottom: 0;
 }
+.searchIndrawer{
+  border: 0;
+  
+  margin-bottom: 10%;
+  padding-bottom: 30px;
+}
 .drawerdeleteButton{
+  float:right;
   margin-right: 10px;
   margin-top: 0;
   margin-bottom: 0;
@@ -1339,18 +1351,18 @@ mounted:function(){
     color: #3f51b5;
     font-size: 14px;
     font-weight: 500;
-    height: 44px;
-    min-height: 44px;
-    line-height: 3em;
-    margin-bottom: 13px;
-    position: relative;
-    padding: 6px 96px 5px 32px;
+    height: 55px;
+    position: absolute;
+    top: 110px;
+    left: 0px;
+    width: 100%;
     border-bottom: 1px solid #d0d0d0;
     background-color: transparent;
    
 }
 .md-padding {
   margin-top: 85px;
+  
 }
 
 .searchBar{
@@ -1406,5 +1418,9 @@ mounted:function(){
 .addCourseButton:hover{
   background-color:rgb(41,98,255);
   transition: all .3s cubic-bezier(.55,0,.55,.2);
+}
+.no-program {
+  display: flex;
+  flex-direction: column;
 }
 </style>
