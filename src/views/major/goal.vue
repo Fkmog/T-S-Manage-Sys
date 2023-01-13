@@ -1,112 +1,114 @@
 <template>
-  <div v-show="hasProgram" class="body-check">
-    <div class="card">
-      <div class="card-head">
-        <span class="head-text" style="color: grey; font-size: 14px"
-          >毕业要求</span
-        >
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="编辑"
-          placement="bottom"
-          :hide-after="0"
-        >
-          <el-icon class="edit-pen" @click="goEdit()"><EditPen /></el-icon>
-        </el-tooltip>
-      </div>
-      <div class="noAttribute" v-show="!hasAttribute">
-        <span>待添加</span>
-      </div>
-      <div v-show="hasAttribute">
-        <div
-          class="graduate-attribute"
-          v-for="attribute in requirements"
-          :key="attribute.id"
-        >
-          <div class="attribute">
-            <div class="two-digits">
-              <section class="num-title">
-                <section class="num-wrap">
-                  <span class="title-text">{{ attribute.serialNum }}</span>
-                </section>
-                <section class="rotate-bar"></section>
-              </section>
-            </div>
-            <div class="attribute-content">
-              <div class="name">
-                {{ attribute.name }}
-              </div>
-              <div class="desc">
-                {{ attribute.description }}
-              </div>
-            </div>
-          </div>
-          <div
-            class="attribute-detail"
-            v-for="detail in attribute.programIndicators"
-            :key="detail.id"
+  <div class="content">
+    <div v-show="hasProgram" class="body-check">
+      <div class="card">
+        <div class="card-head">
+          <span class="head-text" style="color: grey; font-size: 14px"
+            >毕业要求</span
           >
-            <div class="detail-num">
-              {{ detail.serialNum }}
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="编辑"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon class="edit-pen" @click="goEdit()"><EditPen /></el-icon>
+          </el-tooltip>
+        </div>
+        <div class="noAttribute" v-if="!hasAttribute">
+          <span>待添加</span>
+        </div>
+        <div v-if="hasAttribute">
+          <div
+            class="graduate-attribute"
+            v-for="attribute in requirements"
+            :key="attribute.id"
+          >
+            <div class="attribute">
+              <div class="two-digits">
+                <section class="num-title">
+                  <section class="num-wrap">
+                    <span class="title-text">{{ attribute.serialNum }}</span>
+                  </section>
+                  <section class="rotate-bar"></section>
+                </section>
+              </div>
+              <div class="attribute-content">
+                <div class="name">
+                  {{ attribute.name }}
+                </div>
+                <div class="desc">
+                  {{ attribute.description }}
+                </div>
+              </div>
             </div>
-            <div class="detail-content">
-              <div class="name">{{ detail.name }}</div>
-              <div class="desc">{{ detail.description }}</div>
+            <div
+              class="attribute-detail"
+              v-for="detail in attribute.programIndicators"
+              :key="detail.id"
+            >
+              <div class="detail-num">
+                {{ detail.serialNum }}
+              </div>
+              <div class="detail-content">
+                <div class="name">{{ detail.name }}</div>
+                <div class="desc">{{ detail.description }}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div v-show="!hasProgram" class="no-program">
-    <h2 style="display: flex; justify-content: center; margin-top: 100px">
-      未创建培养方案
-    </h2>
-    <div style="display: flex; justify-content: center; color: grey">
-      请先点击右上角圆形按钮创建培养方案
-    </div>
+    <div v-show="!hasProgram" class="no-program">
+      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+        未创建培养方案
+      </h2>
+      <div style="display: flex; justify-content: center; color: grey">
+        请先点击右上角圆形按钮创建培养方案
+      </div>
 
-    <addBtn
-      @click="
-        this.addProgramForm.enrollyear = this.$store.state.currentInfo.year;
-        dialogFormVisible = true;
-      "
-    >
-    </addBtn>
-    <!-- 弹出表单-新增培养方案 -->
-    <el-dialog
-      v-model="dialogFormVisible"
-      title="创建培养方案"
-      style="width: 600px"
-    >
-      <el-form
-        :model="addProgramForm"
-        label-position="top"
-        style="margin-left: 120px"
+      <addBtn
+        @click="
+          this.addProgramForm.enrollyear = this.$store.state.currentInfo.year;
+          dialogFormVisible = true;
+        "
       >
-        <el-form-item label="专业" :label-width="formLabelWidth">
-          <el-input
-            v-model="addProgramForm.major"
-            disabled
-            style="width: 300px"
-          />
-        </el-form-item>
-        <el-form-item label="学年" :label-width="formLabelWidth">
-          <el-input
-            v-model="addProgramForm.enrollyear"
-            disabled
-            style="width: 300px"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="addProgram()"> 确认 </el-button>
-        </span>
-      </template>
-    </el-dialog>
+      </addBtn>
+      <!-- 弹出表单-新增培养方案 -->
+      <el-dialog
+        v-model="dialogFormVisible"
+        title="创建培养方案"
+        style="width: 400px"
+      >
+        <el-form
+          :model="addProgramForm"
+          label-position="top"
+          style="margin-left: 30px"
+        >
+          <el-form-item label="专业" :label-width="formLabelWidth">
+            <el-input
+              v-model="addProgramForm.major"
+              disabled
+              style="width: 300px"
+            />
+          </el-form-item>
+          <el-form-item label="学年" :label-width="formLabelWidth">
+            <el-input
+              v-model="addProgramForm.enrollyear"
+              disabled
+              style="width: 300px"
+            />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="addProgram()"> 确认 </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -183,15 +185,22 @@ export default {
           this.hasProgram = false;
         }
         if (res.msg == "操作成功" && res.code == 200) {
+          this.hasProgram = true
           this.programId = res.data.programId;
           this.$store.commit("major/setProgramId", this.programId);
           this.requirements = res.data.graduateAttributes;
-          console.log("requirements", this.requirements);
-          if (this.requirements.length == 0) {
+          if( this.requirements == null){
             this.hasAttribute = false;
-          } else {
+          }
+          console.log("requirements", this.requirements);
+          if (this.requirements !== null&&this.requirements.length == 0) {
+            this.hasAttribute = false;
+          } 
+          if(this.requirements!==null)
+          {
             this.hasAttribute = true;
           }
+
         }
       });
     },
@@ -226,6 +235,11 @@ export default {
 </script>
 
 <style scoped>
+.content {
+  height: 100vh;
+  background-color: #f2f2f2;
+ 
+}
 .body-check {
   display: flex;
   justify-content: center;

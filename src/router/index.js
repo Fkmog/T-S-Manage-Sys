@@ -21,6 +21,7 @@ import BaseCourseDetail from '@/views/baseCourse/baseCourseDetail.vue'
 import baseCourseObjectives from '@/views/baseCourse/objectives.vue'
 import baseCourseActivities from '@/views/baseCourse/activities.vue'
 import baseCourseIndicators from '@/views/baseCourse/indicators.vue'
+import baseCourseIndicatorsEdit from '@/views/baseCourse/indicators-edit.vue'
 
 import userLogin from '@/components/userLogin/index.vue'
 
@@ -88,6 +89,10 @@ export default createRouter({
                     component:baseCourseIndicators,
                 },
                 {
+                    path:'/baseCourseIndicatorsEdit',    
+                    component:baseCourseIndicatorsEdit,
+                },
+                {
                     path:'/baseCourseObjectives',    
                     component:baseCourseObjectives,
                 },
@@ -109,12 +114,6 @@ export default createRouter({
                     meta: { isMajor: true }
 
                 },
-                {
-                    path:'/edit',
-                    component:GoalEdit,
-                    meta: { isMajor: true }
-
-                }, 
                 {
                     name: "Courses",
                     path: '/courses',

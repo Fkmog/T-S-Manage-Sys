@@ -1,9 +1,6 @@
 <template>
-<div class="content">
-
-  <!-- 顶部导航栏 -->
-  <div class="block">
-    <el-row class="block-row">
+  <div class="head-block">
+    <el-row style="margin-left: 30px">
       <el-tooltip
         class="box-item"
         effect="dark"
@@ -15,16 +12,38 @@
           class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="backBaseCourseDetail()"
+          @click="back()"
         >
           <Back />
         </el-icon>
       </el-tooltip>
-      <div class="title">{{ course.name }}</div>
+      <div
+        style="
+          margin-top: 15px;
+          margin-left: 20px;
+          height: 30px;
+          border-left: 1px solid rgb(189, 189, 189);
+        "
+      ></div>
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="保存"
+        placement="bottom"
+        :hide-after="0"
+      >
+        <el-icon
+          class="icon"
+          size="24px"
+          color="rgb(137, 137, 137)"
+          @click="save()"
+          style="margin-left: 20px"
+        >
+          <DocumentChecked />
+        </el-icon>
+      </el-tooltip>
     </el-row>
   </div>
-  <editBtn @click="goEdit()"></editBtn>
   <div class="body">
     <el-tabs class="major-tab">
       <el-tab-pane
@@ -51,45 +70,69 @@
                 <div class="name">{{ indicator.name }}</div>
                 <div class="desc">{{ indicator.description }}</div>
               </div>
+              <div class="closeIcon">
+                <el-icon class="close-icon" @click="deleteIndicator(indicator)"><Close /></el-icon>
+              </div>
             </div>
+
             <!-- 支撑方式 -->
             <div style="margin-left: 90px">
-              <span style="color: grey; font-size: 14px; "
-                >支撑方式</span
-              >
+              <div class="support-head">
+                <span style="color: grey; font-size: 14px">支撑方式</span>
+                <div class="penIcon">
+                  <el-icon class="pen-icon" @click="editSupportMethods(indicator)"><EditPen /></el-icon>
+                </div>
+              </div>
               <div class="methods">
                 <div
                   v-for="method in indicator.supportMethodVos"
                   :key="method.id"
                 >
                   <div class="method-detail">
-                    <div class="method-weight">(&nbsp;{{ method.weight }}%&nbsp;)</div>
-                    <div class="method-desc" style="margin-left:80px" >{{ method.name }}</div>
+                    <div class="method-weight">
+                      (&nbsp;{{ method.weight }}%&nbsp;)
+                    </div>
+                    <div class="method-desc" style="margin-left: 80px">
+                      {{ method.name }}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+         <el-button class="add-indicator-button" style="color: #6573c0" text @click="addIndicator()">
+            <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
+            新增支持指标点
+          </el-button>
+
+
         </div>
       </el-tab-pane>
     </el-tabs>
   </div>
-</div>
-
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
-import { getIndicators, getMajors, getDetailMajor } from "@/api/basecourse";
+import { getIndicators, getMajors, getDetailMajor,getIndicatorList } from "@/api/basecourse";
 import { getMajorInfo } from "@/api/major";
-import editBtn from "@/components/general/editBtn.vue";
-
+import {
+  Back,
+  DocumentChecked,
+  Plus,
+  Delete,
+  Close,
+  EditPen,
+} from "@element-plus/icons-vue";
 export default {
-  name: "baseCourseIndicators",
+  name: "baseCourseIndicatorsEdit",
   components: {
     Back,
-    editBtn
-    
+    DocumentChecked,
+    Plus,
+    Delete,
+    Close,
+    EditPen,
   },
   data() {
     return {
@@ -110,15 +153,14 @@ export default {
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
     this.programId = this.$store.state.major.programId;
-    console.log(this.course.name, this.course.detailId);
     this.checkMajors();
   },
   methods: {
-    backBaseCourseDetail() {
-      this.$router.push("/baseCourseDetail");
+    back() {
+      this.$router.push("/baseCourseIndicators");
     },
-    goEdit(){
-      this.$router.push("/baseCourseIndicatorsEdit");
+    save() {
+      console.log("save");
     },
     //查询对应的专业以及bcdmId
     checkMajors() {
@@ -144,7 +186,6 @@ export default {
         ).then((res) => {
           console.log("getIndicators:", i, res);
           this.majorList[i].indicators = res.data;
-
           //处理id->serialNum
           for (let j = 0; j < this.majorList[i].indicators.length; j++) {
             let serialNum = [];
@@ -163,25 +204,25 @@ export default {
         });
       }
     },
-    // checkDetailMajor() {
-    //   for(let i = 0 ;i<this.majorList.length;i++){
-    //   getDetailMajor(this.majorList[i].bcdmId).then((res)=>{
-    //     console.log("getDetailMajor",res);
-    //   });
-
-    //   }
-    // },
+    //删除指标点
+    deleteIndicator(indicator){
+        console.log("deleteIndicator",indicator);
+    },
+    //编辑支撑方式
+    editSupportMethods(indicator){
+        console.log("editSupportMethods",indicator);
+    },
+    //新增支持指标点 todo!需要拿到对应的bcdmId 即选中的标签页
+    addIndicator(){
+        console.log("addIndicator");
+        // getIndicatorList()
+    }
   },
 };
 </script>
 
 <style scoped>
-.content {
-  height: 100vh;
-  background-color: #f2f2f2;
- 
-}
-.block {
+.head-block {
   position: absolute;
   top: 110px;
   left: 0px;
@@ -190,18 +231,9 @@ export default {
   width: 100%;
 }
 .icon {
+  margin-top: 15px;
+  margin-left: 10px;
   cursor: pointer;
-}
-.block-row {
-  margin-top: 18px;
-}
-.title {
-  margin-left: 20px;
-  font-size: 16px;
-}
-.divider {
-  margin-left: 20px;
-  height: 24px;
 }
 .body {
   display: flex;
@@ -222,6 +254,9 @@ export default {
 :deep().el-tabs__content {
   overflow: visible;
 }
+.detail-content {
+  width: 600px;
+}
 .detail-num {
   color: #5c6bc0;
   font-weight: bold;
@@ -241,17 +276,48 @@ export default {
   margin-left: 30px;
   margin-top: 25px;
 }
+.attribute:hover .closeIcon {
+  opacity: 1;
+}
+.closeIcon {
+  opacity: 0;
+  margin-top: 50px;
+  margin-left: 30px;
+}
+.close-icon {
+  cursor: pointer;
+}
+
+.support-head{
+    display: flex;
+    flex-direction: row;
+}
+.attribute:hover .penIcon{
+  opacity: 1;
+}
+.penIcon{
+  opacity: 0;
+}
+.pen-icon {
+  cursor: pointer;
+  margin-left:545px;
+
+}
 .attribute-detail {
   display: flex;
   flex-direction: row;
   margin-top: 20px;
 }
-.methods{
-  margin-top:20px
+.methods {
+  margin-top: 20px;
 }
-.method-detail{
+.method-detail {
   display: flex;
   flex-direction: row;
-  margin-top:10px
+  margin-top: 20px;
+}
+.add-indicator-button{
+    width:150px;
+    margin-top:30px
 }
 </style>

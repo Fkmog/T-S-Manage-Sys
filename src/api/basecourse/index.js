@@ -37,3 +37,13 @@ export function getDetailMajor(bcdmId) {
         method: 'get',
     })
 }
+// 获取指标点列表
+export function getIndicatorList(bcdmId) {
+    return request({
+        url: '/detailMajor/list ',
+        method: 'get',
+        params:{
+            bcdmId:bcdmId
+        }
+    })
+}

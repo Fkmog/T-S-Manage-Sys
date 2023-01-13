@@ -1,38 +1,38 @@
-// 右侧添加按钮
+// 右侧编辑按钮
 <template>
-  <div class="addBtnBlock">
-    <el-button class="addBtn" color="#626aef" plain type="primary"
-      >+
-      <!-- <el-icon>
-        <Plus />
-      </el-icon> -->
-    </el-button>
-    <!-- <button class="addBtn" >
-       </button> -->
+  <div class="editBtnBlock">
+    <el-button
+      class="editBtn"
+      color="#626aef"
+      plain
+      type="primary"
+      ><el-icon><EditPen /></el-icon>
+      </el-button
+    >
+
   </div>
 </template>
 
 <script>
-import { Plus } from "@element-plus/icons-vue";
+import {  EditPen } from "@element-plus/icons-vue";
 
 export default {
-  name: "addBtn",
+  name: "editBtn",
   components: {
-    Plus,
+      EditPen
   },
 };
 </script>
 
 <style scoped>
-.addBtnBlock {
+.editBtnBlock {
   position: absolute;
   top: 80px;
   right: 80px;
   z-index: 10;
 }
-.addBtn {
+.editBtn {
   margin-right: 10px;
-  margin-top: 10px;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -45,7 +45,7 @@ export default {
   font-size: 25px;
   box-shadow: 0 2px 5px 0 rgb(0 0 0 / 26%);
 }
-.addBtn:hover {
+.editBtn:hover {
   margin-right: 8px;
   margin-top: 8px;
   width: 65px;

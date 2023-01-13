@@ -1,4 +1,6 @@
 <template>
+<div class="content">
+
   <!-- 顶部导航栏 -->
   <div class="block">
     <el-row class="block-row">
@@ -130,6 +132,8 @@
     <!-- </el-tab-pane> -->
     <!-- </el-tabs> -->
   </div>
+</div>
+
 </template>
 
 <script>
@@ -354,6 +358,11 @@ export default {
 </script>
 
 <style scoped>
+.content {
+  height: 100vh;
+  background-color: #f2f2f2;
+ 
+}
 /* 顶部导航栏 */
 .block {
   position: absolute;

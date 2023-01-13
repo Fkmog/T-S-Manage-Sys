@@ -33,7 +33,7 @@
         <el-icon
           class="toolsIcon"
           size="18px"
-          @click.stop="changeMajor(major.majorId)"
+          @click.stop="changeMajor(major.majorId,major.majorName)"
         >
           <Tools />
         </el-icon>
@@ -136,11 +136,7 @@ export default {
           });
         })
         .catch(() => {
-          ElMessage({
-            type: "info",
-            message: "取消增加专业",
-            duration: 1000,
-          });
+         
         });
     },
     //删除专业
@@ -164,10 +160,11 @@ export default {
       });
     },
     //修改专业
-    changeMajor(majorId) {
+    changeMajor(majorId,majorName) {
       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
+        inputPlaceholder:majorName,
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入修改后的专业名称",
@@ -187,11 +184,7 @@ export default {
           );
         })
         .catch(() => {
-          ElMessage({
-            type: "info",
-            message: "取消修改专业",
-            duration: 1000,
-          });
+          
         });
     },
   },
