@@ -736,32 +736,33 @@ export default {
         }
       });
     },
-    goAddBaseCourses() {
-      this.$router.push({ path: "/batchCourseAdd" });
+    goAddBaseCourses(){
+      this.$router.push({ path:'/batchCourseAdd'}) 
     },
-    formTopostData(form) {
+    formTopostData(form){
       let postData = {};
-      postData.departmentId = this.departmentId;
+      postData.departmentId=this.departmentId;
       postData.schoolId = this.schoolId;
-      postData.courseName = form.courseName;
-      postData.courseCode = form.courseCode;
-      postData.courseType = form.courseType;
-      postData.courseNature = form.courseNature;
-      postData.credit = form.credit;
-      postData.courseYear = form.courseYear;
-      postData.remark = form.remark;
-
+      postData.courseName=form.courseName;
+      postData.courseCode=form.courseCode;
+      postData.courseType=form.courseType;
+      postData.courseNature=form.courseNature;
+      postData.credit=form.credit;
+      postData.courseYear=form.courseYear;
+      postData.remark=form.remark;
+      
       return postData;
     },
-    postDataToform(val) {
+    postDataToform(val){
       this.preform.courseId = val.courseId;
-      this.preform.courseName = val.courseName;
+      this.preform.courseName= val.courseName;
       this.preform.courseCode = val.courseCode;
-      this.preform.courseType = val.courseType == "学科基础课" ? "0" : "1";
-      this.preform.courseNature = val.courseNature == "专业任选" ? "0" : "1";
-      this.preform.credit = val.credit;
-      this.preform.courseYear = val.courseYear == "2022" ? "0" : "1";
+      this.preform.courseType= (val.courseType == '学科基础课') ? '0':'1';
+      this.preform.courseNature= (val.courseNature=='专业任选') ? '0':'1';
+      this.preform.credit=val.credit;
+      this.preform.courseYear=(val.courseYear=='2022')? '0':'1';
       this.preform.remark = val.remark;
+     
     },
     dataTransfrom(course) {
       // course.courseName = _.isEmpty(course.courseName)
