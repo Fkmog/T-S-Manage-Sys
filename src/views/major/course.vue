@@ -1,6 +1,7 @@
 <template>
-  <div v-show="hasProgram"> 
-    <HeaderSearch v-show="!closeShow">
+  <div v-show="hasProgram">
+    <div v-show="hasCourse" >
+      <HeaderSearch v-show="!closeShow">
     <template #rightTime>
         <div class="selectionBar">
           
@@ -93,8 +94,22 @@
       </span>
     </template>
   </el-dialog>
+    </div>
+    <div v-show="!hasCourse" class="no-program">
+    <HeaderSearch v-show="!closeShow">
+  </HeaderSearch>
 
-  <el-drawer v-model="drawer" :direction="direction" size="50%">
+<div layout="row" flex class="md-padding" >
+  <addBtn @click="this.drawerShow()"></addBtn>
+</div>
+      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      没有课程
+    </h2>
+    <div style="display: flex; justify-content: center; color: grey">
+        请先点击右上角圆形按钮添加课程
+      </div>
+    </div>
+    <el-drawer v-model="drawer" :direction="direction" size="50%">
     <template #title>
       <h4 style="width:500px;">基础课程</h4>
       <el-select
@@ -184,6 +199,9 @@
     <h2 style="display: flex; justify-content: center; margin-top: 100px">
       未创建培养方案
     </h2>
+    <div style="display: flex; justify-content: center; color: grey">
+        请先创建培养方案
+      </div>
   </div>
 </template>
 
@@ -208,6 +226,8 @@ data(){
   return{
     //是否有program
     hasProgram:Boolean,
+    //课程是否为空
+    hasCourse:Boolean,
     //checkbox
     checkList:ref([' ']),
 
@@ -261,16 +281,16 @@ data(){
     courseYear:'',
     remark:'',
   },],
-  //   origintableData:[
-  // {
-  //   courseName:'',
-  //   courseCode:'',
-  //   courseType:'',
-  //   courseNature:'',
-  //   credit:'',
-  //   courseYear:'',
-  //   remark:'',
-  // },],
+    origintableData:[
+  {
+    courseName:'',
+    courseCode:'',
+    courseType:'',
+    courseNature:'',
+    credit:'',
+    courseYear:'',
+    remark:'',
+  },],
 
     //学校部门专业信息
     departmentId:'',
@@ -508,9 +528,10 @@ methods:{
     this.currentVersionValue = label;
     this.getBaseCourse(this.pageSize,this.pageNum);
   },
-  getProgramCourse(){
+  async getProgramCourse(){
     let that = this;
     that.drawertableData = [];
+    that.origintableData = [];
     let courses = [];
     let eachCourse = [];
     let CourseId = [];
@@ -524,7 +545,7 @@ methods:{
       that.programInfoCourseCount = res.total;
           if(res.total){
             res.rows.forEach(function(course){
-            
+            that.hasCourse = true;
             let eachCourseId = '';
             // let eachVersionId = '';
 
@@ -549,9 +570,12 @@ methods:{
             CourseId.push(eachCourseId);
           });
           }
-          else{}
+          else{
+            that.hasCourse = false;
+          }
 
           that.drawertableData = courses;
+          that.origintableData = courses;
           that.programeCourseInfo = eachCourse;
           that.programInfoCourseId = CourseId;
           console.log('programeCourseInfo is ',that.programeCourseInfo);
@@ -587,7 +611,11 @@ methods:{
   },
   selectionOption2(val){
     console.log(val,typeof(val));
+    let originData = this.origintableData;
     let courseList = [];
+    if(val=='全部'){
+      this.drawertableData = originData;
+    }
     if(val == '已完成设置'){
       this.drawertableData.forEach(function(course){
         if(course.status == '0'){
@@ -634,6 +662,7 @@ methods:{
             ElMessage({
                 type: 'success',
                 message: `搜索成功`,
+                duration:1000,
               });
             res.rows.forEach(function(course){
             course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
@@ -692,6 +721,7 @@ methods:{
             ElMessage({
                   type: 'error',
                   message: `搜索失败`,
+                  duration:1000,
                 });
            
           }
@@ -751,6 +781,7 @@ methods:{
             ElMessage({
                 type: 'success',
                 message: `添加成功`,
+                duration:1000,
               });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -759,6 +790,7 @@ methods:{
             ElMessage({
                   type: 'error',
                   message: `添加失败`,
+                  duration:1000,
                 });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -837,6 +869,7 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `删除成功`,
+                duration:1000,
               });
             // that.clearForm();
             that.getProgramCourse();
@@ -845,6 +878,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `删除失败`,
+                  duration:1000,
                 });
             // that.clearForm();
             // that.getProgramCourse();
@@ -937,6 +971,7 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `添加成功`,
+                duration:1000,
               });
             that.drawercourseId=[];
             that.getProgramCourse();
@@ -953,6 +988,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `添加失败`,
+                  duration:1000,
                 });
             that.drawercourseId=[];
             that.$refs.drawermultipleTable.clearSelection();
@@ -988,6 +1024,7 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `修改成功`,
+                duration:1000,
               });
             
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -996,6 +1033,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `修改失败`,
+                  duration:1000,
                 });
             that.getBaseCourse(that.pageSize,that.pageNum);
           }

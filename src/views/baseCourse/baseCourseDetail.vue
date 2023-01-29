@@ -207,28 +207,20 @@ export default {
         }).then(function (res) {
           console.log(res);
           if (res.code == "200") {
-            ElMessageBox.alert(res.msg, "Code:" + res.code, {
-              confirmButtonText: "OK",
-              callback: function (action) {
-                ElMessage({
+            ElMessage({
                   type: "success",
                   message: `新增成功`,
+                  duration:1000,
                 });
-              },
-            });
             //成功后根据vesionId和basecouseId获取详细信息
             that.isVisiable = true;
             that.getDetail();
           } else {
-            ElMessageBox.alert(res.msg, "Code:" + res.code, {
-              confirmButtonText: "OK",
-              callback: function (action) {
-                ElMessage({
+            ElMessage({
                   type: "error",
                   message: `新增失败`,
+                  duration:1000,
                 });
-              },
-            });
             //失败后退回basecouse页面
             that.goBaseCourse();
           }

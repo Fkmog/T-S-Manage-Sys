@@ -119,9 +119,13 @@ export default createStore({
         baseCourseCredit: '',
         baseCourseCourseYear: '',
         baseCourseRemark: '',
+        baseCourseDetailId:'',
       },
       getters: {},
       mutations: {
+        setbaseCourseDetailId(state, newVal) {
+          state.baseCourseDetailId = newVal
+        },
         setCourseName(state, newVal) {
           state.courseName = newVal
         },
