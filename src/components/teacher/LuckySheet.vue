@@ -1,21 +1,21 @@
 <template>
 <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
-    <div class="submenu no-select layout-align-center-center layout-row" layout="row" layout-align="center center" style="justify-content: left">
+    <div class="submenu" layout="row" layout-align="center center" style="justify-content: left">
       <el-tooltip content="返回" style="float:left;">
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
-        <el-icon><Back /></el-icon>
+        <el-icon :size="24"><Back /></el-icon>
       </el-button>
       </el-tooltip>
       <div class="s-v-bar" style="float:left;">&nbsp;</div>
       <el-tooltip content="保存" style="float:left;">
         <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
-          <el-icon><FolderChecked /></el-icon>
+          <el-icon :size="24"><FolderChecked /></el-icon>
         </el-button>  
       </el-tooltip>
       <!--  -->
           <div class="s-v-bar" style="float:left;">&nbsp;</div>
       <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link >
-        <el-icon style="float:left;"><InfoFilled /></el-icon>
+        <el-icon style="float:left;" :size="24"><InfoFilled /></el-icon>
         <div layout="row" layout-align="center center" style="float:right;">
         <span>可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
       </div>
@@ -201,6 +201,7 @@ export default{
             ElMessage({
                 type: 'success',
                 message: `添加成功`,
+                duration:1000,
               })
             that.isNotDirty();
             that.goBackandClean();}
@@ -208,6 +209,7 @@ export default{
           ElMessage({
                 type: 'error',
                 message: `添加失败`,
+                duration:1000,
               })
           that.goBackandClean();
     }
@@ -222,6 +224,7 @@ export default{
     this.postData.teachers.length = 0; // clean array
     var res = this.postData.teachers;
       var valid = true;
+    
       this.db.items.forEach(function (teacher) {
         teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
         

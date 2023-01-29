@@ -14,7 +14,7 @@
           @click="goBaseCourse"
           link
         >
-          <el-icon><Back /></el-icon>
+          <el-icon :size="24"><Back /></el-icon>
         </el-button>
       </el-tooltip>
       <div class="s-v-bar" style="float: left">&nbsp;</div>
@@ -26,7 +26,7 @@
           link
           :disabled="!isValid()"
         >
-          <el-icon><FolderChecked /></el-icon>
+          <el-icon :size="24"><FolderChecked /></el-icon>
         </el-button>
       </el-tooltip>
       <div flex></div>
@@ -155,64 +155,6 @@ export default {
         // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
         //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
       ],
-      //   hotSettings:{
-      //     // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
-
-      //     licenseKey: 'non-commercial-and-evaluation',
-      //     colHeaders: true,
-      //     rowHeaders: true,
-
-      //     columns: [
-      //     { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-      //     { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-      //     { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
-      //     { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
-      //     { data: 'credit', title: '学分', width: 80, height: 20,  allowEmpty: false},//需要添加validator
-      //     ],
-      //     minSpareRows: 2,
-      //     preventOverflow: 'horizontal',
-      //     manualColumnMove: true,
-      //     // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-      //     // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
-      //     // contextMenu: ['row_above', 'row_below', 'remove_row'],
-      //     // columns:[
-      //     //   {type: 'numeric',},
-      //     //   {type:'text'},
-      //     //   {allowInvalid: false}
-      //     // ],
-      //     contextMenu: {
-      //       items:{
-      //           'row_above': {
-      //               name: '在上方插入行'
-      //           },
-      //           'row_below': {
-      //               name: '在下方插入行'
-      //           },
-      //           'remove_row': {
-      //               name: '删除行'
-      //           }
-      //       }
-      //     },
-      //     afterChange(changes, source) {
-      //       if (source === 'loadData') {
-      //         console.log('same');
-      //         return;
-      //       } else {
-      //         if(self.count==0){
-      //           self.dirty=false;
-      //           console.log('console:',self.count);
-      //           console.log('different',self.dirty);
-      //         }
-      //         else{
-      //           self.dirty=true;
-      //           console.log('console:',self.count);
-      //           console.log('different',self.dirty);
-      //         }
-      //         self.count++;
-      //         console.log('console:',self.count);
-
-      //         }
-      //     }},
     };
   },
   components: {
@@ -373,32 +315,20 @@ export default {
         console.log("res:", res);
 
         if (res.code == "200") {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: "OK",
-            callback: (action) => {
-              ElMessage({
+          ElMessage({
                 type: "success",
                 message: `添加成功`,
+                duration: 1000,
               });
-            },
-          });
 
           that.goBackandClean();
           that.isNotDirty();
         } else {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: "OK",
-            callback: (action) => {
-              ElMessage({
+          ElMessage({
                 type: "error",
                 message: `添加失败`,
+                duration: 1000,
               });
-            },
-          });
 
           that.goBackandClean();
           that.isNotDirty();
@@ -550,7 +480,7 @@ export default {
 
 .hot-table-container {
   margin-left: 20%;
-  width: 50%;
+  width: 51%;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {

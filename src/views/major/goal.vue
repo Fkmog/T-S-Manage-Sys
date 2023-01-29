@@ -183,6 +183,7 @@ export default {
         console.log("checkProgram", res);
         if (res.msg == "未查到" && res.code == 200) {
           this.hasProgram = false;
+          this.$store.commit("major/setProgramId", '');
         }
         if (res.msg == "操作成功" && res.code == 200) {
           this.hasProgram = true
