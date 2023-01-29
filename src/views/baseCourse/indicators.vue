@@ -80,7 +80,7 @@
 
 <script>
 import { Back } from "@element-plus/icons-vue";
-import { getIndicators, getMajors, getDetailMajor } from "@/api/basecourse";
+import { getIndicators, getMajors, getDetailMajor,getPullIndicator } from "@/api/basecourse";
 import { getMajorInfo } from "@/api/major";
 import editBtn from "@/components/general/editBtn.vue";
 
@@ -101,7 +101,7 @@ export default {
         schoolId: Number,
       },
       majorList: [],
-      programId: Number,
+      programId: '',
     };
   },
   mounted() {
@@ -110,8 +110,11 @@ export default {
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
     this.programId = this.$store.state.major.programId;
+    console.log("!",this.programId);
+
     console.log(this.course.name, this.course.detailId);
     this.checkMajors();
+    this.checkPullIndicators()
   },
   methods: {
     backBaseCourseDetail() {
@@ -163,14 +166,13 @@ export default {
         });
       }
     },
-    // checkDetailMajor() {
-    //   for(let i = 0 ;i<this.majorList.length;i++){
-    //   getDetailMajor(this.majorList[i].bcdmId).then((res)=>{
-    //     console.log("getDetailMajor",res);
-    //   });
-
-    //   }
-    // },
+    //查询新增指标点列表
+    checkPullIndicators(){
+      getPullIndicator(this.programId).then((res)=>{
+        console.log("getPullIndicator",res);
+      })
+    }
+   
   },
 };
 </script>

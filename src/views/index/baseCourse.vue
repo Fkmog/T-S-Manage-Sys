@@ -646,24 +646,8 @@
     this.$store.commit("course/setbaseCourseCredit",  row.credit);
     this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
     this.$store.commit("course/setbaseCourseRemark", row.remark);
-
-
-
     this.$router.push({
       path:'/baseCourseDetail',
-      // query:{
-      //   versionName:versionName,
-      //   versionFlag:row.versionId,
-      //   versionId:this.currentVersionValue,
-      //   courseId:row.courseId,
-      //   courseName: row.courseName,
-      //   courseCode: row.courseCode,
-      //   courseType: row.courseType,
-      //   courseNature: row.courseNature,
-      //   credit: row.credit,
-      //   courseYear: row.courseYear,
-      //   remark: row.remark,
-      // },
     })
   },
     editTrigger(val){
@@ -816,7 +800,6 @@
   .clearSelected{
     min-height:36px; 
     color: #3f51b5;
-    float: left;
     display: inline-block;
       position: relative;
       cursor: pointer;
@@ -932,7 +915,6 @@
   .numSelectedTeacher{
     min-height:36px; 
     color: #3f51b5;
-    float: left;
     display: inline-block;
       position: relative;
       cursor: pointer;

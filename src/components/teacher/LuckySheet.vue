@@ -198,32 +198,17 @@ export default{
           console.log('res:',res);
           
           if(res.code == '200'){
-            ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: (action) => {
-              ElMessage({
+            ElMessage({
                 type: 'success',
                 message: `添加成功`,
               })
-              
-            },
-          });
             that.isNotDirty();
             that.goBackandClean();}
          else{
-          ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: 'OK',
-            callback: (action) => {
-              ElMessage({
+          ElMessage({
                 type: 'error',
                 message: `添加失败`,
               })
-            },
-          });
           that.goBackandClean();
     }
         });

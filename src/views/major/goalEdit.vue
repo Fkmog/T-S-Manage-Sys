@@ -142,7 +142,12 @@
               <el-icon :size="18" color="#6573c0"><Plus /></el-icon>
               新增毕业要求{{ attributeIdNew }}
             </el-button>
-            <el-button type="danger" text @click="deleteAttribute()">
+            <el-button
+              v-show="canDelete"
+              type="danger"
+              text
+              @click="deleteAttribute()"
+            >
               <el-icon :size="18" color="#ff0000"><Delete /></el-icon>
               删除毕业要求{{ attributeIdDelete }}
             </el-button>
@@ -167,10 +172,6 @@ export default {
   },
   data() {
     return {
-      // formRule: {
-      //   description: [{ required: true, message: "必填", trigger: "blur" }],
-      //   // detailDescription:[{required: true, message: '必填', trigger: 'blur'}]
-      // },
       currentMajorId: "",
       currentSchoolId: "",
       currentDepartmentId: "",
@@ -181,6 +182,7 @@ export default {
       attributeIdNew: "",
       hasDetail: true,
       deteleArray: [],
+      canDelete: true, //控制删除毕业要求按钮显示
     };
   },
   mounted() {
@@ -215,16 +217,18 @@ export default {
     },
     // 删除要求点
     deleteAttributeId() {
-      if (this.requirements !== null) {
+      if (this.requirements.length > 0) {
         this.attributeIdDelete =
           this.requirements[this.requirements.length - 1].serialNum;
       }
     },
     // 新增要求点
     newAttributeId() {
-      if (this.requirements !== null) {
+      if (this.requirements.length > 0) {
         let v = this.requirements[this.requirements.length - 1].serialNum;
         this.attributeIdNew = ++v;
+      } else {
+        this.attributeIdNew = 1;
       }
     },
     //返回上级查看页面
@@ -315,7 +319,7 @@ export default {
       currentObj.name = null;
       currentObj.description = null;
       currentObj.programIndicators = [];
-      if (this.requirements !== null) {
+      if (this.requirements.length > 0) {
         // 确定Id
         let currentId =
           Number(this.requirements[this.requirements.length - 1].id) + 1;
@@ -333,15 +337,15 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
-      this.requirements.push(currentObj);
-
+        this.requirements.push(currentObj);
       } else {
         currentObj.Id = "01";
         currentObj.serialNum = "1";
-        this.requirements=[]
-      this.requirements.push(currentObj);
-
+        this.requirements = [];
+        this.requirements.push(currentObj);
       }
+      //显示删除要求点按钮
+      this.canDelete = true;
       //更新对应新增删除的要求点的数字
       this.deleteAttributeId();
       this.newAttributeId();
@@ -350,24 +354,26 @@ export default {
     },
     //删除要求点
     deleteAttribute() {
-      console.log("!!", this.attributeIdDelete);
-      ElMessageBox.confirm(
-        "是否确定删除毕业要求" + this.attributeIdDelete + "?",
-        "",
-        {
-          confirmButtonText: "确认",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      ).then(() => {
-        //复制到待删除数组中
-        // this.deteleArray.push(this.requirements[this.requirements.length - 1]);
-        // this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
-        this.requirements.pop();
-        //更新对应新增删除的要求点的数字
-        this.deleteAttributeId();
-        this.newAttributeId();
-      });
+      console.log("@", this.requirements);
+      if (this.requirements.length > 0) {
+        ElMessageBox.confirm(
+          "是否确定删除毕业要求" + this.attributeIdDelete + "?",
+          "",
+          {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+        ).then(() => {
+          this.requirements.pop();
+          if (this.requirements.length == 0) {
+            this.canDelete = false;
+          }
+          //更新对应新增删除的要求点的数字
+          this.deleteAttributeId();
+          this.newAttributeId();
+        });
+      }
     },
     // //标注要求的修改
     // changeAttribute(attribute) {

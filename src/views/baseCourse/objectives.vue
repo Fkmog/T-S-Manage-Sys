@@ -22,22 +22,64 @@
       <div class="title">{{ course.name }}</div>
     </el-row>
   </div>
+  <editBtn @click="goEdit()"></editBtn>
   <div class="body">
     <div class="card">
       <span style="color: grey; font-size: 14px; margin-top: 20px"
         >课程目标</span
       >
+
+      <div v-for="objective in list.objectives" :key="objective.id">
+        <el-row>
+          <el-col :span="2" class="objective-num">{{
+            objective.serialNum
+          }}</el-col>
+          <el-col :span="20">
+            <div class="objective-name">
+              {{ objective.name }}
+            </div>
+            <div class="objective-description">
+              {{ objective.description }}
+            </div>
+            <div style="margin-top: 30px">
+              <span style="color: grey; font-size: 14px">考核方式</span>
+            </div>
+            <div
+              v-for="(assessment, index) in objective.assessmentMethods"
+              :key="index"
+            >
+              <el-row class="assessments">
+                <el-col :span="5">
+                  {{ assessment.name }}
+                </el-col>
+                <el-col :span="5">( {{ assessment.weight }}% )</el-col>
+                <el-col
+                  :span="2"
+                  v-for="(activity, index) in assessment.activities.item"
+                  :key="index"
+                >
+                  {{ activity }}
+                </el-col>
+              </el-row>
+            </div>
+          </el-col>
+        </el-row>
+        <div style="height: 30px"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
+import editBtn from "@/components/general/editBtn.vue";
+import { getObjectives } from "@/api/basecourse";
 
 export default {
   name: "baseCourseObjectives",
   components: {
     Back,
+    editBtn
   },
   data() {
     return {
@@ -47,14 +89,37 @@ export default {
         departmentId: Number,
         schoolId: Number,
       },
+      list: [],
     };
   },
   mounted() {
     this.course.name = this.$store.state.course.courseName;
+    this.course.detailId = this.$store.state.course.detailId;
+    this.checkObjectives();
   },
   methods: {
     backBaseCourseDetail() {
       this.$router.push("/baseCourseDetail");
+    },
+    goEdit(){
+       this.$router.push("/baseCourseObjectivesEdit");
+    },
+    //获取课程目标
+    checkObjectives() {
+      getObjectives(this.course.detailId).then((res) => {
+        this.list = res.data;
+        //处理数据-serialNum
+        if (this.list.objectives) {
+          this.list.objectives.forEach((value) => {
+            if (value.id.charAt(0) == "0") {
+              value.serialNum = value.id.charAt(1);
+            } else {
+              value.serialNum = value.id;
+            }
+          });
+        }
+        console.log("getObjectives:", this.list);
+      });
     },
   },
 };
@@ -97,5 +162,24 @@ export default {
   margin-top: 100px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   padding: 0 0 20px 20px;
+}
+.objective-num {
+  font-size: 1.6em;
+  color: #5c6bc0;
+  font-weight: bold;
+  margin-top: 30px;
+  padding-left: 16px;
+}
+.objective-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-top: 33px;
+}
+.objective-description {
+  margin-top: 30px;
+}
+.assessments {
+  margin-top: 30px;
 }
 </style>

@@ -119,6 +119,7 @@ export default {
       ElMessageBox.prompt("专业名称：", "新建专业", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
+        customClass: 'add-major-box',
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入新增专业名称",
@@ -164,7 +165,7 @@ export default {
       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        inputPlaceholder:majorName,
+        inputValue:majorName,
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入修改后的专业名称",
@@ -325,4 +326,5 @@ export default {
   margin-top: 20px;
   transition: 0.3s;
 }
+
 </style>

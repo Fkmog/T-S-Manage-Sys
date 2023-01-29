@@ -1,15 +1,4 @@
 import request from '@/utils/request/request'
-//   //添加教学班列表
-// export function addClass(remark) {
-//   return request({
-//     url: '/classes/add',
-//     method: 'POST',
-//     data:{
-
-//       remark:remark,
-//     }
-//   })
-// }
 // 查询毕业要求指标点
 export function getIndicators(bcdmId, departmentId, schoolId,programId) {
     return request({
@@ -46,4 +35,28 @@ export function getIndicatorList(bcdmId) {
             bcdmId:bcdmId
         }
     })
+}
+// 获取指标点下拉列表
+export function getPullIndicator(programId) {
+    return request({
+        url: '/detailMajor/indicatorAll/'+programId,
+        method: 'get',
+    })
+}
+//获取课程目标
+export function getObjectives(detailId) {
+    return request({
+        url: '/detail/'+detailId,
+        method: 'get',
+    })
+}
+//课程目标保存
+export function saveObjectives(Array) {
+  return request({
+    url: '/detail',
+    method: 'PUT',
+    data:{
+      Array:Array,
+    }
+  })
 }
