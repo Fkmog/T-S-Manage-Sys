@@ -1,244 +1,270 @@
 <template>
-<div class="content">
+  <div class="content">
     <!-- 顶部导航栏 -->
-  <div class="head-block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon class="icon" size="24px" style="margin-left: 50px" color="rgb(137, 137, 137)" @click="back()">
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <el-divider class="divider" direction="vertical" />
-
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="保存"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          color="rgb(137, 137, 137)"
-          size="24px" style="margin-left: 10px"
-          @click="save()"
+    <div class="head-block">
+      <el-row class="block-row">
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="返回"
+          placement="bottom"
+          :hide-after="0"
         >
-          <DocumentChecked />
-        </el-icon>
-      </el-tooltip>
-    </el-row>
-  </div>
-  <div class="body">
-    <el-tabs class="major-tab">
-      <el-tab-pane
-        v-model="chosenMajor"
-        v-for="(major, index1) in majorList"
-        :key="major.majorId"
-        :label="major.majorName"
-      >
-        <div class="card">
-          <span style="color: grey; font-size: 14px; margin-top: 20px"
-            >毕业要求指标点</span
+          <el-icon
+            class="icon"
+            size="24px"
+            style="margin-left: 50px"
+            color="rgb(137, 137, 137)"
+            @click="back()"
           >
+            <Back />
+          </el-icon>
+        </el-tooltip>
+        <el-divider class="divider" direction="vertical" />
 
-          <div
-            class="attribute"
-            v-for="(indicator, index2) in major.indicators"
-            :key="indicator.id"
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="保存"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            color="rgb(137, 137, 137)"
+            size="24px"
+            style="margin-left: 10px"
+            @click="judgeBeforeSave()"
           >
-            <div class="attribute-detail">
-              <div class="detail-num">
-                {{ indicator.serialNum }}
-              </div>
-              <div class="detail-content">
-                <div class="name">{{ indicator.name }}</div>
-                <div class="desc">{{ indicator.description }}</div>
-              </div>
-              <div class="closeIcon">
-                <el-icon
-                  class="close-icon"
-                  @click="deleteIndicator(indicator, index1)"
-                  ><Close
-                /></el-icon>
-              </div>
-            </div>
-
-            <!-- 支撑方式 -->
-            <div
-              v-if="indicator.supportMethodVos.length !== 0"
-              style="margin-left: 90px"
+            <DocumentChecked />
+          </el-icon>
+        </el-tooltip>
+      </el-row>
+    </div>
+    <div class="body">
+      <el-tabs class="major-tab">
+        <el-tab-pane
+          v-model="chosenMajor"
+          v-for="(major, index1) in majorList"
+          :key="major.majorId"
+          :label="major.majorName"
+        >
+          <div class="card">
+            <span style="color: grey; font-size: 14px; margin-top: 20px"
+              >毕业要求指标点</span
             >
-              <div class="support-head">
-                <span style="color: grey; font-size: 14px">支撑方式</span>
-                <div class="penIcon">
+
+            <div
+              class="attribute"
+              v-for="(indicator, index2) in major.indicators"
+              :key="indicator.id"
+            >
+              <div class="attribute-detail">
+                <div class="detail-num">
+                  {{ indicator.serialNum }}
+                </div>
+                <div class="detail-content">
+                  <div class="name">{{ indicator.name }}</div>
+                  <div class="desc">{{ indicator.description }}</div>
+                </div>
+                <div class="closeIcon">
                   <el-icon
-                    class="pen-icon"
-                    @click="editSupportMethods(indicator, index1, index2)"
-                    ><EditPen
+                    class="close-icon"
+                    @click="deleteIndicator(indicator, index1)"
+                    ><Close
                   /></el-icon>
                 </div>
               </div>
-              <div class="methods">
-                <div
-                  v-for="method in indicator.supportMethodVos"
-                  :key="method.id"
-                >
-                  <div class="method-detail">
-                    <div class="method-weight">
-                      (&nbsp;{{ method.weight }}%&nbsp;)
-                    </div>
-                    <div class="method-desc" style="margin-left: 80px">
-                      {{ method.name }}
+
+              <!-- 支撑方式 -->
+              <div
+                v-if="indicator.supportMethodVos.length !== 0"
+                style="margin-left: 90px"
+              >
+                <div class="support-head">
+                  <span style="color: grey; font-size: 14px">支撑方式</span>
+                  <div class="penIcon">
+                    <el-icon
+                      class="pen-icon"
+                      @click="editSupportMethods(indicator, index1, index2)"
+                      ><EditPen
+                    /></el-icon>
+                  </div>
+                </div>
+                <div class="methods">
+                  <div
+                    v-for="method in indicator.supportMethodVos"
+                    :key="method.id"
+                  >
+                    <div class="method-detail">
+                      <div class="method-weight">
+                        (&nbsp;{{ method.weight }}%&nbsp;)
+                      </div>
+                      <div class="method-desc" style="margin-left: 80px">
+                        {{ method.name }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <el-row
+                class="noSupport"
+                v-if="indicator.supportMethodVos.length == 0"
+              >
+                <div>
+                  <el-button
+                    style="color: #6573c0"
+                    text
+                    @click="newSupportPart(indicator, index1, index2)"
+                    >添加支撑方式
+                  </el-button>
+                </div>
+              </el-row>
             </div>
-            <el-row
-              class="noSupport"
-              v-if="indicator.supportMethodVos.length == 0"
+
+            <el-button
+              v-show="!newIndicator"
+              class="add-indicator-button"
+              style="color: #6573c0"
+              text
+              @click="this.newIndicator = true"
             >
-              <div>
-                <el-button
-                  style="color: #6573c0"
-                  text
-                  @click="newSupportPart(indicator, index1, index2)"
-                  >添加支撑方式
-                </el-button>
+              <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
+              新增支持指标点
+            </el-button>
+            <div
+              style="display: flex; flex-direction: row"
+              v-show="newIndicator"
+            >
+              <el-autocomplete
+                popper-class="el-autocomplete-suggestion"
+                :popper-append-to-body="false"
+                v-model="searchValue"
+                :fetch-suggestions="querySearch"
+                placeholder="选择指标点（筛选可输入文字或指标点编号，如：1.2）"
+                style="width: 680px; margin-left: 20px; margin-top: 30px"
+                :fit-input-width="true"
+                @select="addIndicator(searchValue, index1)"
+              ></el-autocomplete>
+              <div style="margin-top: 35px">
+                <el-icon
+                  class="autocomplete-icon"
+                  @click="this.newIndicator = false"
+                  ><Close
+                /></el-icon>
               </div>
-            </el-row>
-          </div>
-
-          <el-button
-            v-show="!newIndicator"
-            class="add-indicator-button"
-            style="color: #6573c0"
-            text
-            @click="this.newIndicator = true"
-          >
-            <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
-            新增支持指标点
-          </el-button>
-          <div style="display: flex; flex-direction: row" v-show="newIndicator">
-            <el-autocomplete
-              popper-class="el-autocomplete-suggestion"
-              :popper-append-to-body="false"
-              v-model="searchValue"
-              :fetch-suggestions="querySearch"
-              placeholder="选择指标点（筛选可输入文字或指标点编号，如：1.2）"
-              style="width: 680px; margin-left: 20px; margin-top: 30px"
-              :fit-input-width="true"
-              @select="addIndicator(searchValue, index1)"
-            ></el-autocomplete>
-            <div style="margin-top: 30px">
-              <el-icon
-                class="autocomplete-icon"
-                @click="this.newIndicator = false"
-                ><Close
-              /></el-icon>
             </div>
           </div>
-        </div>
-      </el-tab-pane>
-    </el-tabs>
-  </div>
-  <!-- 弹出对话框 -->
-  <div>
-    <el-dialog
-      v-model="dialogFormVisible"
-      title="设置支撑方式"
-      width="680px"
-      :show-close="false"
-      :align-center="true"
-    >
-      <el-row style="margin-bottom: 10px">
-        <el-col :span="1"></el-col>
-        <el-col :span="4" class="indicator-name"
-          >指标点{{ dialogIndicator.serialNum }}</el-col
-        >
-        <el-col :span="19" class="indicator-desc">{{
-          dialogIndicator.description
-        }}</el-col>
-      </el-row>
-      <div style="margin-top: 50px"></div>
-      <el-row
-        class="assessment"
-        v-for="(support, index1) in dialogIndicator.supportMethodVos"
-        :key="index1"
-        style="margin-top: 30px"
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+    <!-- 弹出对话框 -->
+    <div>
+      <el-dialog
+        v-model="dialogFormVisible"
+        title="设置支撑方式"
+        width="680px"
+        :show-close="false"
+        :align-center="true"
       >
-        <el-col :span="1"></el-col>
-        <!-- 编辑权重 -->
-        <el-col :span="4" v-show="!support.isEditWeight" class="showWeight">
-          <el-row>
-            <el-col :span="10">{{ support.weight }}% </el-col>
-            <el-col :span="12">
-              <el-icon @click="editWeight(support)"><Edit /></el-icon>
-            </el-col>
-          </el-row>
-        </el-col>
-        <el-col :span="4" v-show="support.isEditWeight" class="editWeight">
-          <el-row>
-            <el-col :span="12">
-              <el-input v-model="support.weight"></el-input>
-            </el-col>
-            <el-col :span="12">
-              <el-icon @click="saveWeight(support)"
-                ><DocumentChecked
-              /></el-icon>
-            </el-col>
-          </el-row>
-        </el-col>
-
-        <el-col :span="16">
-          <el-select
-            v-model="support.name"
-            style="width: 400px"
-            placeholder="课程目标"
+        <el-row style="margin-bottom: 10px">
+          <el-col :span="1"></el-col>
+          <el-col :span="4" class="indicator-name"
+            >指标点{{ dialogIndicator.serialNum }}</el-col
           >
-            <el-option
-              v-for="object in objectives"
-              :key="object.id"
-              :label="object.name"
-              :value="object.name"
+          <el-col :span="19" class="indicator-desc">{{
+            dialogIndicator.description
+          }}</el-col>
+        </el-row>
+        <div style="margin-top: 50px"></div>
+        <el-row
+          class="assessment"
+          v-for="(support, index1) in dialogIndicator.supportMethodVos"
+          :key="index1"
+          style="margin-top: 30px"
+        >
+          <el-col :span="1"></el-col>
+          <!-- 编辑权重 -->
+          <el-col :span="4" v-show="!support.isEditWeight" class="showWeight">
+            <el-row>
+              <el-col :span="10">{{ support.weight }}% </el-col>
+              <el-col :span="12">
+                <el-icon @click="editWeight(support)"><Edit /></el-icon>
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="4" v-show="support.isEditWeight" class="editWeight">
+            <el-row>
+              <el-col :span="12">
+                <el-input v-model="support.weight"></el-input>
+              </el-col>
+              <el-col :span="12">
+                <el-icon @click="saveWeight(support)"
+                  ><DocumentChecked
+                /></el-icon>
+              </el-col>
+            </el-row>
+          </el-col>
+
+          <el-col :span="16">
+            <!-- <el-select
+              v-model="support.name"
+              style="width: 400px"
+              placeholder="课程目标"
+              @change="changeSelect"
             >
-            </el-option>
-          </el-select>
-        </el-col>
-        <el-col :span="1">
-          <div style="margin-top: 7px">
-            <el-icon @click="deleteSupport(support)"><Close /></el-icon>
-          </div>
-        </el-col>
-      </el-row>
+              <el-option
+                v-for="object in objectives"
+                :key="object.id"
+                :label="object.name"
+                :value="object.name"
+              >
+              </el-option>
+            </el-select> -->
+            <el-select
+              v-model="support.name"
+              style="width: 400px"
+              placeholder="课程目标"
+            >
+              <el-option
+                v-for="object in objectives"
+                :key="object.id"
+                :label="object.name"
+                :value="object.name"
+              >
+              </el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="1">
+            <div style="margin-top: 7px">
+              <el-icon @click="deleteSupport(support)"><Close /></el-icon>
+            </div>
+          </el-col>
+        </el-row>
 
-      <el-button
-        class="add-support-button"
-        style="color: #6573c0; margin-top: 30px"
-        text
-        @click="addSupport()"
-      >
-        <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
-        新增课程目标
-      </el-button>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmAddSupport(dialogIndicator)">
-            确定
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
+        <el-button
+          class="add-support-button"
+          style="color: #6573c0; margin-top: 30px"
+          text
+          @click="addSupport()"
+        >
+          <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
+          新增课程目标
+        </el-button>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取消</el-button>
+            <el-button
+              type="primary"
+              @click="confirmAddSupport(dialogIndicator)"
+            >
+              确定
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
   </div>
-</div>
-
 </template>
 
 <script>
@@ -246,9 +272,8 @@ import {
   getIndicators,
   getMajors,
   getPullIndicator,
-  getDetailMajor,
-  getIndicatorList,
   getObjectives,
+  saveIndicators,
 } from "@/api/basecourse";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getMajorInfo } from "@/api/major";
@@ -291,6 +316,9 @@ export default {
       dialogFormVisible: false,
       dialogIndicator: {},
       objectives: [],
+      successNum: 0,
+      canSave: true,
+      wrongNum: 0,
     };
   },
   mounted() {
@@ -307,9 +335,56 @@ export default {
     back() {
       this.$router.push("/baseCourseIndicators");
     },
-    save() {
-      console.log("save");
+    judgeBeforeSave() {
+      //判断有无未编辑支撑方式的指标点，有则不能保存
+      this.wrongNum = 0;
+      this.majorList.forEach((major) => {
+        major.indicators.forEach((item) => {
+          item.supportMethods = item.supportMethodVos;
+          if (item.supportMethods.length == 0) {
+            this.wrongNum = this.wrongNum + 1;
+          }
+        });
+      });
+      if (this.wrongNum > 0) {
+        this.canSave = false;
+        ElMessage.error("请为指标点添加支撑方式");
+      } else {
+        this.canSave = true;
+      }
+      if (this.canSave) {
+        this.save();
+      }
     },
+    save() {
+      this.successNum = 0;
+      this.majorList.forEach((major) => {
+        major.indicators.forEach((item) => {
+          item.supportMethods = item.supportMethodVos;
+        });
+        // console.log("#", major);
+        major.courseIndicators = major.indicators;
+        saveIndicators(major).then((res) => {
+          console.log("save", res);
+          if (res.code == 200) {
+            this.successNum = this.successNum + 1;
+            ElMessage({
+              type: "success",
+              message: `保存成功`,
+              duration: 1000,
+            });
+            this.back();
+          } else {
+            ElMessage({
+              type: "error",
+              message: `保存失败`,
+              duration: 1000,
+            });
+          }
+        });
+      });
+    },
+
     //查询对应的专业以及bcdmId
     checkMajors() {
       getMajors(this.course.detailId).then((res) => {
@@ -334,6 +409,9 @@ export default {
         ).then((res) => {
           console.log("getIndicators:", i, res);
           this.majorList[i].indicators = res.data;
+          this.majorList[i].schoolId = this.course.schoolId;
+          this.majorList[i].departmentId = this.course.departmentId;
+
           //处理id->serialNum
           for (let j = 0; j < this.majorList[i].indicators.length; j++) {
             let serialNum = [];
@@ -410,18 +488,20 @@ export default {
       console.log("indicator", this.dialogIndicator);
       this.dialogFormVisible = true;
     },
-    //删除支撑方式
+    //删除课程目标
     deleteSupport(support) {
       this.dialogIndicator.supportMethodVos.pop(support);
     },
-    //新增支撑方式
+    //新增课程目标
     addSupport() {
       let support = {};
       support.name = "";
       support.weight = 0;
       support.isEditWeight = false;
       support.description = "";
+      support.id = "";
       this.dialogIndicator.supportMethodVos.push(support);
+      console.log("@", this.dialogIndicator.supportMethodVos);
     },
     //新创建的指标点下 新建支撑方式部分
     newSupportPart(indicator, index1, index2) {
@@ -431,29 +511,44 @@ export default {
       console.log("!!!", indicator);
       this.dialogFormVisible = true;
     },
-    //新增支持指标点 todo!需要拿到对应的bcdmId 即选中的标签页
+    //新增支持指标点
     addIndicator(searchValue, index1) {
-      let info = searchValue.split(" ");
-      let newIndicator = {};
-      newIndicator.supportMethodVos = [];
-      newIndicator.achievement = Number;
-      // ？why 指标点的name都是空值
-      newIndicator.name = "";
-      newIndicator.description = info[3];
-      newIndicator.serialNum = info[2];
-      let i = info[2].split(".");
-      if (Number(i[0]) > 9) {
-        newIndicator.id = i[0];
-      } else {
-        newIndicator.id = "0" + i[0];
+      try {
+        let info = searchValue.split(" ");
+        // 判断选中的指标点是否已存在
+        console.log("!", this.majorList[index1].indicators, info);
+        this.majorList[index1].indicators.forEach((item) => {
+          if (item.serialNum == info[2]) {
+            ElMessage.error("指标点" + info[2] + "已存在");
+            this.searchValue = "";
+            throw "true";
+          }
+        });
+        let newIndicator = {};
+        newIndicator.supportMethodVos = [];
+        newIndicator.achievement = Number;
+        newIndicator.name = "";
+        newIndicator.description = info[3];
+        newIndicator.serialNum = info[2];
+        let i = info[2].split(".");
+        if (Number(i[0]) > 9) {
+          newIndicator.id = i[0];
+        } else {
+          newIndicator.id = "0" + i[0];
+        }
+        if (Number(i[1]) > 9) {
+          newIndicator.id = newIndicator.id + i[1];
+        } else {
+          newIndicator.id = newIndicator.id + "0" + i[1];
+        }
+        this.majorList[index1].indicators.push(newIndicator);
+        this.newIndicator = false;
+        this.searchValue = "";
+      } catch (stat) {
+        if (stat == "true") {
+          return;
+        }
       }
-      if (Number(i[1]) > 9) {
-        newIndicator.id = newIndicator.id + i[1];
-      } else {
-        newIndicator.id = newIndicator.id + "0" + i[1];
-      }
-      this.majorList[index1].indicators.push(newIndicator);
-      this.newIndicator = false;
     },
     //查询新增指标点列表
     checkPullIndicators() {
@@ -496,7 +591,7 @@ export default {
     },
     //编辑权重
     editWeight(support) {
-      console.log("1", support);
+      // console.log("1", support);
       support.isEditWeight = true;
     },
     //保存权重
@@ -513,6 +608,13 @@ export default {
       let isItemNull = false;
       let haveZero = false;
       dialogIndicator.supportMethodVos.forEach((support) => {
+        //处理supportMethodVos下的id赋值
+        this.objectives.forEach((item) => {
+          if (item.name == support.name) {
+            support.id = item.id;
+          }
+        });
+        //逻辑校验处理
         sum = sum + Number(support.weight);
         if (support.name == "") {
           isItemNull = true;
@@ -533,6 +635,7 @@ export default {
       if (sum == 100 && isItemNull == false && haveZero == false) {
         this.majorList[this.index1].indicators[this.index2].supportMethodVos =
           this.dialogIndicator.supportMethodVos;
+        // console.log("~",this.majorList[this.index1].indicators[this.index2].supportMethodVos);
         this.dialogFormVisible = false;
       }
     },

@@ -413,12 +413,20 @@ export default {
       console.log("save", this.programInfo);
       editProgram(this.programInfo).then((res) => {
         console.log(res);
+        if(res.code == 200){
         ElMessage({
           type: "success",
           message: `保存成功`,
           duration: 1000,
         });
         this.backGoal();
+        }else{
+           ElMessage({
+          type: "error",
+          message: `保存失败`,
+          duration: 1000,
+        });
+        }
       });
     },
   },

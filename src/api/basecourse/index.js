@@ -52,11 +52,17 @@ export function getObjectives(detailId) {
 }
 //课程目标保存
 export function saveObjectives(Array) {
-  return request({
-    url: '/detail',
-    method: 'PUT',
-    data:{
-      Array:Array,
-    }
-  })
-}
+    return request({
+      url: '/detail',
+      method: 'PUT',
+      data:Array
+    })
+  }
+  //指标点保存
+  export function saveIndicators(Array) {
+    return request({
+      url: '/detailMajor',
+      method: 'PUT',
+      data:Array
+    })
+  }

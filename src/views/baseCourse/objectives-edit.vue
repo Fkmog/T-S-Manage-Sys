@@ -313,6 +313,21 @@ export default {
       this.list.majorId = this.$store.state.major.majorId;
       saveObjectives(this.list).then((res) => {
         console.log("save", res);
+        if (res.code == 200) {
+          ElMessage({
+          type: "success",
+          message: `保存成功`,
+          duration: 1000,
+        });
+        this.backObjectives();
+        }
+        else{
+          ElMessage({
+          type: "error",
+          message: `保存失败`,
+          duration: 1000,
+        });
+        }
       });
     },
     //获取课程目标
@@ -625,7 +640,7 @@ export default {
   width: 24px;
   height: 24px;
 }
-:deep().block .el-icon svg{
+:deep().block .el-icon svg {
   width: 24px;
   height: 24px;
 }
