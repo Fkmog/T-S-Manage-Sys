@@ -80,7 +80,7 @@
         <hot-table :settings="hotSettings" v-model:data="db.items"  style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
          
         </hot-table>
-      <!-- <LuckySheet /> -->
+     
     </div>
       </div>
   

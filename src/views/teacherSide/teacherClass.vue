@@ -147,6 +147,7 @@ export default {
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    
     console.log("classInfo", this.classInfo);
   },
   methods: {

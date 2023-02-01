@@ -1,0 +1,844 @@
+<template>
+    <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+<div class="block">
+    <el-row class="block-row">
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="返回"
+        placement="bottom"
+        :hide-after="0"
+      >
+        <el-icon
+          class="icon"
+          size="24px"
+          color="rgb(137, 137, 137)"
+          style="margin-left: 50px"
+          @click="goTeacher()"
+        >
+          <Back />
+        </el-icon>
+      </el-tooltip>
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="保存成绩"
+        placement="bottom"
+        :hide-after="0"
+        
+      >
+      <el-button 
+      @click="save" 
+      link
+      :disabled="!isValid()" >
+        <el-icon
+          
+          size="22px"
+          color="rgb(137, 137, 137)"
+          style="margin-left: 20px;top:-4px;"
+          
+        >
+       
+          <FolderChecked />
+        </el-icon>
+      </el-button>
+      </el-tooltip>
+
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="添加成绩项"
+        placement="bottom"
+        :hide-after="0"
+      >
+        <el-icon
+          class="icon"
+          size="22px"
+          color="rgb(137, 137, 137)"
+          style="margin-left: 20px"
+          
+        >
+        <!-- @click="addActivities" -->
+          <CirclePlus />
+        </el-icon>
+      </el-tooltip>
+
+    </el-row>
+  </div>
+    
+       
+    
+        <div layout="row" flex class="md-padding">
+            <div
+            class="hot-table-container"
+            
+            flex
+            
+            id="courseHot"
+      ></div>
+        </div>
+        
+        
+      </div>
+    
+      
+    </template>
+    
+    <script >
+    import { ref, onMounted,reactive} from 'vue'
+    
+    import { HotTable,HotColumn } from '@handsontable/vue3';
+    import { registerAllModules } from 'handsontable/registry';
+    import { ElTooltip,ElIcon,ElInput,ElMessage, ElMessageBox } from 'element-plus'
+    
+    import   Action  from 'element-plus'
+    
+    import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus} from '@element-plus/icons-vue'
+    import Handsontable from 'handsontable';
+    import request from '@/utils/request/request'
+    import '@/components/teacher/addTeacher.js'
+    
+    
+    import 'element-plus/dist/index.css'
+    import 'handsontable/dist/handsontable.full.css'
+    
+    
+    import 'handsontable/dist/handsontable.full.css'
+    
+    
+    
+    export default{
+      name:'addTeacher',
+      inject:['reload'], 
+      provide(){
+          return{
+            reload:this.reload
+          }
+        },
+      data(){
+        let self = this;
+        return{
+          departmentId:'',
+          schoolId:'',
+          programId:'',
+          classInfo:'',
+
+          //一开始有多少行和列
+          NUM_AUX_ROW:3,
+          NUM_AUX_COL:2,
+        ROW_INDEX_ACTIVITY : 0,
+        ROW_INDEX_TOTALSCORE : 1,
+        ROW_INDEX_SCORESETTING : 2,
+    
+        currentNumberofActivities:0,
+  
+        firstActivities:true,
+
+        //添加学生
+        addNewStudentList:[],
+        hotInstance: undefined,
+        columnList:[{
+                data:'studentNumber',
+            },
+            {
+                data:'studentName',
+            },
+            {
+                data:'pass',
+            },],
+        scoreSettingOptions:['总评','期末'],
+          isRouterAlive:true,
+          dirty:false,
+          saving:false,
+          count:0,
+          localres:{},
+          postData: { students: [] ,scores:[],newStudents:[]},
+          db: { items: [] },
+          departmentId:0,
+          fromCourseBatchAdd:false,
+          
+             
+    
+        }
+      },
+      components:{
+        ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
+        ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
+        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action,
+        CirclePlus
+      },
+      methods:{
+addActivities(){
+        this.firstActivities = false;
+        let length = Object.keys(this.db.items[0]).length-2;
+        let activityName = '成绩项'+length.toString();
+        var activityDict = {
+            data:activityName
+        }
+        this.columnList.push(activityDict)
+        this.hotInstance.updateSettings({
+                columns:this.columnList,
+              });
+        console.log('db items:',this.db.items,'column List',this.columnList);
+        // this.db.items[0][activityName] = '';
+      },
+activate(){
+        this.departmentId = this.$store.state.currentInfo.departmentId;
+        this.schoolId = this.$store.state.currentInfo.schoolId;
+        this.programId = this.$store.state.major.programId;
+        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        console.log('this.departmentId',this.departmentId,'this.schoolId',this.schoolId,'this.programId',this.programId,'this.classInfo',this.classInfo);
+        this.activateHotcolumn();
+            },
+activateHotcolumn(){
+    let self = this;
+        let that = this;
+        this.getActivities().then(function(){
+       
+        
+        let container = document.querySelector("#courseHot");
+        let hotRegisterer = new Handsontable(container,{
+             data: self.db.items,
+            licenseKey: 'non-commercial-and-evaluation',
+            colHeaders: function(index) { // false
+                // return index === 0 ? '学号' : '成绩项';
+                if (index === 0) {
+                return '学号';
+                }
+                else if (index === 1) {
+                return '姓名';
+                } else if (index === 2) {
+                return '不及格';
+                } else {
+                return '成绩项';
+                }
+                },
+            rowHeaders: function(index) { // true
+                if (index === 0) {
+                return '名称';
+                } else if (index === 1) {
+                return '分值';
+                // } else if (index === 2) {
+                //   return '平均分';
+                // } else if (index === 2) {
+                //   return '指标点';
+                } else if (index === 2) {
+                return '设置';
+                } else {
+                return index - self.NUM_AUX_ROW + 1;
+                }
+                // return index === 0 ? '成绩项' : index;
+            },
+            
+            fixedRowsTop: 3,
+            fixedColumnsLeft: 2,
+            minSpareRows: 3,
+            minSpareCols: 0,
+            preventOverflow: 'horizontal',
+            manualColumnMove: false,
+            copyPaste: true,
+            colWidths: 52,
+            
+            contextMenu: {
+              items:{
+                  'row_above': {
+                      name: '在上方插入行'
+                  },
+                  'row_below': {
+                      name: '在下方插入行'
+                  },
+                  'remove_row': {
+                      name: '删除行'
+                  }
+              }
+            },
+            afterChange(changes, source) {
+              if (source === 'loadData') { 
+                console.log('same');
+                return;
+              } else { 
+                // self.isValid();
+                if(self.count==0){
+                  self.dirty=false;
+                  console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+                }
+                else{
+                  self.dirty=true;
+                  self.firstActivities = false;
+                  console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+                }
+                self.count++;
+                console.log('console:',self.count);
+                }
+            }
+        });
+        that.hotInstance = hotRegisterer;
+        that.hotInstance.updateSettings({
+                data:that.db.items,
+                columns:that.columnList,
+                cells: that.getHotCellsFunction(),
+                
+              });
+        });
+},
+getHotCellsFunction() {
+                
+            return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+                var cellProperties = {};
+                let that = this;
+                if (col === 0) {  // studentNo column
+                   
+                cellProperties.readOnly = true;
+                cellProperties.className = 'cell-disallow';
+                }
+                if (row < 3  && col < 3 && col!=0) {
+                 // left-top zone
+                cellProperties.readOnly = false;
+                // cellProperties.type = 'string';
+                cellProperties.className = 'cell-disallow';
+                }
+                if (col === 2 && row >= 3) {
+                // fail(不及格) column
+                cellProperties.type = 'checkbox';
+                cellProperties.checkedTemplate = 'F', // F: fail
+                cellProperties.uncheckedTemplate = '',
+                cellProperties.className = 'cell-disallow';
+                }
+                if (row != 0 && row != 2 && col >= 3) { 
+                // for 2nd row(分值), also validScore
+                cellProperties.type = 'numeric';  // by default: 'string'
+                //   cellProperties.validator = that.validScore();
+                cellProperties.format = '0[.]0';  // http://numeraljs.com/
+                } else {
+                //   cellProperties.validator =  that.validString();
+                }
+
+            
+
+                if (col === 0) {
+                cellProperties.width = 100;
+                if(row >2){
+                    cellProperties.readOnly = false;
+                }
+                }
+
+                if (col > 2 && row === 2) {
+                cellProperties.type = 'dropdown';
+                cellProperties.source = [' ','总评','期末'];
+                cellProperties.allowEmpty = true;
+                cellProperties.className = 'ht-s-size';
+                //   cellProperties.validator = that.validScoreSetting();
+                }
+
+                return cellProperties;
+            };
+    },
+    _validScore(value) {
+      if (/^[1]?[0-9]{1,2}(\.[0-9]+)?$/.test(value)) { // && value <= 100) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    validScore(value, callback) {
+      callback(_validScore(value));
+    },
+    validString(value, callback) {
+      if (value && value.length > 0) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    },
+    validScoreSetting(value, callback) {
+      if (this.scoreSettingOptions.indexOf(value) >= 0) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    },
+
+
+
+async getActivities(){
+      let that = this;
+      return request({
+        url:'/classes/'+this.classInfo.classId,
+        method:'get',
+      }).then(function(res){
+        console.log('class Info',res);
+        
+        let course = res.data;
+        if(course.activities){
+          let activityNumber = course.activities.item.length;
+          let studentNum = course.scores.length;
+          that.currentNumberofActivities = activityNumber;
+        //   that.db.items[0]={};
+        //   that.db.items[1]={};
+          for(let i=0;i<studentNum+3;i++){
+            that.db.items[i]={};
+          }
+         
+         for(let i=0;i<activityNumber;i++){
+        //   itemDict[i.toString()] = course.activities.item[i];
+        var columnDist = {};
+          that.db.items[0][course.activities.item[i]]= course.activities.item[i];
+          that.db.items[1][course.activities.item[i]]= course.activities.value[i];
+          columnDist={
+            data:course.activities.item[i],
+          }
+          that.columnList.push(columnDist);
+
+         
+        //   valueDict[i.toString()] = course.activities.value[i];
+         }
+         
+          for(let i=0;i<studentNum;i++){
+            that.db.items[3+i]['studentNumber']=course.scores[i]['info'][0];
+            that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
+            that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
+            for(let j=0;j<activityNumber;j++){
+                that.db.items[3+i][course.activities.item[j]] = course.scores[i]['grade'][j];
+            }
+          };
+          console.log('db.items',that.db.items);
+         
+          
+        //   that.db.items.push(itemDict);
+        //   that.db.items.push(valueDict);
+         
+        }
+        else {
+          console.log('res has no activities');
+          that.db.items = [[''],['']];
+              // add two columns (fail column, 1 score column)
+              that.addColumn();
+              that.addColumn();
+          }
+        
+      })
+    },
+      isValid(){
+        if(this.firstActivities){
+        return false;
+      }
+      else{
+        var result = this.toPostData();
+          if (!result) {
+            return false;
+          } else {
+            return true;
+          }
+      }
+
+
+
+       
+      },
+      isNotDirty(){
+        
+        this.dirty=false;
+      },
+      save() {
+
+        this.saving = true;
+        this.dirty = false;
+        var result = this.isValid();
+          if (!result) {
+            this.saving = false;
+            return;
+          }
+       
+        if (!this.postData.students || this.postData.students.length <= 0) {
+              return $q.reject('学号或姓名不能为空');
+            }
+            
+            
+
+            let that =this;
+
+            this.searchForStudent().then(function(res){
+                if(res){
+            var studentList = JSON.parse( JSON.stringify(that.db.items));
+            let activityNumber = that.columnList.length;
+            for(let m=0;m<3;m++){
+            studentList.shift();
+        }
+            for(let i=0;i<studentList.length;i++){
+                
+                if(studentList[i]['studentNumber']!=undefined){
+                    
+                    var gradeList = [];
+                    for(let j=0;j<activityNumber-3;j++){
+                        var activityLabel = that.columnList[activityNumber-3+j];
+                        
+                        gradeList.push(studentList[i][activityLabel.data]);
+                    };
+                    studentList[i]['pass'] = studentList[i]['pass']==undefined ? "":studentList[i]['pass'];
+                    var scoreDist = {
+                        'info':[studentList[i]['studentNumber'],studentList[i]['studentName'],studentList[i]['pass']],
+                        'grade':gradeList,
+                    }
+                    
+                    that.postData.scores.push(scoreDist);
+                }
+            }
+           
+            that.addScores(that.postData.scores);
+                }
+            });
+            
+            
+
+            
+      
+    },
+      toPostData(){
+        let that = this;
+        this.postData.students.length = 0; // clean array
+        var res = this.postData.students;
+        var newstudent = this.postData.newStudents;
+        var scoreRes = this.postData.scores;
+        var studentList = JSON.parse( JSON.stringify(this.db.items));
+        var valid = true;
+        for(let m=0;m<3;m++){
+            studentList.shift();
+        }
+        
+        var OrFlag = Boolean;
+        var AndFlag = Boolean;
+        
+        studentList.forEach(function(student){
+            let activityNumber = that.columnList.length;
+            
+            student.studentNumber = (_.isEmpty(student.studentNumber)) ? '' : student.studentNumber.trim();
+            student.studentName = (_.isEmpty(student.studentName)) ? '' : student.studentName.trim();
+            student.pass = (_.isEmpty(student.pass)) ? '' : student.pass.trim();
+            
+            var trueFlagNum = 0;//为空的个数
+            var falseFlagNum = 0;//不为空的个数
+                console.log('current student:',student);
+                for(let j=0;j<activityNumber-3;j++){
+                    let activityLabel = that.columnList[activityNumber-3+j];//从columnList中获取成绩项名称
+                    
+                    // console.log('student[activityLabel]',activityLabel.data,'student[activityLabel]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
+                    if(!student[activityLabel.data]){
+                        trueFlagNum++;
+                    }
+                    else{
+                        falseFlagNum++;
+                    }
+              };
+             // true means null, false mens not null
+              if(trueFlagNum>0){
+                OrFlag = true;
+                if(trueFlagNum == activityNumber-3){
+                    AndFlag = true;
+                }
+                else{
+                    AndFlag = false;
+                }
+              }
+              else{
+                OrFlag = false;
+                AndFlag = false;
+              }
+            //   console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
+            if (_.isEmpty(student.studentNumber) || _.isEmpty(student.studentName) || OrFlag) {
+              if (_.isEmpty(student.studentNumber) && _.isEmpty(student.studentName) && AndFlag) {
+                // console.log('scoreRes:',scoreRes,'res: ',res);
+                // console.log('----------全都为空------------');
+                return;
+              } else {  // either name OR teacherNo is empty, but not both
+                valid = false;
+                // console.log('scoreRes:',scoreRes,'res: ',res);
+                // console.log('-----------部分为空-----------');
+                return;
+              }
+            } 
+            else {  // both are not empty: post
+
+                
+               
+              var distTeacher = {
+                'studentNumber':student.studentNumber,
+                'studentName':student.studentName,
+                // 'email':teacher.email,
+                'programId': that.programId,
+                // 'pass':student.pass,
+                'departmentId':that.departmentId,
+                'schoolId':that.schoolId
+              };
+            //   console.log('that.searchStudent(student.studentNumber)',that.searchStudent(student.studentNumber));
+              that.searchStudent(student.studentNumber).then(function(res){
+                console.log('search res:',res);
+                if(res){
+                    var newStudent = {
+                'studentNumber':student.studentNumber,
+                'studentName':student.studentName,
+                // 'email':teacher.email,
+                'programId': that.programId,
+                // 'pass':student.pass,
+                'departmentId':that.departmentId,
+                'schoolId':that.schoolId
+                    }
+                    newstudent.push(newStudent);
+                };
+              })
+              
+             
+            //   var scoreDist = {
+            //     'info':[student.studentNumber,student.studentName,pass],
+            //     'grade':gradeList,
+            //   };
+            
+                // if(scoreRes[0]==undefined){
+                //     // console.log('is going to push!!!!!!');
+                //     scoreRes.push(scoreDist);
+                // }
+                // else{
+                //     for(let i=0;i<scoreRes.length;i++){
+                //         if(scoreRes[i]['info'][0] == student.studentNumber){
+                //         // console.log('duplicated !!!!!!!!!');
+                //     }
+                //     else{
+                //         // console.log('is going to push!!!!!!');
+                //         scoreRes.push(scoreDist);
+                //     }
+                // }
+                // }
+
+            
+            res.push(distTeacher);
+            // console.log('scoreRes:',scoreRes,'res: ',res);
+            // console.log('-----------都不空-----------');
+            };
+          });
+    
+          return valid;
+      },
+async searchForStudent(){
+    let that = this;
+    var newStudentList = [];
+    var addFlag = Boolean;
+    // console.log('this.postData.newStudents:',this.postData.newStudents);
+            this.postData.newStudents.forEach(function(student){
+                        newStudentList.push(student);
+            });
+
+            console.log('newStudentList:',newStudentList);
+            
+                this.addTeacher(newStudentList).then(function(res){
+                console.log('add student res:',res);
+                that.firstActivities = true;
+                //   that.getActivities();
+                if(res.code == '200'){
+                    ElMessage({
+                        type: 'success',
+                        message: `添加成功`,
+                        duration:1000,
+                    });
+                    addFlag = true;
+                }
+                else{
+                ElMessage({
+                        type: 'error',
+                        message: `添加失败`,
+                        duration:1000,
+                    })
+                    addFlag = false;
+            }
+                });
+               
+            
+            
+            return  addFlag;
+                  
+},
+
+    goBackandClean(){
+        let that = this;
+      this.db.items = [];
+        this.columnList = [{
+                data:'studentNumber',
+            },
+            {
+                data:'studentName',
+            },
+            {
+                data:'pass',
+            },];
+      this.postData.students = [];
+      this.postData.scores = [];
+      this.postData.newStudents = [];
+      
+      this.getActivities().then(function(){
+       
+      });
+      
+      console.log('datas:', this.db.items,this.postData.students);
+    },
+    reload(){
+      this.isRouterAlive = false;
+      this.count = 0;
+      this.$nextTick(function () {
+        this.isRouterAlive = true;
+      });
+    },
+    goTeacher(){
+      console.log('goteacher:'+this.saving+this.dirty);//只有dirty = flase 或者 saving = true时才可以退出
+      
+      
+      if(this.dirty == true || this.saving== false&&this.dirty == true ){
+        ElMessageBox.confirm(
+        '数据还未保存，是否仍然关闭？',
+        '注意',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          this.$router.push({ path:'/score'});
+        })
+        .catch(() => {
+          
+        })
+      }
+      else{
+        
+        this.$router.push({ path:'/score'});
+      
+      }
+    },
+ async searchStudent(postData){
+    
+        return request({
+            url:'/student/number'+'/'+postData,
+            method:'get'
+        }).then(function(res){
+            console.log('searching for studentNumber:',postData,'student search res:',res);
+            if(res.data == undefined){
+                
+                return true;
+            }
+            else{
+                return false;
+            }
+            
+        })
+    },
+ async addTeacher(postData){
+      var localres;
+      console.log('student postData:',postData);
+      return request({
+                url:'/student/addStudents',
+                method:'post',
+                data:postData
+            }).then(function(res){
+              localres = res;
+              
+              return localres;
+            });
+    },
+    addScores(postData){
+        let that = this;
+        console.log('score postData:',postData);
+        return request({
+            url:'/classes/editScores',
+            method:'post',
+            data:{
+                'classId':this.classInfo.classId,
+                'scores':postData,
+            }
+        }).then(function(res){
+            console.log('saving scores res:',res);
+            that.firstActivities = true;
+            if(res.code == '200'){
+                ElMessage({
+                    type: 'success',
+                    message: `成绩保存成功`,
+                    duration:1000,
+                  });
+                 that.goBackandClean();
+            }
+             else{
+              ElMessage({
+                    type: 'error',
+                    message: `成绩保存失败`,
+                    duration:1000,
+                  })
+             that.goBackandClean();
+        }
+        })
+    }
+    
+      },
+      mounted:function(){
+        this.activate();
+      },
+     
+    
+      
+      
+    
+    
+    }
+    
+    
+     
+    </script>
+    
+    <style  scoped>
+    .icon {
+  cursor: pointer;
+}
+    .block-row {
+  margin-top: 18px;
+}
+    .block {
+  position: absolute;
+  top: 110px;
+  left: 0px;
+  height: 55px;
+  border-bottom: 1px solid rgb(189, 189, 189);
+  width: 100%;
+}
+    .hot-table-container{
+    float: left;
+    margin-left: 5%;
+  }
+    .hotTable{
+      box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+    }
+    .md-padding{
+      margin-top: 120px;
+    }
+    .ng-scope layout-column flex{
+    display: flex;
+    flex-direction: column;
+    }
+   
+   
+    
+    #luckysheet {
+      margin: 0px;
+      padding: 0px;
+      border:1px aquamarine;
+      /* position: absolute; */
+      width: 100%;
+      height: 750px;
+      /* left: 0px; */
+      margin-top: 20px;
+      /* top: 30px; */
+      bottom: 0px;
+    }
+    
+    #uploadBtn {
+      font-size: 16px;
+    }
+    
+    
+    </style>
+    
