@@ -96,26 +96,26 @@
       <el-col>
         <el-col style="margin-top: 15px">
           <div class="detail-title">课程名</div>
-          <div class="detail-info">1</div>
+          <div class="detail-info">{{ classInfo.courseName }}</div>
         </el-col>
         <el-row style="margin-top: 15px">
           <el-col :span="12" style="margin-top: 10px">
             <div class="detail-title">课程号</div>
-            <div class="detail-info">2</div>
+            <div class="detail-info">{{ classInfo.courseCode }}</div>
           </el-col>
           <el-col :span="6" style="margin-top: 10px">
             <div class="detail-title">开课号</div>
-            <div class="detail-info">2</div>
+            <div class="detail-info">{{ classInfo.identifier }}</div>
           </el-col>
         </el-row>
         <el-row style="margin-top: 15px">
           <el-col :span="12" style="margin-top: 10px">
             <div class="detail-title">学年</div>
-            <div class="detail-info">3</div>
+            <div class="detail-info">{{classInfo.academicYear}}</div>
           </el-col>
           <el-col :span="6" style="margin-top: 10px">
             <div class="detail-title">学期</div>
-            <div class="detail-info">3</div>
+            <div class="detail-info">{{classInfo.semester}}</div>
           </el-col>
         </el-row>
       </el-col>
@@ -131,6 +131,8 @@ import {
   Checked,
   Download,
 } from "@element-plus/icons-vue";
+import { getDictionary } from "@/api/dictionary";
+
 export default {
   name: "TeacherClass",
   components: {
@@ -143,12 +145,15 @@ export default {
   data() {
     return {
       classInfo: {},
+      academicYear: [],
+      semester: [],
     };
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
     
     console.log("classInfo", this.classInfo);
+    this.getDictionary()
   },
   methods: {
     //返回教师端首页
@@ -171,6 +176,24 @@ export default {
     toObjectives() {
       this.$router.push({
         name: "Objectives",
+      });
+    },
+    //获取数据字典
+    getDictionary() {
+      getDictionary().then((res) => {
+        console.log("getDictionary", res);
+        this.academicYear = res.academic_year;
+        this.semester = res.semester;
+        this.academicYear.forEach((year) => {
+          if (year.dictValue == this.classInfo.academicYear) {
+            this.classInfo.academicYear = year.dictLabel;
+          }
+        });
+        this.semester.forEach((semester) => {
+          if (semester.dictValue == this.classInfo.semester) {
+            this.classInfo.semester = semester.dictLabel;
+          }
+        });
       });
     },
   },
