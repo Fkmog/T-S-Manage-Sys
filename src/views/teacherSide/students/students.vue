@@ -23,8 +23,11 @@
       <el-divider class="divider" direction="vertical" />
     </el-row>
   </div>
-  <!-- 学生信息列表 -->
-  <el-table
+
+  <div layout="row" flex class="md-padding">
+    <!-- <addBtn @click="goAddStudent"></addBtn> -->
+<!-- 学生信息列表 -->
+    <el-table
     class="studentsTable"
     :data="studentsTable"
     style="width: 40%"
@@ -35,17 +38,24 @@
     <el-table-column prop="studentId" label="学号"  width="200px"/>
     <el-table-column prop="studentName" label="姓名" />
   </el-table>
+  </div>
+
+  
+  
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
+import addBtn from "@/components/general/addBtn.vue";
+import request from "@/utils/request/request";
 export default {
   name: "Students",
   components: {
-    Back,
+    Back,addBtn,request,
   },
   data() {
     return {
+      programId:'',
       classInfo: [],
       // 临时
       studentsTable:[{
@@ -60,17 +70,34 @@ export default {
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    this.programId = this.$store.state.major.programId;
     console.log("classInfo", this.classInfo);
+    this.getStudents();
   },
   methods: {
+    // goAddStudent(){
+    //   console.log('go add student');
+    //   this.$router.push("/addStudents");
+    // },
     backClass(){
       this.$router.push("/teacherClass");
+    },
+    getStudents(){
+      return request({
+        url:'/student/listByProgram'+'/'+this.programId,
+        method:'get'
+      }).then(function(res){
+        console.log(res);
+      })
     }
   },
 };
 </script>
 
 <style scoped>
+.md-padding {
+  margin-top: 120px;
+}
 .block {
   position: absolute;
   top: 110px;

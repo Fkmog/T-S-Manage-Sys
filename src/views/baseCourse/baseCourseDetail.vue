@@ -207,28 +207,20 @@ export default {
         }).then(function (res) {
           console.log(res);
           if (res.code == "200") {
-            ElMessageBox.alert(res.msg, "Code:" + res.code, {
-              confirmButtonText: "OK",
-              callback: function (action) {
-                ElMessage({
+            ElMessage({
                   type: "success",
                   message: `新增成功`,
+                  duration:1000,
                 });
-              },
-            });
             //成功后根据vesionId和basecouseId获取详细信息
             that.isVisiable = true;
             that.getDetail();
           } else {
-            ElMessageBox.alert(res.msg, "Code:" + res.code, {
-              confirmButtonText: "OK",
-              callback: function (action) {
-                ElMessage({
+            ElMessage({
                   type: "error",
                   message: `新增失败`,
+                  duration:1000,
                 });
-              },
-            });
             //失败后退回basecouse页面
             that.goBaseCourse();
           }
@@ -293,7 +285,12 @@ export default {
       let majorList = [];
       let index = 0;
       console.log("index Type:", typeof index.toString());
-      if (this.majorNumber > 1) {
+      if(!this.majorList){
+        console.log('majorList is null ');
+        this.majorForm = [];
+      }
+      else{
+        if (this.majorNumber > 1) {
         this.majorId.forEach(function (major) {
           console.log("each majoId:", major);
           return request({
@@ -318,6 +315,8 @@ export default {
       }
       console.log("majorList", majorList);
       this.majorForm = majorList;
+      }
+      
     },
     //路由跳转
     backBaseCourse() {

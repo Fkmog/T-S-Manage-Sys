@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // 引入组件
 import Student from '../views/major/student.vue'
+import BaseAddStudent from '@/components/student/addStudent.vue'
 import Achieve from '../views/major/achieve.vue'
 import Courses from '../views/major/course.vue'
 import Goal from '../views/major/goal.vue'
@@ -32,6 +33,7 @@ import TeacherIndex from '@/views/teacherSide/teacherIndex.vue'
 import TeacherClasses from '@/views/teacherSide/teacherClasses.vue'
 import TeacherClass from '@/views/teacherSide/teacherClass.vue'
 import Students from '@/views/teacherSide/students/students.vue'
+import AddScore from '@/views/teacherSide/score/addScore.vue'
 import Score from '@/views/teacherSide/score/score.vue'
 import Objectives from '@/views/teacherSide/objectives/objectives.vue'
 
@@ -156,7 +158,12 @@ export default createRouter({
                     path: '/student',
                     component: Student,
                     meta: { isMajor: true }
-
+                },
+                {
+                    name: "BaseAddStudent",
+                    path: '/baseAddStudent',
+                    component: BaseAddStudent,
+                    meta: { isMajor: true }
                 },
                 {
                     name: "Manage",
@@ -197,6 +204,11 @@ export default createRouter({
                     name: "Students",
                     path: '/students',
                     component: Students,
+                },
+                {
+                    name: "AddScore",
+                    path: '/addScore',
+                    component: AddScore,
                 },
                 {
                     name: "Score",

@@ -14,7 +14,7 @@
           @click="goBaseCourse"
           link
         >
-          <el-icon><Back /></el-icon>
+          <el-icon :size="24"><Back /></el-icon>
         </el-button>
       </el-tooltip>
       <div class="s-v-bar" style="float: left">&nbsp;</div>
@@ -26,13 +26,13 @@
           link
           :disabled="!isValid()"
         >
-          <el-icon><FolderChecked /></el-icon>
+          <el-icon :size="24"><FolderChecked /></el-icon>
         </el-button>
       </el-tooltip>
       <div flex></div>
     </div>
     <div layout="row" flex class="md-padding">
-      <!-- id="courseHot" -->
+
       <div
         class="hot-table-container"
         layout="column"
@@ -55,7 +55,7 @@ import {
   ElMessage,
   ElMessageBox,
 } from "element-plus";
-import Action from "element-plus";
+
 
 import {
   Back,
@@ -91,6 +91,8 @@ export default {
       schoolId: "",
       courseTypeSource: ["学科基础课", "还未确定"], //课程类型
       courseNatureSource: ["专业任选", "还未确定"], //课程性质
+
+      firstActivities:true,
 
       count: 0,
       localres: {},
@@ -155,64 +157,6 @@ export default {
         // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
         //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
       ],
-      //   hotSettings:{
-      //     // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
-
-      //     licenseKey: 'non-commercial-and-evaluation',
-      //     colHeaders: true,
-      //     rowHeaders: true,
-
-      //     columns: [
-      //     { data: 'courseName', title: '课程名', width: 260, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-      //     { data: 'courseCode', title: '课程号', width: 180, height: 20, validator: /^(.){1,50}$/, allowEmpty: false },
-      //     { data: 'courseType', title: '课程类型', width: 180, height: 20, _key: 'courseTypes',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
-      //     { data: 'courseNature', title: '课程性质', width: 120, height: 20, _key: 'courseNatures',validator: /^(.){1,50}$/,type: 'dropdown', source:[], allowEmpty: false },
-      //     { data: 'credit', title: '学分', width: 80, height: 20,  allowEmpty: false},//需要添加validator
-      //     ],
-      //     minSpareRows: 2,
-      //     preventOverflow: 'horizontal',
-      //     manualColumnMove: true,
-      //     // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-      //     // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
-      //     // contextMenu: ['row_above', 'row_below', 'remove_row'],
-      //     // columns:[
-      //     //   {type: 'numeric',},
-      //     //   {type:'text'},
-      //     //   {allowInvalid: false}
-      //     // ],
-      //     contextMenu: {
-      //       items:{
-      //           'row_above': {
-      //               name: '在上方插入行'
-      //           },
-      //           'row_below': {
-      //               name: '在下方插入行'
-      //           },
-      //           'remove_row': {
-      //               name: '删除行'
-      //           }
-      //       }
-      //     },
-      //     afterChange(changes, source) {
-      //       if (source === 'loadData') {
-      //         console.log('same');
-      //         return;
-      //       } else {
-      //         if(self.count==0){
-      //           self.dirty=false;
-      //           console.log('console:',self.count);
-      //           console.log('different',self.dirty);
-      //         }
-      //         else{
-      //           self.dirty=true;
-      //           console.log('console:',self.count);
-      //           console.log('different',self.dirty);
-      //         }
-      //         self.count++;
-      //         console.log('console:',self.count);
-
-      //         }
-      //     }},
     };
   },
   components: {
@@ -235,7 +179,7 @@ export default {
     DocumentAdd,
     ElMessage,
     ElMessageBox,
-    Action,
+
   },
   methods: {
     activate() {
@@ -247,7 +191,7 @@ export default {
       // let hotRegisterer = new Handsontable();
       // let hotInstance = hotRegisterer.getInstance(courseHot);
 
-      // console.log('ColHeader:',hotInstance.hotInstance.getColHeader(2));
+      
       let container = document.querySelector("#courseHot");
       let hotRegisterer = new Handsontable(container, {
         data: this.db.items,
@@ -297,7 +241,7 @@ export default {
             source: this.courseTypeSource,
             allowEmpty: false,
           },
-          {
+          { 
             data: "courseNature",
             title: "课程性质",
             width: 120,
@@ -318,7 +262,6 @@ export default {
         afterChange(changes, source) {
           if (source === "loadData") {
             console.log("same");
-            return;
           } else {
             if (self.count == 0) {
               self.dirty = false;
@@ -326,6 +269,7 @@ export default {
               console.log("different", self.dirty);
             } else {
               self.dirty = true;
+              self.firstActivities = false;
               console.log("console:", self.count);
               console.log("different", self.dirty);
             }
@@ -337,12 +281,13 @@ export default {
       this.hotInstance = hotRegisterer;
     },
     isValid() {
-      var result = this.toPostData();
 
-      if (!result) {
+      if(this.firstActivities){
         return false;
-      } else {
-        return this.postData.courses.length > 0;
+      }
+      else{
+        let result = this.toPostData();
+          return !(!result);
       }
     },
     isNotDirty() {
@@ -350,55 +295,34 @@ export default {
     },
     save() {
       this.saving = true;
-      var result = this.isValid();
+      let result = this.isValid();
       if (!result) {
         this.saving = false;
         return;
       }
 
-      if (!this.postData.courses || this.postData.courses.length <= 0) {
-        return $q.reject("工号或姓名不能为空");
-      }
-      // var postData = {
-      //   teachers:  this.postData.teachers,
-      //   // departmentId: this.departmentId
-      // };
-
-      // return service.post(postData).then(function(res) {
-      //   return res;
-      // });
+     
+      
       let that = this;
 
       this.addBaseCourses(this.postData.courses).then(function (res) {
         console.log("res:", res);
-
+        that.firstActivities = true;    
         if (res.code == "200") {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: "OK",
-            callback: (action) => {
-              ElMessage({
+          ElMessage({
                 type: "success",
                 message: `添加成功`,
+                duration: 1000,
               });
-            },
-          });
 
           that.goBackandClean();
           that.isNotDirty();
         } else {
-          ElMessageBox.alert(res.msg, "Code:" + res.code, {
-            // if you want to disable its autofocus
-            // autofocus: false,
-            confirmButtonText: "OK",
-            callback: (action) => {
-              ElMessage({
+          ElMessage({
                 type: "error",
                 message: `添加失败`,
+                duration: 1000,
               });
-            },
-          });
 
           that.goBackandClean();
           that.isNotDirty();
@@ -409,8 +333,8 @@ export default {
       this.postData.courses.length = 0; // clean array
       let that = this;
 
-      var res = this.postData.courses;
-      var valid = true;
+      let res = this.postData.courses;
+      let valid = true;
       this.db.items.forEach(function (course) {
         course.courseCode = _.isEmpty(course.courseCode)
           ? ""
@@ -448,7 +372,7 @@ export default {
           }
         } else {
           // both are not empty: post
-          var distCourse = {
+          let distCourse = {
             departmentId: that.departmentId,
             schoolId: that.schoolId,
             courseName: course.courseName,
@@ -476,15 +400,9 @@ export default {
       this.hotInstance.updateSettings({
         data: this.db.items,
       });
-      //   this.reload();
+      
     },
-    // reload(){
-    //   this.isRouterAlive = false;
-    //   this.count = 0;
-    //   this.$nextTick(function () {
-    //     this.isRouterAlive = true;
-    //   });
-    // },
+    
     goBaseCourse() {
       //如果dirty是true 或者saving是false并且dirty是true需要询问
       console.log("gobasecourse:" + this.saving + this.dirty);
@@ -503,8 +421,8 @@ export default {
       }
     },
     addBaseCourses(postData) {
-      var localres;
-      var courseList = [];
+      let localres;
+      let courseList = [];
 
       this.postData.courses.forEach(function (course) {
         courseList.push(course);
@@ -521,20 +439,20 @@ export default {
         return localres;
       });
     },
-    getCourseTypeDict() {
-      return request({
-        url: "/dict/data/school/type",
-        method: "get",
-        pramas: this.schoolId,
-      }).then(function (res) {
-        console.log("dict:", res);
-        return res;
-      });
-    },
+    // getCourseTypeDict() {
+    //   return request({
+    //     url: "/dict/data/school/type",
+    //     method: "get",
+    //     pramas: this.schoolId,
+    //   }).then(function (res) {
+    //     console.log("dict:", res);
+    //     return res;
+    //   });
+    // },
   },
   mounted() {
     this.activate();
-    this.getCourseTypeDict();
+    
   },
 };
 </script>
@@ -542,15 +460,14 @@ export default {
     <style  scoped>
 .md-padding {
   margin-top: 10px;
-}
-.ng-scope layout-column flex {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
 }
 
+
 .hot-table-container {
-  margin-left: 20%;
-  width: 50%;
+ 
+  width: 910px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {
