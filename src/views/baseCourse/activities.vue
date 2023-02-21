@@ -268,12 +268,8 @@
       }
         else{
           var result = this.toPostData();
-          console.log('isvalid:',result);
-          if (!result) {
-            return false;
-          } else {
-            return true;
-          }
+          
+          return !(!result);
       }
       
       

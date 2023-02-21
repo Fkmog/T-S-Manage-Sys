@@ -32,7 +32,7 @@
             <hot-column  data="teacherName" title="姓名" width="200" height="20" ></hot-column>
             <hot-column  data="email" title="邮箱" width="200" height="20" validator="emailcheck" ></hot-column>
           </hot-table>
-        <!-- <LuckySheet /> -->
+       
       </div>
     </div>
 
@@ -49,19 +49,11 @@ import { ref, onMounted,reactive} from 'vue'
 import { HotTable,HotColumn } from '@handsontable/vue3';
 import { registerAllModules } from 'handsontable/registry';
 import { ElTooltip,ElIcon,ElInput,ElMessage, ElMessageBox } from 'element-plus'
-
-import   Action  from 'element-plus'
-
 import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
 import Handsontable from 'handsontable';
 import request from '@/utils/request/request'
 import '@/components/teacher/addTeacher.js'
-
-
 import 'element-plus/dist/index.css'
-import 'handsontable/dist/handsontable.full.css'
-
-
 import 'handsontable/dist/handsontable.full.css'
 
 
@@ -80,7 +72,7 @@ export default{
       departmentId:'',
       schoolId:'',
 
-
+      firstActivities:true,
 
       isRouterAlive:true,
       dirty:false,
@@ -89,7 +81,7 @@ export default{
       localres:{},
       postData: { teachers: [] },
       db: { items: [] },
-      departmentId:0,
+      
       fromCourseBatchAdd:false,
       hotSettings:{
         // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
@@ -124,7 +116,7 @@ export default{
         afterChange(changes, source) {
           if (source === 'loadData') { 
             console.log('same');
-            return;
+            
           } else { 
             if(self.count==0){
               self.dirty=false;
@@ -133,6 +125,7 @@ export default{
             }
             else{
               self.dirty=true;
+              self.firstActivities = false;
               console.log('console:',self.count);
               console.log('different',self.dirty);
             }
@@ -148,7 +141,7 @@ export default{
   components:{
     ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
     ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-    Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
+    Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox
   },
   methods:{
     activate(){
@@ -156,11 +149,12 @@ export default{
             this.schoolId = this.$store.state.currentInfo.schoolId;
         },
   isValid(){
-    var result = this.toPostData();
-      if (!result) {
+    if(this.firstActivities){
         return false;
-      } else {
-        return this.postData.teachers.length > 0;
+      }
+      else{
+        let result = this.toPostData();
+          return !(!result);
       }
   },
   isNotDirty(){
@@ -169,7 +163,7 @@ export default{
   },
   save() {
     this.saving = true;
-    var result = this.isValid();
+    let result = this.isValid();
       if (!result) {
         this.saving = false;
         return;
@@ -178,25 +172,16 @@ export default{
     if (!this.postData.teachers || this.postData.teachers.length <= 0) {
           return $q.reject('工号或姓名不能为空');
         }
-        // var postData = {
-        //   teachers:  this.postData.teachers,
-        //   // departmentId: this.departmentId
-        // };
-        var teacherList = [];
-
+        let teacherList = [];
         this.postData.teachers.forEach(function(teacher){
           teacherList.push(teacher);
         });
         console.log('teacherList:',teacherList);
-        // return service.post(postData).then(function(res) {
-        //   return res;
-        // });
         let that =this;
-        
-        
+
         this.addTeacher(teacherList).then(function(res){
           console.log('res:',res);
-          
+          that.firstActivities = true; 
           if(res.code == '200'){
             ElMessage({
                 type: 'success',
@@ -214,16 +199,12 @@ export default{
           that.goBackandClean();
     }
         });
-
-
-      
-  
 },
   toPostData(){
     let that = this;
     this.postData.teachers.length = 0; // clean array
-    var res = this.postData.teachers;
-      var valid = true;
+    let res = this.postData.teachers;
+    let valid = true;
     
       this.db.items.forEach(function (teacher) {
         teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
@@ -239,7 +220,7 @@ export default{
             return;
           }
         } else {  // both are not empty: post
-          var distTeacher = {
+          let distTeacher = {
             'teacherNumber':teacher.teacherNumber,
             'email':teacher.email,
             'teacherName':teacher.teacherName,
@@ -249,7 +230,7 @@ export default{
           res.push(distTeacher);
         }
       });
-
+     
       return valid;
   },
 goBackandClean(){
@@ -289,13 +270,11 @@ goTeacher(){
     })
   }
   else{
-    
     this.$router.push({ path:'/teacher'});
-  
   }
 },
 addTeacher(postData){
-  var localres;
+  let localres;
   console.log('postData:',postData);
   return request({
             url:'/teacher/addTeachers',
@@ -331,10 +310,7 @@ addTeacher(postData){
 .md-padding{
   margin-top: 10px;
 }
-.ng-scope layout-column flex{
-display: flex;
-flex-direction: column;
-}
+
 .submenu{
     color: #3f51b5;
     font-size: 14px;

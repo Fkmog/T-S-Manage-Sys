@@ -402,11 +402,6 @@ async getActivities(){
             }
           };
           console.log('db.items',that.db.items);
-         
-          
-        //   that.db.items.push(itemDict);
-        //   that.db.items.push(valueDict);
-         
         }
         else {
           console.log('res has no activities');
@@ -424,11 +419,7 @@ async getActivities(){
       }
       else{
         var result = this.toPostData();
-          if (!result) {
-            return false;
-          } else {
-            return true;
-          }
+          return !(!result);
       }
 
 

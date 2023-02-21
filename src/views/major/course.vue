@@ -35,7 +35,7 @@
 </div>
 
 <div layout="row" flex class="md-padding" >
-    <!-- <el-button  class="addCourseButton"  circle @click="drawer = true"><el-icon class="addIcon"><Plus /></el-icon></el-button> -->
+    
     <addBtn @click="this.drawerShow()"></addBtn>
     <div class="el-table-container">
       <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange">
@@ -120,13 +120,7 @@
         
         @change="getCourseByYear(currentVersion)"
       >
-      <!-- 远程搜索version -->
-      <!-- remote-show-suffix
-        remote
-        filterable
-        reserve-keyword
-        :remote-method="remoteMethod"
-        :loading="loading" -->
+    
         <el-option
           v-for="item in versions"
           :key="item.value"
@@ -547,7 +541,7 @@ methods:{
             res.rows.forEach(function(course){
             that.hasCourse = true;
             let eachCourseId = '';
-            // let eachVersionId = '';
+            
 
             eachCourseId = course.courseId;
             
@@ -555,13 +549,13 @@ methods:{
             course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.credit=course.credit;
+            
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.versionId = course.bcDetails[0].versionId;
             course.versionName = course.bcDetails[0].versionName;
             courses.push(course);
-            var courseDict = {
+            let courseDict = {
               'courseId':eachCourseId,
               // 'versionId':eachVersionId,
             };
@@ -1318,7 +1312,7 @@ mounted:function(){
 .numSelectedTeacher{
   min-height:36px; 
   color: #3f51b5;
-  float: left;
+  
   display: inline-block;
     position: relative;
     cursor: pointer;

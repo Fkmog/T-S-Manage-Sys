@@ -285,7 +285,12 @@ export default {
       let majorList = [];
       let index = 0;
       console.log("index Type:", typeof index.toString());
-      if (this.majorNumber > 1) {
+      if(!this.majorList){
+        console.log('majorList is null ');
+        this.majorForm = [];
+      }
+      else{
+        if (this.majorNumber > 1) {
         this.majorId.forEach(function (major) {
           console.log("each majoId:", major);
           return request({
@@ -310,6 +315,8 @@ export default {
       }
       console.log("majorList", majorList);
       this.majorForm = majorList;
+      }
+      
     },
     //路由跳转
     backBaseCourse() {

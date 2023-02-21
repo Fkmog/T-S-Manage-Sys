@@ -32,7 +32,7 @@
       <div flex></div>
     </div>
     <div layout="row" flex class="md-padding">
-      <!-- id="courseHot" -->
+
       <div
         class="hot-table-container"
         layout="column"
@@ -55,7 +55,7 @@ import {
   ElMessage,
   ElMessageBox,
 } from "element-plus";
-import Action from "element-plus";
+
 
 import {
   Back,
@@ -91,6 +91,8 @@ export default {
       schoolId: "",
       courseTypeSource: ["学科基础课", "还未确定"], //课程类型
       courseNatureSource: ["专业任选", "还未确定"], //课程性质
+
+      firstActivities:true,
 
       count: 0,
       localres: {},
@@ -177,7 +179,7 @@ export default {
     DocumentAdd,
     ElMessage,
     ElMessageBox,
-    Action,
+
   },
   methods: {
     activate() {
@@ -189,7 +191,7 @@ export default {
       // let hotRegisterer = new Handsontable();
       // let hotInstance = hotRegisterer.getInstance(courseHot);
 
-      // console.log('ColHeader:',hotInstance.hotInstance.getColHeader(2));
+      
       let container = document.querySelector("#courseHot");
       let hotRegisterer = new Handsontable(container, {
         data: this.db.items,
@@ -239,7 +241,7 @@ export default {
             source: this.courseTypeSource,
             allowEmpty: false,
           },
-          {
+          { 
             data: "courseNature",
             title: "课程性质",
             width: 120,
@@ -260,7 +262,6 @@ export default {
         afterChange(changes, source) {
           if (source === "loadData") {
             console.log("same");
-            return;
           } else {
             if (self.count == 0) {
               self.dirty = false;
@@ -268,6 +269,7 @@ export default {
               console.log("different", self.dirty);
             } else {
               self.dirty = true;
+              self.firstActivities = false;
               console.log("console:", self.count);
               console.log("different", self.dirty);
             }
@@ -279,12 +281,13 @@ export default {
       this.hotInstance = hotRegisterer;
     },
     isValid() {
-      var result = this.toPostData();
 
-      if (!result) {
+      if(this.firstActivities){
         return false;
-      } else {
-        return this.postData.courses.length > 0;
+      }
+      else{
+        let result = this.toPostData();
+          return !(!result);
       }
     },
     isNotDirty() {
@@ -292,28 +295,19 @@ export default {
     },
     save() {
       this.saving = true;
-      var result = this.isValid();
+      let result = this.isValid();
       if (!result) {
         this.saving = false;
         return;
       }
 
-      if (!this.postData.courses || this.postData.courses.length <= 0) {
-        return $q.reject("工号或姓名不能为空");
-      }
-      // var postData = {
-      //   teachers:  this.postData.teachers,
-      //   // departmentId: this.departmentId
-      // };
-
-      // return service.post(postData).then(function(res) {
-      //   return res;
-      // });
+     
+      
       let that = this;
 
       this.addBaseCourses(this.postData.courses).then(function (res) {
         console.log("res:", res);
-
+        that.firstActivities = true;    
         if (res.code == "200") {
           ElMessage({
                 type: "success",
@@ -339,8 +333,8 @@ export default {
       this.postData.courses.length = 0; // clean array
       let that = this;
 
-      var res = this.postData.courses;
-      var valid = true;
+      let res = this.postData.courses;
+      let valid = true;
       this.db.items.forEach(function (course) {
         course.courseCode = _.isEmpty(course.courseCode)
           ? ""
@@ -378,7 +372,7 @@ export default {
           }
         } else {
           // both are not empty: post
-          var distCourse = {
+          let distCourse = {
             departmentId: that.departmentId,
             schoolId: that.schoolId,
             courseName: course.courseName,
@@ -406,15 +400,9 @@ export default {
       this.hotInstance.updateSettings({
         data: this.db.items,
       });
-      //   this.reload();
+      
     },
-    // reload(){
-    //   this.isRouterAlive = false;
-    //   this.count = 0;
-    //   this.$nextTick(function () {
-    //     this.isRouterAlive = true;
-    //   });
-    // },
+    
     goBaseCourse() {
       //如果dirty是true 或者saving是false并且dirty是true需要询问
       console.log("gobasecourse:" + this.saving + this.dirty);
@@ -433,8 +421,8 @@ export default {
       }
     },
     addBaseCourses(postData) {
-      var localres;
-      var courseList = [];
+      let localres;
+      let courseList = [];
 
       this.postData.courses.forEach(function (course) {
         courseList.push(course);
@@ -451,20 +439,20 @@ export default {
         return localres;
       });
     },
-    getCourseTypeDict() {
-      return request({
-        url: "/dict/data/school/type",
-        method: "get",
-        pramas: this.schoolId,
-      }).then(function (res) {
-        console.log("dict:", res);
-        return res;
-      });
-    },
+    // getCourseTypeDict() {
+    //   return request({
+    //     url: "/dict/data/school/type",
+    //     method: "get",
+    //     pramas: this.schoolId,
+    //   }).then(function (res) {
+    //     console.log("dict:", res);
+    //     return res;
+    //   });
+    // },
   },
   mounted() {
     this.activate();
-    this.getCourseTypeDict();
+    
   },
 };
 </script>
@@ -472,15 +460,14 @@ export default {
     <style  scoped>
 .md-padding {
   margin-top: 10px;
-}
-.ng-scope layout-column flex {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
 }
 
+
 .hot-table-container {
-  margin-left: 20%;
-  width: 51%;
+ 
+  width: 910px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {

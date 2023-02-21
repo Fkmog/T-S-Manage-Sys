@@ -50,7 +50,7 @@
     import { registerAllModules } from 'handsontable/registry';
     import { ElTooltip,ElIcon,ElInput,ElMessage, ElMessageBox } from 'element-plus'
     
-    import   Action  from 'element-plus'
+  
     
     import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
     import Handsontable from 'handsontable';
@@ -90,7 +90,7 @@
           localres:{},
           postData: { students: [] },
           db: { items: [] },
-          departmentId:0,
+          
           fromCourseBatchAdd:false,
           hotSettings:{
             // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
@@ -149,7 +149,7 @@
       components:{
         ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
         ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
+        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox
       },
       methods:{
         activate(){
@@ -162,7 +162,7 @@
           if (!result) {
             return false;
           } else {
-            return this.postData.students.length > 0;
+            return true > 0;
           }
       },
       isNotDirty(){
