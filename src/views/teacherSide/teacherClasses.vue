@@ -1,6 +1,5 @@
 <template>
   <HeaderSearch></HeaderSearch>
-  <addBtn></addBtn>
   <div class="classes-list">
     <div
       class="card"
@@ -24,7 +23,6 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import addBtn from "@/components/general/addBtn.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Search, DeleteFilled, Tools } from "@element-plus/icons-vue";
 import { checkClasses } from "@/api/teacherSide";
@@ -35,7 +33,6 @@ export default {
     DeleteFilled,
     Tools,
     HeaderSearch,
-    addBtn,
   },
   data() {
     return {

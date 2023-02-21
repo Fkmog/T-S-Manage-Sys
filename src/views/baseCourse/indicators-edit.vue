@@ -362,7 +362,7 @@ export default {
         major.indicators.forEach((item) => {
           item.supportMethods = item.supportMethodVos;
         });
-        // console.log("#", major);
+        console.log("保存内容", major);
         major.courseIndicators = major.indicators;
         saveIndicators(major).then((res) => {
           console.log("save", res);
@@ -501,14 +501,14 @@ export default {
       support.description = "";
       support.id = "";
       this.dialogIndicator.supportMethodVos.push(support);
-      console.log("@", this.dialogIndicator.supportMethodVos);
+      // console.log("@", this.dialogIndicator.supportMethodVos);
     },
     //新创建的指标点下 新建支撑方式部分
     newSupportPart(indicator, index1, index2) {
       this.index1 = index1;
       this.index2 = index2;
       this.dialogIndicator = JSON.parse(JSON.stringify(indicator));
-      console.log("!!!", indicator);
+      // console.log("!!!", indicator);
       this.dialogFormVisible = true;
     },
     //新增支持指标点

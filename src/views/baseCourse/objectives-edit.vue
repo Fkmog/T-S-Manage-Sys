@@ -33,7 +33,7 @@
             class="icon"
             size="24px"
             color="rgb(137, 137, 137)"
-            @click="save()"
+            @click="judgeBeforeSave()"
             style="margin-left: 10px"
           >
             <DocumentChecked />
@@ -130,7 +130,12 @@
               <el-icon :size="18" color="#6573c0"><Plus /></el-icon>
               新增课程目标
             </el-button>
-            <el-button type="danger" text @click="deleteObject()">
+            <el-button
+              v-show="canDelete"
+              type="danger"
+              text
+              @click="deleteObject()"
+            >
               <el-icon :size="18" color="#ff0000"><Delete /></el-icon>
               删除课程目标{{ deleteSerialNum }}
             </el-button>
@@ -288,6 +293,7 @@ export default {
       activities: [],
       isEditWeight: false,
       isChange: false, //页面有无修改
+      canDelete: true,
     };
   },
   watch: {
@@ -307,10 +313,35 @@ export default {
     backObjectives() {
       this.$router.push("/baseCourseObjectives");
     },
+    judgeBeforeSave() {
+      try {
+        this.list.schoolId = this.$store.state.currentInfo.schoolId;
+        this.list.departmentId = this.$store.state.currentInfo.departmentId;
+        this.list.majorId = this.$store.state.major.majorId;
+        // console.log("保存的list:", this.list);
+        //有无课程目标
+        if(this.list.objectives.length==0){
+            ElMessage.error("请添加课程目标");
+            throw "true";
+        }
+        this.list.objectives.forEach((object) => {
+          if (object.description == "") {
+            ElMessage.error("描述内容不能为空");
+            throw "true";
+          }
+          else if(object.assessmentMethods.length==0){
+            ElMessage.error("请为课程目标添加考核方式");
+            throw "true";
+          }
+        });
+        this.save()
+      } catch (stat) {
+        if (stat == "true") {
+          return;
+        }
+      }
+    },
     save() {
-      this.list.schoolId = this.$store.state.currentInfo.schoolId;
-      this.list.departmentId = this.$store.state.currentInfo.departmentId;
-      this.list.majorId = this.$store.state.major.majorId;
       saveObjectives(this.list).then((res) => {
         console.log("save", res);
         if (res.code == 200) {
@@ -458,6 +489,7 @@ export default {
       this.objectives.push(newObject);
       console.log("!!", this.objectives);
       this.getDeleteSerialNum();
+      this.canDelete = true;
     },
     // 删除课程目标
     deleteObject() {
@@ -472,14 +504,20 @@ export default {
       ).then(() => {
         // bug! 当删除到最后一项时会出错
         this.objectives.pop();
+        if (this.objectives.length == 0) {
+          this.canDelete = false;
+        }
         this.getDeleteSerialNum();
       });
     },
     // 获取删除课程目标的serialNum
     getDeleteSerialNum() {
-      if (this.objectives !== null) {
+      // console.log("!", this.objectives);
+      if (this.objectives.length > 0) {
         this.deleteSerialNum =
           this.objectives[this.objectives.length - 1].serialNum;
+      } else {
+        this.deleteSerialNum = 0;
       }
     },
     // 编辑权重

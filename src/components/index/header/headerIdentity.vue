@@ -2,7 +2,7 @@
   <div>
     <span class="info" @click="show">
       {{ $store.state.userInfo.userName }} |
-      {{ $store.state.userInfo.roleInfo[0].roleName }}
+      {{ $store.state.currentInfo.identity }}
       <el-icon v-show="showDown" class="infoIconDown" size="14px">
         <CaretBottom />
       </el-icon>
@@ -16,7 +16,7 @@
   <el-card class="box-card" v-show="showCard">
     <template #header>
       <div class="card-header">
-        <span class="cardInfo">身份信息</span>
+        <span class="cardInfo" style="cursor: default">身份信息</span>
         <div class="cardBtn">
           <span class="cardOption1">修改密码</span>
           <span class="cardOption2" @click="exit">退出</span>
@@ -27,9 +27,14 @@
       class="identity"
       v-for="(identity, index) in $store.state.userInfo.identity"
       :key="index"
-      @click="changeCurrentInfo(identity,index)"
+      @click="changeCurrentInfo(identity, index)"
     >
-      {{ identity.departmentName }}--{{ identity.roleName }}
+      <div v-show="identity.roleName !== '课程负责人'">
+        {{ identity.departmentName }} -- {{ identity.roleName }}
+      </div>
+      <div v-show="identity.roleName == '课程负责人'">
+        {{ identity.roleName }}
+      </div>
     </div>
   </el-card>
 </template>
@@ -76,7 +81,7 @@ export default {
         .catch(() => {});
     },
     //修改当前专业/学院等信息
-    changeCurrentInfo(identity,index) {
+    changeCurrentInfo(identity, index) {
       console.log("identity", identity);
       this.$store.commit(
         "currentInfo/setDepartmentName",
@@ -85,7 +90,20 @@ export default {
       this.$store.commit("currentInfo/setDepartmentId", identity.departmentId);
       this.$store.commit("currentInfo/setSchoolName", identity.schoolName);
       this.$store.commit("currentInfo/setSchoolId", identity.schoolId);
-      this.$store.commit("currentInfo/setRole",this.$store.state.userInfo.identity[index]);
+      this.$store.commit(
+        "currentInfo/setRole",
+        this.$store.state.userInfo.identity[index]
+      );
+      this.$store.getters["currentInfo/changeIsTeacher"];
+      if (identity.roleName == "学院管理员") {
+        this.$router.replace("/major");
+      }
+      if (identity.roleName == "教师") {
+        this.$router.replace("teacherClasses");
+      }
+      if (identity.roleName == "课程负责人") {
+        this.$router.replace("principalBaseCourse");
+      }
     },
   },
 };

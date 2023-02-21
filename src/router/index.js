@@ -35,7 +35,10 @@ import Students from '@/views/teacherSide/students/students.vue'
 import Score from '@/views/teacherSide/score/score.vue'
 import Objectives from '@/views/teacherSide/objectives/objectives.vue'
 
-
+//课程管理人端组件
+import PrincipalIndex from '@/views/principalSide/principalIndex.vue'
+import PrincipalBaseCourse from '@/views/principalSide/baseCourse/baseCourse.vue'
+import PrincipalClass from '@/views/principalSide/class/class.vue'
 
 export default createRouter({
     //history配置暂未定
@@ -50,7 +53,7 @@ export default createRouter({
             path: '/login',
             component: userLogin
         },
-        //非教师端的路由
+        //学院管理员端的路由
         {
             path: '/index',
             component: Index,
@@ -77,33 +80,49 @@ export default createRouter({
                 {
                     path: '/addTeacher',
                     component: AddTeacher,
+                    meta: { isMajor: false }
+
                 },
                 {
                     path: '/batchCourseAdd',
                     component: BatchCourseAdd,
+                    meta: { isMajor: false }
+
                 },
                 {
-                    path:'/baseCourseDetail',    
-                    component:BaseCourseDetail,
+                    path: '/baseCourseDetail',
+                    component: BaseCourseDetail,
+                    meta: { isMajor: false }
+
                 },
                 {
-                    path:'/baseCourseIndicators',    
-                    component:baseCourseIndicators,
+                    path: '/baseCourseIndicators',
+                    component: baseCourseIndicators,
+                    meta: { isMajor: false }
+
                 },
                 {
-                    path:'/baseCourseIndicatorsEdit',    
-                    component:baseCourseIndicatorsEdit,
+                    path: '/baseCourseIndicatorsEdit',
+                    component: baseCourseIndicatorsEdit,
+                    meta: { isMajor: false }
+
                 },
                 {
-                    path:'/baseCourseObjectives',    
-                    component:baseCourseObjectives,
-                },{
-                    path:'/baseCourseObjectivesEdit',    
-                    component:baseCourseObjectivesEdit,
+                    path: '/baseCourseObjectives',
+                    component: baseCourseObjectives,
+                    meta: { isMajor: false }
+
+                }, {
+                    path: '/baseCourseObjectivesEdit',
+                    component: baseCourseObjectivesEdit,
+                    meta: { isMajor: false }
+
                 },
                 {
-                    path:'/baseCourseActivities',    
-                    component:baseCourseActivities,
+                    path: '/baseCourseActivities',
+                    component: baseCourseActivities,
+                    meta: { isMajor: false }
+
                 },
                 //专业视图下路由
                 {
@@ -165,7 +184,7 @@ export default createRouter({
             component: TeacherIndex,
             children: [
                 {
-                    name:"TeacherClasses",
+                    name: "TeacherClasses",
                     path: '/teacherClasses',
                     component: TeacherClasses
                 },
@@ -190,5 +209,20 @@ export default createRouter({
                     component: Objectives,
                 },
             ]
-        }]
+        },
+        // 课程负责人端路由
+        {
+            path: '/principalIndex',
+            component: PrincipalIndex,
+            children: [{
+                name: "principalBaseCourse",
+                path: '/principalBaseCourse',
+                component: PrincipalBaseCourse
+            }, {
+                name: "principalClass",
+                path: '/principalClass',
+                component: PrincipalClass
+            },]
+        }
+    ]
 })

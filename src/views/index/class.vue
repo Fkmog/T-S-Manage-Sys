@@ -35,11 +35,11 @@
     </template>
   </HeaderSearch>
   <!-- 添加教学班按钮 -->
-  <addBtn @click="dialogFormVisible = true"></addBtn>
-  <!-- 弹出表单 -->
+  <addBtn @click="addVisible = true"></addBtn>
+  <!-- 弹出新建表单 -->
   <div>
     <el-dialog
-      v-model="dialogFormVisible"
+      v-model="addVisible"
       title="新建教学班"
       width="580px"
       :show-close="false"
@@ -124,8 +124,104 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="addClass('classAddForm')">
+          <el-button @click="addVisible = false">取消</el-button>
+          <el-button type="primary" @click="addClass(classAddForm)">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
+  <!-- 弹出修改表单 -->
+  <div>
+    <el-dialog
+      v-model="editVisible"
+      title="修改教学班"
+      width="580px"
+      :show-close="false"
+      :align-center="true"
+    >
+      <el-form
+        :model="classEditForm"
+        :rules="rules"
+        ref="classEditForm"
+        label-position="top"
+      >
+        <el-form-item
+          label="课程名"
+          :label-width="formLabelWidth"
+          prop="className"
+        >
+          <el-input v-model="classEditForm.className" autocomplete="off" />
+        </el-form-item>
+        <el-form-item
+          label="任课教师"
+          :label-width="formLabelWidth"
+          prop="instructor"
+        >
+          <el-input v-model="classEditForm.instructor" autocomplete="off" />
+        </el-form-item>
+        <el-form-item
+          label="课程号"
+          :label-width="formLabelWidth"
+          prop="courseCode"
+        >
+          <el-input v-model="classEditForm.courseCode" autocomplete="off" />
+        </el-form-item>
+        <el-form-item
+          label="开课号"
+          :label-width="formLabelWidth"
+          prop="identifier"
+        >
+          <el-input v-model="classEditForm.identifier" autocomplete="off" />
+        </el-form-item>
+        <el-form-item
+          label="开课学年"
+          :label-width="formLabelWidth"
+          prop="chosenYear"
+        >
+          <el-select
+            v-model="classEditForm.chosenYear"
+            placeholder="选择开课学年"
+          >
+            <el-option
+              v-for="item in academicYear"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="开课学期"
+          :label-width="formLabelWidth"
+          prop="chosenSemester"
+        >
+          <el-select
+            v-model="classEditForm.chosenSemester"
+            placeholder="选择开课学期"
+          >
+            <el-option
+              v-for="item in semester"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
+          <el-input
+            :rows="2"
+            type="textarea"
+            v-model="classEditForm.remark"
+            autocomplete="off"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmEditClass(classEditForm)">
             确定
           </el-button>
         </span>
@@ -136,7 +232,7 @@
   <el-table
     class="classesTable"
     :data="classTable"
-    style="width: 70%"
+    style="width: 1480px"
     :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -151,14 +247,14 @@
     }"
     highlight-current-row
   >
-    <el-table-column prop="className" label="课程名" width="200" />
-    <el-table-column prop="teacherName" label="任课教师" width="150" />
+    <el-table-column prop="className" label="课程名" width="230" />
+    <el-table-column prop="teacherName" label="任课教师" width="160" />
     <el-table-column prop="courseCode" label="课程号" width="200" />
-    <el-table-column prop="identifier" label="开课号" width="250px" />
-    <el-table-column prop="academicYear" label="学年" width="150" />
-    <el-table-column prop="semester" label="学期" width="130" />
-    <el-table-column prop="remark" label="备注" width="130" />
-    <el-table-column>
+    <el-table-column prop="identifier" label="开课号" width="220" />
+    <el-table-column prop="academicYear" label="学年" width="180" />
+    <el-table-column prop="semester" label="学期" width="180" />
+    <el-table-column prop="remark" label="备注" width="160" />
+    <el-table-column width="150">
       <template #default="scope">
         <el-tooltip content="修改" :hide-after="0">
           <el-button
@@ -197,7 +293,7 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass } from "@/api/class";
+import { getClass, addClass,editClass } from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
 import { Edit, Delete } from "@element-plus/icons-vue";
@@ -220,9 +316,19 @@ export default {
       currentInfo: {
         departmentId: Number,
       },
-      dialogFormVisible: false,
+      addVisible: false,
+      editVisible:false,
       formLabelWidth: "140px",
       classAddForm: {
+        className: "",
+        instructor: "",
+        courseCode: "",
+        identifier: "",
+        chosenYear: "",
+        chosenSemester: "",
+        remark: "",
+      },
+      classEditForm: {
         className: "",
         instructor: "",
         courseCode: "",
@@ -250,9 +356,6 @@ export default {
         chosenSemester: [
           { required: true, message: "请选择开课学期", trigger: "change" },
         ],
-        resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
-        ],
       },
       currentPage: 1,
       pageSize: 20,
@@ -262,6 +365,7 @@ export default {
   mounted() {
     //设置默认当前学院/专业等信息
     this.currentInfo.departmentId = this.$store.state.currentInfo.departmentId;
+    this.currentInfo.schoolId = this.$store.state.currentInfo.schoolId;
     this.getDictionary();
   },
   computed: {
@@ -304,6 +408,7 @@ export default {
         this.currentPage
       ).then((res) => {
         console.log("getClassList", res);
+        if(res.code == 200){
         this.classTable = res.rows;
         this.total = res.total;
         if (this.classTable.length > 0) {
@@ -319,6 +424,7 @@ export default {
               }
             });
           }
+        }
         }
       });
     },
@@ -336,13 +442,12 @@ export default {
             this.classAddForm.courseCode,
             this.classAddForm.remark
           ).then((res) => {
-            this.dialogFormVisible = false;
+            this.addVisible = false;
             console.log("addClass", res);
           });
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return;
-          // this.$refs[formName].resetFields();重置表单内容方法
         }
       });
     },
@@ -359,16 +464,34 @@ export default {
           row.semester = semester.dictValue;
         }
       });
-      this.classAddForm.className = row.className;
-      this.classAddForm.instructor = row.teacherName;
-      this.classAddForm.courseCode = row.courseCode;
-      this.classAddForm.identifier = row.identifier;
-      this.classAddForm.chosenYear = row.academicYear;
-      this.classAddForm.chosenSemester = row.semester;
-      this.classAddForm.remark = row.remark;
-      this.dialogFormVisible = true;
+      this.classEditForm.className = row.className;
+      this.classEditForm.instructor = row.teacherName;
+      this.classEditForm.courseCode = row.courseCode;
+      this.classEditForm.identifier = row.identifier;
+      this.classEditForm.chosenYear = row.academicYear;
+      this.classEditForm.chosenSemester = row.semester;
+      this.classEditForm.remark = row.remark;
+      this.classEditForm.classId = row.classId;
+      this.editVisible = true;
     },
-    //删除教学部
+    //提交修改教学班信息
+    confirmEditClass(classEditForm){
+      console.log("!",classEditForm)
+      let handleForm = classEditForm
+      handleForm.academicYear = handleForm.chosenYear
+      handleForm.semester = handleForm.chosenSemester
+      handleForm.departmentId =  this.currentInfo.departmentId
+      handleForm.schoolId =this.currentInfo.schoolId
+      // handleForm.teacherName = 
+      // handleForm.teacherId = 
+      editClass(handleForm).then((res)=>{
+        console.log("confirmEditClass",res)
+        if(res.code==200){
+          this.editVisible =false
+        }
+      })
+    },
+    //删除教学班
     deleteClass(index, row) {
       console.log("index", index, "row", row);
       ElMessageBox.confirm("是否确定删除该教学班?", "", {
@@ -378,6 +501,7 @@ export default {
       }).then(() => {
         this.classTable.pop(row);
       });
+
     },
   },
 };

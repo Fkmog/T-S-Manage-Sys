@@ -66,15 +66,25 @@ export default createStore({
         year: '',
         role: {},
         isTeacher: false,
+        //当前角色身份
+        identity:'',
         // 教师端变量
         teacherSideClassInfo:{}
       },
       getters: {
         changeIsTeacher(state) {
           if (state.role.roleName == "教师") {
-            state.isTeacher = true
-          } else { state.isTeacher = false }
-          return state.isTeacher
+            // state.isTeacher = true
+            state.identity = "教师"
+          } 
+          // else { state.isTeacher = false }
+          else if (state.role.roleName == "学院管理员") {
+            state.identity = "学院管理员"
+          } 
+          else if (state.role.roleName == "课程负责人") {
+            state.identity = "课程负责人"
+          } 
+          return state.identity
         }
       },
       mutations: {
@@ -95,6 +105,9 @@ export default createStore({
         },
         setRole(state, newVal) {
           state.role = newVal
+        },
+        setIdentity(state, newVal){
+          state.identity =newVal
         },
         setTeacherSideClassInfo(state,newVal){
           state.teacherSideClassInfo = newVal

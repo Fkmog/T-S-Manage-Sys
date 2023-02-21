@@ -1,10 +1,11 @@
 <template>
   <!-- 教师端页面 -->
-  <div v-show="$store.state.currentInfo.isTeacher" class="headerBgd">
+  <div v-show="$store.state.currentInfo.identity=='教师'" class="headerBgd">
     <HeaderIdentity></HeaderIdentity>
   </div>
-  <!-- 非教师端页面 -->
-  <div v-show="!$store.state.currentInfo.isTeacher" class="headerBgd">
+  <!-- 学院管理员页面 -->
+  <!-- <div v-show="!$store.state.currentInfo.isTeacher" class="headerBgd"> -->
+  <div v-show="$store.state.currentInfo.identity=='学院管理员'" class="headerBgd">
     <div class="content">
       <div v-if="$route.meta.isMajor" class="headIcon" @click="backIndex()">
         <el-icon :size="24"><HomeFilled /></el-icon>
@@ -46,12 +47,33 @@
       </div>
     </div>
   </div>
+  <!-- 课程负责人页面 -->
+  <div v-show="$store.state.currentInfo.identity=='课程负责人'" class="headerBgd">
+    <div class="content">
+      <!-- 左侧icon的占位 -->
+      <div class="headPlaceholder"></div>
+      <div>
+        <div style="display: flex; flex-direction: row">
+          <div class="placeholder" style="height:30px">
+          </div>
+        </div>
+        <div class="navigatorList">
+          <HeaderNav></HeaderNav>
+        </div>
+      </div>
+      <div>
+        <HeaderIdentity></HeaderIdentity>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
 import HeaderNav from "./headerNav.vue";
 import HeaderIdentity from "./headerIdentity.vue";
 import { HomeFilled } from "@element-plus/icons-vue";
+// import PrincipalNav from "./principalNav";
 
 export default {
   name: "MainHeader",
@@ -59,6 +81,7 @@ export default {
     HeaderNav,
     HeaderIdentity,
     HomeFilled,
+    // PrincipalNav,
   },
   data() {
     return {

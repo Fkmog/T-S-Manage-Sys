@@ -34,3 +34,11 @@ export function addClass(academicYear,semester,departmentId,className,identifier
     }
   })
 }
+  //修改教学班信息
+  export function editClass(array) {
+    return request({
+      url: '/classes/edit',
+      method: 'POST',
+      data:array,
+    })
+}

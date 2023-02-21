@@ -1,28 +1,43 @@
 <template>
-  <div v-if="!$route.meta.isMajor" class="pageNav">
-    <ul v-for="(info, index) in infos1" :key="index" class="Navs">
-      <li>
-        <router-link
-          :to="`${info.path}`"
-          @click.capture="show(index)"
-          :class="activeDisplay == index ? 'active1' : ''"
-          >{{ info.value }}</router-link
-        >
-      </li>
-    </ul>
+  <div v-if="$store.state.currentInfo.identity == '学院管理员'">
+    <div v-if="!$route.meta.isMajor" class="pageNav">
+      <ul v-for="(info, index) in infos1" :key="index" class="Navs">
+        <li>
+          <router-link
+            :to="`${info.path}`"
+            @click.capture="show1(index)"
+            :class="activeDisplay1 == index ? 'active1' : ''"
+            >{{ info.value }}</router-link
+          >
+        </li>
+      </ul>
+    </div>
+    <div v-if="$route.meta.isMajor" class="pageNav">
+      <ul v-for="(info, index) in infos2" :key="index">
+        <li>
+          <router-link
+            :to="`${info.path}`"
+            @click.capture="show2(index)"
+            :class="activeDisplay2 == index ? 'active1' : ''"
+            >{{ info.value }}</router-link
+          >
+        </li>
+      </ul>
+    </div>
   </div>
-
-  <div v-if="$route.meta.isMajor" class="pageNav">
-    <ul v-for="(info, index) in infos2" :key="index">
-      <li>
-        <router-link
-          :to="`${info.path}`"
-          @click.capture="show(index)"
-          :class="activeDisplay == index ? 'active1' : ''"
-          >{{ info.value }}</router-link
-        >
-      </li>
-    </ul>
+  <div v-if="$store.state.currentInfo.identity == '课程负责人'">
+    <div class="pageNav">
+      <ul v-for="(info, index) in infos3" :key="index" class="Navs">
+        <li>
+          <router-link
+            :to="`${info.path}`"
+            @click.capture="show3(index)"
+            :class="activeDisplay3 == index ? 'active1' : ''"
+            >{{ info.value }}</router-link
+          >
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -31,8 +46,9 @@ export default {
   name: "HeaderNav",
   data() {
     return {
-      activeDisplay: 0,
-      isMajor: Boolean,
+      activeDisplay1: 0,
+      activeDisplay2: 0,
+      activeDisplay3: 0,
       infos1: [
         {
           value: "专 业",
@@ -77,11 +93,53 @@ export default {
           path: "./setting",
         },
       ],
+      infos3: [
+        {
+          value: "课程库",
+          path: "./principalBaseCourse",
+        },
+        {
+          value: "教学班",
+          path: "./principalClass",
+        },
+      ],
     };
   },
+   computed: {
+    currentChange() {
+      return this.$store.state.currentInfo;
+    },
+  },
+  watch: {
+    $route: {
+      handler(val, oldval) {
+        if (val.meta.isMajor !== oldval.meta.isMajor) {
+          this.activeDisplay1 = 0;
+          this.activeDisplay2 = 0;
+        }
+      },
+      deep: true,
+    },
+    // 监视currentInfo
+    currentChange: {
+      deep: true,
+      handler(value) {
+        // console.log("看我", this.$store.state.currentInfo.identity);
+      },
+    },
+  },
+  mounted() {
+    // console.log("看我", this.$store.state.currentInfo.identity);
+  },
   methods: {
-    show(index) {
-      this.activeDisplay = index;
+    show1(index) {
+      this.activeDisplay1 = index;
+    },
+    show2(index) {
+      this.activeDisplay2 = index;
+    },
+    show3(index) {
+      this.activeDisplay3 = index;
     },
   },
 };
@@ -91,6 +149,7 @@ export default {
 .pageNav {
   display: flex;
   flex-direction: row;
+  height:60px
 }
 /* 设置所有字体为微软雅黑 */
 * {
@@ -132,7 +191,7 @@ ul {
 .pageNav a:hover::after {
   transform: scaleX(1);
 }
-.active1  {
-	border-bottom: 1px solid white;
+.active1 {
+  border-bottom: 1px solid white;
 }
 </style>

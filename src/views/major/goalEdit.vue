@@ -375,15 +375,7 @@ export default {
         });
       }
     },
-    // //标注要求的修改
-    // changeAttribute(attribute) {
-    //   attribute.isDeleted = 1;
-    // },
-    // //标注指标点的修改
-    // changeDetail(detail) {
-    //   detail.isDeleted = 1;
-    // },
-    //保存毕业要求修改情况 要不要弄个消息弹窗？!!todo
+    //保存毕业要求修改情况
     save() {
       for (let n = 0; n < this.requirements.length; n++) {
         if (this.requirements[n].programIndicators.length > 0) {
