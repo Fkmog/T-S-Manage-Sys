@@ -545,8 +545,8 @@ methods:{
 
             eachCourseId = course.courseId;
             
-            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
+            // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             
@@ -659,8 +659,8 @@ methods:{
                 duration:1000,
               });
             res.rows.forEach(function(course){
-            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseName=(course.courseName) ? '' : course.courseName.trim();
+            course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             course.remark = '';
@@ -829,13 +829,13 @@ methods:{
    
   },
   dataTransfrom(course){
-    course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-    course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+    course.courseName=(course.courseName) ? '' : course.courseName.trim();
+    course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
     course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
     course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
     course.credit=course.credit;
     course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-    course.remark=(_.isEmpty(course.remark)) ? '' : course.remark.trim();
+    course.remark=(course.remark) ? '' : course.remark.trim();
 
     return course;
 
@@ -1162,8 +1162,8 @@ ElMessageBox.confirm(
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
-            course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseName=(course.courseName) ? '' : course.courseName.trim();
+            course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             course.remark = '';

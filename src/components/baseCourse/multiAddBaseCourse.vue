@@ -336,33 +336,33 @@ export default {
       let res = this.postData.courses;
       let valid = true;
       this.db.items.forEach(function (course) {
-        course.courseCode = _.isEmpty(course.courseCode)
-          ? ""
-          : course.courseCode.trim();
-        course.courseName = _.isEmpty(course.courseName)
-          ? ""
-          : course.courseName.trim();
-        course.courseType = _.isEmpty(course.courseType)
-          ? ""
-          : course.courseType.trim(); //that.courseTypeSource.map(item => item).indexOf(course.courseType)
-        course.courseNature = _.isEmpty(course.courseNature)
-          ? ""
-          : course.courseNature.trim();
-        course.credit = _.isEmpty(course.credit) ? "" : course.credit.trim();
+        // course.courseCode = _.isEmpty(course.courseCode)
+        //   ? ""
+        //   : course.courseCode.trim();
+        // course.courseName = _.isEmpty(course.courseName)
+        //   ? ""
+        //   : course.courseName.trim();
+        // course.courseType = _.isEmpty(course.courseType)
+        //   ? ""
+        //   : course.courseType.trim(); //that.courseTypeSource.map(item => item).indexOf(course.courseType)
+        // course.courseNature = _.isEmpty(course.courseNature)
+        //   ? ""
+        //   : course.courseNature.trim();
+        // course.credit = _.isEmpty(course.credit) ? "" : course.credit.trim();
 
         if (
-          _.isEmpty(course.courseCode) ||
-          _.isEmpty(course.courseName) ||
-          _.isEmpty(course.courseType) ||
-          _.isEmpty(course.courseNature) ||
-          _.isEmpty(course.credit)
+          course.courseCode||
+          course.courseName||
+         course.courseType||
+          course.courseNature||
+          course.credit
         ) {
           if (
-            _.isEmpty(course.courseCode) &&
-            _.isEmpty(course.courseName) &&
-            _.isEmpty(course.courseType) &&
-            _.isEmpty(course.courseNature) &&
-            _.isEmpty(course.credit)
+            course.courseCode &&
+            course.courseName&&
+            course.courseType&&
+            course.courseNature&&
+            course.credit
           ) {
             return;
           } else {

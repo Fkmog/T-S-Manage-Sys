@@ -502,9 +502,9 @@ async getActivities(){
         studentList.forEach(function(student){
             let activityNumber = that.columnList.length;
             
-            student.studentNumber = (_.isEmpty(student.studentNumber)) ? '' : student.studentNumber.trim();
-            student.studentName = (_.isEmpty(student.studentName)) ? '' : student.studentName.trim();
-            student.pass = (_.isEmpty(student.pass)) ? '' : student.pass.trim();
+            student.studentNumber = (student.studentNumber) ? '' : student.studentNumber.trim();
+            student.studentName = (student.studentName) ? '' : student.studentName.trim();
+            student.pass = (student.pass) ? '' : student.pass.trim();
             
             var trueFlagNum = 0;//为空的个数
             var falseFlagNum = 0;//不为空的个数
@@ -535,8 +535,8 @@ async getActivities(){
                 AndFlag = false;
               }
             //   console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
-            if (_.isEmpty(student.studentNumber) || _.isEmpty(student.studentName) || OrFlag) {
-              if (_.isEmpty(student.studentNumber) && _.isEmpty(student.studentName) && AndFlag) {
+            if (student.studentNumber || student.studentName || OrFlag) {
+              if (student.studentNumber && student.studentName && AndFlag) {
                 // console.log('scoreRes:',scoreRes,'res: ',res);
                 // console.log('----------全都为空------------');
                 return;

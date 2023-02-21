@@ -207,13 +207,13 @@ export default{
     let valid = true;
     
       this.db.items.forEach(function (teacher) {
-        teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
+        // teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
         
-        teacher.teacherName = (_.isEmpty(teacher.teacherName)) ? '' : teacher.teacherName.trim();
-        teacher.email = (_.isEmpty(teacher.email)) ? '' : teacher.email.trim();
+        // teacher.teacherName = (_.isEmpty(teacher.teacherName)) ? '' : teacher.teacherName.trim();
+        // teacher.email = (_.isEmpty(teacher.email)) ? '' : teacher.email.trim();
 
-        if (_.isEmpty(teacher.teacherNumber) || _.isEmpty(teacher.teacherName) || _.isEmpty(teacher.email)) {
-          if (_.isEmpty(teacher.teacherNumber) && _.isEmpty(teacher.teacherName) && _.isEmpty(teacher.email)) {
+        if (teacher.teacherNumber || teacher.teacherName || teacher.email) {
+          if (teacher.teacherNumber && teacher.teacherName && teacher.email) {
             return;
           } else {  // either name OR teacherNo is empty, but not both
             valid = false;
