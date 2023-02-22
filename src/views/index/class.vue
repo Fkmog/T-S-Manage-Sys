@@ -63,7 +63,13 @@
           :label-width="formLabelWidth"
           prop="instructor"
         >
-          <el-input v-model="classAddForm.instructor" autocomplete="off" />
+          <el-autocomplete
+            style="width: 540px"
+            v-model="classAddForm.instructor"
+            :fetch-suggestions="querySearch"
+            hide-loading
+
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -159,7 +165,12 @@
           :label-width="formLabelWidth"
           prop="instructor"
         >
-          <el-input v-model="classEditForm.instructor" autocomplete="off" />
+          <el-autocomplete
+            style="width: 540px"
+            v-model="classEditForm.instructor"
+            hide-loading
+            :fetch-suggestions="querySearch"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -293,7 +304,8 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass,editClass } from "@/api/class";
+import { getClass, addClass, editClass } from "@/api/class";
+import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
 import { Edit, Delete } from "@element-plus/icons-vue";
@@ -308,6 +320,8 @@ export default {
   },
   data() {
     return {
+      searchTeacher: "",
+      allTeachers: [],
       classTable: [],
       academicYear: [],
       semester: [],
@@ -315,9 +329,10 @@ export default {
       chosenSemester: "",
       currentInfo: {
         departmentId: Number,
+        schoolId: Number,
       },
       addVisible: false,
-      editVisible:false,
+      editVisible: false,
       formLabelWidth: "140px",
       classAddForm: {
         className: "",
@@ -372,6 +387,12 @@ export default {
     currentChange() {
       return this.$store.state.currentInfo;
     },
+    teacherAddChange() {
+      return this.classAddForm.instructor;
+    },
+    teacherEditChange() {
+      return this.classEditForm.instructor;
+    },
   },
   watch: {
     currentChange: {
@@ -382,6 +403,26 @@ export default {
         this.getClassList();
       },
     },
+    teacherAddChange: {
+      deep: true,
+      handler(value) {
+        if (value !== "") {
+          this.goSearch(this.classAddForm.instructor);
+        } else {
+          this.allTeachers = [];
+        }
+      },
+    },
+    teacherEditChange: {
+      deep: true,
+      handler(value) {
+        if (value !== "") {
+          this.goSearch(this.classEditForm.instructor);
+        } else {
+          this.allTeachers = [];
+        }
+      },
+    },
   },
   methods: {
     //获取数据字典
@@ -390,6 +431,14 @@ export default {
         console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
+        let year={}
+        year.dictLabel = '全部学年'
+        year.dictValue = null
+        this.academicYear.unshift(year)
+        let semester = {}
+        semester.dictLabel = '全部学期'
+        semester.dictValue = null
+        this.semester.unshift(semester)
         this.getClassList();
       });
     },
@@ -408,29 +457,29 @@ export default {
         this.currentPage
       ).then((res) => {
         console.log("getClassList", res);
-        if(res.code == 200){
-        this.classTable = res.rows;
-        this.total = res.total;
-        if (this.classTable.length > 0) {
-          for (let i = 0; i < this.classTable.length; i++) {
-            this.academicYear.forEach((year) => {
-              if (year.dictValue == this.classTable[i].academicYear) {
-                this.classTable[i].academicYear = year.dictLabel;
-              }
-            });
-            this.semester.forEach((semester) => {
-              if (semester.dictValue == this.classTable[i].semester) {
-                this.classTable[i].semester = semester.dictLabel;
-              }
-            });
+        if (res.code == 200) {
+          this.classTable = res.rows;
+          this.total = res.total;
+          if (this.classTable.length > 0) {
+            for (let i = 0; i < this.classTable.length; i++) {
+              this.academicYear.forEach((year) => {
+                if (year.dictValue == this.classTable[i].academicYear) {
+                  this.classTable[i].academicYear = year.dictLabel;
+                }
+              });
+              this.semester.forEach((semester) => {
+                if (semester.dictValue == this.classTable[i].semester) {
+                  this.classTable[i].semester = semester.dictLabel;
+                }
+              });
+            }
           }
-        }
         }
       });
     },
     //新增教学班
     addClass(classAddForm) {
-      this.$refs[classAddForm].validate((valid) => {
+      this.$refs["classAddForm"].validate((valid) => {
         if (valid) {
           addClass(
             this.classAddForm.chosenYear,
@@ -440,7 +489,8 @@ export default {
             this.classAddForm.identifier,
             this.classAddForm.instructor,
             this.classAddForm.courseCode,
-            this.classAddForm.remark
+            this.classAddForm.remark,
+            this.currentInfo.schoolId
           ).then((res) => {
             this.addVisible = false;
             console.log("addClass", res);
@@ -464,6 +514,7 @@ export default {
           row.semester = semester.dictValue;
         }
       });
+      //修改表单信息初始化
       this.classEditForm.className = row.className;
       this.classEditForm.instructor = row.teacherName;
       this.classEditForm.courseCode = row.courseCode;
@@ -472,24 +523,24 @@ export default {
       this.classEditForm.chosenSemester = row.semester;
       this.classEditForm.remark = row.remark;
       this.classEditForm.classId = row.classId;
+      this.classEditForm.teacherName = row.teacherName;
+      this.classEditForm.teacherNumber = row.teacherNumber;
       this.editVisible = true;
     },
     //提交修改教学班信息
-    confirmEditClass(classEditForm){
-      console.log("!",classEditForm)
-      let handleForm = classEditForm
-      handleForm.academicYear = handleForm.chosenYear
-      handleForm.semester = handleForm.chosenSemester
-      handleForm.departmentId =  this.currentInfo.departmentId
-      handleForm.schoolId =this.currentInfo.schoolId
-      // handleForm.teacherName = 
-      // handleForm.teacherId = 
-      editClass(handleForm).then((res)=>{
-        console.log("confirmEditClass",res)
-        if(res.code==200){
-          this.editVisible =false
+    confirmEditClass(classEditForm) {
+      classEditForm.academicYear = classEditForm.chosenYear;
+      classEditForm.semester = classEditForm.chosenSemester;
+      classEditForm.departmentId = this.currentInfo.departmentId;
+      classEditForm.schoolId = this.currentInfo.schoolId;
+      // console.log("修改后", classEditForm);
+      editClass(classEditForm).then((res) => {
+        console.log("confirmEditClass", res);
+        if (res.code == 200) {
+          this.editVisible = false;
+          this.getClassList();
         }
-      })
+      });
     },
     //删除教学班
     deleteClass(index, row) {
@@ -501,7 +552,41 @@ export default {
       }).then(() => {
         this.classTable.pop(row);
       });
+    },
+    goSearch(searchTeacher) {
+      this.allTeachers = [];
+      // console.log("@", searchTeacher);
+      checkTeachers(
+        this.currentInfo.departmentId,
+        this.currentInfo.schoolId,
+        searchTeacher
+      ).then((res) => {
+        // console.log("!!", res);
+        this.allTeachers = res.data;
+      });
+    },
+    //远程模糊搜索教师
+    querySearch(queryString, cb) {
+      var allTeachers = this.allTeachers;
+      if (allTeachers.length > 0) {
 
+      var results = queryString
+        ? allTeachers.filter(this.createStateFilter(queryString))
+        : allTeachers;
+        results = allTeachers.map((item) => ({ value: item }));
+        cb(results);
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          cb(results);
+        }, 3000 * Math.random());
+      }
+    },
+    //实现模糊搜索
+    createStateFilter(queryString) {
+      return (state) => {
+        return;
+        state.value.toUpperCase().match(queryString.toUpperCase());
+      };
     },
   },
 };
@@ -538,24 +623,24 @@ export default {
 .container {
   margin: 0 auto;
   width: 70%;
-  margin-top:10px
+  margin-top: 10px;
 }
-:deep().el-pagination button:disabled{
+:deep().el-pagination button:disabled {
   cursor: default;
 }
-:deep().el-icon{
+:deep().el-icon {
   height: 18px;
   width: 18px;
 }
-:deep().el-icon svg{
+:deep().el-icon svg {
   height: 18px;
   width: 18px;
 }
-:deep().searchBlock .el-icon{
+:deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
 }
-:deep().searchBlock .el-icon svg{
+:deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
 }
