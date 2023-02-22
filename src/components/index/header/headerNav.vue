@@ -129,6 +129,7 @@ export default {
     },
   },
   mounted() {
+    
     // console.log("看我", this.$store.state.currentInfo.identity);
   },
   methods: {

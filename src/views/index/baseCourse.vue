@@ -24,17 +24,10 @@
       </template>
     </HeaderSearch>
   </div>
-  
- 
-  
     <div layout="row" flex class="md-padding" >
-      
       <addBtn @click="dialogFormVisible = true"></addBtn>
-      
       <div class="el-table-container" layout="column" flex layout-align="start center" >
-        
         <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-          
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
