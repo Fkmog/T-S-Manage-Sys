@@ -11,13 +11,7 @@
           
           @change="getCourseByYear(currentVersion)"
         >
-        <!-- 远程搜索version -->
-        <!-- remote-show-suffix
-          remote
-          filterable
-          reserve-keyword
-          :remote-method="remoteMethod"
-          :loading="loading" -->
+        
           <el-option
             v-for="item in versions"
             :key="item.value"
@@ -30,21 +24,10 @@
       </template>
     </HeaderSearch>
   </div>
-  
-  <!-- <div v-show="closeShow" class="submenu " style="height: 45px;min-height: 45px;">
-        <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
-        <div class="numSelectedTeacher">已选中 {{numSelected}} 节基础课程</div>
-        <el-button @click="deleteBaseCourse" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
-  </div> -->
-  
     <div layout="row" flex class="md-padding" >
-      
       <addBtn @click="dialogFormVisible = true"></addBtn>
-      
       <div class="el-table-container" layout="column" flex layout-align="start center" >
-        
         <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-          <!-- <el-table-column  type="selection" width="55" /> -->
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
@@ -82,13 +65,7 @@
           </el-table-column>
           
          
-          <!-- <el-table-column prop="remark" label="备注" width="150">
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <span>{{ scope.row.remark }}</span>
-              </div>
-            </template>
-          </el-table-column> -->
+         
           <el-table-column  label="操作" >
             <template #default="scope">
               <el-tooltip content="删除">
@@ -112,45 +89,44 @@
     </div>
   
     <el-dialog v-model="dialogFormVisible" title="添加基础课程">
-      <el-form :model="form">
-        <el-form-item label="课程名称" :label-width="formLabelWidth">
+      <el-form :model="form" :rules="rules" ref="ruleForm">
+        <el-form-item label="课程名称" :label-width="formLabelWidth" prop="courseName">
           <el-input v-model="form.courseName" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="课程代码" :label-width="formLabelWidth">
+        <el-form-item label="课程代码" :label-width="formLabelWidth" prop="courseCode">
           <el-input v-model="form.courseCode" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="学分" :label-width="formLabelWidth">
+        <el-form-item label="学分" :label-width="formLabelWidth" prop="credit">
           <el-input v-model="form.credit" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="课程性质" :label-width="formLabelWidth">
+        <el-form-item label="课程性质" :label-width="formLabelWidth" prop="courseNature">
           <el-select v-model="form.courseNature" placeholder="请选择课程性质">
             <el-option label="专业任选" value="0" />
             <el-option label="还未确定" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="课程类型" :label-width="formLabelWidth">
+        <el-form-item label="课程类型" :label-width="formLabelWidth" prop="courseType">
           <el-select v-model="form.courseType" placeholder="请选择课程类型">
             <el-option label="学科基础课" value="0" />
             <el-option label="还未确定" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="学年" :label-width="formLabelWidth">
-          <el-select v-model="form.courseYear" placeholder="请选择学年">
-            <el-option label="2022" value="0" />
-            <el-option label="2023" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" :label-width="formLabelWidth">
+        
+        <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input v-model="form.remark" autocomplete="off" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="goAddBaseCourses">批量添加</el-button>
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="addBaseCourse">
+          
+          <el-button type="primary" @click="submitForm('ruleForm')">
             提交
           </el-button>
+          <el-button  @click="resetForm('ruleForm')">
+            重置
+          </el-button>
+          <el-button @click="dialogFormVisible = false;resetForm('ruleForm')">取消</el-button>
         </span>
       </template>
     </el-dialog>
@@ -178,12 +154,7 @@
             <el-option label="还未确定" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="学年" :label-width="formLabelWidth">
-          <el-select v-model="preform.courseYear" placeholder="请选择学年">
-            <el-option label="2022" value="0" />
-            <el-option label="2023" value="1" />
-          </el-select>
-        </el-form-item>
+        
         <el-form-item label="备注" :label-width="formLabelWidth">
           <el-input v-model="preform.remark" autocomplete="off" />
         </el-form-item>
@@ -236,6 +207,31 @@
   //     },
   data(){
     return{
+      //form rules
+      rules: {
+        courseName: [
+            { required: true, message: '请输入课程名称', trigger: 'blur' },
+            { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+          ],
+          courseCode: [
+            { required: true, message: '请输入课程代码', trigger: 'blur' },
+            { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          ],
+          credit: [
+            { required: true, message: '请输入课程学分', trigger: 'blur' },
+            // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          ],
+          courseNature:[
+            { required: true, message: '请选择课程性质', trigger: 'change' }
+          ],
+          courseType:[
+            { required: true, message: '请选择课程类型', trigger: 'change' }
+          ],
+
+      },
+
+
+
       //from Route
       routeVersionId:'',
       routeCourseId:'',
@@ -337,6 +333,26 @@
   }, 
   methods: 
   {
+    //添加课程
+    submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.addBaseCourse();
+          } else {
+            ElMessage({
+                    type: 'error',
+                    message: `添加失败`,
+                    duration:1000,
+                  });
+            return false;
+          }
+        });
+      },
+    //清除输入课程信息
+    resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+
     getRouter(){
       this.routeVersionId = this.$route.query.versionId;
       this.routeCourseId = this.$route.query.courseId;
@@ -368,34 +384,20 @@
       }).then(function(res){
         console.log(res);
         if(res.code == '200'){
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action) {
-                ElMessage({
+          ElMessage({
                   type: 'success',
                   message: `新增成功`,
+                  duration:1000,
                 });
-                // that.reload();
-              },
-              });
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
             else{
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: 'OK',
-                callback: function(action)  {
-                  ElMessage({
+              ElMessage({
                     type: 'error',
                     message: `新增失败`,
+                    duration:1000,
                   });
-                  // that.reload();
-                },
-              });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
@@ -505,34 +507,20 @@
           }).then(function(res){
             
             if(res.code == '200'){
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action) {
-                ElMessage({
+              ElMessage({
                   type: 'success',
                   message: `添加成功`,
+                  duration:1000,
                 });
-                // that.reload();
-              },
-              });
               that.clearForm();
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
             else{
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: 'OK',
-                callback: function(action)  {
-                  ElMessage({
+              ElMessage({
                     type: 'error',
                     message: `添加失败`,
+                    duration:1000,
                   });
-                  // that.reload();
-                },
-              });
               that.clearForm();
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
@@ -563,7 +551,7 @@
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
-              course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
+              // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
               course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
@@ -594,34 +582,20 @@
       }).then(function(res){
         console.log(res);
         if(res.code == '200'){
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action) {
-                ElMessage({
+          ElMessage({
                   type: 'success',
                   message: `删除成功`,
+                  duration:1000,
                 });
-                // that.reload();
-              },
-              });
               
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
             else{
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: 'OK',
-                callback: function(action)  {
-                  ElMessage({
+              ElMessage({
                     type: 'error',
                     message: `删除失败`,
+                    duration:1000,
                   });
-                  // that.reload();
-                },
-              });
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
       })
@@ -634,7 +608,6 @@
     goBaseCourseDetail(index, row){
     console.log('goBaseCourseDetail',row);
     let versionName = this.versions[this.currentVersionValue-1].label;
-
     this.$store.commit("course/setbaseCourseVersionName", versionName);
     this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
     this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
@@ -646,6 +619,7 @@
     this.$store.commit("course/setbaseCourseCredit",  row.credit);
     this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
     this.$store.commit("course/setbaseCourseRemark", row.remark);
+   
     this.$router.push({
       path:'/baseCourseDetail',
     })
@@ -671,34 +645,20 @@
       }).then(function(res){
         console.log('res:',res);
         if(res.code == '200'){
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-              // if you want to disable its autofocus
-              // autofocus: false,
-              confirmButtonText: 'OK',
-              callback: function(action) {
-                ElMessage({
+          ElMessage({
                   type: 'success',
                   message: `修改成功`,
+                  duration:1000,
                 });
-                // that.reload();
-              },
-              });
               
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
             else{
-              ElMessageBox.alert(res.msg, 'Code:'+res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: 'OK',
-                callback: function(action)  {
-                  ElMessage({
+              ElMessage({
                     type: 'error',
                     message: `修改失败`,
+                    duration:1000,
                   });
-                  // that.reload();
-                },
-              });
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
       })
@@ -732,13 +692,13 @@
       this.preform.remark = val.remark;
     },
     dataTransfrom(course){
-      course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-      course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+      course.courseName=(course.courseName) ? '' : course.courseName.trim();
+      course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
       course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
       course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
       course.credit=course.credit;
       course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-      course.remark=(_.isEmpty(course.remark)) ? '' : course.remark.trim();
+      course.remark=(course.remark) ? '' : course.remark.trim();
   
       return course;
   

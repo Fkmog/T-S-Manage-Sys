@@ -23,32 +23,122 @@
       <el-divider class="divider" direction="vertical" />
     </el-row>
   </div>
+
+
+  <div layout="row" flex class="md-padding">
+    <addBtn @click="goAddScore"></addBtn>
+<!-- 学生信息列表 -->
+    <el-table
+    class="studentsTable"
+    :data="studentsTable"
+    style="width: 60%"
+    :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
+    :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
+    
+  >
+    <el-table-column prop="studentNumber" label="学号"  width="200px"/>
+    <el-table-column prop="studentName" label="姓名" />
+    <el-table-column  >
+      <template #header>
+        <span>成绩</span>
+      </template>
+      <template #default="scope">
+        <el-row>
+          <el-col v-for="(item,i) in activityName" :key="item.name" :span="8">
+          {{ item }}
+          <el-row>({{ activityScores[i] }})</el-row>
+          <el-row>{{ scope.row.scores[i] }}</el-row>
+        </el-col>
+        </el-row>
+        
+        
+       
+        
+      </template>
+    </el-table-column>
+    
+  </el-table>
+  </div>
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
+import addBtn from "@/components/general/addBtn.vue";
+import request from "@/utils/request/request";
 export default {
   name: "Score",
   components: {
-    Back,
+    Back,addBtn,request
   },
   data() {
     return {
       classInfo: [],
+      activityName:[],
+      activityScores:[],
+      studentsTable:[]
     };
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    this.getActivities();
+    
+    
   },
   methods: {
+    goAddScore(){
+      this.$router.push("/addScore");
+    },
     backClass() {
       this.$router.push("/teacherClass");
+    },
+    async getActivities(){
+      let that = this;
+      return request({
+        url:'/classes/'+this.classInfo.classId,
+        method:'get',
+      }).then(function(res){
+        console.log('class Info',res);
+        
+        let course = res.data;
+        if(course.activities){
+          let activityNumber = course.activities.item.length;
+          let studentNum = course.scores.length;
+         that.activityName = course.activities.item;
+         that.activityScores = course.activities.value;
+        for(let i=0;i<studentNum;i++){
+          var student = {
+          studentNumber:course.scores[i]['info'][0],
+          studentName:course.scores[i]['info'][1],
+          scores:course.scores[i]['grade'],
+        };
+        that.studentsTable.push(student);
+        };
+
+        }
+        else {
+          console.log('res has no activities');
+          that.db.items = [[''],['']];
+              // add two columns (fail column, 1 score column)
+              that.addColumn();
+              that.addColumn();
+          }
+        
+      })
     },
   },
 };
 </script>
 
 <style scoped>
+.studentsTable{
+  margin-left: 10%;
+  margin-top: 85px;
+  box-shadow: 0px 1px 3px rgb(164, 163, 163);
+}
+.md-padding {
+  margin-top: 120px;
+ 
+}
 .block {
   position: absolute;
   top: 110px;

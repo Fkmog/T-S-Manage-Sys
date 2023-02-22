@@ -99,7 +99,12 @@
           :label-width="formLabelWidth"
           prop="instructor"
         >
-          <el-input v-model="classEditForm.instructor" autocomplete="off" />
+          <el-autocomplete
+            style="width: 540px"
+            v-model="classEditForm.instructor"
+            hide-loading
+            :fetch-suggestions="querySearch"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -173,8 +178,11 @@
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import { Edit } from "@element-plus/icons-vue";
+import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import { getPrincipalClassList } from "@/api/principal";
+import { editClass } from "@/api/class";
+
 export default {
   name: "PrincipalClass",
   components: {
@@ -184,6 +192,7 @@ export default {
   data() {
     return {
       classList: [],
+      allTeachers: [],
       dialogFormVisible: false,
       classEditForm: {
         className: "",
@@ -194,8 +203,12 @@ export default {
         chosenSemester: "",
         remark: "",
       },
+      currentInfo: {
+        departmentId: Number,
+        schoolId: Number,
+      },
       formLabelWidth: "140px",
-       rules: {
+      rules: {
         className: [
           { required: true, message: "请输入课程名称", trigger: "blur" },
         ],
@@ -214,9 +227,6 @@ export default {
         chosenSemester: [
           { required: true, message: "请选择开课学期", trigger: "change" },
         ],
-        resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
-        ],
       },
       academicYear: [],
       semester: [],
@@ -224,43 +234,74 @@ export default {
       chosenSemester: "",
     };
   },
+  computed: {
+    teacherEditChange() {
+      return this.classEditForm.instructor;
+    },
+  },
+  watch: {
+    teacherEditChange: {
+      deep: true,
+      handler(value) {
+        if (value !== "") {
+          this.goSearch(this.classEditForm.instructor);
+        } else {
+          this.allTeachers = [];
+        }
+      },
+    },
+  },
   mounted() {
+    //设置默认当前学院/专业等信息
+    this.currentInfo.departmentId = this.$store.state.currentInfo.departmentId;
+    this.currentInfo.schoolId = this.$store.state.currentInfo.schoolId;
     this.getDictionary();
   },
   methods: {
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
+        console.log(res)
+        let year={}
+        year.dictLabel = '全部学年'
+        year.dictValue = null
         this.academicYear = res.academic_year;
+        this.academicYear.unshift(year)
+        let semester = {}
+        semester.dictLabel = '全部学期'
+        semester.dictValue = null
         this.semester = res.semester;
+        this.semester.unshift(semester)
         this.getClassList();
       });
     },
     //查询教学班列表
     getClassList() {
-      getPrincipalClassList().then((res) => {
-        this.classList = res.data;
-        console.log("getClassList", this.classList);
-        if (this.classList.length > 0) {
-          for (let i = 0; i < this.classList.length; i++) {
-            this.academicYear.forEach((year) => {
-              if (year.dictValue == this.classList[i].academicYear) {
-                this.classList[i].academicYear = year.dictLabel;
-              }
-            });
-            this.semester.forEach((semester) => {
-              if (semester.dictValue == this.classList[i].semester) {
-                this.classList[i].semester = semester.dictLabel;
-              }
-            });
+      getPrincipalClassList(this.chosenYear, this.chosenSemester).then(
+        (res) => {
+          this.classList = res.data;
+          console.log("getClassList", this.classList);
+          if (this.classList.length > 0) {
+            for (let i = 0; i < this.classList.length; i++) {
+              this.academicYear.forEach((year) => {
+                if (year.dictValue == this.classList[i].academicYear) {
+                  this.classList[i].academicYear = year.dictLabel;
+                }
+              });
+              this.semester.forEach((semester) => {
+                if (semester.dictValue == this.classList[i].semester) {
+                  this.classList[i].semester = semester.dictLabel;
+                }
+              });
+            }
           }
         }
-      });
+      );
     },
     //编辑教学班
     editClass(index, row) {
       console.log("index", index, "row", row);
-       this.academicYear.forEach((year) => {
+      this.academicYear.forEach((year) => {
         if (year.dictLabel == row.academicYear) {
           row.academicYear = year.dictValue;
         }
@@ -277,12 +318,60 @@ export default {
       this.classEditForm.chosenYear = row.academicYear;
       this.classEditForm.chosenSemester = row.semester;
       this.classEditForm.remark = row.remark;
+      this.classEditForm.classId = row.classId;
+      this.classEditForm.teacherName = row.teacherName;
+      this.classEditForm.teacherNumber = row.teacherNumber;
       this.dialogFormVisible = true;
     },
     //提交修改教学班信息
-    confirmEditClass(classEditForm){
-      //先完成管理员端的class
-    }
+    confirmEditClass(classEditForm) {
+      classEditForm.academicYear = classEditForm.chosenYear;
+      classEditForm.semester = classEditForm.chosenSemester;
+      classEditForm.departmentId = this.currentInfo.departmentId;
+      classEditForm.schoolId = this.currentInfo.schoolId;
+      // console.log("修改后", classEditForm);
+      editClass(classEditForm).then((res) => {
+        console.log("confirmEditClass", res);
+        if (res.code == 200) {
+          this.dialogFormVisible = false;
+          this.getClassList();
+        }
+      });
+    },
+    goSearch(searchTeacher) {
+      this.allTeachers = [];
+      // console.log("@", searchTeacher, this.currentInfo.departmentId);
+      checkTeachers(
+        this.currentInfo.departmentId,
+        this.currentInfo.schoolId,
+        searchTeacher
+      ).then((res) => {
+        // console.log("!!", res);
+        this.allTeachers = res.data;
+      });
+    },
+    //远程模糊搜索教师
+    querySearch(queryString, cb) {
+      var allTeachers = this.allTeachers;
+      if (allTeachers.length > 0) {
+        var results = queryString
+          ? allTeachers.filter(this.createStateFilter(queryString))
+          : allTeachers;
+        results = allTeachers.map((item) => ({ value: item }));
+        cb(results);
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          cb(results);
+        }, 3000 * Math.random());
+      }
+    },
+    //实现模糊搜索
+    createStateFilter(queryString) {
+      return (state) => {
+        return;
+        state.value.toUpperCase().match(queryString.toUpperCase());
+      };
+    },
   },
 };
 </script>

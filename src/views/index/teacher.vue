@@ -241,29 +241,17 @@ export default {
             let localres = res;
             console.log("localres", localres);
             if (res.code == "200") {
-              ElMessageBox.alert(res.msg, "Code:" + res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: "OK",
-                callback: (action) => {
-                  ElMessage({
+              ElMessage({
                     type: "success",
                     message: `删除成功`,
+                    duration:1000,
                   });
-                },
-              });
             } else {
-              ElMessageBox.alert(res.msg, "Code:" + res.code, {
-                // if you want to disable its autofocus
-                // autofocus: false,
-                confirmButtonText: "OK",
-                callback: (action) => {
-                  ElMessage({
+              ElMessage({
                     type: "error",
                     message: `删除失败`,
+                    duration:1000,
                   });
-                },
-              });
             }
             return localres;
           });

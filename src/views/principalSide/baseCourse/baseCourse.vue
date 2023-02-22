@@ -1,12 +1,7 @@
 <template>
   <HeaderSearch></HeaderSearch>
   <div class="content">
-    <!-- <div class="basecourses"
-    :data="basecourseTable"
     
-    >
-
-    </div> -->
   </div>
 </template>
 
