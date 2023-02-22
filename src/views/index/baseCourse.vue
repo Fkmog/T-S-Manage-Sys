@@ -364,7 +364,7 @@
       this.routeVersionId = this.$route.query.versionId;
       this.routeCourseId = this.$route.query.courseId;
       console.log('routeVersion:',this.routeVersionId)
-      console.log('routeCourse:',this.routeCourseId )
+      console.log('routeCourse:',this.routeCourseId)
     },
     addBaseCourseDetail(row){
       let that = this;
@@ -411,21 +411,21 @@
       })
       })
     },
-    remoteMethod(version){
-      let that = this;
-      if (version) {
-      this.loading = true
-      setTimeout(() => {
-        that.loading = false
-        that.options = that.versionLabel.filter((item) => {
-          return item.includes(version)
-        })
-      }, 200)
-    } else {
-      that.options = []
-    }
+    // remoteMethod(version){
+    //   let that = this;
+    //   if (version) {
+    //   this.loading = true
+    //   setTimeout(() => {
+    //     that.loading = false
+    //     that.options = that.versionLabel.filter((item) => {
+    //       return item.includes(version)
+    //     })
+    //   }, 200)
+    // } else {
+    //   that.options = []
+    // }
   
-    },
+    // },
     getCourseByYear(label){
       this.currentVersionValue = label;
       
@@ -552,8 +552,8 @@
             console.log('department:',that.departmentId,'schoolId:',that.schoolId);
             res.rows.forEach(function(course){
               
-              // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-              // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+              course.courseName= course.courseName;
+              course.courseCode= course.courseCode;
               course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;

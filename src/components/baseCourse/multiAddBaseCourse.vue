@@ -336,19 +336,11 @@ export default {
       let res = this.postData.courses;
       let valid = true;
       this.db.items.forEach(function (course) {
-        // course.courseCode = _.isEmpty(course.courseCode)
-        //   ? ""
-        //   : course.courseCode.trim();
-        // course.courseName = _.isEmpty(course.courseName)
-        //   ? ""
-        //   : course.courseName.trim();
-        // course.courseType = _.isEmpty(course.courseType)
-        //   ? ""
-        //   : course.courseType.trim(); //that.courseTypeSource.map(item => item).indexOf(course.courseType)
-        // course.courseNature = _.isEmpty(course.courseNature)
-        //   ? ""
-        //   : course.courseNature.trim();
-        // course.credit = _.isEmpty(course.credit) ? "" : course.credit.trim();
+        course.courseCode =course.courseCode;
+        course.courseName = course.courseName;
+        course.courseType = course.courseType; //that.courseTypeSource.map(item => item).indexOf(course.courseType)
+        course.courseNature = course.courseNature;
+        course.credit = course.credit;
 
         if (
           course.courseCode||

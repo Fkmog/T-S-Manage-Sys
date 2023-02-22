@@ -39,6 +39,7 @@ import Objectives from '@/views/teacherSide/objectives/objectives.vue'
 
 //课程管理人端组件
 import PrincipalIndex from '@/views/principalSide/principalIndex.vue'
+import PrincipalBaseCourseDetail from '@/views/principalSide/baseCourse/baseCourseDetail.vue'
 import PrincipalBaseCourse from '@/views/principalSide/baseCourse/baseCourse.vue'
 import PrincipalClass from '@/views/principalSide/class/class.vue'
 
@@ -234,7 +235,13 @@ export default createRouter({
                 name: "principalClass",
                 path: '/principalClass',
                 component: PrincipalClass
-            },]
+            },
+            {
+                name: "principalBaseCourseDetail",
+                path: '/principalBaseCourseDetail',
+                component: PrincipalBaseCourseDetail
+            }
+        ]
         }
     ]
 })

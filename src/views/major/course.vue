@@ -110,37 +110,53 @@
       </div>
     </div>
     <el-drawer v-model="drawer" :direction="direction" size="50%">
-    <template #title>
-      <h4 style="width:500px;">基础课程</h4>
-      <el-select
-        v-model="currentVersion"
-        class="m-3"
-        
-        placeholder="Please enter a keyword"
-        
-        @change="getCourseByYear(currentVersion)"
-      >
-    
-        <el-option
-          v-for="item in versions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
+    <template #header class="drawerHeader">
+      <el-row>
+        <el-col :span="12">
+          <el-row class="row-style">
+            <span >基础课程</span>
+          </el-row>
+         
+          <el-row >
+            <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
+          </el-row>
+         
+         
+        </el-col>
+        <el-col :span="12">
+          <el-row class="row-style">
+            <el-select
+              v-model="currentVersion"
+              
+              
+              placeholder="Please enter a keyword"
+              
+              @change="getCourseByYear(currentVersion)"
+            >
+            <el-option
+              v-for="item in versions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          </el-row>
+          
+        </el-col>
+      </el-row>
     </template>
 
-    <template #default ><!-- 具体basecourse页面，分页 可搜索-->
+   <!-- 具体basecourse页面，分页 可搜索-->
       
-      <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
-      <div v-show="drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;">
-        <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div>
-        <div class="drawerdeleteButton">
-          <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
-        </div>
-      </div>
+      
       
       <div class="drawerBlock" flex>
+        <div  class="drawersubmenu" >
+          <!-- <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div> -->
+          <div class="drawerdeleteButton">
+            <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
+          </div>
+        </div>
         <div >
           <el-table 
           :data="tableData"  
@@ -159,7 +175,7 @@
                   <el-button v-show="!scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
                 </el-tooltip>
                 <el-tooltip content="添加信息">
-                  <el-tag v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                  <el-button v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-button>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -169,8 +185,8 @@
 
      
       
-    </template>
-    <template #footer>
+    
+    
       <div style="flex: auto" class="drawerFooter">
        
         
@@ -186,7 +202,7 @@
         </el-pagination>
       </div>
       </div>
-    </template>
+    
   </el-drawer>
   </div>
   <div v-show="!hasProgram" class="no-program">
@@ -545,8 +561,8 @@ methods:{
 
             eachCourseId = course.courseId;
             
-            // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             
@@ -1162,11 +1178,11 @@ ElMessageBox.confirm(
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
-            course.courseName=(course.courseName) ? '' : course.courseName.trim();
-            course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.remark = '';
+            course.remark = '';//用remark来判断是否选课
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.trueversionId = course.versionId;
@@ -1181,7 +1197,7 @@ ElMessageBox.confirm(
               try{
                  
               courses.forEach(function(course){
-                console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+                // console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
                 if(!course.remark){
                   
                 if(courseInfo.courseId == course.courseId ){
@@ -1247,6 +1263,10 @@ mounted:function(){
 </script>
 
 <style scoped> 
+
+.row-style{
+  padding-top:5px
+}
 .el-checkbox__input.is-disabled{
     background-color: #0e5cd0;
 }
@@ -1285,14 +1305,13 @@ mounted:function(){
   margin-bottom: 0;
 }
 .searchIndrawer{
-  border: 0;
-  
-  margin-bottom: 10%;
-  padding-bottom: 30px;
+top:12px;
+border-bottom:none;
+left:-46px;
 }
 .drawerdeleteButton{
   float:right;
-  margin-right: 10px;
+  margin-left: 30px;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1306,7 +1325,7 @@ mounted:function(){
     margin-bottom: 13px;
     position: relative;
     padding: 6px 6px 5px 5px;
-    border-bottom: 1px solid #d0d0d0;
+    /* border-bottom: 1px solid #d0d0d0; */
     background-color: transparent;
 }
 .numSelectedTeacher{
@@ -1422,7 +1441,6 @@ mounted:function(){
   
 }
 .m-3{
-  
   float: right;
   top: 6px;
   right: 10%;
