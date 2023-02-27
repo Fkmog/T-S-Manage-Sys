@@ -312,7 +312,7 @@ export default {
 .edit-pen {
   cursor: pointer;
   color: grey;
-  margin-left: 720px;
+  margin-left: 710px;
 }
 /* 毕业要求 */
 .graduate-attribute {

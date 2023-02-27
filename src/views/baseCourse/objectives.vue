@@ -22,13 +22,23 @@
       <div class="title">{{ course.name }}</div>
     </el-row>
   </div>
-  <editBtn @click="goEdit()"></editBtn>
+  <!-- <editBtn @click="goEdit()"></editBtn> -->
   <div class="body">
     <div class="card">
-      <span style="color: grey; font-size: 14px; margin-top: 20px"
-        >课程目标</span
-      >
-
+      <el-row class="card-head" style="margin-top: 30px">
+        <span style="color: grey; font-size: 14px">课程目标</span>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="编辑"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon class="edit-pen" style="margin-top: -10px" @click="goEdit()"
+            ><EditPen
+          /></el-icon>
+        </el-tooltip>
+      </el-row>
       <div v-for="objective in list.objectives" :key="objective.id">
         <el-row>
           <el-col :span="2" class="objective-num">{{
@@ -71,7 +81,7 @@
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
+import { Back,EditPen } from "@element-plus/icons-vue";
 import editBtn from "@/components/general/editBtn.vue";
 import { getObjectives } from "@/api/basecourse";
 
@@ -79,7 +89,8 @@ export default {
   name: "baseCourseObjectives",
   components: {
     Back,
-    editBtn
+    editBtn,
+    EditPen
   },
   data() {
     return {
@@ -101,8 +112,8 @@ export default {
     backBaseCourseDetail() {
       this.$router.push("/baseCourseDetail");
     },
-    goEdit(){
-       this.$router.push("/baseCourseObjectivesEdit");
+    goEdit() {
+      this.$router.push("/baseCourseObjectivesEdit");
     },
     //获取课程目标
     checkObjectives() {
@@ -181,5 +192,10 @@ export default {
 }
 .assessments {
   margin-top: 30px;
+}
+.edit-pen {
+  cursor: pointer;
+  color: grey;
+  margin-left: 710px;
 }
 </style>

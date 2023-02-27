@@ -207,20 +207,6 @@
           </el-col>
 
           <el-col :span="16">
-            <!-- <el-select
-              v-model="support.name"
-              style="width: 400px"
-              placeholder="课程目标"
-              @change="changeSelect"
-            >
-              <el-option
-                v-for="object in objectives"
-                :key="object.id"
-                :label="object.name"
-                :value="object.name"
-              >
-              </el-option>
-            </el-select> -->
             <el-select
               v-model="support.name"
               style="width: 400px"
@@ -270,7 +256,7 @@
 <script>
 import {
   getIndicators,
-  getMajors,
+  getMajorsProgram,
   getPullIndicator,
   getObjectives,
   saveIndicators,
@@ -302,7 +288,7 @@ export default {
       searchValue: "",
       allIndicators: [],
       newIndicator: false,
-      chosenMajor: "",
+      chosenMajor: '',
       course: {
         name: "",
         detailId: Number,
@@ -327,6 +313,7 @@ export default {
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
     this.programId = this.$store.state.major.programId;
+    this.chosenMajor = this.$store.state.baseCourseDetailProgram.majorNum;
     this.checkMajors();
     this.checkPullIndicators();
     this.checkObjectives();
@@ -384,11 +371,14 @@ export default {
         });
       });
     },
-
     //查询对应的专业以及bcdmId
     checkMajors() {
-      getMajors(this.course.detailId).then((res) => {
-        this.majorList = res.rows;
+      getMajorsProgram(
+        this.course.detailId,
+        this.course.departmentId,
+        this.course.schoolId
+      ).then((res) => {
+        this.majorList = res.data;
         console.log("this.majorList:", this.majorList);
         for (let i = 0; i < this.majorList.length; i++) {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
@@ -405,7 +395,7 @@ export default {
           this.majorList[i].bcdmId,
           this.course.departmentId,
           this.course.schoolId,
-          this.programId
+          this.majorList[i].programId
         ).then((res) => {
           console.log("getIndicators:", i, res);
           this.majorList[i].indicators = res.data;
@@ -541,7 +531,10 @@ export default {
         } else {
           newIndicator.id = newIndicator.id + "0" + i[1];
         }
+        console.log("#",newIndicator);
         this.majorList[index1].indicators.push(newIndicator);
+        console.log("##",this.majorList[index1]);
+
         this.newIndicator = false;
         this.searchValue = "";
       } catch (stat) {

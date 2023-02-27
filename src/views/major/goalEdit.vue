@@ -217,14 +217,15 @@ export default {
     },
     // 删除要求点
     deleteAttributeId() {
-      if (this.requirements.length > 0) {
+      if (this.requirements&&this.requirements.length > 0) {
         this.attributeIdDelete =
           this.requirements[this.requirements.length - 1].serialNum;
       }
+      
     },
     // 新增要求点
     newAttributeId() {
-      if (this.requirements.length > 0) {
+      if (this.requirements&&this.requirements.length > 0) {
         let v = this.requirements[this.requirements.length - 1].serialNum;
         this.attributeIdNew = ++v;
       } else {

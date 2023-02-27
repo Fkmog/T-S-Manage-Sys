@@ -2,7 +2,7 @@ import request from '@/utils/request/request'
 // 查询毕业要求指标点
 export function getIndicators(bcdmId, departmentId, schoolId,programId) {
     return request({
-        url: '/detailMajor/courseIndicator',
+        url: '/detailProgram/courseIndicator',
         method: 'get',
         params: {
             bcdmId: bcdmId,
@@ -13,23 +13,28 @@ export function getIndicators(bcdmId, departmentId, schoolId,programId) {
     })
 }
 // 通过detailId查询对应的majors以及bcdmId
-export function getMajors(detailId) {
+export function getMajorsProgram(detailId,departmentId,schoolId) {
     return request({
-        url: '/detailMajor/list' + '?detailId=' + detailId,
+        url: '/detailProgram/listProgram' ,
         method: 'get',
+        params:{
+            detailId:detailId,
+            departmentId:departmentId,
+            schoolId:schoolId
+        }
     })
 }
 //通过bcdmId获得培养计划课程专业详情
 export function getDetailMajor(bcdmId) {
     return request({
-        url: '/detailMajor/ '+ bcdmId,
+        url: '/detailProgram/ '+ bcdmId,
         method: 'get',
     })
 }
 // 获取指标点列表
 export function getIndicatorList(bcdmId) {
     return request({
-        url: '/detailMajor/list ',
+        url: '/detailProgram/list ',
         method: 'get',
         params:{
             bcdmId:bcdmId
@@ -39,7 +44,7 @@ export function getIndicatorList(bcdmId) {
 // 获取指标点下拉列表
 export function getPullIndicator(programId) {
     return request({
-        url: '/detailMajor/indicatorAll/'+programId,
+        url: '/detailProgram/indicatorAll/'+programId,
         method: 'get',
     })
 }
@@ -61,7 +66,7 @@ export function saveObjectives(Array) {
   //指标点保存
   export function saveIndicators(Array) {
     return request({
-      url: '/detailMajor',
+      url: '/detailProgram',
       method: 'PUT',
       data:Array
     })
