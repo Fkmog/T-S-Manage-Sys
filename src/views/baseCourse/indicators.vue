@@ -1,86 +1,114 @@
 <template>
-<div class="content">
-
-  <!-- 顶部导航栏 -->
-  <div class="block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="backBaseCourseDetail()"
+  <div class="content">
+    <!-- 顶部导航栏 -->
+    <div class="block">
+      <el-row class="block-row">
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="返回"
+          placement="bottom"
+          :hide-after="0"
         >
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <div class="title">{{ course.name }}</div>
-    </el-row>
-  </div>
-  <editBtn @click="goEdit()"></editBtn>
-  <div class="body">
-    <el-tabs class="major-tab">
-      <el-tab-pane
-        v-model="chosenMajor"
-        v-for="major in majorList"
-        :key="major.majorId"
-        :label="major.majorName"
-      >
-        <div class="card">
-          <span style="color: grey; font-size: 14px; margin-top: 20px"
-            >毕业要求指标点</span
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 50px"
+            @click="backBaseCourseDetail()"
           >
-
-          <div
-            class="attribute"
-            v-for="indicator in major.indicators"
-            :key="indicator.id"
-          >
-            <div class="attribute-detail">
-              <div class="detail-num">
-                {{ indicator.serialNum }}
-              </div>
-              <div class="detail-content">
-                <div class="name">{{ indicator.name }}</div>
-                <div class="desc">{{ indicator.description }}</div>
-              </div>
-            </div>
-            <!-- 支撑方式 -->
-            <div style="margin-left: 90px">
-              <span style="color: grey; font-size: 14px; "
-                >支撑方式</span
-              >
-              <div class="methods">
-                <div
-                  v-for="method in indicator.supportMethodVos"
-                  :key="method.id"
+            <Back />
+          </el-icon>
+        </el-tooltip>
+        <div class="title">{{ course.name }}</div>
+      </el-row>
+    </div>
+    <!-- <editBtn @click="goEdit()"></editBtn> -->
+    <div class="body">
+      <el-tabs class="major-tab">
+        <el-tab-pane
+          v-model="chosenMajor"
+          v-for="major in majorList"
+          :key="major.majorId"
+          :label="major.programVersion"
+        >
+          <div class="card">
+            <el-row class="card-head" style="margin-top: 30px">
+              <span style="color: grey; font-size: 14px">毕业要求指标点</span>
+              <div >
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="编辑"
+                  placement="bottom"
+                  :hide-after="0"
                 >
-                  <div class="method-detail">
-                    <div class="method-weight">(&nbsp;{{ method.weight }}%&nbsp;)</div>
-                    <div class="method-desc" style="margin-left:80px" >{{ method.name }}</div>
+                  <el-icon
+                    class="edit-pen"
+                    style="margin-top: -15px"
+                    @click="goEdit(major.majorName)"
+                    ><EditPen
+                  /></el-icon>
+                </el-tooltip>
+              </div>
+            </el-row>
+            <!-- <div v-show="!hasIndicators" class="noIndicator">
+              <el-button
+                style="color: #6573c0"
+                text
+                @click="goEdit()"
+                >添加考核方式
+              </el-button>
+            </div> -->
+            <div
+              class="attribute"
+              v-for="indicator in major.indicators"
+              :key="indicator.id"
+            >
+              <div class="attribute-detail">
+                <div class="detail-num">
+                  {{ indicator.serialNum }}
+                </div>
+                <div class="detail-content">
+                  <div class="name">{{ indicator.name }}</div>
+                  <div class="desc">{{ indicator.description }}</div>
+                </div>
+              </div>
+              <!-- 支撑方式 -->
+              <div style="margin-left: 90px">
+                <span style="color: grey; font-size: 14px">支撑方式</span>
+                <div class="methods">
+                  <div
+                    v-for="method in indicator.supportMethodVos"
+                    :key="method.id"
+                  >
+                    <div class="method-detail">
+                      <div class="method-weight">
+                        (&nbsp;{{ method.weight }}%&nbsp;)
+                      </div>
+                      <div class="method-desc" style="margin-left: 80px">
+                        {{ method.name }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </el-tab-pane>
-    </el-tabs>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
   </div>
-</div>
-
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
-import { getIndicators, getMajors, getDetailMajor,getPullIndicator } from "@/api/basecourse";
+import { Back, EditPen } from "@element-plus/icons-vue";
+import {
+  getIndicators,
+  getMajorsProgram,
+  getDetailMajor,
+  getPullIndicator,
+} from "@/api/basecourse";
 import { getMajorInfo } from "@/api/major";
 import editBtn from "@/components/general/editBtn.vue";
 
@@ -88,8 +116,8 @@ export default {
   name: "baseCourseIndicators",
   components: {
     Back,
-    editBtn
-    
+    editBtn,
+    EditPen,
   },
   data() {
     return {
@@ -101,7 +129,8 @@ export default {
         schoolId: Number,
       },
       majorList: [],
-      programId: '',
+      programId: "",
+      hasIndicators: Boolean,
     };
   },
   mounted() {
@@ -110,27 +139,42 @@ export default {
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
     this.programId = this.$store.state.major.programId;
-    console.log("!",this.programId);
+    // console.log("!", this.programId);
 
     console.log(this.course.name, this.course.detailId);
     this.checkMajors();
-    this.checkPullIndicators()
+    this.checkPullIndicators();
   },
   methods: {
     backBaseCourseDetail() {
       this.$router.push("/baseCourseDetail");
     },
-    goEdit(){
+    goEdit(index1) {
+      this.$store.commit("baseCourseDetailProgram/setmajorNum", index1);
       this.$router.push("/baseCourseIndicatorsEdit");
     },
     //查询对应的专业以及bcdmId
     checkMajors() {
-      getMajors(this.course.detailId).then((res) => {
-        this.majorList = res.rows;
+      getMajorsProgram(
+        this.course.detailId,
+        this.course.departmentId,
+        this.course.schoolId
+      ).then((res) => {
+        console.log("!", res);
+        this.majorList = res.data;
         console.log("this.majorList:", this.majorList);
         for (let i = 0; i < this.majorList.length; i++) {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
+            this.majorList[i].programVersion =
+              this.majorList[i].majorName + "-" + this.majorList[i].enrollyear;
+              console.log("!",typeof(this.majorList[i].indicators));
+            if (this.majorList[i].indicators==undefined) {
+              this.hasIndicators=false;
+            }else{
+              this.hasIndicators=true;
+
+            }
           });
         }
         this.checkIndicators();
@@ -143,7 +187,7 @@ export default {
           this.majorList[i].bcdmId,
           this.course.departmentId,
           this.course.schoolId,
-          this.programId
+          this.majorList[i].programId
         ).then((res) => {
           console.log("getIndicators:", i, res);
           this.majorList[i].indicators = res.data;
@@ -167,12 +211,11 @@ export default {
       }
     },
     //查询新增指标点列表
-    checkPullIndicators(){
-      getPullIndicator(this.programId).then((res)=>{
-        console.log("getPullIndicator",res);
-      })
-    }
-   
+    checkPullIndicators() {
+      getPullIndicator(this.programId).then((res) => {
+        console.log("getPullIndicator", res);
+      });
+    },
   },
 };
 </script>
@@ -181,7 +224,6 @@ export default {
 .content {
   height: 100vh;
   background-color: #f2f2f2;
- 
 }
 .block {
   position: absolute;
@@ -248,12 +290,28 @@ export default {
   flex-direction: row;
   margin-top: 20px;
 }
-.methods{
-  margin-top:20px
+.methods {
+  margin-top: 20px;
 }
-.method-detail{
+.method-detail {
   display: flex;
   flex-direction: row;
-  margin-top:10px
+  margin-top: 10px;
+}
+.edit-pen {
+  cursor: pointer;
+  color: grey;
+  margin-left: 710px;
+}
+.noIndicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 64px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px dashed #bdbdbd;
+  margin: 16px auto;
 }
 </style>

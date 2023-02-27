@@ -207,8 +207,15 @@
               v-model="assessment.activities.item"
               style="width: 330px"
             >
-              <el-option
+              <!-- <el-option
                 v-for="(itemObject, index2) in assessment.activities.itemObject"
+                :key="index2"
+                :label="itemObject.value"
+                :value="itemObject.value"
+              >
+              </el-option> -->
+              <el-option
+                v-for="(itemObject, index2) in allActivities"
                 :key="index2"
                 :label="itemObject.value"
                 :value="itemObject.value"
@@ -291,6 +298,7 @@ export default {
       index: Number, //dialog中指明操作的object
       deleteSerialNum: "",
       activities: [],
+      allActivities:[],
       isEditWeight: false,
       isChange: false, //页面有无修改
       canDelete: true,
@@ -366,6 +374,10 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
+        this.allActivities=this.list.activities.item
+        // console.log("@", this.allActivities)
+        this.allActivities = this.allActivities.map((item) => ({ value: item }));
+
         //处理数据-serialNum
         if (this.list.objectives) {
           this.list.objectives.forEach((value) => {

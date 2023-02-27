@@ -67,8 +67,6 @@
             style="width: 540px"
             v-model="classAddForm.instructor"
             :fetch-suggestions="querySearch"
-            hide-loading
-
           ></el-autocomplete>
         </el-form-item>
         <el-form-item
@@ -431,14 +429,14 @@ export default {
         console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
-        let year={}
-        year.dictLabel = '全部学年'
-        year.dictValue = null
-        this.academicYear.unshift(year)
-        let semester = {}
-        semester.dictLabel = '全部学期'
-        semester.dictValue = null
-        this.semester.unshift(semester)
+        let year = {};
+        year.dictLabel = "全部学年";
+        year.dictValue = null;
+        this.academicYear.unshift(year);
+        let semester = {};
+        semester.dictLabel = "全部学期";
+        semester.dictValue = null;
+        this.semester.unshift(semester);
         this.getClassList();
       });
     },
@@ -569,10 +567,9 @@ export default {
     querySearch(queryString, cb) {
       var allTeachers = this.allTeachers;
       if (allTeachers.length > 0) {
-
-      var results = queryString
-        ? allTeachers.filter(this.createStateFilter(queryString))
-        : allTeachers;
+        var results = queryString
+          ? allTeachers.filter(this.createStateFilter(queryString))
+          : allTeachers;
         results = allTeachers.map((item) => ({ value: item }));
         cb(results);
         clearTimeout(this.timeout);

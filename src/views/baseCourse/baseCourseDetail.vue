@@ -137,6 +137,7 @@ import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElTooltip, ElMessage, ElMessageBox } from "element-plus";
 import { Back, Histogram, List, Checked } from "@element-plus/icons-vue";
+import { getMajorsProgram} from "@/api/basecourse";
 
 export default {
   name: "baseCourseDetail",
@@ -253,71 +254,68 @@ export default {
         });
         console.log("detailId", that.detailId);
         that.$store.commit("course/setDetailId", that.detailId);
-        that.getMajorId();
+        // that.getMajorId();
       });
-    },
-    //根据detailID获取majorId，bcdmId 第二步
-    getMajorId() {
-      let that = this;
-      let majorList = [];
-      let majorNumber = 0;
-      return request({
-        url: "/detailMajor/list" + "?detailId=" + this.detailId,
-        method: "get",
-      }).then(function (res) {
-        console.log("getMajorId:", res);
-        if (res.rows) {
-          res.rows.forEach(function (detail) {
-            majorList.push(detail.majorId);
-            majorNumber++;
-          });
-        } else {
-          majorList.push(res.data.majorId);
-          majorNumber = 1;
-        }
-        that.majorId = majorList;
-        that.majorNumber = majorNumber;
-        that.showMajor();
-      });
-    },
+    }, 
+    // //根据detailID获取majorId，bcdmId 第二步
+    // getMajorId() {
+    //   let that = this;
+    //   let majorList = [];
+    //   let majorNumber = 0;
+    //  getMajorsProgram(this.detailId,this.departmentId,this.schoolId).then(function (res) {
+    //     console.log("getMajorId:", res);
+    //     if (res.rows) {
+    //       res.rows.forEach(function (detail) {
+    //         majorList.push(detail.majorId);
+    //         majorNumber++;
+    //       });
+    //     } else {
+    //       majorList.push(res.data.majorId);
+    //       majorNumber = 1;
+    //     }
+    //     that.majorId = majorList;
+    //     that.majorNumber = majorNumber;
+    //     that.showMajor();
+    //   });
+    // },
     //根据majorId显示major,没有考虑其他学校中majorId会重复的问题，默认Id唯一 第三步
-    showMajor() {
-      let majorList = [];
-      let index = 0;
-      console.log("index Type:", typeof index.toString());
-      if(!this.majorList){
-        console.log('majorList is null ');
-        this.majorForm = [];
-      }
-      else{
-        if (this.majorNumber > 1) {
-        this.majorId.forEach(function (major) {
-          console.log("each majoId:", major);
-          return request({
-            url: "/major/" + major,
-            method: "get",
-          }).then(function (major) {
-            console.log("Each Major Detail:", major);
-            major.data.index = index.toString();
-            majorList.push(major.data);
-            index++;
-          });
-        });
-      } else {
-        return request({
-          url: "/major/" + this.majorId[0],
-          method: "get",
-        }).then(function (major) {
-          console.log("Each Major Detail:", major);
-          major.data.index = index.toString();
-          majorList.push(major.data);
-        });
-      }
-      console.log("majorList", majorList);
-      this.majorForm = majorList;
-      }
+    // showMajor() {
+    //   let majorList = [];
+    //   let index = 0;
+    //   console.log("index Type:", typeof index.toString());
+    //   if(!this.majorList){
+    //     console.log('majorList is null ');
+    //     this.majorForm = [];
+    //   }
+    //   else{
+    //     if (this.majorNumber > 1) {
+    //     this.majorId.forEach(function (major) {
+    //       console.log("each majoId:", major);
+    //       return request({
+    //         url: "/major/" + major,
+    //         method: "get",
+    //       }).then(function (major) {
+    //         console.log("Each Major Detail:", major);
+    //         major.data.index = index.toString();
+    //         majorList.push(major.data);
+    //         index++;
+    //       });
+    //     });
+    //   } else {
+    //     return request({
+    //       url: "/major/" + this.majorId[0],
+    //       method: "get",
+    //     }).then(function (major) {
+    //       console.log("Each Major Detail:", major);
+    //       major.data.index = index.toString();
+    //       majorList.push(major.data);
+    //     });
+    //   }
+    //   console.log("majorList", majorList);
+    //   this.majorForm = majorList;
+    //   }
       
-    },
+    // },
     //路由跳转
     backBaseCourse() {
       this.$router.push("/baseCourse");
@@ -334,8 +332,8 @@ export default {
     //获取路由参数信息
     getRouter() {
       this.versionName = this.$store.state.course.baseCourseVersionName;
-      this.versionId = this.$store.state.course.baseCourseVersionFlag;
-      this.versionFlag = this.$store.state.course.baseCourseVersionId;
+      this.versionId = this.$store.state.course.baseCourseVersionId;
+      this.versionFlag = this.$store.state.course.baseCourseVersionFlag;
       this.courseId = this.$store.state.course.baseCourseCourseId;
       this.form.courseName = this.$store.state.course.baseCourseCourseName;
       this.form.courseCode = this.$store.state.course.baseCourseCourseCode;
@@ -344,7 +342,6 @@ export default {
       this.form.credit = this.$store.state.course.baseCourseCredit;
       this.form.courseYear = this.$store.state.course.baseCourseCourseYear;
       this.form.remark = this.$store.state.course.baseCourseRemark;
-
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
     },
