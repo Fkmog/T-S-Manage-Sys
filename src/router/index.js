@@ -1,16 +1,18 @@
+import Cookies from "js-cookie";
+import store from "../store";
 //引入vue-router4写法
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
 // 引入组件
-import Student from '../views/major/student.vue'
-import BaseAddStudent from '@/components/student/addStudent.vue'
-import Achieve from '../views/major/achieve.vue'
-import Courses from '../views/major/course.vue'
-import Goal from '../views/major/goal.vue'
-import GoalEdit from '../views/major/goalEdit.vue'
-import Manage from '../views/major/manage.vue'
-import Setting from '../views/major/setting.vue'
+import Student from "../views/major/student.vue";
+import BaseAddStudent from "@/components/student/addStudent.vue";
+import Achieve from "../views/major/achieve.vue";
+import Courses from "../views/major/course.vue";
+import Goal from "../views/major/goal.vue";
+import GoalEdit from "../views/major/goalEdit.vue";
+import Manage from "../views/major/manage.vue";
+import Setting from "../views/major/setting.vue";
 
-import Index from '@/components/index/index.vue'
+import Index from "@/components/index/index.vue";
 
 import BaseCourse from '@/views/index/baseCourse.vue'
 import Class from '@/views/index/class.vue'
@@ -26,17 +28,16 @@ import baseCourseIndicators from '@/views/baseCourse/indicators.vue'
 import baseCourseIndicatorsEdit from '@/views/baseCourse/indicators-edit.vue'
 import baseCourseObjectivesEdit from '@/views/baseCourse/objectives-edit.vue'
 
-
-import userLogin from '@/components/userLogin/index.vue'
+import userLogin from "@/components/userLogin/index.vue";
 
 //教师端组件
-import TeacherIndex from '@/views/teacherSide/teacherIndex.vue'
-import TeacherClasses from '@/views/teacherSide/teacherClasses.vue'
-import TeacherClass from '@/views/teacherSide/teacherClass.vue'
-import Students from '@/views/teacherSide/students/students.vue'
-import AddScore from '@/views/teacherSide/score/addScore.vue'
-import Score from '@/views/teacherSide/score/score.vue'
-import Objectives from '@/views/teacherSide/objectives/objectives.vue'
+import TeacherIndex from "@/views/teacherSide/teacherIndex.vue";
+import TeacherClasses from "@/views/teacherSide/teacherClasses.vue";
+import TeacherClass from "@/views/teacherSide/teacherClass.vue";
+import Students from "@/views/teacherSide/students/students.vue";
+import AddScore from "@/views/teacherSide/score/addScore.vue";
+import Score from "@/views/teacherSide/score/score.vue";
+import Objectives from "@/views/teacherSide/objectives/objectives.vue";
 
 //课程管理人端组件
 import PrincipalIndex from '@/views/principalSide/principalIndex.vue'
@@ -230,7 +231,6 @@ export default createRouter({
                 },
             ]
         },
-        // 课程负责人端路由
         {
             path: '/principalIndex',
             component: PrincipalIndex,

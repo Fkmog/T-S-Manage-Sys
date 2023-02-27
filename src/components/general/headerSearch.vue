@@ -3,17 +3,20 @@
   <div class="Block">
     <div class="bar">
       <div class="searchBlock">
-      <el-icon class="iconSearch" size="24px" color="rgb(137, 137, 137)">
-        <Search />
-      </el-icon>
-      <div class="searchLine">
-        <input
-          class="searchInput"
-          v-model="searchInput"
-          placeholder="搜索专业名称"
-          @change="sendMessage"
-        />
-      </div>
+        <el-icon class="iconSearch" size="24px" color="rgb(137, 137, 137)">
+          <Search />
+        </el-icon>
+        <div class="searchLine">
+          <input
+            class="searchInput"
+            :class="active ? 'activeInput' : ''"
+            v-model="searchInput"
+            placeholder="搜索专业名称"
+            @change="sendMessage"
+            @focus="active = true"
+            @blur="active = false"
+          />
+        </div>
       </div>
       <!-- 右侧时间选择插槽 -->
       <slot name="rightTime" class="rightSlot"></slot>
@@ -26,27 +29,26 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  props:['msg'],
-  props:['msg'],
+  props: ["msg"],
   components: {
     Search,
   },
   data() {
     return {
       searchInput: "",
-      isActive:true,
-      isActive:true,
+      // isActive:true,
+      active: false,
     };
   },
   methods: {
-    sendMessage(){
+    sendMessage() {
       this.msg(this.searchInput);
-    }
+    },
   },
   methods: {
-    sendMessage(){
+    sendMessage() {
       this.msg(this.searchInput);
-    }
+    },
   },
 };
 </script>
@@ -54,10 +56,10 @@ export default {
 <style scoped>
 .Block {
   position: absolute;
-  top:110px;
+  top: 110px;
   left: 0px;
   height: 55px;
-  border-bottom:  1px solid rgb(189, 189, 189);
+  border-bottom: 1px solid rgb(189, 189, 189);
   width: 100%;
 }
 .iconSearch {
@@ -76,8 +78,8 @@ export default {
   opacity: 0;
   background: rgba(0, 0, 0, 0);
 }
-.bar{
-   width: 400px;
+.bar {
+  width: 400px;
   display: flex;
   flex-direction: row;
 }
@@ -86,7 +88,7 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.searchBlock:hover .searchInput {
+.activeInput {
   width: 220px;
   transition: all 0.3s;
   border-top-width: 0px;
@@ -94,11 +96,23 @@ export default {
   border-right-width: 0px;
   border-bottom-width: 1px;
   opacity: 1;
-  transition: 0.5s;
+  transition: 0.3s;
+  margin-top:20px;
+
+}
+.searchBlock:hover .searchInput {
+  margin-top:20px;
+  width: 220px;
+  transition: all 0.3s;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  border-bottom-width: 1px;
+  opacity: 1;
+  transition: 0.3s;
 }
 .searchInput:focus {
   width: 220px;
   outline: 0;
 }
-
 </style>
