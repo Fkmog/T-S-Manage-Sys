@@ -343,18 +343,18 @@ export default {
         course.credit = course.credit;
 
         if (
-          course.courseCode||
-          course.courseName||
-         course.courseType||
-          course.courseNature||
-          course.credit
+          !course.courseCode||
+          !course.courseName||
+         !course.courseType||
+          !course.courseNature||
+          !course.credit
         ) {
           if (
-            course.courseCode &&
-            course.courseName&&
-            course.courseType&&
-            course.courseNature&&
-            course.credit
+            !course.courseCode &&
+            !course.courseName&&
+            !course.courseType&&
+            !course.courseNature&&
+            !course.credit
           ) {
             return;
           } else {

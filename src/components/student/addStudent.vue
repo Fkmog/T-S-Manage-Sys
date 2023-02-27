@@ -231,10 +231,10 @@
             student.studentNumber = student.studentNumber;
             
             student.studentName = student.studentName;
-            teacher.email = teacher.email;
+            // teacher.email = teacher.email;
     
-            if (student.studentNumber || student.studentName ) {
-              if (student.studentNumber && student.studentName ) {
+            if (!student.studentNumber || !student.studentName ) {
+              if (!student.studentNumber && !student.studentName ) {
                 return;
               } else {  // either name OR teacherNo is empty, but not both
                 valid = false;

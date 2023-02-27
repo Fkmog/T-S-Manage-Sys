@@ -130,6 +130,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
+          <el-button @click="goBatchAddClass">批量添加</el-button>
           <el-button @click="addVisible = false">取消</el-button>
           <el-button type="primary" @click="addClass(classAddForm)">
             确定
@@ -425,6 +426,10 @@ export default {
     },
   },
   methods: {
+    //跳转到批量添加
+    goBatchAddClass(){
+      this.$router.push({ path:'/batchClassAdd'});
+    },
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {

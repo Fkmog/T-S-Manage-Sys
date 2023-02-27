@@ -18,6 +18,7 @@ import Major from '@/views/index/major.vue'
 import Teacher from '@/views/index/teacher.vue'
 import AddTeacher from '@/views/teacher/addTeacher.vue'
 import BatchCourseAdd from '@/views/baseCourse/batchCourseAdd.vue'
+import BatchClassAdd from '@/components/class/batchAddClass.vue'
 import BaseCourseDetail from '@/views/baseCourse/baseCourseDetail.vue'
 import baseCourseObjectives from '@/views/baseCourse/objectives.vue'
 import baseCourseActivities from '@/views/baseCourse/activities.vue'
@@ -89,6 +90,12 @@ export default createRouter({
                 {
                     path: '/batchCourseAdd',
                     component: BatchCourseAdd,
+                    meta: { isMajor: false }
+
+                },
+                {
+                    path: '/batchClassAdd',
+                    component: BatchClassAdd,
                     meta: { isMajor: false }
 
                 },

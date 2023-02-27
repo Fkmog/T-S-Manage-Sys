@@ -93,32 +93,34 @@
     </div>
 
     <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
-      <el-form :model="preform">
-        <el-form-item label="课程名称" :label-width="formLabelWidth">
-          <el-input v-model="preform.courseName" autocomplete="off" />
+      <el-form :model="preform" :rules="rules" ref="ruleForm">
+        <el-form-item label="课程名称" :label-width="formLabelWidth" prop="courseName">
+          <span >{{ preform.courseName }}</span>
+          <!-- <el-input v-model="preform.courseName" autocomplete="off" /> -->
         </el-form-item>
-        <el-form-item label="课程代码" :label-width="formLabelWidth">
-          <el-input v-model="preform.courseCode" autocomplete="off" />
+        <el-form-item label="课程代码" :label-width="formLabelWidth" prop="courseCode">
+          <span >{{ preform.courseCode }}</span>
+          <!-- <el-input v-model="preform.courseCode" autocomplete="off" /> -->
         </el-form-item>
-        <el-form-item label="学分" :label-width="formLabelWidth">
+        <el-form-item label="学分" :label-width="formLabelWidth" prop="credit">
           <el-input v-model="preform.credit" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="课程性质" :label-width="formLabelWidth">
+        <el-form-item label="课程性质" :label-width="formLabelWidth" prop="courseNature">
           <el-select v-model="preform.courseNature" placeholder="请选择课程性质">
             <el-option label="专业任选" value="0" />
             <el-option label="还未确定" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="课程类型" :label-width="formLabelWidth">
+        <el-form-item label="课程类型" :label-width="formLabelWidth" prop="courseType">
           <el-select v-model="preform.courseType" placeholder="请选择课程类型">
             <el-option label="学科基础课" value="0" />
             <el-option label="还未确定" value="1" />
           </el-select>
         </el-form-item>
         
-        <el-form-item label="备注" :label-width="formLabelWidth">
+        <!-- <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input v-model="preform.remark" autocomplete="off" />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -160,6 +162,29 @@ export default {
   name: "PrincipalBaseCourse",
   data() {
     return {
+
+      //form rules
+      rules: {
+        courseName: [
+            { required: true, message: '请输入课程名称', trigger: 'blur' },
+            { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+          ],
+          courseCode: [
+            { required: true, message: '请输入课程代码', trigger: 'blur' },
+            // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          ],
+          credit: [
+            { required: true, message: '请输入课程学分', trigger: 'blur' },
+            // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          ],
+          courseNature:[
+            { required: true, message: '请选择课程性质', trigger: 'change' }
+          ],
+          courseType:[
+            { required: true, message: '请选择课程类型', trigger: 'change' }
+          ],
+
+      },
       //select
       currentVersion:'2016级',
       currentVersionValue:1,

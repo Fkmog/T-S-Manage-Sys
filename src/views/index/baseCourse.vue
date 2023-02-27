@@ -24,63 +24,105 @@
       </template>
     </HeaderSearch>
   </div>
+
+  <div v-show="closeShow" class="submenu" >
+    <el-row>
+      <el-col :span="6" class="columnstyle">
+        <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
+      </el-col>
+      <el-col :span="6" class="columnstyle">
+        <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
+      </el-col>
+      <el-col :span="6" class="columnstyle">
+        <el-button @click="this.addPrincipal()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
+        
+      </el-col>
+    </el-row>
+  </div>
     <div layout="row" flex class="md-padding" >
       <addBtn @click="dialogFormVisible = true"></addBtn>
       <div class="el-table-container" layout="column" flex layout-align="start center" >
-        <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-          <el-table-column  label="课程名" width="250" >
+        <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
+        :header-cell-style="{
+      'padding-left': '20px',
+      'font-size': '14.4px',
+      height: '48px',
+      'font-weight': 'bold',
+      color: 'black',
+    }"
+    :cell-style="{
+      'padding-left': '20px',
+      'font-size': '16px',
+      height: '60px',
+    }"
+        @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
+        <el-table-column width="55" type="selection" :selectable="selectable">
+            </el-table-column>
+          <el-table-column  label="课程名" width="250" label-class-name="textbold" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseName }}</span>
+                <span >{{ scope.row.courseName }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程号" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseCode }}</span>
+                <span >{{ scope.row.courseCode }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程类型" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseType }}</span>
+                <span >{{ scope.row.courseType }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程性质" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseNature }}</span>
+                <span >{{ scope.row.courseNature }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="学分" width="80" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.credit }}</span>
+                <span >{{ scope.row.credit }}</span>
               </div>
             </template>
           </el-table-column>
-          
+          <el-table-column  label="负责人" width="150" >
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <span v-for="item in scope.row.respondentName">{{ item }}&nbsp;&nbsp;</span>
+              </div>
+            </template>
+          </el-table-column>
          
          
           <el-table-column  label="操作" >
             <template #default="scope">
-              <el-tooltip content="删除">
+              <el-tooltip content="删除课程">
                 <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
               </el-tooltip>
-              <el-tooltip content="修改">
+
+              <el-tooltip content="修改课程">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
+              </el-tooltip>
+              <el-tooltip content="修改课程负责人">
+                <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
               </el-tooltip>
   
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
+
               <el-tooltip content="添加信息">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
+
             </template>
           </el-table-column>
           
@@ -112,9 +154,9 @@
           </el-select>
         </el-form-item>
         
-        <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
+        <!-- <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input v-model="form.remark" autocomplete="off" />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -168,16 +210,66 @@
         </span>
       </template>
     </el-dialog>
+
+
+    <el-dialog v-model="showPrinciple" title="添加负责人">
+     <span>
+      请选择负责人姓名：
+     </span>
+          <el-select v-model="selectedRespondent" 
+          :remote-method="remoteMethodinADD" 
+          :loading="loading" 
+          remote 
+          
+          filterable
+          reserve-keyword>
+            <el-option v-for="teacher in principleForm" :key="teacher.userId" :value="teacher.userId" :label="teacher.respondentName">
+            </el-option>
+          </el-select>
+          
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="showPrinciple = false">取消</el-button>
+              <el-button type="primary" @click="addRespondent">
+                添加负责人
+              </el-button>
+            </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="editPrinciple" title="修改负责人">
+     <span>
+      请选择负责人姓名：
+     </span>
+          <el-select v-model="editRespondentInfo"
+          :remote-method="remoteMethodinEdit" 
+          :loading="loading" 
+          remote 
+          
+          filterable
+          reserve-keyword
+          >
+            <el-option v-for="teacher in principleForm" :key="teacher.userId" :value="teacher.userId" :label="teacher.respondentName">
+            </el-option>
+          </el-select>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="editPrinciple = false">取消</el-button>
+              <el-button type="primary" @click="editRespondent">
+                修改负责人
+              </el-button>
+              <el-button type="danger" @click="deleteRespondent">
+                删除负责人
+              </el-button>
+            </span>
+      </template>
+    </el-dialog>
+
     <div class="pagination-container" flex>
-      <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          class="pagination"
-          :page-sizes="[10, 15]"
-          :page-size="10"
-          layout="total,sizes,prev, pager, next, jumper"
-          :total="result.total">
-        </el-pagination>
+      <el-row type="flex" justify="center" align="middle">
+        <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
+      </el-row>
+      
     </div>
        
         
@@ -191,7 +283,7 @@
   import addBtn from "@/components/general/addBtn.vue";
   import { ref,reactive, version,}from 'vue';
   import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown,ElTag } from 'element-plus'
-  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document} from '@element-plus/icons-vue'
+  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document,Avatar} from '@element-plus/icons-vue'
   
   
   
@@ -207,6 +299,29 @@
   //     },
   data(){
     return{
+      //remote option
+      loading: false,
+      remoteteacher:[],
+      //current edit row
+      currentEditRow:'',
+      //editRespondentPostdata
+      editRespondentPostdata:[],
+      //editRespondentInfo
+      editRespondentInfo:'',
+      //respondentInfos
+      respondentInfos:'',
+      //editPrinciple
+      editPrinciple:false,
+      //respondentPostdata
+      respondentPostdata:[],
+      //selected respondent
+      selectedRespondent:'',
+      //principel form
+      principleForm:[],
+      //choose principle
+      showPrinciple:false,
+      //show load button
+      showLoadmore:true,
       //form rules
       rules: {
         courseName: [
@@ -237,46 +352,46 @@
       routeCourseId:'',
   
       //select
-      currentVersion:'2016级',
+      currentVersion:'2016版',
       currentVersionValue:1,
       loading:ref(false),
       options:[],
       versions:[{
-        label:'2016级',
+        label:'2016版',
         value:1
       },
       {
-        label:'2017级',
+        label:'2017版',
         value:2
       },
       {
         value:3,
-        label:'2018级'
+        label:'2018版'
       },
       {
         value:4,
-        label:'2019级'
+        label:'2019版'
       },
       {
         value:5,
-        label:'2020级'
+        label:'2020版'
       },
       {
         value:6,
-        label:'2021级'
+        label:'2021版'
       },
       {
         value:7,
-        label:'2022级'
+        label:'2022版'
       },
       {
         value:8,
-        label:'2023级'
+        label:'2023版'
       },
       ],
       versionLabel:[
-      '2016级','2017级','2018级',
-      '2019级','2020级','2021级','2022级','2023级'
+      '2016版','2017版','2018版',
+      '2019版','2020版','2021版','2022版','2023版'
       ],
   
       // isRouterAlive:true,
@@ -292,6 +407,8 @@
       courseCode:'',
       courseType:'',
       courseNature:'',
+      respondentInfos:'',
+      respondentName:'',
       credit:'',
       courseYear:'',
       remark:'',
@@ -310,6 +427,8 @@
     courseCode: '',
     courseType: '',
     courseNature: '',
+    respondentInfos:'',
+    respondentName:'',
     credit: '',
     courseYear: '',
     remark: '',
@@ -321,6 +440,8 @@
     courseCode: '',
     courseType: '',
     courseNature: '',
+    respondentInfos:'',
+    respondentName:'',
     credit: '',
     courseYear: '',
     remark: '',
@@ -333,6 +454,211 @@
   }, 
   methods: 
   {
+    //remotemethod
+    remoteMethodinADD(query){
+      if (query !== '') {
+          this.loading = true;
+          setTimeout(() => {
+            this.loading = false;
+            this.principleForm = this.remoteteacher.filter(item => {
+              return item.respondentName
+                .indexOf(query) > -1;
+            });
+          }, 200);
+        } else {
+          this.principleForm = [];
+        }
+    },
+    remoteMethodinEdit(query){
+      if (query !== '') {
+          this.loading = true;
+          setTimeout(() => {
+            this.loading = false;
+            this.principleForm = this.remoteteacher.filter(item => {
+              return item.respondentName
+                .indexOf(query) > -1;
+            });
+          }, 200);
+        } else {
+          this.principleForm = [];
+        }
+    },
+    
+    //showEditRespondent
+    showEditRespondent(row){
+      this.editPrinciple = true;
+      this.currentEditRow = row;
+    },
+    //修改课程负责人
+    editRespondent(){
+      let that = this;
+      let row = this.currentEditRow;
+      console.log('修改课程负责人：',row);
+      this.respondentInfos = row.respondentInfos;
+      var courseRespondentDict={
+        "courseId": row.courseId,
+        "departmentId": this.departmentId,
+        "schoolId": this.schoolId,
+        "userId": this.editRespondentInfo
+      }
+    this.editRespondentPostdata.push(courseRespondentDict);
+    return request({
+    url:'/system/role/editRespondent',
+    method:'put',
+    data:this.editRespondentPostdata
+    }).then(function(res){
+      console.log('edit respondent res:',res);
+      that.getBaseCourse(that.pageSize,that.pageNum);
+      that.editPrinciple = false;
+      that.editRespondentPostdata = [];
+      if(res.code == '200'){
+          ElMessage({
+                    type: 'success',
+                    message: `修改负责人成功`,
+                    duration:1000,
+                  });
+        }
+        else{
+          ElMessage({
+                    type: 'error',
+                    message: `修改负责人失败`,
+                    duration:1000,
+                  });
+        }
+    })
+    },
+    //删除课程负责人
+    deleteRespondent(){
+      let that = this;
+      let row = this.currentEditRow;
+      var courseRespondentDict={
+        "courseId": row.courseId,
+        "departmentId": this.departmentId,
+        "schoolId": this.schoolId,
+        "userId": this.currentEditRow.respondentInfos[0].userId
+      };
+      this.editRespondentPostdata.push(courseRespondentDict);
+      ElMessageBox.confirm("即将删除课程负责人", "注意", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        return request({
+        url:'/system/role/removeRespondent',
+        method:'delete',
+        data:this.editRespondentPostdata
+    }).then(function(res){
+      console.log('delete respondent res:',res);
+      that.getBaseCourse(that.pageSize,that.pageNum);
+      that.editPrinciple = false;
+      that.editRespondentPostdata = [];
+      if(res.code == '200'){
+          ElMessage({
+                    type: 'success',
+                    message: `删除负责人成功`,
+                    duration:1000,
+                  });
+        }
+        else{
+          ElMessage({
+                    type: 'error',
+                    message: `删除负责人失败`,
+                    duration:1000,
+                  });
+        }
+    })
+      }) .catch(() => {});
+      
+    },
+    //添加课程负责人
+    addRespondent(){
+      let that = this;
+      this.courseId.forEach(function(res){
+        var courseRespondentDict={
+          "courseId": res,
+          "departmentId": that.departmentId,
+          "schoolId": that.schoolId,
+          "userId": that.selectedRespondent
+        }
+        that.respondentPostdata.push(courseRespondentDict);
+      })
+      return request({
+        url:'/system/role/addRespondent',
+        method:'post',
+        data:this.respondentPostdata
+      }).then(function(res){
+        console.log('respondentPostdata :',res);
+        that.getBaseCourse(that.pageSize,that.pageNum);
+        that.showPrinciple = false;
+        that.respondentPostdata = [];
+        if(res.code == '200'){
+          ElMessage({
+                    type: 'success',
+                    message: `添加负责人成功`,
+                    duration:1000,
+                  });
+        }
+        else{
+          ElMessage({
+                    type: 'error',
+                    message: `添加负责人失败`,
+                    duration:1000,
+                  });
+        }
+        
+      })
+    },
+    //获取负责人信息
+    getPrincipleInfo(){
+      let that = this;
+      return request({
+        url:'/teacher/list',
+        method:'get',
+        params: {
+          schoolId: this.schoolId,
+          departmentId: this.departmentId,
+        },
+      }).then(function(res){
+        
+        that.remoteteacher = res.rows.map(item =>{
+          return {userId:item.userId,respondentName:item.teacherName}
+        });
+        console.log('principle INfo :',that.remoteteacher);
+        // res.rows.forEach(function(teacher){
+        //   if(teacher.userId){
+        //     // that.principleForm.push(teacher);
+        //     that.remoteteacher.push(teacher);
+        //   }
+        // })
+      })
+    },
+    //load more course
+    loadmoreCourse(){
+    if(this.result.total-this.pageSize>=10){
+      this.pageSize +=10;
+      this.getBaseCourse(this.pageSize,this.pageNum);
+    }
+    else{
+      this.pageSize +=(this.result.total-this.pageSize);
+      this.getBaseCourse(this.pageSize,this.pageNum);
+    }
+    
+
+  },
+    //添加课程负责人
+    addPrincipal(){
+    console.log('add principle',this.principleForm);
+    this.showPrinciple = true;
+    },
+     //是否可选
+  selectable(row,index){
+    if(row.respondentInfos.length){
+      
+      return !row.respondentInfos.length;
+    }
+    else return true;
+    
+  },
     //添加课程
     submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -430,6 +756,8 @@
       this.form.courseCode = '';
       this.form.courseType= '';
       this.form.courseNature= '';
+      this.form.respondentInfos='',
+      this.form.respondentName = '',
       this.form.credit='';
       this.form.courseYear='';
       this.form.remark = '';
@@ -550,6 +878,16 @@
               course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
+              if(course.respondentInfos){
+                let teacherName =[];
+                course.respondentInfos.forEach(function(respondent){
+                  teacherName.push(respondent.respondentName);
+                });
+                course.respondentName = teacherName;
+              }
+              course.respondentInfos = course.respondentInfos;
+            
+              
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
@@ -559,6 +897,9 @@
             });
             that.tableData = courses;
             that.result = res;
+            if(pageSize>=res.total){
+              that.showLoadmore = false;
+            }
           });
     },
     deleteBaseCourse(index, row){
@@ -675,6 +1016,7 @@
       postData.courseCode = form.courseCode;
       postData.courseType = form.courseType;
       postData.courseNature = form.courseNature;
+      postData.respondentName = form.respondentName;
       postData.credit = form.credit;
       postData.courseYear = form.courseYear;
       postData.remark = form.remark;
@@ -688,14 +1030,16 @@
       this.preform.courseType = val.courseType == "学科基础课" ? "0" : "1";
       this.preform.courseNature = val.courseNature == "专业任选" ? "0" : "1";
       this.preform.credit = val.credit;
+      this.preform.respondentName = val.respondentName;
       this.preform.courseYear = val.courseYear == "2022" ? "0" : "1";
       this.preform.remark = val.remark;
     },
     dataTransfrom(course){
-      course.courseName=(course.courseName) ? '' : course.courseName.trim();
-      course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
+      course.courseName=course.courseName;
+      course.courseCode=course.courseCode;
       course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
       course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+      course.respondentName = course.respondentName;
       course.credit=course.credit;
       course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
       course.remark=(course.remark) ? '' : course.remark.trim();
@@ -708,16 +1052,11 @@
               this.schoolId = this.$store.state.currentInfo.schoolId;
           },
   },
-  mounted:function(){
-    // let that = this;
-    // this.activate();
-    // that.getBaseCourse(that.pageSize,that.pageNum);
-    // console.log('vesions:',this.versions);
-  },
   created(){
     let that = this;
     this.activate();
     this.getRouter();
+    this.getPrincipleInfo();
     if(this.routeVersionId){
       
       this.currentVersionValue = this.routeVersionId;
@@ -730,13 +1069,39 @@
     request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
     Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
     ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
-    Document,ElTag
+    Document,ElTag,Avatar
   }
   
   }
   </script>
   
   <style scoped>
+  .submenudeleteButton{
+    float:right;
+    margin-top:16px;
+  }
+  .columnstyle{
+    height:50px;
+    
+  }
+:deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
+}
+:deep().el-icon svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().el-icon {
+  height: 18px;
+  width: 18px;
+}
+  
+
   .selectionBar{
     
     position: absolute;
@@ -750,9 +1115,7 @@
     top: 6px;
     right: 10%;
   }
-  .el-icon--right{
-    color: white;
-  }
+
   .dropDown{
     margin-left: 1%;
     width: 100px;
@@ -760,20 +1123,16 @@
   .clearSelected{
     min-height:36px; 
     color: #3f51b5;
-    display: inline-block;
-      position: relative;
-      cursor: pointer;
+    
+     
+      
       min-height: 36px;
       min-width: 88px;
-      line-height: 36px;
-      vertical-align: middle;
+      line-height: 55px;
+     
       align-items: center;
       text-align: center;
       border-radius: 2px;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
       outline: none;
       border: 0;
       padding: 0 6px;
@@ -815,6 +1174,7 @@
   }
   .deleteButton, .editButton{
     min-width: 10px;
+    line-height:55px;
     padding: 0;
     margin: 0;
   }
@@ -837,11 +1197,7 @@
     top: -34px;
     right: 40px;
   }
-  .el-icon svg{
-    width: 20px;
-    height: 20px;
-  
-  }
+ 
   .addCourseButton:hover{
     background-color:rgb(41,98,255);
     transition: all .3s cubic-bezier(.55,0,.55,.2);
@@ -849,21 +1205,21 @@
   
   .el-table-container{
     width: 80%;
+    color:black;
     margin-left: 10%;
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
   .submenu {
-      color: #3f51b5;
-      font-size: 14px;
-      font-weight: 500;
-      height: 44px;
-      min-height: 44px;
-      line-height: 3em;
-      margin-bottom: 13px;
-      position: relative;
-      padding: 6px 96px 5px 32px;
-      border-bottom: 1px solid #d0d0d0;
-      background-color: transparent;
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    height: 55px;
+    position: absolute;
+    top: 110px;
+    left: 0px;
+    width: 100%;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: transparent;
      
   }
   
@@ -875,35 +1231,23 @@
   .numSelectedTeacher{
     min-height:36px; 
     color: #3f51b5;
-    display: inline-block;
+    
       position: relative;
       cursor: pointer;
       min-height: 36px;
       min-width: 88px;
-      line-height: 36px;
-      vertical-align: middle;
-      align-items: center;
-      text-align: center;
+      line-height: 55px;
+    
       border-radius: 2px;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-      outline: none;
+     
       border: 0;
       padding: 0 6px;
       margin: 0;
       background: transparent;
       
-      white-space: nowrap;
-      text-transform: uppercase;
-      font-weight: 500;
-      font-size: 14px;
-      font-style: inherit;
-      font-variant: inherit;
-      font-family: inherit;
-      text-decoration: none;
-      overflow: hidden;
+     
+    
+      
       transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
   }
   

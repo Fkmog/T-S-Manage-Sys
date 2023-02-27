@@ -322,15 +322,15 @@
         backBaseCourse() {
           this.$router.push("/principalBaseCourse");
         },
-        toActivities() {
-          this.$router.push("/baseCourseActivities");
-        },
-        toIndicators() {
-          this.$router.push("/baseCourseIndicators");
-        },
-        toObjectives() {
-          this.$router.push("/baseCourseObjectives");
-        },
+        // toActivities() {
+        //   this.$router.push("/baseCourseActivities");
+        // },
+        // toIndicators() {
+        //   this.$router.push("/baseCourseIndicators");
+        // },
+        // toObjectives() {
+        //   this.$router.push("/baseCourseObjectives");
+        // },
         //获取路由参数信息
         getRouter() {
           this.versionName = this.$store.state.course.baseCourseVersionName;

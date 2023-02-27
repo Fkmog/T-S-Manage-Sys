@@ -334,8 +334,8 @@ export default {
     //获取路由参数信息
     getRouter() {
       this.versionName = this.$store.state.course.baseCourseVersionName;
-      this.versionId = this.$store.state.course.baseCourseVersionFlag;
-      this.versionFlag = this.$store.state.course.baseCourseVersionId;
+      this.versionId = this.$store.state.course.baseCourseVersionId;
+      this.versionFlag = this.$store.state.course.baseCourseVersionFlag;
       this.courseId = this.$store.state.course.baseCourseCourseId;
       this.form.courseName = this.$store.state.course.baseCourseCourseName;
       this.form.courseCode = this.$store.state.course.baseCourseCourseCode;
