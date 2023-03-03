@@ -166,39 +166,45 @@
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseName }}</span>
+                <span >{{ scope.row.courseName }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程号" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseCode }}</span>
+                <span >{{ scope.row.courseCode }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程类型" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseType }}</span>
+                <span >{{ scope.row.courseType }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程性质" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseNature }}</span>
+                <span >{{ scope.row.courseNature }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="学分" width="80" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.credit }}</span>
+                <span >{{ scope.row.credit }}</span>
               </div>
             </template>
           </el-table-column>
-          
+          <el-table-column  label="负责人" width="150" >
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
+              </div>
+            </template>
+          </el-table-column>
          
          
           <el-table-column  label="操作" >
@@ -209,13 +215,18 @@
               <el-tooltip content="修改">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
               </el-tooltip>
+              <el-tooltip content="修改课程负责人">
+                <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
+              </el-tooltip>
   
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
+
               <el-tooltip content="添加信息">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
+
             </template>
           </el-table-column>
           
@@ -1011,6 +1022,9 @@
             });
             that.tableData = courses;
             that.result = res;
+            if(pageSize>=res.total){
+              that.showLoadmore = false;
+            }
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }

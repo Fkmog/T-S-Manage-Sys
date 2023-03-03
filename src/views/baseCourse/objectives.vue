@@ -24,64 +24,80 @@
   </div>
   <!-- <editBtn @click="goEdit()"></editBtn> -->
   <div class="body">
-    <div class="card">
-      <el-row class="card-head" style="margin-top: 30px">
-        <span style="color: grey; font-size: 14px">课程目标</span>
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="编辑"
-          placement="bottom"
-          :hide-after="0"
-        >
-          <el-icon class="edit-pen" style="margin-top: -10px" @click="goEdit()"
-            ><EditPen
-          /></el-icon>
-        </el-tooltip>
-      </el-row>
-      <div v-for="objective in list.objectives" :key="objective.id">
-        <el-row>
-          <el-col :span="2" class="objective-num">{{
-            objective.serialNum
-          }}</el-col>
-          <el-col :span="20">
-            <div class="objective-name">
-              {{ objective.name }}
-            </div>
-            <div class="objective-description">
-              {{ objective.description }}
-            </div>
-            <div style="margin-top: 30px">
-              <span style="color: grey; font-size: 14px">考核方式</span>
-            </div>
-            <div
-              v-for="(assessment, index) in objective.assessmentMethods"
-              :key="index"
-            >
-              <el-row class="assessments">
-                <el-col :span="5">
-                  {{ assessment.name }}
-                </el-col>
-                <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                <el-col
-                  :span="2"
-                  v-for="(activity, index) in assessment.activities.item"
-                  :key="index"
-                >
-                  {{ activity }}
-                </el-col>
-              </el-row>
-            </div>
-          </el-col>
+    <div v-show="!hasActivities" class="no-activities">未设置成绩项</div>
+    <div v-show="hasActivities" class="card">
+      <div v-show="!hasObjectives">
+        <el-row class="card-head" style="margin-top: 20px">
+          <span style="color: grey; font-size: 14px">课程目标</span>
         </el-row>
-        <div style="height: 30px"></div>
+        <div class="noObjectives">
+        <el-button style="color: #6573c0" text @click="goEdit()"
+          >新增
+        </el-button>
+        </div>
+      </div>
+      <div v-show="hasObjectives">
+        <el-row class="card-head" style="margin-top: 20px">
+          <span style="color: grey; font-size: 14px">课程目标</span>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="编辑"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="edit-pen"
+              style="margin-top: -15px"
+              @click="goEdit()"
+              ><EditPen
+            /></el-icon>
+          </el-tooltip>
+        </el-row>
+        <div v-for="objective in list.objectives" :key="objective.id">
+          <el-row>
+            <el-col :span="2" class="objective-num">{{
+              objective.serialNum
+            }}</el-col>
+            <el-col :span="20">
+              <div class="objective-name">
+                {{ objective.name }}
+              </div>
+              <div class="objective-description">
+                {{ objective.description }}
+              </div>
+              <div style="margin-top: 30px">
+                <span style="color: grey; font-size: 14px">考核方式</span>
+              </div>
+              <div
+                v-for="(assessment, index) in objective.assessmentMethods"
+                :key="index"
+              >
+                <el-row class="assessments">
+                  <el-col :span="5">
+                    {{ assessment.name }}
+                  </el-col>
+                  <el-col :span="5">( {{ assessment.weight }}% )</el-col>
+                  <el-col
+                    :span="2"
+                    v-for="(activity, index) in assessment.activities.item"
+                    :key="index"
+                  >
+                    {{ activity }}
+                  </el-col>
+                </el-row>
+              </div>
+            </el-col>
+          </el-row>
+          <div style="height: 30px"></div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { Back,EditPen } from "@element-plus/icons-vue";
+import { Back, EditPen } from "@element-plus/icons-vue";
 import editBtn from "@/components/general/editBtn.vue";
 import { getObjectives } from "@/api/basecourse";
 
@@ -90,7 +106,7 @@ export default {
   components: {
     Back,
     editBtn,
-    EditPen
+    EditPen,
   },
   data() {
     return {
@@ -101,6 +117,8 @@ export default {
         schoolId: Number,
       },
       list: [],
+      hasActivities: true,
+      hasObjectives:false,
     };
   },
   mounted() {
@@ -119,8 +137,17 @@ export default {
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         this.list = res.data;
+        if (this.list.activities === null) {
+          this.hasActivities = false;
+        } else {
+          this.hasActivities = true;
+        }
         //处理数据-serialNum
-        if (this.list.objectives) {
+        if (this.list.objectives===null) {
+          this.hasObjectives=false
+         
+        }else{
+           this.hasObjectives=true
           this.list.objectives.forEach((value) => {
             if (value.id.charAt(0) == "0") {
               value.serialNum = value.id.charAt(1);
@@ -163,6 +190,11 @@ export default {
   display: flex;
   justify-content: center;
 }
+.no-activities {
+  margin-top: 150px;
+  text-align: center;
+  font-size: 20px;
+}
 .card {
   display: flex;
   flex-direction: column;
@@ -197,5 +229,16 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
+}
+.noObjectives{
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 64px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px dashed #bdbdbd;
+  margin: 16px auto;
 }
 </style>

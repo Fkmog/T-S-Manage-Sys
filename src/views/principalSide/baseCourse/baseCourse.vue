@@ -174,6 +174,7 @@
 
 <script>
 import request from '@/utils/request/request'
+import request from '@/utils/request/request'
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive, version,}from 'vue';
