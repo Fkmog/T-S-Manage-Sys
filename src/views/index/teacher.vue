@@ -8,21 +8,29 @@
       v-show="closeShow"
       class="submenu"
     >
-      <el-button
+    <el-row>
+      <el-col :span="6">
+        <el-button
         @click="this.toggleSelection()"
         style="float: left"
         class="clearSelected"
         link
         >取消选择</el-button
       >
-      <div class="numSelectedTeacher">已选中 {{ numSelected }} 个教师</div>
-      <el-button
+      </el-col>
+      <el-col :span="6">
+        <div class="numSelectedTeacher">已选中 {{ numSelected }} 个教师</div>
+      </el-col>
+      <el-col :span="6">
+        <el-button
         @click="deleteTeacher"
-        style="float: right"
+        
         class="deleteButton"
         link
         ><el-icon><Delete /></el-icon
       ></el-button>
+      </el-col>
+    </el-row>
     </div>
 
     <div layout="row" flex class="md-padding">
@@ -39,6 +47,18 @@
           tooltip-effect="dark"
           @selection-change="handleSelectionChange"
           class="elTable"
+          :header-cell-style="{
+      'padding-left': '20px',
+      'font-size': '14.4px',
+      height: '48px',
+      'font-weight': 'bold',
+      color: 'black',
+    }"
+    :cell-style="{
+      'padding-left': '20px',
+      'font-size': '16px',
+      height: '60px',
+    }"
         >
           <el-table-column type="selection" width="55" />
           <el-table-column property="teacherId" label="工号" width="120" />
@@ -47,6 +67,7 @@
             property="email"
             label="邮箱"
             show-overflow-tooltip
+            width="480"
           />
         </el-table>
       </div>
@@ -362,7 +383,7 @@ export default {
   padding: 0;
 }
 .elTable {
-  width: 50%;
+  width: 800px;
   top: 20%;
   left: 25%;
 }
@@ -403,9 +424,9 @@ export default {
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .deleteButton {
-  margin-right: 100px;
-  margin-top: 0;
-  margin-bottom: 0;
+  float:right;
+  margin-top:16px;
+  
 }
 .el-checkbox__input.is-indeterminate .el-checkbox__inner::before {
   height: 10px;

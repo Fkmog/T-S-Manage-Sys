@@ -228,13 +228,13 @@
           var valid = true;
         
           this.db.items.forEach(function (student) {
-            // student.studentNumber = (_.isEmpty(student.studentNumber)) ? '' : student.studentNumber.trim();
+            student.studentNumber = student.studentNumber;
             
-            // student.studentName = (_.isEmpty(student.studentName)) ? '' : student.studentName.trim();
-            // teacher.email = (_.isEmpty(teacher.email)) ? '' : teacher.email.trim();
+            student.studentName = student.studentName;
+            // teacher.email = teacher.email;
     
-            if (student.studentNumber || student.studentName ) {
-              if (student.studentNumber && student.studentName ) {
+            if (!student.studentNumber || !student.studentName ) {
+              if (!student.studentNumber && !student.studentName ) {
                 return;
               } else {  // either name OR teacherNo is empty, but not both
                 valid = false;

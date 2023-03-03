@@ -182,7 +182,7 @@ export default {
       attributeIdNew: "",
       hasDetail: true,
       deteleArray: [],
-      canDelete: true, //控制删除毕业要求按钮显示
+      canDelete: false, //控制删除毕业要求按钮显示
     };
   },
   mounted() {
@@ -217,15 +217,14 @@ export default {
     },
     // 删除要求点
     deleteAttributeId() {
-      if (this.requirements&&this.requirements.length > 0) {
+      if (this.requirements && this.requirements.length > 0) {
         this.attributeIdDelete =
           this.requirements[this.requirements.length - 1].serialNum;
       }
-      
     },
     // 新增要求点
     newAttributeId() {
-      if (this.requirements&&this.requirements.length > 0) {
+      if (this.requirements && this.requirements.length > 0) {
         let v = this.requirements[this.requirements.length - 1].serialNum;
         this.attributeIdNew = ++v;
       } else {
@@ -242,6 +241,12 @@ export default {
         this.programInfo = res.data;
         console.log("programInfo", this.programInfo);
         this.requirements = res.data.graduateAttributes;
+        if (this.requirements === null || this.requirements.length == 0) {
+          this.canDelete = false;
+        }else{
+          this.canDelete = true;
+
+        }
         this.deleteAttributeId();
         this.newAttributeId();
         console.log("requirements", this.requirements);
@@ -280,14 +285,15 @@ export default {
         currentObj.serialNum = parent.join(".");
         this.requirements[parent[0] - 1].programIndicators.push(currentObj);
       }
-      if (attribute.programIndicators.length == 0) {
+     else {
+        // if (attribute.programIndicators.length == 0) {
         currentObj.serialNum = attribute.serialNum + ".1";
         //确定id
         if (attribute.serialNum.length == 2) {
-          currentObj.id = attribute.serialNum;
+          currentObj.id = attribute.serialNum+'01';
         }
         if (attribute.serialNum.length == 1) {
-          currentObj.id = "0" + attribute.serialNum;
+          currentObj.id = "0" + attribute.serialNum+'01';
         }
         let num = Number(attribute.serialNum);
         this.requirements[num - 1].programIndicators.push(currentObj);
@@ -305,11 +311,6 @@ export default {
           type: "warning",
         }
       ).then(() => {
-        //复制到待删除数组中
-        // this.deteleArray.push(
-        //   attribute.programIndicators[attribute.programIndicators.length - 1]
-        // );
-        // this.deteleArray[this.deteleArray.length - 1].isDeleted = 2;
         attribute.programIndicators.pop();
       });
     },
@@ -320,7 +321,13 @@ export default {
       currentObj.name = null;
       currentObj.description = null;
       currentObj.programIndicators = [];
-      if (this.requirements.length > 0) {
+
+      if (this.requirements === null || this.requirements.length == 0) {
+        currentObj.id = "01";
+        currentObj.serialNum = "1";
+        this.requirements = [];
+        this.requirements.push(currentObj);
+      } else {
         // 确定Id
         let currentId =
           Number(this.requirements[this.requirements.length - 1].id) + 1;
@@ -330,7 +337,7 @@ export default {
           currentObj.Id = currentId.toString;
         }
         // 确定serialNum
-        if (this.requirements.length == 0) {
+        if (this.requirements === null || this.requirements.length == 0) {
           currentObj.serialNum = "1";
         } else {
           currentObj.serialNum =
@@ -338,11 +345,6 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
-        this.requirements.push(currentObj);
-      } else {
-        currentObj.Id = "01";
-        currentObj.serialNum = "1";
-        this.requirements = [];
         this.requirements.push(currentObj);
       }
       //显示删除要求点按钮
@@ -367,7 +369,7 @@ export default {
           }
         ).then(() => {
           this.requirements.pop();
-          if (this.requirements.length == 0) {
+          if (this.requirements.length == 0 || this.requirements == null) {
             this.canDelete = false;
           }
           //更新对应新增删除的要求点的数字
@@ -389,7 +391,6 @@ export default {
               this.requirements[n].programIndicators[m].description == null ||
               this.requirements[n].programIndicators[m].description == ""
             ) {
-              //要不要弄个消息弹窗？!!
               return;
             }
           }
@@ -401,24 +402,23 @@ export default {
           return;
         }
       }
-      // this.requirements = this.requirements.concat(this.deteleArray);
       this.programInfo.graduateAttributes = this.requirements;
       console.log("save", this.programInfo);
       editProgram(this.programInfo).then((res) => {
         console.log(res);
-        if(res.code == 200){
-        ElMessage({
-          type: "success",
-          message: `保存成功`,
-          duration: 1000,
-        });
-        this.backGoal();
-        }else{
-           ElMessage({
-          type: "error",
-          message: `保存失败`,
-          duration: 1000,
-        });
+        if (res.code == 200) {
+          ElMessage({
+            type: "success",
+            message: `保存成功`,
+            duration: 1000,
+          });
+          this.backGoal();
+        } else {
+          ElMessage({
+            type: "error",
+            message: `保存失败`,
+            duration: 1000,
+          });
         }
       });
     },

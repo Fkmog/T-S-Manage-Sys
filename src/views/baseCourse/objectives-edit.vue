@@ -298,10 +298,11 @@ export default {
       index: Number, //dialog中指明操作的object
       deleteSerialNum: "",
       activities: [],
-      allActivities:[],
+      allActivities: [],
       isEditWeight: false,
       isChange: false, //页面有无修改
-      canDelete: true,
+      canDelete: false,
+      hasActivities: true,
     };
   },
   watch: {
@@ -328,21 +329,20 @@ export default {
         this.list.majorId = this.$store.state.major.majorId;
         // console.log("保存的list:", this.list);
         //有无课程目标
-        if(this.list.objectives.length==0){
-            ElMessage.error("请添加课程目标");
-            throw "true";
+        if (this.list.objectives.length == 0) {
+          ElMessage.error("请添加课程目标");
+          throw "true";
         }
         this.list.objectives.forEach((object) => {
           if (object.description == "") {
             ElMessage.error("描述内容不能为空");
             throw "true";
-          }
-          else if(object.assessmentMethods.length==0){
+          } else if (object.assessmentMethods.length == 0) {
             ElMessage.error("请为课程目标添加考核方式");
             throw "true";
           }
         });
-        this.save()
+        this.save();
       } catch (stat) {
         if (stat == "true") {
           return;
@@ -354,18 +354,17 @@ export default {
         console.log("save", res);
         if (res.code == 200) {
           ElMessage({
-          type: "success",
-          message: `保存成功`,
-          duration: 1000,
-        });
-        this.backObjectives();
-        }
-        else{
+            type: "success",
+            message: `保存成功`,
+            duration: 1000,
+          });
+          this.backObjectives();
+        } else {
           ElMessage({
-          type: "error",
-          message: `保存失败`,
-          duration: 1000,
-        });
+            type: "error",
+            message: `保存失败`,
+            duration: 1000,
+          });
         }
       });
     },
@@ -374,10 +373,16 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
-        this.allActivities=this.list.activities.item
-        // console.log("@", this.allActivities)
-        this.allActivities = this.allActivities.map((item) => ({ value: item }));
-
+        console.log("list", res, this.list);
+        if (!this.list.activities === null) {
+          this.allActivities = this.list.activities.item;
+          this.allActivities = this.allActivities.map((item) => ({
+            value: item,
+          }));
+        }
+        // this.allActivities=this.list.activities.item
+        // // console.log("@", this.allActivities)
+        // this.allActivities = this.allActivities.map((item) => ({ value: item }));
         //处理数据-serialNum
         if (this.list.objectives) {
           this.list.objectives.forEach((value) => {
@@ -519,6 +524,9 @@ export default {
         if (this.objectives.length == 0) {
           this.canDelete = false;
         }
+        if (this.objectives.length > 0) {
+          this.canDelete = true;
+        }
         this.getDeleteSerialNum();
       });
     },
@@ -528,8 +536,11 @@ export default {
       if (this.objectives.length > 0) {
         this.deleteSerialNum =
           this.objectives[this.objectives.length - 1].serialNum;
+          this.canDelete=true
       } else {
         this.deleteSerialNum = 0;
+          this.canDelete=false
+
       }
     },
     // 编辑权重
