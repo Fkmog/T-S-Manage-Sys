@@ -96,7 +96,7 @@ export default {
       infos3: [
         {
           value: "课程库",
-          path: "./principalBaseCourse",
+          path: "./baseCourse",
         },
         {
           value: "教学班",
