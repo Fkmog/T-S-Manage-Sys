@@ -301,26 +301,28 @@ export default {
     //编辑教学班
     editClass(index, row) {
       console.log("index", index, "row", row);
+      let rowInfo = JSON.parse(JSON.stringify(row));
+
       this.academicYear.forEach((year) => {
-        if (year.dictLabel == row.academicYear) {
-          row.academicYear = year.dictValue;
+        if (year.dictLabel == rowInfo.academicYear) {
+          rowInfo.academicYear = year.dictValue;
         }
       });
       this.semester.forEach((semester) => {
-        if (semester.dictLabel == row.semester) {
-          row.semester = semester.dictValue;
+        if (semester.dictLabel == rowInfo.semester) {
+          rowInfo.semester = semester.dictValue;
         }
       });
-      this.classEditForm.className = row.className;
-      this.classEditForm.instructor = row.teacherName;
-      this.classEditForm.courseCode = row.courseCode;
-      this.classEditForm.identifier = row.identifier;
-      this.classEditForm.chosenYear = row.academicYear;
-      this.classEditForm.chosenSemester = row.semester;
-      this.classEditForm.remark = row.remark;
-      this.classEditForm.classId = row.classId;
-      this.classEditForm.teacherName = row.teacherName;
-      this.classEditForm.teacherNumber = row.teacherNumber;
+      this.classEditForm.className = rowInfo.className;
+      this.classEditForm.instructor = rowInfo.teacherName;
+      this.classEditForm.courseCode = rowInfo.courseCode;
+      this.classEditForm.identifier = rowInfo.identifier;
+      this.classEditForm.chosenYear = rowInfo.academicYear;
+      this.classEditForm.chosenSemester = rowInfo.semester;
+      this.classEditForm.remark = rowInfo.remark;
+      this.classEditForm.classId = rowInfo.classId;
+      this.classEditForm.teacherName = rowInfo.teacherName;
+      this.classEditForm.teacherNumber = rowInfo.teacherNumber;
       this.dialogFormVisible = true;
     },
     //提交修改教学班信息

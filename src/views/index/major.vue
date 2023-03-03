@@ -77,7 +77,7 @@ export default {
   },
   mounted() {
     this.currentDepartmentId =
-      this.$store.state.userInfo.identity[0].departmentId;
+      this.$store.state.currentInfo.departmentId;
     //获取专业列表
     // this.getMajorList();
     this.getMajorList(this.currentDepartmentId);
@@ -120,6 +120,7 @@ export default {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         customClass: 'add-major-box',
+        showClose:false,
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入新增专业名称",

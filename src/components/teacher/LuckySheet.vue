@@ -120,11 +120,13 @@ export default{
           } else { 
             if(self.count==0){
               self.dirty=false;
+              self.isValid();
               console.log('console:',self.count);
               console.log('different',self.dirty);
             }
             else{
               self.dirty=true;
+              self.isValid();
               self.firstActivities = false;
               console.log('console:',self.count);
               console.log('different',self.dirty);
@@ -153,6 +155,7 @@ export default{
         return false;
       }
       else{
+       
         let result = this.toPostData();
           return !(!result);
       }
@@ -207,13 +210,12 @@ export default{
     let valid = true;
     
       this.db.items.forEach(function (teacher) {
-        // teacher.teacherNumber = (_.isEmpty(teacher.teacherNumber)) ? '' : teacher.teacherNumber.trim();
+        teacher.teacherNumber = teacher.teacherNumber;
+        teacher.teacherName = teacher.teacherName;
+        teacher.email = teacher.email;
         
-        // teacher.teacherName = (_.isEmpty(teacher.teacherName)) ? '' : teacher.teacherName.trim();
-        // teacher.email = (_.isEmpty(teacher.email)) ? '' : teacher.email.trim();
-
-        if (teacher.teacherNumber || teacher.teacherName || teacher.email) {
-          if (teacher.teacherNumber && teacher.teacherName && teacher.email) {
+        if (!teacher.teacherNumber || !teacher.teacherName || !teacher.email) {
+          if (!teacher.teacherNumber && !teacher.teacherName && !teacher.email) {
             return;
           } else {  // either name OR teacherNo is empty, but not both
             valid = false;

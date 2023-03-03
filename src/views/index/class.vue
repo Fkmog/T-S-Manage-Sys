@@ -128,6 +128,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
+          <el-button @click="goBatchAddClass">批量添加</el-button>
           <el-button @click="addVisible = false">取消</el-button>
           <el-button type="primary" @click="addClass(classAddForm)">
             确定
@@ -239,9 +240,11 @@
   </div>
   <!-- 教学班展示列表 -->
   <el-table
+    ref="multipleTable"
     class="classesTable"
     :data="classTable"
-    style="width: 1480px"
+    style="width: 1530px"
+    @selection-change="handleSelectionChange"
     :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -256,6 +259,7 @@
     }"
     highlight-current-row
   >
+    <el-table-column width="50" type="selection" :selectable="canSelect" />
     <el-table-column prop="className" label="课程名" width="230" />
     <el-table-column prop="teacherName" label="任课教师" width="160" />
     <el-table-column prop="courseCode" label="课程号" width="200" />
@@ -306,7 +310,7 @@ import { getClass, addClass, editClass } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
-import { Edit, Delete } from "@element-plus/icons-vue";
+import { Edit, Delete, DocumentAdd } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 export default {
   name: "Class",
@@ -315,6 +319,7 @@ export default {
     addBtn,
     Edit,
     Delete,
+    DocumentAdd,
   },
   data() {
     return {
@@ -373,6 +378,7 @@ export default {
       currentPage: 1,
       pageSize: 20,
       total: 0,
+      multipleSelection: [],
     };
   },
   mounted() {
@@ -423,6 +429,10 @@ export default {
     },
   },
   methods: {
+    //跳转到批量添加
+    goBatchAddClass() {
+      this.$router.push({ path: "/batchClassAdd" });
+    },
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -502,27 +512,29 @@ export default {
     //编辑教学班
     editClass(index, row) {
       console.log("index", index, "row", row);
+      let rowInfo = JSON.parse(JSON.stringify(row));
+
       this.academicYear.forEach((year) => {
-        if (year.dictLabel == row.academicYear) {
-          row.academicYear = year.dictValue;
+        if (year.dictLabel == rowInfo.academicYear) {
+          rowInfo.academicYear = year.dictValue;
         }
       });
       this.semester.forEach((semester) => {
-        if (semester.dictLabel == row.semester) {
-          row.semester = semester.dictValue;
+        if (semester.dictLabel == rowInfo.semester) {
+          rowInfo.semester = semester.dictValue;
         }
       });
       //修改表单信息初始化
-      this.classEditForm.className = row.className;
-      this.classEditForm.instructor = row.teacherName;
-      this.classEditForm.courseCode = row.courseCode;
-      this.classEditForm.identifier = row.identifier;
-      this.classEditForm.chosenYear = row.academicYear;
-      this.classEditForm.chosenSemester = row.semester;
-      this.classEditForm.remark = row.remark;
-      this.classEditForm.classId = row.classId;
-      this.classEditForm.teacherName = row.teacherName;
-      this.classEditForm.teacherNumber = row.teacherNumber;
+      this.classEditForm.className = rowInfo.className;
+      this.classEditForm.instructor = rowInfo.teacherName;
+      this.classEditForm.courseCode = rowInfo.courseCode;
+      this.classEditForm.identifier = rowInfo.identifier;
+      this.classEditForm.chosenYear = rowInfo.academicYear;
+      this.classEditForm.chosenSemester = rowInfo.semester;
+      this.classEditForm.remark = rowInfo.remark;
+      this.classEditForm.classId = rowInfo.classId;
+      this.classEditForm.teacherName = rowInfo.teacherName;
+      this.classEditForm.teacherNumber = rowInfo.teacherNumber;
       this.editVisible = true;
     },
     //提交修改教学班信息
@@ -582,8 +594,19 @@ export default {
     createStateFilter(queryString) {
       return (state) => {
         return;
-        state.value.toUpperCase().match(queryString.toUpperCase());
       };
+    },
+    handleSelectionChange(val) {
+      console.log(val, "nihjaop ");
+    },
+    canSelect(row) {
+      // console.log(row);
+      if (row.courseCode == '123') {
+        return false;
+      }
+      else{
+        return true
+      }
     },
   },
 };

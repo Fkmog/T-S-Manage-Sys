@@ -38,7 +38,20 @@
     
     <addBtn @click="this.drawerShow()"></addBtn>
     <div class="el-table-container">
-      <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%"
+      :header-cell-style="{
+      'padding-left': '20px',
+      'font-size': '14.4px',
+      height: '48px',
+      'font-weight': 'bold',
+      color: 'black',
+    }"
+    :cell-style="{
+      'padding-left': '20px',
+      'font-size': '16px',
+      height: '60px',
+    }"
+      @selection-change="handleSelectionChange">
         <el-table-column  type="selection" width="55" />
         <el-table-column prop="courseName" label="课程名" width="180" />           
         <el-table-column prop="courseCode" label="课程号" width="180" />
@@ -110,37 +123,61 @@
       </div>
     </div>
     <el-drawer v-model="drawer" :direction="direction" size="50%">
-    <template #title>
-      <h4 style="width:500px;">基础课程</h4>
-      <el-select
-        v-model="currentVersion"
-        class="m-3"
+    <template #header class="drawerHeader">
+      <el-col :span="24">
+        <el-row>
+        <el-col :span="12">
+          <el-row class="row-style">
+            <span >基础课程</span>
+          </el-row>
+         
+          <el-row >
+            <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
+          </el-row>
+         
+         
+        </el-col>
+        <el-col :span="12">
+          <el-row class="row-style">
+            <el-select
+              v-model="currentVersion"
+              @change="getCourseByYear(currentVersion)"
+            >
+            <el-option
+              v-for="item in versions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          </el-row>
+          
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <div  class="drawersubmenu">
+            <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div>
+            <div class="drawerdeleteButton">
+              <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
+            </div>
+          </div>
+        </el-col>
         
-        placeholder="Please enter a keyword"
-        
-        @change="getCourseByYear(currentVersion)"
-      >
-    
-        <el-option
-          v-for="item in versions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
+      </el-row>
+
+      </el-col>
+      
+     
+      
     </template>
 
-    <template #default ><!-- 具体basecourse页面，分页 可搜索-->
+   <!-- 具体basecourse页面，分页 可搜索-->
       
-      <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
-      <div v-show="drawercloseShow" class="drawersubmenu" style="height: 45px;min-height: 45px;">
-        <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div>
-        <div class="drawerdeleteButton">
-          <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
-        </div>
-      </div>
+  
       
       <div class="drawerBlock" flex>
+        
         <div >
           <el-table 
           :data="tableData"  
@@ -153,13 +190,14 @@
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
+            <el-table-column prop="respondentName" label="课程负责人" width="120" />
             <el-table-column  label="课程大纲" width="180" >
               <template #default="scope">
-                <el-tooltip content="查看信息">
+                <el-tooltip content="查看课程大纲">
                   <el-button v-show="!scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
                 </el-tooltip>
-                <el-tooltip content="添加信息">
-                  <el-tag v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                <el-tooltip content="添加课程大纲">
+                  <el-button v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-button>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -169,13 +207,13 @@
 
      
       
-    </template>
-    <template #footer>
+    
+    
       <div style="flex: auto" class="drawerFooter">
        
         
         <div class="pagination-container" flex>
-        <el-pagination
+        <!-- <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             class="pagination"
@@ -183,10 +221,14 @@
             :page-size="10"
             layout="total,sizes,prev, pager, next, jumper"
             :total="result.total">
-        </el-pagination>
+        </el-pagination> -->
+        <el-row type="flex" justify="center" align="middle">
+          <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
+        </el-row>
+        
       </div>
       </div>
-    </template>
+    
   </el-drawer>
   </div>
   <div v-show="!hasProgram" class="no-program">
@@ -218,6 +260,10 @@ components:{
 },
 data(){
   return{
+    //show loadmore
+    showLoadmore:true,
+
+    
     //是否有program
     hasProgram:Boolean,
     //课程是否为空
@@ -264,6 +310,7 @@ data(){
     drawernumSelected:0,
     drawerclickState:0,
     drawercourseId:[],//clear after add,
+    drawerCourseIndex:[],//clear after add,
     drawerresult:reactive({}),
     drawertableData:[
   {
@@ -353,39 +400,39 @@ data(){
   searchCourseId:[0,0],
 
 
-  currentVersion:'2016级',
+  currentVersion:'2016版',
   currentVersionValue:1,
   versions:[{
-      label:'2016级',
+      label:'2016版',
       value:1
     },
     {
-      label:'2017级',
+      label:'2017版',
       value:2
     },
     {
       value:3,
-      label:'2018级'
+      label:'2018版'
     },
     {
       value:4,
-      label:'2019级'
+      label:'2019版'
     },
     {
       value:5,
-      label:'2020级'
+      label:'2020版'
     },
     {
       value:6,
-      label:'2021级'
+      label:'2021版'
     },
     {
       value:7,
-      label:'2022级'
+      label:'2022版'
     },
     {
       value:8,
-      label:'2023级'
+      label:'2023版'
     },
     ],
 
@@ -428,6 +475,65 @@ result:reactive({}),
   }
 },
 methods:{
+  //直接添加课程大纲
+  addBaseCourseDetail(row){
+      let that = this;
+      ElMessageBox.confirm(
+      '尚未添加版本信息是否添加？',
+      '注意',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(() => {
+      console.log('versionId',that.currentVersionValue,'CourseId',that.courseId);
+  
+        return request({
+        url:'/detail',
+        method:'post',
+        data:{
+          'versionId':that.currentVersionValue,
+          'courseId':row.courseId,
+          'departmentId':that.departmentId,
+          'schoolId':that.schoolId
+        }
+      }).then(function(res){
+        console.log(res);
+        if(res.code == '200'){
+          ElMessage({
+                  type: 'success',
+                  message: `新增成功`,
+                  duration:1000,
+                });
+              //成功后根据vesionId和basecouseId获取详细信息
+              that.getBaseCourse(that.pageSize,that.pageNum);
+            }
+            else{
+              ElMessage({
+                    type: 'error',
+                    message: `新增失败`,
+                    duration:1000,
+                  });
+              //失败后退回basecouse页面
+              that.getBaseCourse(that.pageSize,that.pageNum);
+            }
+      })
+      })
+    },
+  //load course
+  loadmoreCourse(){
+    if(this.result.total-this.pageSize>=10){
+      this.pageSize +=10;
+      this.getBaseCourse(this.pageSize,this.pageNum);
+    }
+    else{
+      this.pageSize +=(this.result.total-this.pageSize);
+      this.getBaseCourse(this.pageSize,this.pageNum);
+    }
+    
+
+  },
   //跳转到详细页面
   goBaseCourseDetail(index, row){
     console.log('goBaseCourseDetail',row);
@@ -497,27 +603,27 @@ methods:{
     }
     )
   },
-  addBaseCourseDetail(row){
-    let that = this;
-    console.log('route push '+'versionValue:',that.currentVersionValue,'courseId:',row.courseId)
-    ElMessageBox.confirm(
-    '尚未添加版本信息是否添加？',
-    '注意',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  ).then(() => {
-    this.$router.push({
-      path:'/baseCourse',
-      query:{
-        versionId:that.currentVersionValue,
-        courseId:row.courseId,
-      }
-  })
-    })
-  },
+  // addBaseCourseDetail(row){
+  //   let that = this;
+  //   console.log('route push '+'versionValue:',that.currentVersionValue,'courseId:',row.courseId)
+  //   ElMessageBox.confirm(
+  //   '尚未添加版本信息是否添加？',
+  //   '注意',
+  //   {
+  //     confirmButtonText: '确定',
+  //     cancelButtonText: '取消',
+  //     type: 'warning',
+  //   }
+  // ).then(() => {
+  //   this.$router.push({
+  //     path:'/baseCourse',
+  //     query:{
+  //       versionId:that.currentVersionValue,
+  //       courseId:row.courseId,
+  //     }
+  // })
+  //   })
+  // },
   getCourseByYear(label){
     this.currentVersionValue = label;
     this.getBaseCourse(this.pageSize,this.pageNum);
@@ -545,8 +651,8 @@ methods:{
 
             eachCourseId = course.courseId;
             
-            // course.courseName=(_.isEmpty(course.courseName)) ? '' : course.courseName.trim();
-            // course.courseCode=(_.isEmpty(course.courseCode)) ? '' : course.courseCode.trim();
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             
@@ -659,8 +765,8 @@ methods:{
                 duration:1000,
               });
             res.rows.forEach(function(course){
-            course.courseName=(course.courseName) ? '' : course.courseName.trim();
-            course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             course.remark = '';
@@ -746,17 +852,17 @@ methods:{
   cancelClick() {
   this.drawer = false;
 },
-  handleCurrentChange(val) {
-    this.pageNum = val
-    console.log(`当前页: ${val}`);
-    this.getBaseCourse(this.pageSize,this.pageNum);
+  // handleCurrentChange(val) {
+  //   this.pageNum = val
+  //   console.log(`当前页: ${val}`);
+  //   this.getBaseCourse(this.pageSize,this.pageNum);
    
-  },
-  handleSizeChange(val) {
-    this.pageSize = val;
-    console.log(`每页 ${val} 条`);
-    this.getBaseCourse(this.pageSize,this.pageNum);
-  },
+  // },
+  // handleSizeChange(val) {
+  //   this.pageSize = val;
+  //   console.log(`每页 ${val} 条`);
+  //   this.getBaseCourse(this.pageSize,this.pageNum);
+  // },
   addBaseCourse(){
     this.dialogFormVisible = false;
     console.log(this.form);
@@ -840,9 +946,9 @@ methods:{
     return course;
 
   },
-  goAddBaseCourses(){
-    this.$router.push({ path:'/courses'}) 
-  },
+  // goAddBaseCourses(){
+  //   this.$router.push({ path:'/courses'}) 
+  // },
   deleteBaseCourse(){
     let that = this;
 ElMessageBox.confirm(
@@ -968,6 +1074,7 @@ ElMessageBox.confirm(
                 duration:1000,
               });
             that.drawercourseId=[];
+            that.drawerCourseIndex = [];
             that.getProgramCourse();
             that.getBaseCourse(that.pageSize,that.pageNum);
             // that.$refs.drawermultipleTable.clearSelection();
@@ -985,6 +1092,7 @@ ElMessageBox.confirm(
                   duration:1000,
                 });
             that.drawercourseId=[];
+            that.drawerCourseIndex = [];
             that.$refs.drawermultipleTable.clearSelection();
             if(that.drawerclickState == 1){
               that.drawerclickState=0;
@@ -1069,11 +1177,14 @@ ElMessageBox.confirm(
       },
       drawerchandleSelectionChange(val) {
         var courseId = [];
+        var courseIndex = [];
         this.drawermultipleSelection = val;
         console.log('选中的信息：',val);
         val.forEach(function(course){
           let res = course.courseId;
+          let index = course.index;
           courseId.push(res);
+          courseIndex.push(index);
         });
         this.drawernumSelected = this.drawermultipleSelection.length;
         if(this.drawerclickState != 1){
@@ -1086,7 +1197,8 @@ ElMessageBox.confirm(
             this.drawercloseShow = !this.drawercloseShow;
         }
         this.drawercourseId = courseId;
-        console.log('courseId:',this.drawercourseId);
+        this.drawerCourseIndex = courseIndex;
+        console.log('courseId:',this.drawercourseId,'courseIndex:',this.drawerCourseIndex);
         this.getBaseCourseDictforProgram();
       },
   toggleSelection(rows) {
@@ -1123,7 +1235,7 @@ ElMessageBox.confirm(
     let count=0;
     
     if(majorId){
-      realurl = '/detailMajor/list';//通过majorId来显示已经添加的detail，可以获取到courseId
+      realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       return request({
             url:realurl+'?'+'majorId='+this.majorId,
             method:'get',
@@ -1162,11 +1274,11 @@ ElMessageBox.confirm(
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
-            course.courseName=(course.courseName) ? '' : course.courseName.trim();
-            course.courseCode=(course.courseCode) ? '' : course.courseCode.trim();
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
             course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
             course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.remark = '';
+            course.remark = '';//用remark来判断是否选课
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.trueversionId = course.versionId;
@@ -1181,7 +1293,7 @@ ElMessageBox.confirm(
               try{
                  
               courses.forEach(function(course){
-                console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+                // console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
                 if(!course.remark){
                   
                 if(courseInfo.courseId == course.courseId ){
@@ -1204,7 +1316,9 @@ ElMessageBox.confirm(
           
             that.tableData = courses;
             that.result = res;
-          
+            if(pageSize>=res.total){
+              that.showLoadmore = false;
+            }
           
           
         }).then(function(){
@@ -1247,6 +1361,26 @@ mounted:function(){
 </script>
 
 <style scoped> 
+:deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
+}
+:deep().el-icon svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().el-icon {
+  height: 18px;
+  width: 18px;
+}
+
+.row-style{
+  padding-top:5px
+}
 .el-checkbox__input.is-disabled{
     background-color: #0e5cd0;
 }
@@ -1285,14 +1419,14 @@ mounted:function(){
   margin-bottom: 0;
 }
 .searchIndrawer{
-  border: 0;
-  
-  margin-bottom: 10%;
-  padding-bottom: 30px;
+position:relative;
+top:0px;
+border-bottom:none;
+left:-46px;
 }
 .drawerdeleteButton{
   float:right;
-  margin-right: 10px;
+  margin-left: 30px;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1306,7 +1440,7 @@ mounted:function(){
     margin-bottom: 13px;
     position: relative;
     padding: 6px 6px 5px 5px;
-    border-bottom: 1px solid #d0d0d0;
+    /* border-bottom: 1px solid #d0d0d0; */
     background-color: transparent;
 }
 .numSelectedTeacher{
@@ -1422,7 +1556,6 @@ mounted:function(){
   
 }
 .m-3{
-  
   float: right;
   top: 6px;
   right: 10%;
