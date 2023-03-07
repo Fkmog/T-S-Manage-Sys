@@ -989,7 +989,7 @@
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
               if(course.bcDetails.length){
-                console.log('courseName: ',course.courseName)
+                
                 for(let i=0;i<course.bcDetails.length;i++){
                   if(course.bcDetails[i].versionId == that.currentVersionValue){
                     course.versionId = true;
@@ -1053,7 +1053,7 @@
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
               if(course.bcDetails.length){
-                console.log('courseName: ',course.courseName)
+                
                 for(let i=0;i<course.bcDetails.length;i++){
                   if(course.bcDetails[i].versionId == that.currentVersionValue){
                     course.versionId = true;
