@@ -27,7 +27,6 @@
             show-password
             clearable
             style="margin-top: 10px"
-            v-on:keyup.enter="userLogin()"
           >
             <template #prefix>
               <el-icon><lock /></el-icon>

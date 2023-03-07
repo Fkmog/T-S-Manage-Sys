@@ -33,9 +33,20 @@
         </div>
       </div>
     </template>
+    <template #assignBtn>
+      <div class="assignBtn" v-show="showAdd">
+        <el-button style="color: #6573c0" text @click="assignDetail()">
+          <el-icon :size="18" color="#6573c0"><Plus /></el-icon>
+          分配课程大纲
+        </el-button>
+      </div>
+    </template>
   </HeaderSearch>
   <!-- 添加教学班按钮 -->
-  <addBtn @click="addVisible = true"></addBtn>
+  <addBtn
+    v-show="identity === '学院管理员'"
+    @click="addVisible = true"
+  ></addBtn>
   <!-- 弹出新建表单 -->
   <div>
     <el-dialog
@@ -238,13 +249,44 @@
       </template>
     </el-dialog>
   </div>
+  <!-- 弹出分配课程大纲 -->
+  <div class="assignDialog">
+    <el-dialog
+      v-model="isAssign"
+      title="分配课程大纲"
+      width="330px"
+      :show-close="false"
+      :align-center="true"
+    >
+      <el-select
+        v-model="assignedDetail"
+        style="width: 250px; margin-left: 20px"
+        placeholder="选择课程大纲"
+      >
+        <el-option
+          v-for="(datail, index) in detailList"
+          :key="index"
+          :label="datail.versionInfo"
+          :value="datail.detailId"
+        >
+        </el-option>
+      </el-select>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="isAssign = false">取消</el-button>
+          <el-button type="primary" @click="confirmAssign()"> 确定 </el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
   <!-- 教学班展示列表 -->
   <el-table
     ref="multipleTable"
     class="classesTable"
     :data="classTable"
-    style="width: 1530px"
     @selection-change="handleSelectionChange"
+    style="width: 1530px"
+    :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -258,8 +300,14 @@
       height: '60px',
     }"
     highlight-current-row
+    :row-key="rowKey"
   >
-    <el-table-column width="50" type="selection" :selectable="canSelect" />
+    <el-table-column
+      type="selection"
+      width="50"
+      :selectable="canSelect"
+      :reserve-selection="true"
+    />
     <el-table-column prop="className" label="课程名" width="230" />
     <el-table-column prop="teacherName" label="任课教师" width="160" />
     <el-table-column prop="courseCode" label="课程号" width="200" />
@@ -269,38 +317,36 @@
     <el-table-column prop="remark" label="备注" width="160" />
     <el-table-column width="150">
       <template #default="scope">
-        <el-tooltip content="修改" :hide-after="0">
-          <el-button
-            link
-            style="color: #3f51b5"
-            @click="editClass(scope.$index, scope.row)"
-            ><el-icon><Edit /></el-icon
-          ></el-button>
-        </el-tooltip>
-        <el-tooltip content="删除" :hide-after="0">
-          <el-button
-            link
-            style="color: #3f51b5"
-            @click="deleteClass(scope.$index, scope.row)"
-            ><el-icon><Delete /></el-icon
-          ></el-button>
-        </el-tooltip>
+        <el-row>
+          <el-col :span="8">
+            <el-tooltip content="修改" :hide-after="0">
+              <el-button
+                link
+                style="color: #3f51b5"
+                @click="editClass(scope.$index, scope.row)"
+                ><el-icon><Edit /></el-icon
+              ></el-button>
+            </el-tooltip>
+          </el-col>
+          <el-col :span="12" v-show="identity === '学院管理员'">
+            <el-tooltip content="删除" :hide-after="0">
+              <el-button
+                link
+                style="color: #3f51b5"
+                @click="deleteClass(scope.$index, scope.row)"
+                ><el-icon><Delete /></el-icon
+              ></el-button>
+            </el-tooltip>
+          </el-col>
+        </el-row>
       </template>
     </el-table-column>
   </el-table>
   <!-- 分页 -->
-
-  <div class="container">
-    <el-pagination
-      v-model:current-page="currentPage"
-      @current-change="handleCurrentChange"
-      class="pagination"
-      :page-size="pageSize"
-      layout="total, prev, pager, next"
-      :total="total"
-      hide-on-single-page
-    >
-    </el-pagination>
+  <div class="pagination-container" flex>
+    <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
+      <el-button v-show="showLoadmore" @click="loadMore()">加载更多</el-button>
+    </el-row>
   </div>
 </template>
 
@@ -310,8 +356,10 @@ import { getClass, addClass, editClass } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
-import { Edit, Delete, DocumentAdd } from "@element-plus/icons-vue";
+import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
+import { getDetails, assign } from "@/api/basecourse";
+
 export default {
   name: "Class",
   components: {
@@ -319,10 +367,19 @@ export default {
     addBtn,
     Edit,
     Delete,
-    DocumentAdd,
+    Plus,
   },
   data() {
     return {
+      showLoadmore: true,
+      isAssign: false,
+      showAdd: false,
+      detailList: [],
+      assignedDetail: "",
+      multipleSelection: [],
+      selectedCourseId: "",
+      canSelectAll: true,
+      identity: "",
       searchTeacher: "",
       allTeachers: [],
       classTable: [],
@@ -375,16 +432,16 @@ export default {
           { required: true, message: "请选择开课学期", trigger: "change" },
         ],
       },
-      currentPage: 1,
-      pageSize: 20,
+      pageNum: 1,
+      pageSize: 8,
       total: 0,
-      multipleSelection: [],
     };
   },
   mounted() {
     //设置默认当前学院/专业等信息
     this.currentInfo.departmentId = this.$store.state.currentInfo.departmentId;
     this.currentInfo.schoolId = this.$store.state.currentInfo.schoolId;
+    this.identity = this.$store.state.currentInfo.identity;
     this.getDictionary();
   },
   computed: {
@@ -396,6 +453,9 @@ export default {
     },
     teacherEditChange() {
       return this.classEditForm.instructor;
+    },
+    multipleSelectionChange() {
+      return this.multipleSelection;
     },
   },
   watch: {
@@ -424,6 +484,19 @@ export default {
           this.goSearch(this.classEditForm.instructor);
         } else {
           this.allTeachers = [];
+        }
+      },
+    },
+    multipleSelectionChange: {
+      deep: true,
+      handler(value) {
+        if (value.length > 0) {
+          this.assignedDetail = "";
+          this.getDetailList();
+          this.showAdd = true;
+        } else {
+          this.assignedDetail = "";
+          this.showAdd = false;
         }
       },
     },
@@ -462,12 +535,17 @@ export default {
         this.chosenSemester,
         this.currentInfo.departmentId,
         this.pageSize,
-        this.currentPage
+        this.pageNum
       ).then((res) => {
         console.log("getClassList", res);
         if (res.code == 200) {
           this.classTable = res.rows;
           this.total = res.total;
+          if (this.pageSize >= res.total) {
+            this.showLoadmore = false;
+          } else {
+            this.showLoadmore = true;
+          }
           if (this.classTable.length > 0) {
             for (let i = 0; i < this.classTable.length; i++) {
               this.academicYear.forEach((year) => {
@@ -512,29 +590,27 @@ export default {
     //编辑教学班
     editClass(index, row) {
       console.log("index", index, "row", row);
-      let rowInfo = JSON.parse(JSON.stringify(row));
-
       this.academicYear.forEach((year) => {
-        if (year.dictLabel == rowInfo.academicYear) {
-          rowInfo.academicYear = year.dictValue;
+        if (year.dictLabel == row.academicYear) {
+          row.academicYear = year.dictValue;
         }
       });
       this.semester.forEach((semester) => {
-        if (semester.dictLabel == rowInfo.semester) {
-          rowInfo.semester = semester.dictValue;
+        if (semester.dictLabel == row.semester) {
+          row.semester = semester.dictValue;
         }
       });
       //修改表单信息初始化
-      this.classEditForm.className = rowInfo.className;
-      this.classEditForm.instructor = rowInfo.teacherName;
-      this.classEditForm.courseCode = rowInfo.courseCode;
-      this.classEditForm.identifier = rowInfo.identifier;
-      this.classEditForm.chosenYear = rowInfo.academicYear;
-      this.classEditForm.chosenSemester = rowInfo.semester;
-      this.classEditForm.remark = rowInfo.remark;
-      this.classEditForm.classId = rowInfo.classId;
-      this.classEditForm.teacherName = rowInfo.teacherName;
-      this.classEditForm.teacherNumber = rowInfo.teacherNumber;
+      this.classEditForm.className = row.className;
+      this.classEditForm.instructor = row.teacherName;
+      this.classEditForm.courseCode = row.courseCode;
+      this.classEditForm.identifier = row.identifier;
+      this.classEditForm.chosenYear = row.academicYear;
+      this.classEditForm.chosenSemester = row.semester;
+      this.classEditForm.remark = row.remark;
+      this.classEditForm.classId = row.classId;
+      this.classEditForm.teacherName = row.teacherName;
+      this.classEditForm.teacherNumber = row.teacherNumber;
       this.editVisible = true;
     },
     //提交修改教学班信息
@@ -563,6 +639,7 @@ export default {
         this.classTable.pop(row);
       });
     },
+    //远程模糊搜索教师
     goSearch(searchTeacher) {
       this.allTeachers = [];
       // console.log("@", searchTeacher);
@@ -575,7 +652,6 @@ export default {
         this.allTeachers = res.data;
       });
     },
-    //远程模糊搜索教师
     querySearch(queryString, cb) {
       var allTeachers = this.allTeachers;
       if (allTeachers.length > 0) {
@@ -594,19 +670,94 @@ export default {
     createStateFilter(queryString) {
       return (state) => {
         return;
+        state.value.toUpperCase().match(queryString.toUpperCase());
       };
     },
+    // 多选框设置
     handleSelectionChange(val) {
-      console.log(val, "nihjaop ");
+      this.multipleSelection = val;
+      // console.log(this.multipleSelection);
+      if (this.multipleSelection.length > 0) {
+        this.selectedCourseId = this.multipleSelection[0].courseId;
+        // console.log("this.selectedCourseId", this.selectedCourseId);
+        this.canSelectAll = false;
+      } else {
+        this.selectedCourseId = "";
+        this.canSelectAll = true;
+      }
     },
-    canSelect(row) {
-      // console.log(row);
-      if (row.courseCode == '123') {
-        return false;
+    //disable控制
+    canSelect(row, index) {
+      if (this.selectedCourseId == "") {
+        return true;
+      } else {
+        if (row.courseId == this.selectedCourseId) {
+          return true;
+        } else {
+          return false;
+        }
       }
-      else{
-        return true
+    },
+    //视图控制
+    cellClass(row) {
+      if (this.canSelectAll && row.columnIndex == 0) {
+        return "DisableSelection";
       }
+    },
+    //获取detailId列表
+    getDetailList() {
+      getDetails(
+        this.multipleSelection[0].courseId,
+        this.currentInfo.departmentId,
+        this.currentInfo.schoolId
+      ).then((res) => {
+        // console.log("getDetailList", res);
+        this.detailList = res.rows;
+        this.detailList.forEach((item) => {
+          item.versionInfo = item.courseName + "-" + item.versionName;
+        });
+      });
+    },
+    //分配课程大纲
+    assignDetail() {
+      // console.log("123", this.multipleSelection);
+      this.isAssign = true;
+    },
+    confirmAssign() {
+      console.log("confirmAssign");
+      // console.log("@#",this.assignedDetail,this.multipleSelection);
+      this.multipleSelection.forEach((item) => {
+        item.detailId = this.assignedDetail;
+      });
+      assign(this.multipleSelection).then((res) => {
+        // console.log("assign",res);
+        if (res.code == 200) {
+          this.isAssign = false;
+          ElMessage({
+            type: "success",
+            message: "分配成功",
+            duration: 1000,
+          });
+        } else {
+          ElMessage({
+            type: "error",
+            message: "分配失败",
+            duration: 1000,
+          });
+        }
+      });
+    },
+    loadMore() {
+      if (this.total - this.pageSize >= 10) {
+        this.pageSize += 10;
+        this.getClassList();
+      } else {
+        this.pageSize += this.total - this.pageSize;
+        this.getClassList();
+      }
+    },
+    rowKey(row) {
+      return row.classId;
     },
   },
 };
@@ -624,12 +775,19 @@ export default {
   width: 300px;
   margin-top: 10px;
 }
+.assignBtn {
+  position: absolute;
+  right: 20%;
+  width: 300px;
+  margin-top: 12px;
+}
 .selects {
   display: flex;
   flex-direction: row;
 }
 .selecter {
   margin-left: 15px;
+  width:120px
 }
 :deep().el-dialog__title {
   color: #808080;
@@ -663,5 +821,23 @@ export default {
 :deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
+}
+:deep().el-checkbox__input.is-disabled .el-checkbox__inner {
+  cursor: default;
+}
+.el-table :deep().DisableSelection .cell .el-checkbox__inner {
+  display: none;
+}
+:deep().el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow:0 0 0 0px;
+  border-radius: 0;
+}
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper{
+  box-shadow: 0 0 0 0px;
 }
 </style>

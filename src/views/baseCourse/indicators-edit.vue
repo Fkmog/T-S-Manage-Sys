@@ -42,19 +42,18 @@
       </el-row>
     </div>
     <div class="body">
-      <el-tabs class="major-tab" v-model="chosenMajor" 
-        @tab-change="tabChange()"
-      
-      >
+      <el-tabs class="major-tab">
         <el-tab-pane
+          v-model="chosenMajor"
           v-for="(major, index1) in majorList"
           :key="major.majorId"
-          :label="major.programVersion"
+          :label="major.majorName"
         >
           <div class="card">
             <span style="color: grey; font-size: 14px; margin-top: 20px"
               >毕业要求指标点</span
             >
+
             <div
               class="attribute"
               v-for="(indicator, index2) in major.indicators"
@@ -289,7 +288,7 @@ export default {
       searchValue: "",
       allIndicators: [],
       newIndicator: false,
-      chosenMajor: "0",
+      chosenMajor: '',
       course: {
         name: "",
         detailId: Number,
@@ -297,8 +296,7 @@ export default {
         schoolId: Number,
       },
       majorList: [],
-      currentProgramId: "",
-      programIdList: [],
+      programId: Number,
       index1: Number, //确定哪一专业
       index2: Number, //确定哪一指标点
       dialogFormVisible: false,
@@ -309,28 +307,15 @@ export default {
       wrongNum: 0,
     };
   },
-  computed: {
-    currentProgramIdChange() {
-      return this.currentProgramId;
-    },
-  },
-  watch: {
-    currentProgramIdChange: {
-      deep: true,
-      handler(value) {
-        this.checkPullIndicators();
-      },
-    },
-  },
   mounted() {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
-    // this.programId = this.$store.state.major.programId;
+    this.programId = this.$store.state.major.programId;
     this.chosenMajor = this.$store.state.baseCourseDetailProgram.majorNum;
-    // console.log("##",this.chosenMajor,typeof(this.chosenMajor));
     this.checkMajors();
+    this.checkPullIndicators();
     this.checkObjectives();
   },
   methods: {
@@ -398,10 +383,6 @@ export default {
         for (let i = 0; i < this.majorList.length; i++) {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
-            this.majorList[i].programVersion =
-              this.majorList[i].majorName + "-" + this.majorList[i].enrollyear;
-            this.programIdList[i]=this.majorList[i].programId;
-            // console.log("@###",this.programIdList);
           });
         }
         this.checkIndicators();
@@ -442,8 +423,6 @@ export default {
               item.isEditWeight = false;
             });
           });
-          this.currentProgramId = this.programIdList[this.chosenMajor];
-          this.checkPullIndicators();
         });
       }
     },
@@ -462,6 +441,14 @@ export default {
             }
           });
         }
+        // this.objectives.forEach((object) => {
+        //   object.assessmentMethods.forEach((assessment) => {
+        //     //处理select选择器所需要的数据结构
+        //     assessment.activities.itemObject = assessment.activities.item.map(
+        //       (item) => ({ value: item })
+        //     );
+        //   });
+        // });
         console.log("objectives:", this.objectives);
       });
     },
@@ -544,9 +531,9 @@ export default {
         } else {
           newIndicator.id = newIndicator.id + "0" + i[1];
         }
-        console.log("#", newIndicator);
+        console.log("#",newIndicator);
         this.majorList[index1].indicators.push(newIndicator);
-        console.log("##", this.majorList[index1]);
+        console.log("##",this.majorList[index1]);
 
         this.newIndicator = false;
         this.searchValue = "";
@@ -558,14 +545,14 @@ export default {
     },
     //查询新增指标点列表
     checkPullIndicators() {
-      getPullIndicator(this.currentProgramId).then((res) => {
+      getPullIndicator(this.programId).then((res) => {
         console.log("getPullIndicator", res);
-        this.allIndicators[this.chosenMajor] = res.data;
+        this.allIndicators = res.data;
       });
     },
     //远程查询实现
     querySearch(queryString, cb) {
-      var allIndicators = this.allIndicators[this.chosenMajor];
+      var allIndicators = this.allIndicators;
       var results = queryString
         ? allIndicators.filter(this.createStateFilter(queryString))
         : allIndicators;
@@ -644,12 +631,6 @@ export default {
         // console.log("~",this.majorList[this.index1].indicators[this.index2].supportMethodVos);
         this.dialogFormVisible = false;
       }
-    },
-     //切换tab
-    tabChange() {
-      this.currentProgramId = this.programIdList[this.chosenMajor];
-      console.log(this.programIdList);
-      console.log("tab", 'currentProgramId',this.currentProgramId,'chosen',this.chosenMajor);
     },
   },
 };

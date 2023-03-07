@@ -38,7 +38,16 @@
         
       </el-col>
       <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
+      <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
+        <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
+        
+      </el-col>
+      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
         <el-button @click="this.addPrincipal()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
+        
+      </el-col>
+      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
+        <el-button @click="this.deleteRespondent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
         
       </el-col>
       <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
@@ -47,6 +56,7 @@
       </el-col>
     </el-row>
   </div>
+    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
       <addBtn @click="dialogFormVisible = true"></addBtn>
       <div class="el-table-container" layout="column" flex layout-align="start center" >
@@ -105,6 +115,8 @@
             <template #default="scope">
               <div style="display: flex; align-items: center" >
                 <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+              <div style="display: flex; align-items: center" >
+                <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
               </div>
             </template>
           </el-table-column>
@@ -112,6 +124,13 @@
          
           <el-table-column  label="操作" >
             <template #default="scope">
+             
+                <el-tooltip  content="删除课程" >
+                  <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+                </el-tooltip>
+             
+              
+
              
                 <el-tooltip  content="删除课程" >
                   <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
@@ -1022,6 +1041,14 @@
                   });
                   // course.respondentName = teacherName;
                 
+                
+                  // let teacherName =[];
+                  course.respondentInfos.forEach(function(respondent){
+                    course.respondentName = respondent.respondentName;
+                    // teacherName.push(respondent.respondentName);
+                  });
+                  // course.respondentName = teacherName;
+                
               }
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
@@ -1058,6 +1085,11 @@
             console.log('department:',that.departmentId,'schoolId:',that.schoolId,'currentVersionValue',that.currentVersionValue);
             res.rows.forEach(function(course){
               
+              course.courseName= course.courseName;
+              course.courseCode= course.courseCode;
+              course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+              course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+              course.credit=course.credit;
               course.courseName= course.courseName;
               course.courseCode= course.courseCode;
               course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';

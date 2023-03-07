@@ -100,17 +100,14 @@ export default {
         },
         {
           value: "教学班",
-          path: "./principalClass",
+          path: "./class",
         },
       ],
     };
   },
-  computed: {
+   computed: {
     currentChange() {
       return this.$store.state.currentInfo;
-    },
-    currentDepartmentChange() {
-      return this.$store.state.currentInfo.departmentId;
     },
   },
   watch: {
@@ -130,15 +127,9 @@ export default {
         // console.log("看我", this.$store.state.currentInfo.identity);
       },
     },
-    currentDepartmentChange: {
-      deep: true,
-      handler(value) {
-        this.activeDisplay1 = 0;
-        this.activeDisplay2 = 0;
-      },
-    },
   },
   mounted() {
+    
     // console.log("看我", this.$store.state.currentInfo.identity);
   },
   methods: {
@@ -159,7 +150,7 @@ export default {
 .pageNav {
   display: flex;
   flex-direction: row;
-  height: 60px;
+  height:60px
 }
 /* 设置所有字体为微软雅黑 */
 * {

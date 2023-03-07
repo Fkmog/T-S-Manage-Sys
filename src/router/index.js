@@ -73,7 +73,8 @@ export default createRouter({
                 }, {
                     path: '/class',
                     component: Class,
-                    meta: { isMajor: false }
+                    meta: { isMajor: false },
+                    name:'Class'
                 }, {
                     path: '/teacher',
                     component: Teacher,
