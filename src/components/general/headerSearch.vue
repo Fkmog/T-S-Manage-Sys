@@ -20,6 +20,7 @@
       </div>
       <!-- 右侧时间选择插槽 -->
       <slot name="rightTime" class="rightSlot"></slot>
+      <slot name="assignBtn" class="assignBtn"></slot>
     </div>
   </div>
 </template>

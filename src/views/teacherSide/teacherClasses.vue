@@ -43,6 +43,22 @@ export default {
     this.getClassesList();
   },
 
+  //   computed: {
+  //     currentChange() {
+  //       return this.$store.state.currentInfo;
+  //     },
+  //   },
+
+  //   watch: {
+  //     // 监视currentInfo
+  //     currentChange: {
+  //       deep: true,
+  //       handler(value) {
+  //         this.currentDepartmentId = this.$store.state.currentInfo.departmentId;
+  //         this.getMajorList(this.currentDepartmentId);
+  //       },
+  //     },
+  //   },
 
   methods: {
     //获取课程列表
@@ -60,6 +76,86 @@ export default {
       this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
       this.$router.push({ name: "TeacherClass" });
     },
+    //     //增加专业
+    //     addMajor() {
+    //       ElMessageBox.prompt("专业名称：", "新建专业", {
+    //         confirmButtonText: "确认",
+    //         cancelButtonText: "取消",
+    //         //校验规则
+    //         inputPattern: /^.+$/,
+    //         inputErrorMessage: "请输入新增专业名称",
+    //       })
+    //         .then(({ value }) => {
+    //           let addMajorName = value;
+    //           ElMessage({
+    //             type: "success",
+    //             message: `成功新建专业:${value}`,
+    //             duration: 1000,
+    //           });
+    //           addMajor(addMajorName, this.currentDepartmentId).then((res) => {
+    //             console.log("addMajor", res);
+    //             this.getMajorList();
+    //           });
+    //         })
+    //         .catch(() => {
+    //           ElMessage({
+    //             type: "info",
+    //             message: "取消增加专业",
+    //             duration: 1000,
+    //           });
+    //         });
+    //     },
+    //     //删除专业
+    //     deleteMajor(majorId, majorName) {
+    //       ElMessageBox.confirm("是否确定删除" + majorName + "专业？", "", {
+    //         confirmButtonText: "确认",
+    //         cancelButtonText: "取消",
+    //         type: "warning",
+    //       }).then(() => {
+    //         deleteMajor(majorId)
+    //           .then((res) => {
+    //             console.log("deleteMajor", res);
+    //             this.getMajorList(this.currentDepartmentId);
+    //             ElMessage({
+    //               type: "success",
+    //               message: "删除成功",
+    //               duration: 1000,
+    //             });
+    //           })
+    //           .catch(() => {});
+    //       });
+    //     },
+    //     //修改专业
+    //     changeMajor(majorId) {
+    //       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
+    //         confirmButtonText: "确认",
+    //         cancelButtonText: "取消",
+    //         //校验规则
+    //         inputPattern: /^.+$/,
+    //         inputErrorMessage: "请输入修改后的专业名称",
+    //       })
+    //         .then(({ value }) => {
+    //           let changeMajorName = value;
+    //           ElMessage({
+    //             type: "success",
+    //             message: `成功修改专业名称:${value}`,
+    //             duration: 1000,
+    //           });
+    //           changeMajor(changeMajorName, majorId, this.currentDepartmentId).then(
+    //             (res) => {
+    //               console.log("changeMajor", res);
+    //               this.getMajorList();
+    //             }
+    //           );
+    //         })
+    //         .catch(() => {
+    //           ElMessage({
+    //             type: "info",
+    //             message: "取消修改专业",
+    //             duration: 1000,
+    //           });
+    //         });
+    //     },
   },
 };
 </script>

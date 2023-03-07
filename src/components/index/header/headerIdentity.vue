@@ -102,7 +102,7 @@ export default {
         this.$router.replace("teacherClasses");
       }
       if (identity.roleName == "课程负责人") {
-        this.$router.replace("principalBaseCourse");
+        this.$router.replace("BaseCourse");
       }
     },
   },

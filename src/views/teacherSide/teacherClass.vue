@@ -21,7 +21,7 @@
       </el-tooltip>
       <div class="title">全部课程</div>
       <el-divider class="divider" direction="vertical" />
-      <!-- <el-tooltip
+      <el-tooltip
         class="box-item"
         effect="dark"
         content="学生"
@@ -37,7 +37,7 @@
         >
           <Avatar />
         </el-icon>
-      </el-tooltip> -->
+      </el-tooltip>
       <el-tooltip
         class="box-item"
         effect="dark"
@@ -72,7 +72,7 @@
           <Checked />
         </el-icon>
       </el-tooltip>
-      <!-- <el-tooltip
+      <el-tooltip
         class="box-item"
         effect="dark"
         content="下载报告"
@@ -87,7 +87,7 @@
         >
           <Download />
         </el-icon>
-      </el-tooltip> -->
+      </el-tooltip>
     </el-row>
   </div>
   <div class="body">
@@ -111,11 +111,11 @@
         <el-row style="margin-top: 15px">
           <el-col :span="12" style="margin-top: 10px">
             <div class="detail-title">学年</div>
-            <div class="detail-info">{{ classInfo.academicYear }}</div>
+            <div class="detail-info">{{classInfo.academicYear}}</div>
           </el-col>
           <el-col :span="6" style="margin-top: 10px">
             <div class="detail-title">学期</div>
-            <div class="detail-info">{{ classInfo.semester }}</div>
+            <div class="detail-info">{{classInfo.semester}}</div>
           </el-col>
         </el-row>
       </el-col>
@@ -132,7 +132,6 @@ import {
   Download,
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
-import request from "@/utils/request/request";
 
 export default {
   name: "TeacherClass",
@@ -152,11 +151,9 @@ export default {
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    
     console.log("classInfo", this.classInfo);
-    this.$store.commit("course/setCourseName", this.classInfo.courseName);
-    this.$store.commit("course/setCourseId", this.classInfo.courseId);
-    this.getDetail();
-    this.getDictionary();
+    this.getDictionary()
   },
   methods: {
     //返回教师端首页
@@ -179,29 +176,6 @@ export default {
     toObjectives() {
       this.$router.push({
         name: "Objectives",
-      });
-    },
-    // 获取detailId
-    getDetail() {
-      let that = this;
-      return request({
-        url:
-          "/detail/list" +
-          "?vesionId=" +
-          this.versionId +
-          "&courseId=" +
-          this.courseId,
-        method: "get",
-      }).then(function (res) {
-        console.log("getDetail:", res);
-        res.rows.forEach(function (detail) {
-          if (detail.versionId == that.versionId) {
-            that.detailId = detail.detailId;
-          }
-        });
-        console.log("detailId", that.detailId);
-        that.$store.commit("course/setDetailId", that.detailId);
-        // that.getMajorId();
       });
     },
     //获取数据字典

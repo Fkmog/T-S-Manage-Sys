@@ -218,6 +218,19 @@ export default {
         this.checkProgram();
       });
     },
+    // //查询毕业要求
+    // checkRequirement() {
+    //   checkRequirement(this.programId).then((res) => {
+    //     console.log("checkRequirement", res);
+    //     this.requirements = res.data;
+    //     console.log("requirements", this.requirements);
+    //     if (this.requirements.length == 0) {
+    //       this.hasAttribute = false;
+    //     } else {
+    //       this.hasAttribute = true;
+    //     }
+    //   });
+    // },
   },
 };
 </script>
@@ -332,4 +345,9 @@ export default {
   margin: 20px;
   margin-left: 30px;
 }
+/* :deep().el-input__wrapper {
+  background-color: transparent;
+  border: 0;
+  box-shadow:0 0 0 0px;
+} */
 </style>

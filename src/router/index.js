@@ -67,11 +67,13 @@ export default createRouter({
                 {
                     path: '/baseCourse',
                     component: BaseCourse,
-                    meta: { isMajor: false }
+                    meta: { isMajor: false },
+                    name:'BaseCourse'
                 }, {
                     path: '/class',
                     component: Class,
-                    meta: { isMajor: false }
+                    meta: { isMajor: false },
+                    name:'Class'
                 }, {
                     path: '/teacher',
                     component: Teacher,
@@ -234,11 +236,13 @@ export default createRouter({
         {
             path: '/principalIndex',
             component: PrincipalIndex,
-            children: [{
-                name: "principalBaseCourse",
-                path: '/principalBaseCourse',
-                component: PrincipalBaseCourse
-            }, {
+            children: [
+            //     {
+            //     name: "principalBaseCourse",
+            //     path: '/principalBaseCourse',
+            //     component: PrincipalBaseCourse
+            // }, 
+            {
                 name: "principalClass",
                 path: '/principalClass',
                 component: PrincipalClass

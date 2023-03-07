@@ -24,14 +24,49 @@
       </template>
     </HeaderSearch>
   </div>
+
+  <div v-show="closeShow" class="submenu" >
+    <el-row>
+      <el-col :span="6" class="columnstyle">
+        <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
+      </el-col>
+      <el-col :span="6" class="columnstyle">
+        <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
+      </el-col>
+      <el-col :span="6" class="columnstyle">
+        <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
+        
+      </el-col>
+    </el-row>
+  </div>
+
   <div layout="row" flex class="md-padding" >
       
       <!-- <addBtn @click="dialogFormVisible = true"></addBtn> -->
       
       <div class="el-table-container" layout="column" flex layout-align="start center" >
         
-        <el-table :data="tableData"  ref="multipleTable" style="width: 100%" @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-          
+        <el-table 
+        :data="tableData"  
+        ref="multipleTable" 
+        style="width: 100%" 
+        @selection-change="handleSelectionChange" 
+        @row-dblclick="editTrigger"
+        :header-cell-style="{
+      'padding-left': '20px',
+      'font-size': '14.4px',
+      height: '48px',
+      'font-weight': 'bold',
+      color: 'black',
+    }"
+    :cell-style="{
+      'padding-left': '20px',
+      'font-size': '16px',
+      height: '60px',
+    }"
+        >
+          <el-table-column width="80" type="selection" >
+            </el-table-column>
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
@@ -132,18 +167,7 @@
       </template>
     </el-dialog>
 
-
-    <div class="pagination-container" flex>
-      <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          class="pagination"
-          :page-sizes="[10, 15]"
-          :page-size="10"
-          layout="total,sizes,prev, pager, next, jumper"
-          :total="result.total">
-        </el-pagination>
-    </div>
+    
 
 
 </template>
@@ -162,7 +186,16 @@ export default {
   name: "PrincipalBaseCourse",
   data() {
     return {
-
+      //remoteDetail
+      remoteDetail:[],
+      //DetailForm
+      detailForm:[],
+      //loading
+      loading:false,
+      //showSetDetailPage
+      showSetDetailPage:false,
+      //selectedDetail
+      selectedDetail:'',
       //form rules
       rules: {
         courseName: [
@@ -222,10 +255,23 @@ export default {
         value:8,
         label:'2023级'
       },
+      {
+        value:9,
+        label:'2024级'
+      },
+      {
+        value:10,
+        label:'2025级'
+      },
+      {
+        value:11,
+        label:'2026级'
+      },
       ],
       versionLabel:[
       '2016级','2017级','2018级',
-      '2019级','2020级','2021级','2022级','2023级'
+      '2019级','2020级','2021级','2022级','2023级',
+      '2024级','2025级','2026级'
       ],
       // basecourseTable: [],
       rules: {
@@ -278,6 +324,7 @@ export default {
     pageNum:ref(1),
     departmentId:'',
     schoolId:'',
+    userId:'',
     dialogFormVisible:ref(false),
     dialogFormVisible1:ref(false),
     formLabelWidth : '140px',
@@ -310,11 +357,39 @@ export default {
 
     };
   },
-  mounted() {
-    
-  },
   methods: {
-     //清除输入课程信息
+    //获取detail信息
+    getDetailInfo(){
+      let that = this;
+      return request({
+        url:'',
+        method:'get',
+        params:{
+          schoolId:this.schoolId,
+          departmentId:this.departmentId
+        }
+      })
+    },
+    //remoteMethod
+    remoteMethod(){
+      if (query !== '') {
+          this.loading = true;
+          setTimeout(() => {
+            this.loading = false;
+            this.detailForm = this.remoteDetail.filter(item => {
+              return item.respondentName
+                .indexOf(query) > -1;
+            });
+          }, 200);
+        } else {
+          this.detailForm = [];
+        }
+    },
+    //setDetail
+    setDetail(){
+
+    },
+    //清除输入课程信息
      resetForm(formName) {
         this.$refs[formName].resetFields();
       },
@@ -478,18 +553,18 @@ export default {
       let that = this;
       let courses = []
       return request({
-              url:'/baseCourse/list',
+              url:'/baseCourse/respondent',
               method:'get',
               params:{
               'pageSize':pageSize,
               'pageNum':pageNum,
-              'versionId':that.currentVersionValue,
+              'userId':that.userId,
               'departmentId':that.departmentId,
               'schoolId':that.schoolId}
           }).then(function(res){
             console.log('courseDetails:',res);
-            console.log('department:',that.departmentId,'schoolId:',that.schoolId);
-            res.rows.forEach(function(course){
+            console.log('department:',that.departmentId,'schoolId:',that.schoolId,'currentVersionValue',that.currentVersionValue);
+            res.data.forEach(function(course){
               
               course.courseName= course.courseName;
               course.courseCode= course.courseCode;
@@ -499,7 +574,20 @@ export default {
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
-              course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
+              if(course.bcDetails.length){
+                console.log('courseName: ',course.courseName)
+                for(let i=0;i<course.bcDetails.length;i++){
+                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                    course.versionId = true;
+                    break;
+                  }
+                  else{
+                    course.versionId = false;
+                  }
+                }
+                
+              };
+              // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
             });
@@ -652,6 +740,7 @@ export default {
     activate(){
               this.departmentId = this.$store.state.currentInfo.departmentId;
               this.schoolId = this.$store.state.currentInfo.schoolId;
+              this.userId = this.$store.state.userInfo.userId;
           },
   },
   created(){
@@ -676,6 +765,30 @@ export default {
 </script>
 
 <style scoped>
+.submenudeleteButton{
+    float:right;
+    margin-top:16px;
+  }
+.columnstyle{
+    height:50px;
+    
+  }
+:deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
+}
+:deep().el-icon svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().el-icon {
+  height: 18px;
+  width: 18px;
+}
   .selectionBar{
     
     position: absolute;
@@ -699,20 +812,16 @@ export default {
   .clearSelected{
     min-height:36px; 
     color: #3f51b5;
-    display: inline-block;
-      position: relative;
-      cursor: pointer;
+    
+     
+      
       min-height: 36px;
       min-width: 88px;
-      line-height: 36px;
-      vertical-align: middle;
+      line-height: 55px;
+     
       align-items: center;
       text-align: center;
       border-radius: 2px;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
       outline: none;
       border: 0;
       padding: 0 6px;
@@ -792,17 +901,16 @@ export default {
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
   .submenu {
-      color: #3f51b5;
-      font-size: 14px;
-      font-weight: 500;
-      height: 44px;
-      min-height: 44px;
-      line-height: 3em;
-      margin-bottom: 13px;
-      position: relative;
-      padding: 6px 96px 5px 32px;
-      border-bottom: 1px solid #d0d0d0;
-      background-color: transparent;
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    height: 55px;
+    position: absolute;
+    top: 110px;
+    left: 0px;
+    width: 100%;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: transparent;
      
   }
   
@@ -814,35 +922,23 @@ export default {
   .numSelectedTeacher{
     min-height:36px; 
     color: #3f51b5;
-    display: inline-block;
+    
       position: relative;
       cursor: pointer;
       min-height: 36px;
       min-width: 88px;
-      line-height: 36px;
-      vertical-align: middle;
-      align-items: center;
-      text-align: center;
+      line-height: 55px;
+    
       border-radius: 2px;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-      outline: none;
+     
       border: 0;
       padding: 0 6px;
       margin: 0;
       background: transparent;
       
-      white-space: nowrap;
-      text-transform: uppercase;
-      font-weight: 500;
-      font-size: 14px;
-      font-style: inherit;
-      font-variant: inherit;
-      font-family: inherit;
-      text-decoration: none;
-      overflow: hidden;
+     
+    
+      
       transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
   }
   

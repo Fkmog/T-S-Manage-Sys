@@ -127,7 +127,7 @@
       return{
         departmentId:'',
         schoolId:'',
-
+        courseId:'',
         detailId:'',
         currentNumberofActivities:0,
   
@@ -151,31 +151,27 @@
         
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: false,
-        rowHeaders: function(index) { // true
-        if (index === 0) {
-          return '成绩项';
-        } else if (index === 1) {
-          return '分值';
-        }
-      },
-      minSpareRows: 0,
-      minSpareCols: 0,
+        rowHeaders: true,
+        rowHeaders: ['成绩项', '分值'],
+        
+      // minSpareRows: 0,
+      // minSpareCols: 0,
         // preventOverflow: "horizontal",
-        manualColumnMove: false,
+        // manualColumnMove: false,
         copyPaste: true,
         colWidths: 52,  // same as .scss
-        copyRowsLimit: 2,
+        // copyRowsLimit: 2,
         maxRows: 2,
         contextMenu: {
           items: {
-            row_above: {
-              name: "在上方插入行",
+            col_left: {
+              name: "在左侧插入列",
             },
-            row_below: {
-              name: "在下方插入行",
+            col_right: {
+              name: "在右侧插入列",
             },
-            remove_row: {
-              name: "删除行",
+            remove_col: {
+              name: "删除列",
             },
           },
         },
@@ -219,6 +215,7 @@
       activate(){
               this.departmentId = this.$store.state.currentInfo.departmentId;
               this.schoolId = this.$store.state.currentInfo.schoolId;
+              this.courseId = this.$store.state.course.baseCourseCourseId;
               this.detailId = this.$store.state.course.detailId;
               this.getActivities();
               console.log('db items:',this.db.items);},
@@ -248,10 +245,13 @@
         }
         else {
           console.log('res has no activities');
-          that.db.items = [[''],['']];
+          var itemDict = {'0':''};
+          var valueDict = {'0':''};
+          that.db.items.push(itemDict);
+          that.db.items.push(valueDict);
               // add two columns (fail column, 1 score column)
-              that.addColumn();
-              that.addColumn();
+              // that.addColumn();
+              // that.addColumn();
           }
       })
     },
@@ -308,6 +308,7 @@
         data:{
         'schoolId':this.schoolId,
         'departmentId': this.departmentId,
+        'courseId':this.courseId,
         'detailId':this.detailId,
         "activities": {
         "item": item,
