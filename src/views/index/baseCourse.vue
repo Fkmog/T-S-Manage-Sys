@@ -112,19 +112,17 @@
          
           <el-table-column  label="操作" >
             <template #default="scope">
-              <div v-show="identity == '学院管理员'">
+             
                 <el-tooltip  content="删除课程" >
                   <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
                 </el-tooltip>
-              </div>
+             
               
 
               <el-tooltip content="修改课程">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
               </el-tooltip>
-              <!-- <el-tooltip content="修改课程负责人">
-                <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
-              </el-tooltip> -->
+             
   
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
@@ -372,7 +370,7 @@
       </template>
     </el-dialog>
 
-    <div class="pagination-container" flex v-show="identity == '学院管理员'">
+    <div class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
         <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
@@ -1001,7 +999,19 @@
               course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
-              
+              if(course.bcDetails.length){
+                
+                for(let i=0;i<course.bcDetails.length;i++){
+                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                    course.versionId = true;
+                    break;
+                  }
+                  else{
+                    course.versionId = false;
+                  }
+                }
+                
+              };
               
               if(course.respondentInfos){
                 
@@ -1016,7 +1026,7 @@
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
-              course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
+              // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
             });
@@ -1046,7 +1056,7 @@
           }).then(function(res){
             console.log('courseDetails:',res);
             console.log('department:',that.departmentId,'schoolId:',that.schoolId,'currentVersionValue',that.currentVersionValue);
-            res.data.forEach(function(course){
+            res.rows.forEach(function(course){
               
               course.courseName= course.courseName;
               course.courseCode= course.courseCode;
@@ -1056,25 +1066,28 @@
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
-              // if(course.bcDetails.length){
-              //   console.log('courseName: ',course.courseName)
-              //   for(let i=0;i<course.bcDetails.length;i++){
-              //     if(course.bcDetails[i].versionId == that.currentVersionValue){
-              //       course.versionId = true;
-              //       break;
-              //     }
-              //     else{
-              //       course.versionId = false;
-              //     }
-              //   }
+              if(course.bcDetails.length){
                 
-              // };
+                for(let i=0;i<course.bcDetails.length;i++){
+                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                    course.versionId = true;
+                    break;
+                  }
+                  else{
+                    course.versionId = false;
+                  }
+                }
+                
+              };
               // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
             });
             that.tableData = courses;
             that.result = res;
+            if(pageSize>=res.total){
+              that.showLoadmore = false;
+            }
           });
       }
       if(identity == '教师'){
