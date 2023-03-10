@@ -51,8 +51,9 @@
       'font-size': '16px',
       height: '60px',
     }"
+    :row-key="rowKey"
       @selection-change="handleSelectionChange">
-        <el-table-column  type="selection" width="55" />
+        <el-table-column  type="selection" width="55" :reserve-selection="true" />
         <el-table-column prop="courseName" label="课程名" width="180" />           
         <el-table-column prop="courseCode" label="课程号" width="180" />
         <el-table-column prop="courseType" label="课程类型" width="180" />
@@ -184,9 +185,9 @@
           ref="drawermultipleTable" 
           style="width: 100%;" 
           @selection-change="drawerchandleSelectionChange" 
-         
+          :row-key="rowKey"
           >
-            <el-table-column width="55" type="selection" :selectable="selectable">
+            <el-table-column width="55" type="selection" :selectable="selectable" :reserve-selection="true">
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
@@ -487,6 +488,9 @@ result:reactive({}),
   }
 },
 methods:{
+  rowKey(row) {
+      return row.courseId;
+    },
   //直接添加课程大纲
   addBaseCourseDetail(row){
       let that = this;

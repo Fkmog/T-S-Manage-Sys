@@ -21,7 +21,7 @@
       </el-tooltip>
       <div class="title">全部课程</div>
       <el-divider class="divider" direction="vertical" />
-      <el-tooltip
+      <!-- <el-tooltip
         class="box-item"
         effect="dark"
         content="学生"
@@ -37,7 +37,7 @@
         >
           <Avatar />
         </el-icon>
-      </el-tooltip>
+      </el-tooltip> -->
       <el-tooltip
         class="box-item"
         effect="dark"
@@ -72,7 +72,7 @@
           <Checked />
         </el-icon>
       </el-tooltip>
-      <el-tooltip
+      <!-- <el-tooltip
         class="box-item"
         effect="dark"
         content="下载报告"
@@ -87,7 +87,7 @@
         >
           <Download />
         </el-icon>
-      </el-tooltip>
+      </el-tooltip> -->
     </el-row>
   </div>
   <div class="body">

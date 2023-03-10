@@ -37,7 +37,7 @@
         <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
         
       </el-col>
-      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
+      
       <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
         <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
         
@@ -56,11 +56,12 @@
       </el-col>
     </el-row>
   </div>
-    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
+   
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
       <addBtn @click="dialogFormVisible = true"></addBtn>
       <div class="el-table-container" layout="column" flex layout-align="start center" >
         <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
+        :filter-change="filterChange"
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -73,8 +74,10 @@
       'font-size': '16px',
       height: '60px',
     }"
-        @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-        <el-table-column width="55" type="selection">
+    :row-key="rowKey"
+    @selection-change="handleSelectionChange"
+    @row-dblclick="editTrigger">
+        <el-table-column width="55" type="selection" :reserve-selection="true">
             </el-table-column>
           <el-table-column  label="课程名" width="250" label-class-name="textbold" >
             <template #default="scope">
@@ -113,8 +116,7 @@
           </el-table-column>
           <el-table-column  label="负责人" width="150" >
             <template #default="scope">
-              <div style="display: flex; align-items: center" >
-                <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+             
               <div style="display: flex; align-items: center" >
                 <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
               </div>
@@ -165,6 +167,7 @@
         style="width: 100%" 
         @selection-change="handleSelectionChange" 
         @row-dblclick="editTrigger"
+        
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -177,8 +180,9 @@
       'font-size': '16px',
       height: '60px',
     }"
+     :row-key="rowKey"
         >
-          <el-table-column width="80" type="selection" >
+          <el-table-column width="80" type="selection" :reserve-selection="true" >
             </el-table-column>
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
@@ -586,6 +590,12 @@
   }, 
   methods: 
   {
+    filterChange(){
+      
+    },
+    rowKey(row) {
+      return row.courseId;
+    },
     //setDetail
     setDetail(){
 
