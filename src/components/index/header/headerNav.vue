@@ -39,6 +39,20 @@
       </ul>
     </div>
   </div>
+  <div v-if="$store.state.currentInfo.identity == 'web管理员'">
+    <div class="pageNav">
+      <ul v-for="(info, index) in infos4" :key="index" class="Navs">
+        <li>
+          <router-link
+            :to="`${info.path}`"
+            @click.capture="show4(index)"
+            :class="activeDisplay4 == index ? 'active1' : ''"
+            >{{ info.value }}</router-link
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -49,6 +63,7 @@ export default {
       activeDisplay1: 0,
       activeDisplay2: 0,
       activeDisplay3: 0,
+      activeDisplay4: 0,
       infos1: [
         {
           value: "专 业",
@@ -103,9 +118,16 @@ export default {
           path: "./class",
         },
       ],
+      infos4: [
+        {
+          value: "学校",
+          path: "./schools",
+        },
+        
+      ],
     };
   },
-   computed: {
+  computed: {
     currentChange() {
       return this.$store.state.currentInfo;
     },
@@ -129,7 +151,6 @@ export default {
     },
   },
   mounted() {
-    
     // console.log("看我", this.$store.state.currentInfo.identity);
   },
   methods: {
@@ -142,6 +163,9 @@ export default {
     show3(index) {
       this.activeDisplay3 = index;
     },
+    show4(index) {
+      this.activeDisplay4 = index;
+    },
   },
 };
 </script>
@@ -150,7 +174,7 @@ export default {
 .pageNav {
   display: flex;
   flex-direction: row;
-  height:60px
+  height: 60px;
 }
 /* 设置所有字体为微软雅黑 */
 * {
