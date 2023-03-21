@@ -116,7 +116,7 @@ export default {
                   }
                   this.$store.getters["currentInfo/changeIsTeacher"]
                   if(this.$store.state.currentInfo.identity =='学院管理员'){
-                  this.$router.replace("/major");}
+                  this.$router.replace("major");}
                    if(this.$store.state.currentInfo.identity =='教师'){
                   this.$router.replace("teacherClasses");}
                    if(this.$store.state.currentInfo.identity =='课程负责人'){
