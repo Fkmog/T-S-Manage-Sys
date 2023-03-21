@@ -37,6 +37,11 @@
         <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
         
       </el-col>
+      
+      <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
+        <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
+        
+      </el-col>
       <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
         <el-button @click="this.addPrincipal()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
         
@@ -45,12 +50,18 @@
         <el-button @click="this.deleteRespondent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
         
       </el-col>
+      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
+        <el-button @click="this.deleteRespondent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
+        
+      </el-col>
     </el-row>
   </div>
+   
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
       <addBtn @click="dialogFormVisible = true"></addBtn>
       <div class="el-table-container" layout="column" flex layout-align="start center" >
         <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
+        :filter-change="filterChange"
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -63,8 +74,10 @@
       'font-size': '16px',
       height: '60px',
     }"
-        @selection-change="handleSelectionChange" @row-dblclick="editTrigger">
-        <el-table-column width="55" type="selection">
+    :row-key="rowKey"
+    @selection-change="handleSelectionChange"
+    @row-dblclick="editTrigger">
+        <el-table-column width="55" type="selection" :reserve-selection="true">
             </el-table-column>
           <el-table-column  label="课程名" width="250" label-class-name="textbold" >
             <template #default="scope">
@@ -103,6 +116,7 @@
           </el-table-column>
           <el-table-column  label="负责人" width="150" >
             <template #default="scope">
+             
               <div style="display: flex; align-items: center" >
                 <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
               </div>
@@ -112,6 +126,13 @@
          
           <el-table-column  label="操作" >
             <template #default="scope">
+             
+                <el-tooltip  content="删除课程" >
+                  <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+                </el-tooltip>
+             
+              
+
              
                 <el-tooltip  content="删除课程" >
                   <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
@@ -146,6 +167,7 @@
         style="width: 100%" 
         @selection-change="handleSelectionChange" 
         @row-dblclick="editTrigger"
+        
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -158,45 +180,52 @@
       'font-size': '16px',
       height: '60px',
     }"
+     :row-key="rowKey"
         >
-          <el-table-column width="80" type="selection" >
+          <el-table-column width="80" type="selection" :reserve-selection="true" >
             </el-table-column>
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseName }}</span>
+                <span >{{ scope.row.courseName }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程号" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseCode }}</span>
+                <span >{{ scope.row.courseCode }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程类型" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseType }}</span>
+                <span >{{ scope.row.courseType }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程性质" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.courseNature }}</span>
+                <span >{{ scope.row.courseNature }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="学分" width="80" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
-                <span>{{ scope.row.credit }}</span>
+                <span >{{ scope.row.credit }}</span>
               </div>
             </template>
           </el-table-column>
-          
+          <el-table-column  label="负责人" width="150" >
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
+              </div>
+            </template>
+          </el-table-column>
          
          
           <el-table-column  label="操作" >
@@ -207,13 +236,18 @@
               <el-tooltip content="修改">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
               </el-tooltip>
+              <el-tooltip content="修改课程负责人">
+                <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
+              </el-tooltip>
   
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
+
               <el-tooltip content="添加信息">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
+
             </template>
           </el-table-column>
           
@@ -556,6 +590,12 @@
   }, 
   methods: 
   {
+    filterChange(){
+      
+    },
+    rowKey(row) {
+      return row.courseId;
+    },
     //setDetail
     setDetail(){
 
@@ -989,7 +1029,7 @@
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
               if(course.bcDetails.length){
-                console.log('courseName: ',course.courseName)
+                
                 for(let i=0;i<course.bcDetails.length;i++){
                   if(course.bcDetails[i].versionId == that.currentVersionValue){
                     course.versionId = true;
@@ -1011,6 +1051,14 @@
                   });
                   // course.respondentName = teacherName;
                 
+                
+                  // let teacherName =[];
+                  course.respondentInfos.forEach(function(respondent){
+                    course.respondentName = respondent.respondentName;
+                    // teacherName.push(respondent.respondentName);
+                  });
+                  // course.respondentName = teacherName;
+                
               }
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
@@ -1021,6 +1069,9 @@
             });
             that.tableData = courses;
             that.result = res;
+            if(pageSize>=res.total){
+              that.showLoadmore = false;
+            }
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
@@ -1049,11 +1100,16 @@
               course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
               course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
               course.credit=course.credit;
+              course.courseName= course.courseName;
+              course.courseCode= course.courseCode;
+              course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+              course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+              course.credit=course.credit;
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
               course.semester=(course.semester == '0') ? '上学期' : '下学期';
               if(course.bcDetails.length){
-                console.log('courseName: ',course.courseName)
+                
                 for(let i=0;i<course.bcDetails.length;i++){
                   if(course.bcDetails[i].versionId == that.currentVersionValue){
                     course.versionId = true;

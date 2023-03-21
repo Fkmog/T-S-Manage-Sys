@@ -11,7 +11,7 @@
             class="searchInput"
             :class="active ? 'activeInput' : ''"
             v-model="searchInput"
-            placeholder="搜索专业名称"
+            :placeholder = "msg"
             @change="sendMessage"
             @focus="active = true"
             @blur="active = false"
@@ -30,7 +30,10 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  props: ["msg"],
+  props: {
+      msg: String,
+      required: true
+    },
   components: {
     Search,
   },
@@ -46,11 +49,7 @@ export default {
       this.msg(this.searchInput);
     },
   },
-  methods: {
-    sendMessage() {
-      this.msg(this.searchInput);
-    },
-  },
+
 };
 </script>
 

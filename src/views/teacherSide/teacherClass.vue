@@ -1,27 +1,28 @@
 <template>
-  <!-- 顶部导航栏 -->
-  <div class="block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="backHome()"
+  <div class="content">
+    <!-- 顶部导航栏 -->
+    <div class="block">
+      <el-row class="block-row">
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="返回"
+          placement="bottom"
+          :hide-after="0"
         >
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <div class="title">全部课程</div>
-      <el-divider class="divider" direction="vertical" />
-      <el-tooltip
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 50px"
+            @click="backHome()"
+          >
+            <Back />
+          </el-icon>
+        </el-tooltip>
+        <div class="title">全部课程</div>
+        <el-divider class="divider" direction="vertical" />
+        <!-- <el-tooltip
         class="box-item"
         effect="dark"
         content="学生"
@@ -37,42 +38,42 @@
         >
           <Avatar />
         </el-icon>
-      </el-tooltip>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="成绩"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toScore()"
+      </el-tooltip> -->
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="成绩"
+          placement="bottom"
+          :hide-after="0"
         >
-          <TrendCharts />
-        </el-icon>
-      </el-tooltip>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="课程目标"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toObjectives()"
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toScore()"
+          >
+            <TrendCharts />
+          </el-icon>
+        </el-tooltip>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="课程目标"
+          placement="bottom"
+          :hide-after="0"
         >
-          <Checked />
-        </el-icon>
-      </el-tooltip>
-      <el-tooltip
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toObjectives()"
+          >
+            <Checked />
+          </el-icon>
+        </el-tooltip>
+        <!-- <el-tooltip
         class="box-item"
         effect="dark"
         content="下载报告"
@@ -87,38 +88,39 @@
         >
           <Download />
         </el-icon>
-      </el-tooltip>
-    </el-row>
-  </div>
-  <div class="body">
-    <div class="card">
-      <h3>课程信息</h3>
-      <el-col>
-        <el-col style="margin-top: 15px">
-          <div class="detail-title">课程名</div>
-          <div class="detail-info">{{ classInfo.courseName }}</div>
+      </el-tooltip> -->
+      </el-row>
+    </div>
+    <div class="body">
+      <div class="card">
+        <h3>课程信息</h3>
+        <el-col>
+          <el-col style="margin-top: 15px">
+            <div class="detail-title">课程名</div>
+            <div class="detail-info">{{ classInfo.courseName }}</div>
+          </el-col>
+          <el-row style="margin-top: 15px">
+            <el-col :span="12" style="margin-top: 10px">
+              <div class="detail-title">课程号</div>
+              <div class="detail-info">{{ classInfo.courseCode }}</div>
+            </el-col>
+            <el-col :span="6" style="margin-top: 10px">
+              <div class="detail-title">开课号</div>
+              <div class="detail-info">{{ classInfo.identifier }}</div>
+            </el-col>
+          </el-row>
+          <el-row style="margin-top: 15px">
+            <el-col :span="12" style="margin-top: 10px">
+              <div class="detail-title">学年</div>
+              <div class="detail-info">{{ classInfo.academicYear }}</div>
+            </el-col>
+            <el-col :span="6" style="margin-top: 10px">
+              <div class="detail-title">学期</div>
+              <div class="detail-info">{{ classInfo.semester }}</div>
+            </el-col>
+          </el-row>
         </el-col>
-        <el-row style="margin-top: 15px">
-          <el-col :span="12" style="margin-top: 10px">
-            <div class="detail-title">课程号</div>
-            <div class="detail-info">{{ classInfo.courseCode }}</div>
-          </el-col>
-          <el-col :span="6" style="margin-top: 10px">
-            <div class="detail-title">开课号</div>
-            <div class="detail-info">{{ classInfo.identifier }}</div>
-          </el-col>
-        </el-row>
-        <el-row style="margin-top: 15px">
-          <el-col :span="12" style="margin-top: 10px">
-            <div class="detail-title">学年</div>
-            <div class="detail-info">{{classInfo.academicYear}}</div>
-          </el-col>
-          <el-col :span="6" style="margin-top: 10px">
-            <div class="detail-title">学期</div>
-            <div class="detail-info">{{classInfo.semester}}</div>
-          </el-col>
-        </el-row>
-      </el-col>
+      </div>
     </div>
   </div>
 </template>
@@ -151,9 +153,9 @@ export default {
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-    
+
     console.log("classInfo", this.classInfo);
-    this.getDictionary()
+    this.getDictionary();
   },
   methods: {
     //返回教师端首页
@@ -201,6 +203,10 @@ export default {
 </script>
 
 <style scoped>
+.content {
+  height: 100vh;
+  background-color: #f2f2f2;
+}
 .block {
   position: absolute;
   top: 110px;

@@ -51,8 +51,9 @@
       'font-size': '16px',
       height: '60px',
     }"
+    :row-key="rowKey"
       @selection-change="handleSelectionChange">
-        <el-table-column  type="selection" width="55" />
+        <el-table-column  type="selection" width="55" :reserve-selection="true" />
         <el-table-column prop="courseName" label="课程名" width="180" />           
         <el-table-column prop="courseCode" label="课程号" width="180" />
         <el-table-column prop="courseType" label="课程类型" width="180" />
@@ -184,9 +185,9 @@
           ref="drawermultipleTable" 
           style="width: 100%;" 
           @selection-change="drawerchandleSelectionChange" 
-         
+          :row-key="rowKey"
           >
-            <el-table-column width="55" type="selection" :selectable="selectable">
+            <el-table-column width="55" type="selection" :selectable="selectable" :reserve-selection="true">
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
@@ -194,10 +195,10 @@
             <el-table-column  label="课程大纲" width="180" >
               <template #default="scope">
                 <el-tooltip content="查看课程大纲">
-                  <el-button v-show="!scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
+                  <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
                 </el-tooltip>
                 <el-tooltip content="添加课程大纲">
-                  <el-button v-show="scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-button>
+                  <el-button v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-button>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -434,6 +435,18 @@ data(){
       value:8,
       label:'2023版'
     },
+    {
+      value:9,
+      label:'2024版'
+    },
+    {
+      value:10,
+      label:'2025版'
+    },
+    {
+      value:11,
+      label:'2026版'
+    },
     ],
 
 
@@ -475,6 +488,9 @@ result:reactive({}),
   }
 },
 methods:{
+  rowKey(row) {
+      return row.courseId;
+    },
   //直接添加课程大纲
   addBaseCourseDetail(row){
       let that = this;
@@ -577,9 +593,9 @@ methods:{
       
       return !row.remark;
     }
-    if(row.versionId){
+    if(!row.versionId){
       
-      return !row.versionId;
+      return row.versionId;
     }
     else return true;
   },
@@ -773,7 +789,30 @@ methods:{
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.trueversionId = course.versionId;
-            course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
+            if(course.bcDetails.length){
+               
+                for(let i=0;i<course.bcDetails.length;i++){
+                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                    course.versionId = true;
+                    break;
+                  }
+                  else{
+                    course.versionId = false;
+                  }
+                }
+                
+              };
+              if(course.respondentInfos){
+                
+                // let teacherName =[];
+                course.respondentInfos.forEach(function(respondent){
+                  course.respondentName = respondent.respondentName;
+                  // teacherName.push(respondent.respondentName);
+                });
+                // course.respondentName = teacherName;
+              
+            }
+            // course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
             course.index = count;
             courses.push(course);
             searchCourseId.push(course.courseId);
@@ -1282,7 +1321,30 @@ ElMessageBox.confirm(
             course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
             course.semester=(course.semester == '0') ? '上学期' : '下学期';
             course.trueversionId = course.versionId;
-            course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
+            if(course.bcDetails.length){
+                
+                for(let i=0;i<course.bcDetails.length;i++){
+                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                    course.versionId = true;
+                    break;
+                  }
+                  else{
+                    course.versionId = false;
+                  }
+                }
+                
+              };
+              if(course.respondentInfos){
+                
+                // let teacherName =[];
+                course.respondentInfos.forEach(function(respondent){
+                  course.respondentName = respondent.respondentName;
+                  // teacherName.push(respondent.respondentName);
+                });
+                // course.respondentName = teacherName;
+              
+            }
+            // course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
             course.index = count;
             courses.push(course);
             count++;

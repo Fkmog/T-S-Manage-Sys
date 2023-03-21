@@ -1,4 +1,5 @@
 <template>
+<div class="content">
   <!-- 顶部导航栏 -->
   <div class="block">
     <el-row class="block-row">
@@ -78,6 +79,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
@@ -137,6 +139,10 @@ export default {
 </script>
 
 <style scoped>
+.content {
+  height: 100vh;
+  background-color: #f2f2f2;
+}
 .block {
   position: absolute;
   top: 110px;
