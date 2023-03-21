@@ -56,6 +56,7 @@
       <div class="el-table-container" layout="column" flex layout-align="start center" >
         <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
         :filter-change="filterChange"
+        :filter-change="filterChange"
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -111,6 +112,7 @@
           <el-table-column  label="负责人" width="150" >
             <template #default="scope">
              
+             
               <div style="display: flex; align-items: center" >
                 <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
               </div>
@@ -153,6 +155,7 @@
         @selection-change="handleSelectionChange" 
         @row-dblclick="editTrigger"
         
+        
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -166,12 +169,15 @@
       height: '60px',
     }"
      :row-key="rowKey"
+     :row-key="rowKey"
         >
+          <el-table-column width="80" type="selection" :reserve-selection="true" >
           <el-table-column width="80" type="selection" :reserve-selection="true" >
             </el-table-column>
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
+                <span >{{ scope.row.courseName }}</span>
                 <span >{{ scope.row.courseName }}</span>
               </div>
             </template>
@@ -180,6 +186,7 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseCode }}</span>
+                <span >{{ scope.row.courseCode }}</span>
               </div>
             </template>
           </el-table-column>
@@ -187,12 +194,14 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseType }}</span>
+                <span >{{ scope.row.courseType }}</span>
               </div>
             </template>
           </el-table-column>
           <el-table-column  label="课程性质" width="180" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
+                <span >{{ scope.row.courseNature }}</span>
                 <span >{{ scope.row.courseNature }}</span>
               </div>
             </template>
@@ -208,9 +217,18 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
+                <span >{{ scope.row.credit }}</span>
               </div>
             </template>
           </el-table-column>
+          <el-table-column  label="负责人" width="150" >
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
+              </div>
+            </template>
+          </el-table-column>
+         
          
          
           <el-table-column  label="操作" >
@@ -229,9 +247,11 @@
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
 
+
               <el-tooltip content="添加信息">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
+
 
             </template>
           </el-table-column>

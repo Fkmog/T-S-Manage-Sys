@@ -353,7 +353,6 @@ export default {
 .content {
   height: 100vh;
   background-color: #f2f2f2;
- 
 }
 /* 顶部导航栏 */
 .block {

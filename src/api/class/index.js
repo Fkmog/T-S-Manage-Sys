@@ -43,3 +43,11 @@ export function addClass(academicYear,semester,departmentId,className,identifier
       data:array,
     })
 }
+//课程负责人给予老师修改课程目标权限
+export function setPermission(array) {
+  return request({
+    url: '/classes/setClassIsRespondent',
+    method: 'POST',
+    data:array,
+  })
+}

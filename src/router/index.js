@@ -39,6 +39,7 @@ import Students from "@/views/teacherSide/students/students.vue";
 import AddScore from "@/views/teacherSide/score/addScore.vue";
 import Score from "@/views/teacherSide/score/score.vue";
 import Objectives from "@/views/teacherSide/objectives/objectives.vue";
+import objectivesEdit from "@/views/teacherSide/objectives/objectives-edit.vue";
 
 //课程管理人端组件
 import PrincipalIndex from '@/views/principalSide/principalIndex.vue'
@@ -232,6 +233,12 @@ export default createRouter({
                     path: '/objectives',
                     component: Objectives,
                 },
+                {
+                    name: "ObjectivesEdit",
+                    path: '/objectivesEdit',
+                    component: objectivesEdit,
+                },
+                
             ]
         },
         {

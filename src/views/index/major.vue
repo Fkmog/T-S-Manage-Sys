@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch></HeaderSearch>
+  <HeaderSearch msg="搜索专业名称"></HeaderSearch>
   <addBtn @click="addMajor()"></addBtn>
   <div class="cardList">
     <div

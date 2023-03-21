@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch></HeaderSearch>
+  <HeaderSearch msg="搜索课程名称"></HeaderSearch>
   <div class="classes-list">
     <div
       class="card"

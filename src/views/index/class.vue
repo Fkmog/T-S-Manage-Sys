@@ -1,6 +1,6 @@
 <template>
   <!-- 顶部搜索栏 -->
-  <HeaderSearch>
+  <HeaderSearch msg="搜索课程名称">
     <template #rightTime>
       <div class="rightSlot">
         <div class="selects">
@@ -36,8 +36,7 @@
     <template #assignBtn>
       <div class="assignBtn" v-show="showAdd">
         <el-button style="color: #6573c0" text @click="assignDetail()">
-          <el-icon :size="18" color="#6573c0"><Plus /></el-icon>
-          分配课程大纲
+          设置课程大纲
         </el-button>
       </div>
     </template>
@@ -190,6 +189,23 @@
           <el-input v-model="classEditForm.courseCode" autocomplete="off" />
         </el-form-item>
         <el-form-item
+          label="课程大纲版本"
+          :label-width="formLabelWidth"
+          prop="versionName"
+        >
+          <el-select
+            v-model="classEditForm.versionName"
+            placeholder="设置课程大纲"
+          >
+            <el-option
+              v-for="item in this.detailList"
+              :key="item.detailId"
+              :label="item.versionName"
+              :value="item.detailId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
           label="开课号"
           :label-width="formLabelWidth"
           prop="identifier"
@@ -206,7 +222,7 @@
             placeholder="选择开课学年"
           >
             <el-option
-              v-for="item in academicYear"
+              v-for="item in onlyAcademicYear"
               :key="item.dictValue"
               :label="item.dictLabel"
               :value="item.dictValue"
@@ -223,12 +239,22 @@
             placeholder="选择开课学期"
           >
             <el-option
-              v-for="item in semester"
+              v-for="item in onlySemester"
               :key="item.dictValue"
               :label="item.dictLabel"
               :value="item.dictValue"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item
+          label=""
+          :label-width="formLabelWidth"
+          prop="isRespondent"
+        >
+          <el-radio-group v-model="classEditForm.isRespondent" class="ml-4">
+            <el-radio label="2">允许任课教师修改考核方式</el-radio>
+            <el-radio label="0">不允许任课教师修改考核方式</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input
@@ -253,7 +279,7 @@
   <div class="assignDialog">
     <el-dialog
       v-model="isAssign"
-      title="分配课程大纲"
+      title="设置课程大纲"
       width="330px"
       :show-close="false"
       :align-center="true"
@@ -261,7 +287,7 @@
       <el-select
         v-model="assignedDetail"
         style="width: 250px; margin-left: 20px"
-        placeholder="选择课程大纲"
+        placeholder="选择课程大纲版本"
       >
         <el-option
           v-for="(datail, index) in detailList"
@@ -285,7 +311,7 @@
     class="classesTable"
     :data="classTable"
     @selection-change="handleSelectionChange"
-    style="width: 1530px"
+    style="width: 1720px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
@@ -308,13 +334,28 @@
       :selectable="canSelect"
       :reserve-selection="true"
     />
-    <el-table-column prop="className" label="课程名" width="230" />
+    <el-table-column prop="className" label="课程名" width="210" />
     <el-table-column prop="teacherName" label="任课教师" width="160" />
-    <el-table-column prop="courseCode" label="课程号" width="200" />
+    <el-table-column prop="courseCode" label="课程号" width="180" />
+    <el-table-column prop="versionName" label="大纲版本" width="170" />
     <el-table-column prop="identifier" label="开课号" width="220" />
     <el-table-column prop="academicYear" label="学年" width="180" />
     <el-table-column prop="semester" label="学期" width="180" />
     <el-table-column prop="remark" label="备注" width="160" />
+    <el-table-column prop="isRespondent" label="" width="60">
+      <template #default="scope">
+        <div v-if="scope.row.isRespondent == 2">
+          <el-tooltip content="允许任课教师修改考核方式" :hide-after="0">
+            <el-button link style="color: #3f51b5; cursor: default"
+              ><el-icon style="color: #3f51b5"><SetUp /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </div>
+
+        <span v-else></span>
+      </template>
+    </el-table-column>
+
     <el-table-column width="150">
       <template #default="scope">
         <el-row>
@@ -352,11 +393,11 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass, editClass } from "@/api/class";
+import { getClass, addClass, editClass, setPermission } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
-import { Edit, Delete, Plus } from "@element-plus/icons-vue";
+import { Edit, Delete, Plus, SetUp } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getDetails, assign } from "@/api/basecourse";
 
@@ -368,9 +409,11 @@ export default {
     Edit,
     Delete,
     Plus,
+    SetUp,
   },
   data() {
     return {
+      isRespondent: "0",
       showLoadmore: true,
       isAssign: false,
       showAdd: false,
@@ -385,6 +428,8 @@ export default {
       classTable: [],
       academicYear: [],
       semester: [],
+      onlyAcademicYear: [],
+      onlySemester: [],
       chosenYear: "",
       chosenSemester: "",
       currentInfo: {
@@ -512,6 +557,10 @@ export default {
         console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
+        //修改，新增教学班时使用
+        this.onlyAcademicYear = JSON.parse(JSON.stringify(res.academic_year));
+        this.onlySemester = JSON.parse(JSON.stringify(res.semester));
+        //头部栏筛选使用
         let year = {};
         year.dictLabel = "全部学年";
         year.dictValue = null;
@@ -560,6 +609,7 @@ export default {
               });
             }
           }
+          console.log("#", this.classTable);
         }
       });
     },
@@ -590,12 +640,22 @@ export default {
     //编辑教学班
     editClass(index, row) {
       console.log("index", index, "row", row);
-      this.academicYear.forEach((year) => {
+      //获取detailList
+      getDetails(
+        row.courseId,
+        this.currentInfo.departmentId,
+        this.currentInfo.schoolId
+      ).then((res) => {
+        console.log("getDetailList", res);
+        this.detailList = res.rows;
+      });
+      // console.log("@#",this.onlyAcademicYear);
+      this.onlyAcademicYear.forEach((year) => {
         if (year.dictLabel == row.academicYear) {
           row.academicYear = year.dictValue;
         }
       });
-      this.semester.forEach((semester) => {
+      this.onlySemester.forEach((semester) => {
         if (semester.dictLabel == row.semester) {
           row.semester = semester.dictValue;
         }
@@ -611,7 +671,19 @@ export default {
       this.classEditForm.classId = row.classId;
       this.classEditForm.teacherName = row.teacherName;
       this.classEditForm.teacherNumber = row.teacherNumber;
+      this.classEditForm.versionName = row.versionName;
+      this.classEditForm.isRespondent = row.isRespondent;
       this.editVisible = true;
+      this.onlyAcademicYear.forEach((year) => {
+        if (year.dictValue == row.academicYear) {
+          row.academicYear = year.dictLabel;
+        }
+      });
+      this.onlySemester.forEach((semester) => {
+        if (semester.dictValue == row.semester) {
+          row.semester = semester.dictLabel;
+        }
+      });
     },
     //提交修改教学班信息
     confirmEditClass(classEditForm) {
@@ -619,10 +691,17 @@ export default {
       classEditForm.semester = classEditForm.chosenSemester;
       classEditForm.departmentId = this.currentInfo.departmentId;
       classEditForm.schoolId = this.currentInfo.schoolId;
+      // this.classEditForm.isRespondent = this.isRespondent
+      this.giveRespondentPermission(classEditForm);
       // console.log("修改后", classEditForm);
       editClass(classEditForm).then((res) => {
         console.log("confirmEditClass", res);
         if (res.code == 200) {
+          ElMessage({
+            type: "success",
+            message: "修改成功",
+            duration: 1000,
+          });
           this.editVisible = false;
           this.getClassList();
         }
@@ -738,6 +817,9 @@ export default {
             message: "分配成功",
             duration: 1000,
           });
+          this.multipleSelection = [];
+          this.$refs.multipleTable.clearSelection();
+          this.getClassList();
         } else {
           ElMessage({
             type: "error",
@@ -758,6 +840,21 @@ export default {
     },
     rowKey(row) {
       return row.classId;
+    },
+    giveRespondentPermission(classEditForm) {
+      let msg = {};
+      msg.classId = classEditForm.classId;
+      msg.departmentId = this.currentInfo.departmentId;
+      msg.isRespondent = classEditForm.isRespondent;
+      msg.schoolId = this.currentInfo.schoolId;
+      let arr = [];
+      arr.push(msg);
+      setPermission(arr).then((res) => {
+        console.log("setPermission", res);
+      });
+    },
+    afv() {
+      console.log("123", this.isRespondent);
     },
   },
 };
@@ -787,7 +884,7 @@ export default {
 }
 .selecter {
   margin-left: 15px;
-  width:120px
+  width: 120px;
 }
 :deep().el-dialog__title {
   color: #808080;
@@ -834,10 +931,10 @@ export default {
   border-top: 0;
   border-right: 0;
   border-left: 0;
-  box-shadow:0 0 0 0px;
+  box-shadow: 0 0 0 0px;
   border-radius: 0;
 }
-.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper{
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
 }
 </style>
