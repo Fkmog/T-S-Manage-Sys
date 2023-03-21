@@ -9,7 +9,7 @@
           <div class="s-v-bar" style="float:left;">&nbsp;</div>
           <el-tooltip content="保存" style="float:left;">
             <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
-              <el-icon :size="24"><FolderChecked /></el-icon>
+              <el-icon :size="24"><DocumentChecked /></el-icon>
             </el-button>  
           </el-tooltip>
           <!--  -->
@@ -52,7 +52,7 @@
     
   
     
-    import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
+    import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,DocumentChecked} from '@element-plus/icons-vue'
     import Handsontable from 'handsontable';
     import request from '@/utils/request/request'
     import '@/components/teacher/addTeacher.js'
@@ -77,12 +77,13 @@
       data(){
         let self = this;
         return{
+
+          firstActivities:true,
+
           departmentId:'',
           schoolId:'',
           programId:'',
-    
-    
-    
+
           isRouterAlive:true,
           dirty:false,
           saving:false,
@@ -134,6 +135,7 @@
                 }
                 else{
                   self.dirty=true;
+                  self.firstActivities = false;
                   console.log('console:',self.count);
                   console.log('different',self.dirty);
                 }
@@ -149,7 +151,7 @@
       components:{
         ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
         ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox
+        Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,DocumentChecked
       },
       methods:{
         activate(){
@@ -158,12 +160,15 @@
                 this.programId = this.$store.state.major.programId;
             },
       isValid(){
-        var result = this.toPostData();
-          if (!result) {
-            return false;
-          } else {
-            return true > 0;
-          }
+        if(this.firstActivities){
+          return false;
+        }
+        else{
+          let result = this.toPostData();
+          return !(!result);
+        }
+        
+          
       },
       isNotDirty(){
         
@@ -178,7 +183,7 @@
           }
        
         if (!this.postData.students || this.postData.students.length <= 0) {
-              return $q.reject('学号或姓名不能为空');
+              return console.log('学生姓名或者学号为空');
             }
             // var postData = {
             //   teachers:  this.postData.teachers,
@@ -198,7 +203,7 @@
             
             this.addTeacher(studentList).then(function(res){
               console.log('res:',res);
-              
+              that.firstActivities = true;    
               if(res.code == '200'){
                 ElMessage({
                     type: 'success',
@@ -340,14 +345,9 @@
     }
     .submenu{
         color: #3f51b5;
-        font-size: 14px;
-        font-weight: 500;
-        height: 48px;
-        min-height: 48px;
-        line-height: 1em;
-        margin: 0;
+        
         position: relative;
-        padding: 6px 96px 5px 32px;
+       
         border-bottom: 1px solid #d0d0d0;
         background-color: transparent;
     }

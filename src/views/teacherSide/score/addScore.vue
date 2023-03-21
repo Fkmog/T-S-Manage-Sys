@@ -69,13 +69,7 @@
        
     
         <div layout="row" flex class="md-padding">
-            <div
-            class="hot-table-container"
-            
-            flex
-            
-            id="courseHot"
-      ></div>
+            <div class="hot-table-container" flex id="courseHot"></div>
         </div>
         
         
@@ -232,7 +226,7 @@ activateHotcolumn(){
             
             fixedRowsTop: 3,
             fixedColumnsLeft: 2,
-            minSpareRows: 3,
+            minSpareRows: 1,
             minSpareCols: 0,
             preventOverflow: 'horizontal',
             manualColumnMove: false,
@@ -257,7 +251,7 @@ activateHotcolumn(){
                 console.log('same');
                 return;
               } else { 
-                // self.isValid();
+                self.isValid();
                 if(self.count==0){
                   self.dirty=false;
                   console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
@@ -265,7 +259,10 @@ activateHotcolumn(){
                 else{
                   self.dirty=true;
                   self.firstActivities = false;
-                  console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+                  console.log("console:", self.count,
+                  "dirty", self.dirty,
+                  'items:',self.db.items,
+                  'firstActivities:',self.firstActivities);
                 }
                 self.count++;
                 console.log('console:',self.count);
@@ -384,24 +381,33 @@ async getActivities(){
         var columnDist = {};
           that.db.items[0][course.activities.item[i]]= course.activities.item[i];
           that.db.items[1][course.activities.item[i]]= course.activities.value[i];
+          that.db.items[2][course.activities.item[i]]= course.activities.remark[i];
           columnDist={
             data:course.activities.item[i],
           }
           that.columnList.push(columnDist);
-
+          
          
         //   valueDict[i.toString()] = course.activities.value[i];
          }
          
           for(let i=0;i<studentNum;i++){
+            console.log('number:',3+i);
             that.db.items[3+i]['studentNumber']=course.scores[i]['info'][0];
             that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
             that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
             for(let j=0;j<activityNumber;j++){
+              if(!course.scores[i]['grade'][j]){
+                that.db.items[3+i][course.activities.item[j]] = 0;
+              }
+              else{
                 that.db.items[3+i][course.activities.item[j]] = course.scores[i]['grade'][j];
+              }
+                
             }
           };
-          console.log('db.items',that.db.items);
+          
+          console.log('db.items',that.db.items,'columnList:',that.columnList);
         }
         else {
           console.log('res has no activities');
@@ -419,6 +425,7 @@ async getActivities(){
       }
       else{
         var result = this.toPostData();
+        console.log('result:',result);
           return !(!result);
       }
 
@@ -440,28 +447,24 @@ async getActivities(){
             return;
           }
        
-        if (!this.postData.students || this.postData.students.length <= 0) {
-              return $q.reject('学号或姓名不能为空');
-            }
+       
             
             
 
             let that =this;
 
-            this.searchForStudent().then(function(res){
-                if(res){
-            var studentList = JSON.parse( JSON.stringify(that.db.items));
+           
+            var studentList = JSON.parse(JSON.stringify(that.db.items));
             let activityNumber = that.columnList.length;
             for(let m=0;m<3;m++){
             studentList.shift();
         }
             for(let i=0;i<studentList.length;i++){
-                
+                console.log('studentInfo:',studentList[i]);
                 if(studentList[i]['studentNumber']!=undefined){
-                    
                     var gradeList = [];
                     for(let j=0;j<activityNumber-3;j++){
-                        var activityLabel = that.columnList[activityNumber-3+j];
+                        var activityLabel = that.columnList[3+j];
                         
                         gradeList.push(studentList[i][activityLabel.data]);
                     };
@@ -476,8 +479,7 @@ async getActivities(){
             }
            
             that.addScores(that.postData.scores);
-                }
-            });
+         
             
             
 
@@ -488,8 +490,8 @@ async getActivities(){
         let that = this;
         this.postData.students.length = 0; // clean array
         var res = this.postData.students;
-        var newstudent = this.postData.newStudents;
-        var scoreRes = this.postData.scores;
+        // var newstudent = this.postData.newStudents;
+        // var scoreRes = this.postData.scores;
         var studentList = JSON.parse( JSON.stringify(this.db.items));
         var valid = true;
         for(let m=0;m<3;m++){
@@ -502,17 +504,13 @@ async getActivities(){
         studentList.forEach(function(student){
             let activityNumber = that.columnList.length;
             
-            student.studentNumber = (student.studentNumber) ? '' : student.studentNumber.trim();
-            student.studentName = (student.studentName) ? '' : student.studentName.trim();
-            student.pass = (student.pass) ? '' : student.pass.trim();
-            
             var trueFlagNum = 0;//为空的个数
             var falseFlagNum = 0;//不为空的个数
                 console.log('current student:',student);
                 for(let j=0;j<activityNumber-3;j++){
-                    let activityLabel = that.columnList[activityNumber-3+j];//从columnList中获取成绩项名称
+                    let activityLabel = that.columnList[3+j];//从columnList中获取成绩项名称
                     
-                    // console.log('student[activityLabel]',activityLabel.data,'student[activityLabel]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
+                    console.log('activityLabel',activityLabel,'student[activityLabel]',activityLabel.data,'student[activityLabel]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
                     if(!student[activityLabel.data]){
                         trueFlagNum++;
                     }
@@ -534,16 +532,16 @@ async getActivities(){
                 OrFlag = false;
                 AndFlag = false;
               }
-            //   console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
-            if (student.studentNumber || student.studentName || OrFlag) {
-              if (student.studentNumber && student.studentName && AndFlag) {
+              console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
+            if (!student.studentNumber || !student.studentName || OrFlag) {
+              if (!student.studentNumber && !student.studentName && AndFlag) {
                 // console.log('scoreRes:',scoreRes,'res: ',res);
-                // console.log('----------全都为空------------');
+                console.log('----------全都为空------------');
                 return;
               } else {  // either name OR teacherNo is empty, but not both
                 valid = false;
                 // console.log('scoreRes:',scoreRes,'res: ',res);
-                // console.log('-----------部分为空-----------');
+                console.log('-----------部分为空-----------');
                 return;
               }
             } 
@@ -561,21 +559,21 @@ async getActivities(){
                 'schoolId':that.schoolId
               };
             //   console.log('that.searchStudent(student.studentNumber)',that.searchStudent(student.studentNumber));
-              that.searchStudent(student.studentNumber).then(function(res){
-                console.log('search res:',res);
-                if(res){
-                    var newStudent = {
-                'studentNumber':student.studentNumber,
-                'studentName':student.studentName,
-                // 'email':teacher.email,
-                'programId': that.programId,
-                // 'pass':student.pass,
-                'departmentId':that.departmentId,
-                'schoolId':that.schoolId
-                    }
-                    newstudent.push(newStudent);
-                };
-              })
+              // that.searchStudent(student.studentNumber).then(function(res){
+              //   console.log('search res:',res);
+              //   if(res){
+              //       var newStudent = {
+              //   'studentNumber':student.studentNumber,
+              //   'studentName':student.studentName,
+              //   // 'email':teacher.email,
+              //   'programId': that.programId,
+              //   // 'pass':student.pass,
+              //   'departmentId':that.departmentId,
+              //   'schoolId':that.schoolId
+              //       }
+              //       newstudent.push(newStudent);
+              //   };
+              // })
               
              
             //   var scoreDist = {
@@ -608,66 +606,67 @@ async getActivities(){
     
           return valid;
       },
-async searchForStudent(){
-    let that = this;
-    var newStudentList = [];
-    var addFlag = Boolean;
-    // console.log('this.postData.newStudents:',this.postData.newStudents);
-            this.postData.newStudents.forEach(function(student){
-                        newStudentList.push(student);
-            });
+// async searchForStudent(){
+//     let that = this;
+//     var newStudentList = [];
+//     var addFlag = Boolean;
+//     // console.log('this.postData.newStudents:',this.postData.newStudents);
+//             this.postData.newStudents.forEach(function(student){
+//                         newStudentList.push(student);
+//             });
 
-            console.log('newStudentList:',newStudentList);
+//             console.log('newStudentList:',newStudentList);
             
-                this.addTeacher(newStudentList).then(function(res){
-                console.log('add student res:',res);
-                that.firstActivities = true;
-                //   that.getActivities();
-                if(res.code == '200'){
-                    ElMessage({
-                        type: 'success',
-                        message: `添加成功`,
-                        duration:1000,
-                    });
-                    addFlag = true;
-                }
-                else{
-                ElMessage({
-                        type: 'error',
-                        message: `添加失败`,
-                        duration:1000,
-                    })
-                    addFlag = false;
-            }
-                });
-               
-            
-            
-            return  addFlag;
+//                 this.addTeacher(newStudentList).then(function(res){
+//                 console.log('add student res:',res);
+//                 that.firstActivities = true;
+//                 //   that.getActivities();
+//                 if(res.code == '200'){
+//                     ElMessage({
+//                         type: 'success',
+//                         message: `添加成功`,
+//                         duration:1000,
+//                     });
+//                     addFlag = true;
+//                 }
+//                 else{
+//                 ElMessage({
+//                         type: 'error',
+//                         message: `添加失败`,
+//                         duration:1000,
+//                     })
+//                     addFlag = false;
+//             }
+//                 });
+//             return  addFlag;
                   
-},
+// },
 
     goBackandClean(){
-        let that = this;
+      let that = this;
       this.db.items = [];
-        this.columnList = [{
-                data:'studentNumber',
-            },
-            {
-                data:'studentName',
-            },
-            {
-                data:'pass',
-            },];
+      this.columnList = [{
+              data:'studentNumber',
+          },
+          {
+              data:'studentName',
+          },
+          {
+              data:'pass',
+          },];
       this.postData.students = [];
       this.postData.scores = [];
       this.postData.newStudents = [];
       
-      this.getActivities().then(function(){
-       
-      });
+      this.getActivities().then(function(res){
+        that.hotInstance.updateSettings({
+                data:that.db.items,
+              });
+        that.dirty = false;
+        console.log('datas:', that.db.items,that.postData.students);
+      })
       
-      console.log('datas:', this.db.items,this.postData.students);
+      
     },
     reload(){
       this.isRouterAlive = false;

@@ -1,11 +1,6 @@
 <template>
     <div layout="column" flex class="ng-scope layout-column flex">
-      <div
-        class="submenu no-select layout-align-center-center layout-row"
-        layout="row"
-        layout-align="center center"
-        style="justify-content: left"
-      >
+      <div class="submenu ">
         <el-tooltip content="返回" style="float: left">
           <el-button
             class="md-icon-button button-back"
@@ -26,7 +21,7 @@
             link
             :disabled="!isValid()"
           >
-            <el-icon :size="24"><FolderChecked /></el-icon>
+            <el-icon :size="24"><DocumentChecked /></el-icon>
           </el-button>
         </el-tooltip>
         <div flex></div>
@@ -65,6 +60,7 @@
     Download,
     UploadFilled,
     DocumentAdd,
+    DocumentChecked
   } from "@element-plus/icons-vue";
   import Handsontable from "handsontable";
   import request from "@/utils/request/request";
@@ -194,6 +190,7 @@
       DocumentAdd,
       ElMessage,
       ElMessageBox,
+      DocumentChecked
   
     },
     methods: {
@@ -565,14 +562,7 @@ getDictionary(){
   }
   .submenu {
     color: #3f51b5;
-    font-size: 14px;
-    font-weight: 500;
-    height: 48px;
-    min-height: 48px;
-    line-height: 1em;
-    margin: 0;
     position: relative;
-    padding: 6px 96px 5px 32px;
     border-bottom: 1px solid #d0d0d0;
     background-color: transparent;
   }

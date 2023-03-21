@@ -29,9 +29,21 @@
 
 
 <div v-show="closeShow" class="submenu" >
+  <el-row class="rowStyle">
+    <el-col :span="6">
       <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
+    </el-col>
+    <el-col :span="6">
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
-      <el-button @click="this.deleteBaseCourse()" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button>
+    </el-col>
+    <el-col :span="6">
+      <el-button @click="this.deleteBaseCourse()" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button> 
+    </el-col>
+    
+      
+      
+  </el-row>
+      
 </div>
 
 <div layout="row" flex class="md-padding" >
@@ -1423,6 +1435,21 @@ mounted:function(){
 </script>
 
 <style scoped> 
+.rowStyle{
+  top: 10px;
+}
+  :deep().el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow:0 0 0 0px;
+  border-radius: 0;
+}
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper{
+  box-shadow: 0 0 0 0px;
+}
 :deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
@@ -1555,24 +1582,16 @@ left:-46px;
     text-align: center;
     border-radius: 2px;
     box-sizing: border-box;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    outline: none;
+  
     border: 0;
     padding: 0 6px;
     margin: 0;
     background: transparent;
     
-    white-space: nowrap;
-    text-transform: uppercase;
+   
     font-weight: 500;
     font-size: 14px;
-    font-style: inherit;
-    font-variant: inherit;
-    font-family: inherit;
-    text-decoration: none;
-    overflow: hidden;
+    
     transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
 }
 .submenu {

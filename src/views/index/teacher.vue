@@ -1,14 +1,16 @@
 
 <template>
-  <div layout="column" flex class="ng-scope layout-column flex">
+  
+    <div v-show="!closeShow">
+      <HeaderSearch></HeaderSearch>
+    </div>
     
-      <HeaderSearch v-show="!closeShow" ></HeaderSearch>
   
     <div
       v-show="closeShow"
       class="submenu"
     >
-    <el-row>
+    <el-row class="rowStyle">
       <el-col :span="6">
         <el-button
         @click="this.toggleSelection()"
@@ -25,7 +27,7 @@
         <el-button
         @click="deleteTeacher"
         
-        class="deleteButton"
+        class="deleteButton "
         link
         ><el-icon><Delete /></el-icon
       ></el-button>
@@ -72,7 +74,7 @@
         </el-table>
       </div>
     </div>
-  </div>
+  
 </template>
 
 <script >
@@ -307,6 +309,9 @@ export default {
 </script>
 
 <style scoped>
+.rowStyle{
+  top: 10px;
+}
 .headerSearch {
   border: 0;
   float: left;
@@ -425,7 +430,7 @@ export default {
 }
 .deleteButton {
   float:right;
-  margin-top:16px;
+ margin-top: 6px;
   
 }
 .el-checkbox__input.is-indeterminate .el-checkbox__inner::before {
@@ -485,15 +490,15 @@ export default {
 }
 .submenu {
   color: #3f51b5;
-  font-size: 14px;
-  font-weight: 500;
-  height: 55px;
-  position: absolute;
-  top:110px;
-  left: 0px;
-  width:100%;
-  border-bottom: 1px solid #d0d0d0;
-  background-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    height: 55px;
+    position: absolute;
+    top: 110px;
+    left: 0px;
+    width: 100%;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: transparent;
 }
 
 /* .el-button {

@@ -31,23 +31,23 @@
     <el-table
     class="studentsTable"
     :data="studentsTable"
-    style="width: 60%"
+    style="width: 80%"
     :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
     :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
     
   >
-    <el-table-column prop="studentNumber" label="学号"  width="200px"/>
-    <el-table-column prop="studentName" label="姓名" />
+    <el-table-column prop="studentNumber" label="学号"  width="180px"/>
+    <el-table-column prop="studentName" label="姓名" width="100px"/>
     <el-table-column  >
       <template #header>
         <span>成绩</span>
       </template>
       <template #default="scope">
         <el-row>
-          <el-col v-for="(item,i) in activityName" :key="item.name" :span="8">
+          <el-col v-for="(item,i) in activityName" :key="item.name" :span="4">
           {{ item }}
-          <el-row>({{ activityScores[i] }})</el-row>
-          <el-row>{{ scope.row.scores[i] }}</el-row>
+          <!-- <el-row>({{ activityScores[i] }})</el-row> -->
+          <el-row>{{ scope.row.scores[i]}}/{{ activityScores[i]  }}</el-row>
         </el-col>
         </el-row>
         
