@@ -1,11 +1,13 @@
 <template>
   <!-- 教师端页面 -->
-  <div v-show="$store.state.currentInfo.identity=='教师'" class="headerBgd">
+  <div v-show="$store.state.currentInfo.identity == '教师'" class="headerBgd">
     <HeaderIdentity></HeaderIdentity>
   </div>
   <!-- 学院管理员页面 -->
-  <!-- <div v-show="!$store.state.currentInfo.isTeacher" class="headerBgd"> -->
-  <div v-show="$store.state.currentInfo.identity=='学院管理员'" class="headerBgd">
+  <div
+    v-show="$store.state.currentInfo.identity == '学院管理员'"
+    class="headerBgd"
+  >
     <div class="content">
       <div v-if="$route.meta.isMajor" class="headIcon" @click="backIndex()">
         <el-icon :size="24"><HomeFilled /></el-icon>
@@ -37,7 +39,6 @@
             </el-select>
           </div>
         </div>
-
         <div class="navigatorList">
           <HeaderNav></HeaderNav>
         </div>
@@ -48,14 +49,16 @@
     </div>
   </div>
   <!-- 课程负责人页面 -->
-  <div v-show="$store.state.currentInfo.identity=='课程负责人'" class="headerBgd">
+  <div
+    v-show="$store.state.currentInfo.identity == '课程负责人'"
+    class="headerBgd"
+  >
     <div class="content">
       <!-- 左侧icon的占位 -->
       <div class="headPlaceholder"></div>
       <div>
         <div style="display: flex; flex-direction: row">
-          <div class="placeholder" style="height:30px">
-          </div>
+          <div class="placeholder" style="height: 30px"></div>
         </div>
         <div class="navigatorList">
           <HeaderNav></HeaderNav>
@@ -66,7 +69,27 @@
       </div>
     </div>
   </div>
-
+  <!-- web管理员页面 -->
+  <div
+    v-show="$store.state.currentInfo.identity == 'web管理员'"
+    class="headerBgd"
+  >
+    <div class="content">
+      <!-- 左侧icon的占位 -->
+      <div class="headPlaceholder"></div>
+      <div>
+        <div style="display: flex; flex-direction: row">
+          <div class="placeholder" style="height: 30px"></div>
+        </div>
+        <div class="navigatorList">
+          <HeaderNav></HeaderNav>
+        </div>
+      </div>
+      <div>
+        <HeaderIdentity></HeaderIdentity>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -115,7 +138,7 @@ export default {
 };
 </script>
 
-<style  scoped>
+<style scoped>
 /* 设置所有字体为微软雅黑 */
 * {
   font-family: Microsoft Yahei;
@@ -149,8 +172,8 @@ export default {
 .headIcon {
   color: white;
   cursor: pointer;
-  width:60px;
-  padding-left:18px;
+  width: 60px;
+  padding-left: 18px;
   margin-top: 28px;
 }
 .headPlaceholder {
@@ -164,4 +187,3 @@ export default {
   margin-left: 40px;
 }
 </style>
-

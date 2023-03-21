@@ -120,7 +120,9 @@ export default {
                    if(this.$store.state.currentInfo.identity =='教师'){
                   this.$router.replace("teacherClasses");}
                    if(this.$store.state.currentInfo.identity =='课程负责人'){
-                  this.$router.replace("principalBaseCourse");}
+                  this.$router.replace("BaseCourse");}
+                  if(this.$store.state.currentInfo.identity =='web管理员'){
+                  this.$router.replace("Schools");}
                 });
               }
               if (res.code != 200) {

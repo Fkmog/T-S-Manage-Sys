@@ -47,6 +47,11 @@ import PrincipalBaseCourseDetail from '@/views/principalSide/baseCourse/baseCour
 import PrincipalBaseCourse from '@/views/principalSide/baseCourse/baseCourse.vue'
 import PrincipalClass from '@/views/principalSide/class/class.vue'
 
+//web管理员组件
+import WebAdminIndex from '@/views/webAdmin/index.vue'
+import Schools from '@/views/webAdmin/schools/schools.vue'
+
+
 export default createRouter({
     //history配置暂未定
     history: createWebHistory(),
@@ -245,11 +250,6 @@ export default createRouter({
             path: '/principalIndex',
             component: PrincipalIndex,
             children: [
-            //     {
-            //     name: "principalBaseCourse",
-            //     path: '/principalBaseCourse',
-            //     component: PrincipalBaseCourse
-            // }, 
             {
                 name: "principalClass",
                 path: '/principalClass',
@@ -261,6 +261,16 @@ export default createRouter({
                 component: PrincipalBaseCourseDetail
             }
         ]
+        },
+        //web管理员
+        {
+            path: '/webAdminIndex',
+            component: WebAdminIndex,
+            children:[{
+                name: "Schools",
+                path: '/schools',
+                component: Schools
+            }]
         }
     ]
 })
