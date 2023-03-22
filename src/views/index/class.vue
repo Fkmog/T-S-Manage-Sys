@@ -393,7 +393,13 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass, editClass, setPermission } from "@/api/class";
+import {
+  getClass,
+  addClass,
+  editClass,
+  setPermission,
+  deleteClass,
+} from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
@@ -609,7 +615,7 @@ export default {
               });
             }
           }
-          console.log("#", this.classTable);
+          // console.log("#", this.classTable);
         }
       });
     },
@@ -617,19 +623,25 @@ export default {
     addClass(classAddForm) {
       this.$refs["classAddForm"].validate((valid) => {
         if (valid) {
+          console.log("classAddForm", classAddForm);
+          let array = classAddForm.instructor.split("(");
+          let teacherName = array[0];
+          let teacherNumber = array[1].substr(0, array[1].length - 1);
           addClass(
             this.classAddForm.chosenYear,
             this.classAddForm.chosenSemester,
             this.currentInfo.departmentId,
             this.classAddForm.className,
             this.classAddForm.identifier,
-            this.classAddForm.instructor,
+            teacherName,
+            teacherNumber,
             this.classAddForm.courseCode,
             this.classAddForm.remark,
             this.currentInfo.schoolId
           ).then((res) => {
             this.addVisible = false;
             console.log("addClass", res);
+            this.getClassList();
           });
         } else {
           // console.log("error submit!!");
@@ -687,6 +699,13 @@ export default {
     },
     //提交修改教学班信息
     confirmEditClass(classEditForm) {
+      let array = classEditForm.instructor.split("(");
+      let teacherName = array[0];
+      if (teacherName !== classEditForm.instructor) {
+        let teacherNumber = array[1].substr(0, array[1].length - 1);
+        classEditForm.teacherNumber = teacherNumber;
+      }
+      classEditForm.teacherName = teacherName;
       classEditForm.academicYear = classEditForm.chosenYear;
       classEditForm.semester = classEditForm.chosenSemester;
       classEditForm.departmentId = this.currentInfo.departmentId;
@@ -715,7 +734,10 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        this.classTable.pop(row);
+        deleteClass(row.classId).then((res) => {
+          console.log("deleteClass", res);
+          this.getClassList();
+        });
       });
     },
     //远程模糊搜索教师
@@ -727,7 +749,7 @@ export default {
         this.currentInfo.schoolId,
         searchTeacher
       ).then((res) => {
-        // console.log("!!", res);
+        console.log("!!", res);
         this.allTeachers = res.data;
       });
     },

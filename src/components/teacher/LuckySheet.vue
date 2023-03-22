@@ -1,6 +1,6 @@
 <template>
 <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
-    <div class="submenu" layout="row" layout-align="center center" style="justify-content: left">
+    <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
         <el-icon :size="24"><Back /></el-icon>
@@ -9,7 +9,7 @@
       <div class="s-v-bar" style="float:left;">&nbsp;</div>
       <el-tooltip content="保存" style="float:left;">
         <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
-          <el-icon :size="24"><FolderChecked /></el-icon>
+          <el-icon :size="24"><DocumentChecked /></el-icon>
         </el-button>  
       </el-tooltip>
       <!--  -->
@@ -49,7 +49,7 @@ import { ref, onMounted,reactive} from 'vue'
 import { HotTable,HotColumn } from '@handsontable/vue3';
 import { registerAllModules } from 'handsontable/registry';
 import { ElTooltip,ElIcon,ElInput,ElMessage, ElMessageBox } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd} from '@element-plus/icons-vue'
+import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,DocumentChecked} from '@element-plus/icons-vue'
 import Handsontable from 'handsontable';
 import request from '@/utils/request/request'
 import '@/components/teacher/addTeacher.js'
@@ -143,7 +143,7 @@ export default{
   components:{
     ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
     ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-    Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox
+    Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,DocumentChecked
   },
   methods:{
     activate(){
@@ -315,14 +315,7 @@ addTeacher(postData){
 
 .submenu{
     color: #3f51b5;
-    font-size: 14px;
-    font-weight: 500;
-    height: 48px;
-    min-height: 48px;
-    line-height: 1em;
-    margin: 0;
     position: relative;
-    padding: 6px 96px 5px 32px;
     border-bottom: 1px solid #d0d0d0;
     background-color: transparent;
 }

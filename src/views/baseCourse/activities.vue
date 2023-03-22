@@ -44,7 +44,7 @@
           
         >
         <!-- :disabled="!isValid()" -->
-          <FolderChecked />
+          <DocumentChecked />
         </el-icon>
       </el-button>
         
@@ -74,15 +74,11 @@
 
       
   
-      <div layout="row" flex class="md-padding" >
-        <div class="hot-table-container" layout="column" flex layout-align="start center" >
-        
-        <hot-table :settings="hotSettings" v-model:data="db.items"  style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
-         
-        </hot-table>
      
-    </div>
-      </div>
+
+      <div layout="row" flex class="md-padding">
+            <div class="hot-table-container" flex id="courseHot"></div>
+        </div>
   
       
       
@@ -100,7 +96,7 @@
   
   import   Action  from 'element-plus'
   
-  import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus} from '@element-plus/icons-vue'
+  import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus,DocumentChecked} from '@element-plus/icons-vue'
   import Handsontable from 'handsontable';
   import request from '@/utils/request/request'
  
@@ -147,35 +143,62 @@
         departmentId:0,
         fromCourseBatchAdd:false,
 
-        hotSettings:{
+      }
+    },
+    components:{
+      ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
+      ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
+      Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
+      ,CirclePlus,DocumentChecked
+    },
+    methods:{
+      addActivities(){
+        this.firstActivities = false;
+        let length = Object.keys(this.db.items[0]).length;
         
-        licenseKey: "non-commercial-and-evaluation",
-        colHeaders: false,
-        rowHeaders: true,
-        rowHeaders: ['成绩项', '分值'],
-        
-      // minSpareRows: 0,
-      // minSpareCols: 0,
-        // preventOverflow: "horizontal",
-        // manualColumnMove: false,
-        copyPaste: true,
-        colWidths: 52,  // same as .scss
-        // copyRowsLimit: 2,
-        maxRows: 2,
-        contextMenu: {
-          items: {
-            col_left: {
-              name: "在左侧插入列",
-            },
-            col_right: {
-              name: "在右侧插入列",
-            },
-            remove_col: {
-              name: "删除列",
-            },
-          },
-        },
-        afterChange(changes, source) {
+        this.db.items[0][length.toString()] = '';
+        this.db.items[1][length.toString()] = null;
+        this.db.items[2][length.toString()] = '';
+        this.hotInstance.updateSettings({
+                data:this.db.items,
+               
+              });
+       
+      },
+      activate(){
+              this.departmentId = this.$store.state.currentInfo.departmentId;
+              this.schoolId = this.$store.state.currentInfo.schoolId;
+              this.courseId = this.$store.state.course.baseCourseCourseId;
+              this.detailId = this.$store.state.course.detailId;
+              this.activateHotcolumn();
+              console.log('db items:',this.db.items);},
+    activateHotcolumn(){
+      let self = this;
+      let that = this;
+      this.getActivities().then(function(){
+        let container = document.querySelector("#courseHot");
+        let hotRegisterer = new Handsontable(container,{
+            data: self.db.items,
+            licenseKey: 'non-commercial-and-evaluation',
+            colHeaders: false,
+            rowHeaders: true,
+            rowHeaders: ['成绩项', '分值','设置'],
+            copyPaste: true,
+            colWidths: 52,
+      
+            contextMenu: {
+              items: {
+                col_left: {
+                  name: "在左侧插入列",
+                },
+                col_right: {
+                  name: "在右侧插入列",
+                },
+                remove_col: {
+                  name: "删除列",
+                },
+              },
+            },afterChange(changes, source) {
           if (source === "loadData") {
             console.log("same");
             return;
@@ -187,38 +210,36 @@
             } else {
               self.dirty = true;
               self.firstActivities = false;
-              console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+              console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items,'firstActivities',self.firstActivities);
             }
             self.count++;
             console.log("console:", self.count);
           }
         },
-        }
+        });
 
-      }
+        that.hotInstance = hotRegisterer;
+        that.hotInstance.updateSettings({
+                data:that.db.items,
+                cells: that.getHotCellsFunction(),
+              });
+      })
     },
-    components:{
-      ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
-      ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-      Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
-      ,CirclePlus
-    },
-    methods:{
-      addActivities(){
-        this.firstActivities = false;
-        let length = Object.keys(this.db.items[0]).length;
-        
-        this.db.items[0][length.toString()] = '';
-        this.db.items[1][length.toString()] = null;
-        
-      },
-      activate(){
-              this.departmentId = this.$store.state.currentInfo.departmentId;
-              this.schoolId = this.$store.state.currentInfo.schoolId;
-              this.courseId = this.$store.state.course.baseCourseCourseId;
-              this.detailId = this.$store.state.course.detailId;
-              this.getActivities();
-              console.log('db items:',this.db.items);},
+    getHotCellsFunction() {
+                
+                return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+                  var cellProperties = {};
+                  let that = this;
+                  if (row === 2) {
+                    cellProperties.type = 'dropdown';
+                    cellProperties.source = [' ','总评','期末'];
+                    cellProperties.allowEmpty = true;
+                    cellProperties.className = 'ht-s-size';
+                    //   cellProperties.validator = that.validScoreSetting();
+                    }
+                    return cellProperties;
+                };
+        },
     getActivities(){
       let that = this;
       return request({
@@ -234,21 +255,57 @@
           
           var itemDict = {};
           var valueDict = {};
-         for(let i=0;i<activityNumber;i++){
-          itemDict[i.toString()] = course.activities.item[i];
-          valueDict[i.toString()] = course.activities.value[i];
+          var markDict = {};
+          
+            if(!course.activities.value){
+              for(let i=0;i<activityNumber;i++){
+                valueDict[i.toString()] = '';
          }
+            }
+            else{
+              for(let i=0;i<activityNumber;i++){
+                valueDict[i.toString()] = course.activities.value[i];
+         }
+              
+            }
+            if(!course.activities.remark){
+              for(let i=0;i<activityNumber;i++){
+            markDict[i.toString()] = '';
+         }
+            }
+            else{
+              for(let i=0;i<activityNumber;i++){
+                markDict[i.toString()] = course.activities.remark[i];
+         }
+              
+            }
+            if(!course.activities.item){
+              for(let i=0;i<activityNumber;i++){
+                itemDict[i.toString()] = '';
+         }
+            }
+            else{
+              for(let i=0;i<activityNumber;i++){
+                itemDict[i.toString()] = course.activities.item[i];
+         }
+              
+            }
+            
+         
            
           that.db.items.push(itemDict);
           that.db.items.push(valueDict);
+          that.db.items.push(markDict);
           console.log('res has activities:',that.db.items);
         }
         else {
           console.log('res has no activities');
           var itemDict = {'0':''};
           var valueDict = {'0':''};
+          var markDict = {'0':''};
           that.db.items.push(itemDict);
           that.db.items.push(valueDict);
+          that.db.items.push(markDict);
               // add two columns (fail column, 1 score column)
               // that.addColumn();
               // that.addColumn();
@@ -291,6 +348,7 @@
       
       let item = [];
       let value = [];
+      let remark = [];
       let length = Object.keys(this.db.items[0]).length;
      
       for(let i=0;i<length;i++){
@@ -299,6 +357,7 @@
         }
         item.push(this.db.items[0][i.toString()]);
         value.push(this.db.items[1][i.toString()]);
+        remark.push(this.db.items[2][i.toString()])
       }
     
 
@@ -312,7 +371,8 @@
         'detailId':this.detailId,
         "activities": {
         "item": item,
-        "value": value
+        "value": value,
+        "remark":remark,
   },}
       }).then(function(res){
         
@@ -344,7 +404,7 @@
         
         let length = Object.keys(this.db.items[0]).length;
           for(let i=0;i<length;i++){
-            if (!this.db.items[0][i.toString()] ||!this.db.items[1][i.toString()] ) {
+            if (!this.db.items[0][i.toString()] ||!this.db.items[1][i.toString()]) {
               
               valid = false;
               break;

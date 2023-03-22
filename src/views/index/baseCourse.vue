@@ -33,10 +33,7 @@
       <el-col :span="6" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
       </el-col>
-      <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
-        <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
-        
-      </el-col>
+   
       
       <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
         <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
@@ -50,10 +47,7 @@
         <el-button @click="this.deleteRespondent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
         
       </el-col>
-      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
-        <el-button @click="this.deleteRespondent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
-        
-      </el-col>
+     
     </el-row>
   </div>
    
@@ -62,6 +56,7 @@
       <div class="el-table-container" layout="column" flex layout-align="start center" >
         <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
         :filter-change="filterChange"
+       
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -117,6 +112,7 @@
           <el-table-column  label="负责人" width="150" >
             <template #default="scope">
              
+             
               <div style="display: flex; align-items: center" >
                 <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
               </div>
@@ -130,15 +126,6 @@
                 <el-tooltip  content="删除课程" >
                   <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
                 </el-tooltip>
-             
-              
-
-             
-                <el-tooltip  content="删除课程" >
-                  <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
-                </el-tooltip>
-             
-              
 
               <el-tooltip content="修改课程">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
@@ -168,6 +155,7 @@
         @selection-change="handleSelectionChange" 
         @row-dblclick="editTrigger"
         
+        
         :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -181,13 +169,16 @@
       height: '60px',
     }"
      :row-key="rowKey"
+     
         >
+         
           <el-table-column width="80" type="selection" :reserve-selection="true" >
             </el-table-column>
           <el-table-column  label="课程名" width="250" >
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseName }}</span>
+                
               </div>
             </template>
           </el-table-column>
@@ -195,6 +186,7 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseCode }}</span>
+                
               </div>
             </template>
           </el-table-column>
@@ -202,6 +194,7 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseType }}</span>
+               
               </div>
             </template>
           </el-table-column>
@@ -209,6 +202,7 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span >{{ scope.row.courseNature }}</span>
+               
               </div>
             </template>
           </el-table-column>
@@ -223,9 +217,12 @@
             <template #default="scope">
               <div style="display: flex; align-items: center">
                 <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
+                <span >{{ scope.row.credit }}</span>
               </div>
             </template>
           </el-table-column>
+         
+         
          
          
           <el-table-column  label="操作" >
@@ -236,17 +233,19 @@
               <el-tooltip content="修改">
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
               </el-tooltip>
-              <el-tooltip content="修改课程负责人">
+              <!-- <el-tooltip content="修改课程负责人">
                 <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
-              </el-tooltip>
+              </el-tooltip> -->
   
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
 
+
               <el-tooltip content="添加信息">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
+
 
             </template>
           </el-table-column>
@@ -411,7 +410,7 @@
   import addBtn from "@/components/general/addBtn.vue";
   import { ref,reactive, version,}from 'vue';
   import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown,ElTag } from 'element-plus'
-  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document,Avatar} from '@element-plus/icons-vue'
+  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document,Avatar,DocumentChecked} from '@element-plus/icons-vue'
   
   
   
@@ -1310,13 +1309,25 @@
     request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
     Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
     ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
-    Document,ElTag,Avatar
+    Document,ElTag,Avatar,DocumentChecked
   }
   
   }
   </script>
   
   <style scoped>
+  :deep().el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow:0 0 0 0px;
+  border-radius: 0;
+}
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper{
+  box-shadow: 0 0 0 0px;
+}
   .submenudeleteButton{
     float:right;
     margin-top:16px;
