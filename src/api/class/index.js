@@ -14,7 +14,7 @@ export function getClass(academicYear,semester,departmentId,pageSize,pageNum) {
     })
   }
   //添加教学班列表
-export function addClass(academicYear,semester,departmentId,className,identifier,teacherName,teacherNumber,courseCode,remark,schoolId) {
+export function addClass(academicYear,semester,departmentId,className,identifier,instructor,courseCode,remark,schooldId) {
   return request({
     url: '/classes/add',
     method: 'POST',
@@ -27,12 +27,11 @@ export function addClass(academicYear,semester,departmentId,className,identifier
       // 开课号
       identifier:identifier,
       // 任课教师
-      teacherName:teacherName,
-      teacherNumber:teacherNumber,
+      instructor:instructor,
       // 课程号
       courseCode:courseCode,
       remark:remark,
-      schoolId:schoolId,
+      schooldId:schooldId,
     }
   })
 }
@@ -50,12 +49,5 @@ export function setPermission(array) {
     url: '/classes/setClassIsRespondent',
     method: 'POST',
     data:array,
-  })
-}
-//删除教学班
-export function deleteClass(classId) {
-  return request({
-    url: '/classes/'+classId,
-    method: 'DELETE',
   })
 }
