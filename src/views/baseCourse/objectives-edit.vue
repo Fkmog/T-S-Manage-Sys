@@ -207,13 +207,6 @@
               v-model="assessment.activities.item"
               style="width: 330px"
             >
-              <!-- <el-option
-                v-for="(itemObject, index2) in assessment.activities.itemObject"
-                :key="index2"
-                :label="itemObject.value"
-                :value="itemObject.value"
-              >
-              </el-option> -->
               <el-option
                 v-for="(itemObject, index2) in allActivities"
                 :key="index2"
@@ -297,7 +290,7 @@ export default {
       dialogObject: {},
       index: Number, //dialog中指明操作的object
       deleteSerialNum: "",
-      activities: [],
+      activities: {},
       allActivities:[],
       isEditWeight: false,
       isChange: false, //页面有无修改
@@ -406,6 +399,7 @@ export default {
           if (this.objectives[0].assessmentMethods.length > 0) {
             this.activities =
               this.objectives[0].assessmentMethods[0].activities;
+              console.log("234",this.activities);
           }
         }
         this.getDeleteSerialNum();
