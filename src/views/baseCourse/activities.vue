@@ -137,6 +137,7 @@
         postData: { activities: {
           item:[],
           value:[],
+          remark:[]
         }
           },
         db: { items: [] },
@@ -403,6 +404,16 @@
         
         
         let length = Object.keys(this.db.items[0]).length;
+        // let count=0;
+        // let hasremark=false;
+        // for(let i=0;i<length;i++){
+        //   if(this.db.item[2][i.toString()]){
+        //     count++;
+        //   }
+        // }
+        // if(count){
+        //   hasremark=true;
+        // }
           for(let i=0;i<length;i++){
             if (!this.db.items[0][i.toString()] ||!this.db.items[1][i.toString()]) {
               

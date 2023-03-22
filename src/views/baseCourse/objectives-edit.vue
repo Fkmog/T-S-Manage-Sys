@@ -208,10 +208,10 @@
               style="width: 330px"
             >
               <el-option
-                v-for="(itemObject, index2) in allActivities"
+                v-for="(item, index2) in allActivities.itemObject"
                 :key="index2"
-                :label="itemObject.value"
-                :value="itemObject.value"
+                :label="item.value"
+                :value="index2"
               >
               </el-option>
             </el-select>
@@ -291,7 +291,7 @@ export default {
       index: Number, //dialog中指明操作的object
       deleteSerialNum: "",
       activities: {},
-      allActivities:[],
+      allActivities: {},
       isEditWeight: false,
       isChange: false, //页面有无修改
       canDelete: false,
@@ -321,21 +321,20 @@ export default {
         this.list.majorId = this.$store.state.major.majorId;
         // console.log("保存的list:", this.list);
         //有无课程目标
-        if(this.list.objectives.length==0){
-            ElMessage.error("请添加课程目标");
-            throw "true";
+        if (this.list.objectives.length == 0) {
+          ElMessage.error("请添加课程目标");
+          throw "true";
         }
         this.list.objectives.forEach((object) => {
           if (object.description == "") {
             ElMessage.error("描述内容不能为空");
             throw "true";
-          }
-          else if(object.assessmentMethods.length==0){
+          } else if (object.assessmentMethods.length == 0) {
             ElMessage.error("请为课程目标添加考核方式");
             throw "true";
           }
         });
-        this.save()
+        this.save();
       } catch (stat) {
         if (stat == "true") {
           return;
@@ -344,21 +343,21 @@ export default {
     },
     save() {
       saveObjectives(this.list).then((res) => {
+        console.log("保存的内容", this.list);
         console.log("save", res);
         if (res.code == 200) {
           ElMessage({
-          type: "success",
-          message: `保存成功`,
-          duration: 1000,
-        });
-        this.backObjectives();
-        }
-        else{
+            type: "success",
+            message: `保存成功`,
+            duration: 1000,
+          });
+          this.backObjectives();
+        } else {
           ElMessage({
-          type: "error",
-          message: `保存失败`,
-          duration: 1000,
-        });
+            type: "error",
+            message: `保存失败`,
+            duration: 1000,
+          });
         }
       });
     },
@@ -367,10 +366,14 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
-        this.allActivities=this.list.activities.item
-        // console.log("@", this.allActivities)
-        this.allActivities = this.allActivities.map((item) => ({ value: item }));
-
+        this.allActivities = this.list.activities;
+        // console.log("初始list", this.list);
+        // console.log("初始allActivities", this.list.activities);
+        this.allActivities.itemObject = this.allActivities.item.map((item) => ({
+          value: item,
+        }));
+        // console.log("格式化后的allActivities", this.allActivities);
+        // console.log("格式化后的list", this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
           this.list.objectives.forEach((value) => {
@@ -399,7 +402,6 @@ export default {
           if (this.objectives[0].assessmentMethods.length > 0) {
             this.activities =
               this.objectives[0].assessmentMethods[0].activities;
-              console.log("234",this.activities);
           }
         }
         this.getDeleteSerialNum();
@@ -419,7 +421,9 @@ export default {
       assess.name = "";
       assess.weight = 0;
       // 每一项的成绩项都是一样的吗？这里暂时当作一样 所以直接把某一项的成绩项存到data里用
-      assess.activities = this.activities;
+      assess.activities = {};
+      // assess.activities = this.activities;
+      // console.log("新增考核方式的activities", assess.activities);
       // console.log("addAssessment:", assess, this.dialogObject);
       this.dialogObject.assessmentMethods.push(assess);
     },
@@ -428,7 +432,7 @@ export default {
       this.index = index;
       // 深克隆
       this.dialogObject = JSON.parse(JSON.stringify(objective));
-      console.log("objective", this.dialogObject);
+      // console.log("objective", this.dialogObject);
       this.dialogFormVisible = true;
     },
     //删除考核方式
@@ -471,9 +475,26 @@ export default {
         isItemNull == false &&
         haveZero == false
       ) {
+        // 处理activities
+        let array = this.dialogObject.assessmentMethods[0].activities.item;
+        console.log(array);
+        // console.log("all",this.allActivities);
+        this.dialogObject.assessmentMethods[0].activities.item=[]
+        this.dialogObject.assessmentMethods[0].activities.value=[]
+        this.dialogObject.assessmentMethods[0].activities.remark=[]
+        array.forEach((index)=>{
+          this.dialogObject.assessmentMethods[0].activities.item.push(this.allActivities.item[index])
+          this.dialogObject.assessmentMethods[0].activities.value.push(this.allActivities.value[index])
+          this.dialogObject.assessmentMethods[0].activities.remark.push(this.allActivities.remark[index])
+        })
+
         this.objectives[this.index].assessmentMethods =
           this.dialogObject.assessmentMethods;
         this.dialogFormVisible = false;
+        console.log(
+          "确定编辑考核方式assessmentMethods",
+          this.dialogObject.assessmentMethods[0]
+        );
       }
     },
     //新增课程目标
@@ -522,9 +543,11 @@ export default {
       if (this.objectives.length > 0) {
         this.deleteSerialNum =
           this.objectives[this.objectives.length - 1].serialNum;
+        this.canDelete = true;
+
       } else {
         this.deleteSerialNum = 0;
-        this.canDelete = false
+        this.canDelete = false;
       }
     },
     // 编辑权重

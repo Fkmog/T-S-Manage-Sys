@@ -1,82 +1,89 @@
 <template>
     <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
-<div class="block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="goTeacher()"
-        >
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="保存成绩"
-        placement="bottom"
-        :hide-after="0"
-        
-      >
-      <el-button 
-      @click="save" 
-      link
-      :disabled="!isValid()" >
-        <el-icon
-          
-          size="22px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px;top:-4px;"
-          
-        >
-       
-          <FolderChecked />
-        </el-icon>
-      </el-button>
-      </el-tooltip>
+      <div class="block">
+          <el-row class="block-row">
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="返回"
+              placement="bottom"
+              :hide-after="0"
+            >
+            <el-button
+            link
+            @click="goTeacher()"
+            >
+            <el-icon
+                class="icon"
+                size="24px"
+                color="rgb(137, 137, 137)"
+                style="margin-left: 50px"
+                
+              >
+                <Back />
+              </el-icon>
+            </el-button>
+              
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="保存成绩"
+              placement="bottom"
+              :hide-after="0"
+              
+            >
+            <el-button 
+            @click="save" 
+            link
+            :disabled="!isValid()" >
+              <el-icon
+                size="24px"
+                color="rgb(137, 137, 137)"
+                style="margin-left: 20px"
+              >
+            
+                <FolderChecked />
+              </el-icon>
+            </el-button>
+            </el-tooltip>
 
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="添加成绩项"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="22px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          
-        >
-        <!-- @click="addActivities" -->
-          <CirclePlus />
-        </el-icon>
-      </el-tooltip>
+            <!-- <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="添加成绩项"
+              placement="bottom"
+              :hide-after="0"
+            >
+              <el-icon
+                class="icon"
+                size="22px"
+                color="rgb(137, 137, 137)"
+                style="margin-left: 20px"
+                
+              > -->
+              <!-- @click="addActivities" -->
+                <!-- <CirclePlus />
+              </el-icon>
+            </el-tooltip> -->
 
-    </el-row>
-  </div>
-    
-       
-    
-        <div layout="row" flex class="md-padding">
-            <div class="hot-table-container" flex id="courseHot"></div>
-        </div>
-        
-        
+          </el-row>
       </div>
-    
-      
-    </template>
+      <div layout="row" flex class="md-padding" v-show="hasActivities&&hasObjectives">
+          <div class="hot-table-container" flex id="courseHot"></div>
+      </div>
+      <div v-show="!hasActivities" class="no-program">
+        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+          未创建成绩项
+        </h2>
+      </div>
+      <div v-show="!hasObjectives" class="no-program">
+        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+          未创建课程目标
+        </h2>
+      </div>
+    </div>
+</template>
     
     <script >
     import { ref, onMounted,reactive} from 'vue'
@@ -112,6 +119,9 @@
       data(){
         let self = this;
         return{
+          hasActivities:Boolean,
+          hasScores:Boolean,
+          hasObjectives:Boolean,
           departmentId:'',
           schoolId:'',
           programId:'',
@@ -162,20 +172,20 @@
         CirclePlus
       },
       methods:{
-addActivities(){
-        this.firstActivities = false;
-        let length = Object.keys(this.db.items[0]).length-2;
-        let activityName = '成绩项'+length.toString();
-        var activityDict = {
-            data:activityName
-        }
-        this.columnList.push(activityDict)
-        this.hotInstance.updateSettings({
-                columns:this.columnList,
-              });
-        console.log('db items:',this.db.items,'column List',this.columnList);
-        // this.db.items[0][activityName] = '';
-      },
+// addActivities(){
+//         this.firstActivities = false;
+//         let length = Object.keys(this.db.items[0]).length-2;
+//         let activityName = '成绩项'+length.toString();
+//         var activityDict = {
+//             data:activityName
+//         }
+//         this.columnList.push(activityDict)
+//         this.hotInstance.updateSettings({
+//                 columns:this.columnList,
+//               });
+//         console.log('db items:',this.db.items,'column List',this.columnList);
+//         // this.db.items[0][activityName] = '';
+//       },
 activate(){
         this.departmentId = this.$store.state.currentInfo.departmentId;
         this.schoolId = this.$store.state.currentInfo.schoolId;
@@ -366,12 +376,21 @@ async getActivities(){
         console.log('class Info',res);
         
         let course = res.data;
-        if(course.activities){
-          let activityNumber = course.activities.item.length;
-          let studentNum = course.scores.length;
-          that.currentNumberofActivities = activityNumber;
-        //   that.db.items[0]={};
-        //   that.db.items[1]={};
+        if(course.objectives){
+          that.hasObjectives = true;
+        }
+        else{
+          that.hasObjectives = false;
+        }
+        if(course.scores){
+          that.hasScores = true;
+          if(course.activities&&that.hasObjectives){
+            that.hasActivities = true;
+            let activityNumber = course.activities.item.length;
+            let studentNum = course.scores.length;
+            that.currentNumberofActivities = activityNumber;
+          //   that.db.items[0]={};
+          //   that.db.items[1]={};
           for(let i=0;i<studentNum+3;i++){
             that.db.items[i]={};
           }
@@ -411,11 +430,44 @@ async getActivities(){
         }
         else {
           console.log('res has no activities');
-          that.db.items = [[''],['']];
-              // add two columns (fail column, 1 score column)
-              that.addColumn();
-              that.addColumn();
+          that.hasActivities = false;
+         
           }
+        }
+        else{
+          console.log('res has no scores');
+          that.hasScores = false;
+          if(course.activities&&that.hasObjectives){
+            that.hasActivities = true;
+            let activityNumber = course.activities.item.length;
+            let studentNum = 0;
+            that.currentNumberofActivities = activityNumber;
+         
+          for(let i=0;i<studentNum+4;i++){
+            that.db.items[i]={};
+          }
+         
+         for(let i=0;i<activityNumber;i++){
+        //   itemDict[i.toString()] = course.activities.item[i];
+        var columnDist = {};
+          that.db.items[0][course.activities.item[i]]= course.activities.item[i];
+          that.db.items[1][course.activities.item[i]]= course.activities.value[i];
+          that.db.items[2][course.activities.item[i]]= course.activities.remark[i];
+          columnDist={
+            data:course.activities.item[i],
+          }
+          that.columnList.push(columnDist);
+          
+         
+        
+         }
+         
+        
+          
+          console.log('db.items',that.db.items,'columnList:',that.columnList);
+        }
+        }
+        
         
       })
     },
@@ -768,12 +820,6 @@ async getActivities(){
       mounted:function(){
         this.activate();
       },
-     
-    
-      
-      
-    
-    
     }
     
     
@@ -781,11 +827,15 @@ async getActivities(){
     </script>
     
     <style  scoped>
+    .no-program {
+  display: flex;
+  flex-direction: column;
+}
     .icon {
   cursor: pointer;
 }
     .block-row {
-  margin-top: 18px;
+  margin-top: 15px;
 }
     .block {
   position: absolute;

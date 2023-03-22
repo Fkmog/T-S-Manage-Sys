@@ -25,7 +25,7 @@
   </div>
 
 
-  <div layout="row" flex class="md-padding">
+  <div layout="row" flex class="md-padding" >
     <addBtn @click="goAddScore"></addBtn>
 <!-- 学生信息列表 -->
     <el-table
@@ -34,7 +34,7 @@
     style="width: 80%"
     :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
     :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
-    
+    v-show="hasScores"
   >
     <el-table-column prop="studentNumber" label="学号"  width="180px"/>
     <el-table-column prop="studentName" label="姓名" width="100px"/>
@@ -58,7 +58,14 @@
     </el-table-column>
     
   </el-table>
+  <div v-show="!hasScores" class="no-program">
+      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+        未添加成绩项
+      </h2>
+      
   </div>
+  </div>
+  
 </template>
 
 <script>
@@ -72,6 +79,9 @@ export default {
   },
   data() {
     return {
+      hasActivities:Boolean,
+      hasScores:Boolean,
+
       classInfo: [],
       activityName:[],
       activityScores:[],
@@ -100,7 +110,10 @@ export default {
         console.log('class Info',res);
         
         let course = res.data;
-        if(course.activities){
+        if(course.scores){
+          that.hasScores = true;
+          if(course.activities){
+            that.hasActivities = true;
           let activityNumber = course.activities.item.length;
           let studentNum = course.scores.length;
          that.activityName = course.activities.item;
@@ -117,11 +130,14 @@ export default {
         }
         else {
           console.log('res has no activities');
-          that.db.items = [[''],['']];
-              // add two columns (fail column, 1 score column)
-              that.addColumn();
-              that.addColumn();
+          that.hasActivities = false;
           }
+        }
+        else{
+          console.log('res has no scores');
+          that.hasScores = false;
+        }
+        
         
       })
     },
@@ -130,6 +146,10 @@ export default {
 </script>
 
 <style scoped>
+   .no-program {
+  display: flex;
+  flex-direction: column;
+}
 .studentsTable{
   margin-left: 10%;
   margin-top: 85px;

@@ -121,7 +121,6 @@ export default {
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         this.list = res.data;
-        console.log(res);
         //处理数据-serialNum
         if (this.list.objectives) {
           this.list.objectives.forEach((value) => {

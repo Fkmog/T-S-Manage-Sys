@@ -48,7 +48,7 @@ import PrincipalBaseCourse from '@/views/principalSide/baseCourse/baseCourse.vue
 import PrincipalClass from '@/views/principalSide/class/class.vue'
 
 //web管理员组件
-import WebAdminIndex from '@/views/webAdmin/index.vue'
+import WebAdminIndex from '@/views/webAdmin/webIndex.vue'
 import Schools from '@/views/webAdmin/schools/schools.vue'
 
 
