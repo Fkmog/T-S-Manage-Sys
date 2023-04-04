@@ -113,28 +113,7 @@ export default {
     return {
       departmentId: "",
       schoolId: "",
-      tableData: reactive([
-        {
-          teacherId: 2022030508,
-          teacherName: "王小虎",
-          email: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          teacherId: 2022030508,
-          teacherName: "王小虎",
-          email: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          teacherId: 2022030508,
-          teacherName: "王小虎",
-          email: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          teacherId: 2022030508,
-          teacherName: "王小虎",
-          email: "上海市普陀区金沙江路 1518 弄",
-        },
-      ]),
+      tableData: reactive([]),
       multipleSelection: [],
       numSelected: 0,
       teacherId: [],
