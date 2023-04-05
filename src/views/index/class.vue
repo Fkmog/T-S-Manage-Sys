@@ -1,393 +1,415 @@
 <template>
-  <!-- 顶部搜索栏 -->
-  <HeaderSearch msg="搜索课程名称">
-    <template #rightTime>
-      <div class="rightSlot">
-        <div class="selects">
-          <el-select
-            v-model="chosenYear"
-            placeholder="全部学年"
-            class="selecter"
-            @change="getClassList()"
-          >
-            <el-option
-              v-for="item in academicYear"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
-            />
-          </el-select>
-          <el-select
-            v-model="chosenSemester"
-            placeholder="学期"
-            class="selecter"
-            @change="getClassList()"
-          >
-            <el-option
-              v-for="item in semester"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
-            />
-          </el-select>
+  <div class="content">
+    <!-- 顶部搜索栏 -->
+    <HeaderSearch msg="搜索课程名称">
+      <template #rightTime>
+        <div class="rightSlot">
+          <div class="selects">
+            <el-select
+              v-model="chosenYear"
+              placeholder="全部学年"
+              class="selecter"
+              @change="getClassList()"
+            >
+              <el-option
+                v-for="item in academicYear"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+            <el-select
+              v-model="chosenSemester"
+              placeholder="学期"
+              class="selecter"
+              @change="getClassList()"
+            >
+              <el-option
+                v-for="item in semester"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </div>
         </div>
-      </div>
-    </template>
-    <template #assignBtn>
-      <div class="assignBtn" v-show="showAdd">
-        <el-button style="color: #6573c0" text @click="assignDetail()">
-          设置课程大纲
-        </el-button>
-      </div>
-    </template>
-  </HeaderSearch>
-  <!-- 添加教学班按钮 -->
-  <addBtn
-    v-show="identity === '学院管理员'"
-    @click="addVisible = true"
-  ></addBtn>
-  <!-- 弹出新建表单 -->
-  <div>
-    <el-dialog
-      v-model="addVisible"
-      title="新建教学班"
-      width="580px"
-      :show-close="false"
-      :align-center="true"
-    >
-      <el-form
-        :model="classAddForm"
-        :rules="rules"
-        ref="classAddForm"
-        label-position="top"
-      >
-        <el-form-item
-          label="课程名"
-          :label-width="formLabelWidth"
-          prop="className"
-        >
-          <el-input v-model="classAddForm.className" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="任课教师"
-          :label-width="formLabelWidth"
-          prop="instructor"
-        >
-          <el-autocomplete
-            style="width: 540px"
-            v-model="classAddForm.instructor"
-            :fetch-suggestions="querySearch"
-          ></el-autocomplete>
-        </el-form-item>
-        <el-form-item
-          label="课程号"
-          :label-width="formLabelWidth"
-          prop="courseCode"
-        >
-          <el-input v-model="classAddForm.courseCode" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="开课号"
-          :label-width="formLabelWidth"
-          prop="identifier"
-        >
-          <el-input v-model="classAddForm.identifier" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="开课学年"
-          :label-width="formLabelWidth"
-          prop="chosenYear"
-        >
-          <el-select
-            v-model="classAddForm.chosenYear"
-            placeholder="选择开课学年"
-          >
-            <el-option
-              v-for="item in academicYear"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label="开课学期"
-          :label-width="formLabelWidth"
-          prop="chosenSemester"
-        >
-          <el-select
-            v-model="classAddForm.chosenSemester"
-            placeholder="选择开课学期"
-          >
-            <el-option
-              v-for="item in semester"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
-          <el-input
-            :rows="2"
-            type="textarea"
-            v-model="classAddForm.remark"
-            autocomplete="off"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="goBatchAddClass">批量添加</el-button>
-          <el-button @click="addVisible = false">取消</el-button>
-          <el-button type="primary" @click="addClass(classAddForm)">
-            确定
+      </template>
+      <template #assignBtn>
+        <div class="assignBtn" v-show="showAdd">
+          <el-button style="color: #6573c0" text @click="assignDetail()">
+            设置课程大纲
           </el-button>
-        </span>
+        </div>
       </template>
-    </el-dialog>
-  </div>
-  <!-- 弹出修改表单 -->
-  <div>
-    <el-dialog
-      v-model="editVisible"
-      title="修改教学班"
-      width="580px"
-      :show-close="false"
-      :align-center="true"
-    >
-      <el-form
-        :model="classEditForm"
-        :rules="rules"
-        ref="classEditForm"
-        label-position="top"
+    </HeaderSearch>
+    <!-- 添加教学班按钮 -->
+    <addBtn
+      v-show="identity === '学院管理员'"
+      @click="addVisible = true"
+    ></addBtn>
+    <!-- 弹出新建表单 -->
+    <div>
+      <el-dialog
+        v-model="addVisible"
+        title="新建教学班"
+        width="580px"
+        :show-close="false"
+        :align-center="true"
       >
-        <el-form-item
-          label="课程名"
-          :label-width="formLabelWidth"
-          prop="className"
+        <el-form
+          :model="classAddForm"
+          :rules="rules"
+          ref="classAddForm"
+          label-position="top"
         >
-          <el-input v-model="classEditForm.className" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="任课教师"
-          :label-width="formLabelWidth"
-          prop="instructor"
-        >
-          <el-autocomplete
-            style="width: 540px"
-            v-model="classEditForm.instructor"
-            hide-loading
-            :fetch-suggestions="querySearch"
-          ></el-autocomplete>
-        </el-form-item>
-        <el-form-item
-          label="课程号"
-          :label-width="formLabelWidth"
-          prop="courseCode"
-        >
-          <el-input v-model="classEditForm.courseCode" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="课程大纲版本"
-          :label-width="formLabelWidth"
-          prop="versionName"
-        >
-          <el-select
-            v-model="classEditForm.versionName"
-            placeholder="设置课程大纲"
+          <el-form-item
+            label="课程名"
+            :label-width="formLabelWidth"
+            prop="className"
           >
-            <el-option
-              v-for="item in this.detailList"
-              :key="item.detailId"
-              :label="item.versionName"
-              :value="item.detailId"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label="开课号"
-          :label-width="formLabelWidth"
-          prop="identifier"
-        >
-          <el-input v-model="classEditForm.identifier" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="开课学年"
-          :label-width="formLabelWidth"
-          prop="chosenYear"
-        >
-          <el-select
-            v-model="classEditForm.chosenYear"
-            placeholder="选择开课学年"
+            <el-input v-model="classAddForm.className" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="任课教师"
+            :label-width="formLabelWidth"
+            prop="instructor"
           >
-            <el-option
-              v-for="item in onlyAcademicYear"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label="开课学期"
-          :label-width="formLabelWidth"
-          prop="chosenSemester"
-        >
-          <el-select
-            v-model="classEditForm.chosenSemester"
-            placeholder="选择开课学期"
+            <el-autocomplete
+              style="width: 540px"
+              v-model="classAddForm.instructor"
+              :fetch-suggestions="querySearch"
+            ></el-autocomplete>
+          </el-form-item>
+          <el-form-item
+            label="课程号"
+            :label-width="formLabelWidth"
+            prop="courseCode"
           >
-            <el-option
-              v-for="item in onlySemester"
-              :key="item.dictValue"
-              :label="item.dictLabel"
-              :value="item.dictValue"
+            <el-input v-model="classAddForm.courseCode" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="开课号"
+            :label-width="formLabelWidth"
+            prop="identifier"
+          >
+            <el-input v-model="classAddForm.identifier" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="开课学年"
+            :label-width="formLabelWidth"
+            prop="chosenYear"
+          >
+            <el-select
+              v-model="classAddForm.chosenYear"
+              placeholder="选择开课学年"
+            >
+              <el-option
+                v-for="item in academicYear"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="开课学期"
+            :label-width="formLabelWidth"
+            prop="chosenSemester"
+          >
+            <el-select
+              v-model="classAddForm.chosenSemester"
+              placeholder="选择开课学期"
+            >
+              <el-option
+                v-for="item in semester"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="备注"
+            :label-width="formLabelWidth"
+            prop="remark"
+          >
+            <el-input
+              :rows="2"
+              type="textarea"
+              v-model="classAddForm.remark"
+              autocomplete="off"
             />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label=""
-          :label-width="formLabelWidth"
-          prop="isRespondent"
-        >
-          <el-radio-group v-model="classEditForm.isRespondent" class="ml-4">
-            <el-radio label="2">允许任课教师修改考核方式</el-radio>
-            <el-radio label="0">不允许任课教师修改考核方式</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
-          <el-input
-            :rows="2"
-            type="textarea"
-            v-model="classEditForm.remark"
-            autocomplete="off"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="editVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmEditClass(classEditForm)">
-            确定
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
-  <!-- 弹出分配课程大纲 -->
-  <div class="assignDialog">
-    <el-dialog
-      v-model="isAssign"
-      title="设置课程大纲"
-      width="330px"
-      :show-close="false"
-      :align-center="true"
-    >
-      <el-select
-        v-model="assignedDetail"
-        style="width: 250px; margin-left: 20px"
-        placeholder="选择课程大纲版本"
-      >
-        <el-option
-          v-for="(datail, index) in detailList"
-          :key="index"
-          :label="datail.versionInfo"
-          :value="datail.detailId"
-        >
-        </el-option>
-      </el-select>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="isAssign = false">取消</el-button>
-          <el-button type="primary" @click="confirmAssign()"> 确定 </el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
-  <!-- 教学班展示列表 -->
-  <el-table
-    ref="multipleTable"
-    class="classesTable"
-    :data="classTable"
-    @selection-change="handleSelectionChange"
-    style="width: 1720px"
-    :header-cell-class-name="cellClass"
-    :header-cell-style="{
-      'padding-left': '20px',
-      'font-size': '14.4px',
-      height: '48px',
-      'font-weight': 'bold',
-      color: 'black',
-    }"
-    :cell-style="{
-      'padding-left': '20px',
-      'font-size': '16px',
-      height: '60px',
-    }"
-    highlight-current-row
-    :row-key="rowKey"
-  >
-    <el-table-column
-      type="selection"
-      width="50"
-      :selectable="canSelect"
-      :reserve-selection="true"
-    />
-    <el-table-column prop="className" label="课程名" width="210" />
-    <el-table-column prop="teacherName" label="任课教师" width="160" />
-    <el-table-column prop="courseCode" label="课程号" width="180" />
-    <el-table-column prop="versionName" label="大纲版本" width="170" />
-    <el-table-column prop="identifier" label="开课号" width="220" />
-    <el-table-column prop="academicYear" label="学年" width="180" />
-    <el-table-column prop="semester" label="学期" width="180" />
-    <el-table-column prop="remark" label="备注" width="160" />
-    <el-table-column prop="isRespondent" label="" width="60">
-      <template #default="scope">
-        <div v-if="scope.row.isRespondent == 2">
-          <el-tooltip content="允许任课教师修改考核方式" :hide-after="0">
-            <el-button link style="color: #3f51b5; cursor: default"
-              ><el-icon style="color: #3f51b5"><SetUp /></el-icon>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="goBatchAddClass">批量添加</el-button>
+            <el-button @click="addVisible = false">取消</el-button>
+            <el-button type="primary" @click="addClass(classAddForm)">
+              确定
             </el-button>
-          </el-tooltip>
-        </div>
-
-        <span v-else></span>
-      </template>
-    </el-table-column>
-
-    <el-table-column width="150">
-      <template #default="scope">
-        <el-row>
-          <el-col :span="8">
-            <el-tooltip content="修改" :hide-after="0">
-              <el-button
-                link
-                style="color: #3f51b5"
-                @click="editClass(scope.$index, scope.row)"
-                ><el-icon><Edit /></el-icon
-              ></el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+    <!-- 弹出修改表单 -->
+    <div>
+      <el-dialog
+        v-model="editVisible"
+        title="修改教学班"
+        width="580px"
+        :show-close="false"
+        :align-center="true"
+      >
+        <el-form
+          :model="classEditForm"
+          :rules="rules"
+          ref="classEditForm"
+          label-position="top"
+        >
+          <el-form-item
+            label="课程名"
+            :label-width="formLabelWidth"
+            prop="className"
+          >
+            <el-input v-model="classEditForm.className" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="任课教师"
+            :label-width="formLabelWidth"
+            prop="instructor"
+          >
+            <el-autocomplete
+              style="width: 540px"
+              v-model="classEditForm.instructor"
+              hide-loading
+              :fetch-suggestions="querySearch"
+            ></el-autocomplete>
+          </el-form-item>
+          <el-form-item
+            label="课程号"
+            :label-width="formLabelWidth"
+            prop="courseCode"
+          >
+            <el-input v-model="classEditForm.courseCode" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="课程大纲版本"
+            :label-width="formLabelWidth"
+            prop="versionName"
+          >
+            <el-select
+              v-model="classEditForm.versionName"
+              placeholder="设置课程大纲"
+            >
+              <el-option
+                v-for="item in this.detailList"
+                :key="item.detailId"
+                :label="item.versionName"
+                :value="item.detailId"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="开课号"
+            :label-width="formLabelWidth"
+            prop="identifier"
+          >
+            <el-input v-model="classEditForm.identifier" autocomplete="off" />
+          </el-form-item>
+          <el-form-item
+            label="开课学年"
+            :label-width="formLabelWidth"
+            prop="chosenYear"
+          >
+            <el-select
+              v-model="classEditForm.chosenYear"
+              placeholder="选择开课学年"
+            >
+              <el-option
+                v-for="item in onlyAcademicYear"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="开课学期"
+            :label-width="formLabelWidth"
+            prop="chosenSemester"
+          >
+            <el-select
+              v-model="classEditForm.chosenSemester"
+              placeholder="选择开课学期"
+            >
+              <el-option
+                v-for="item in onlySemester"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label=""
+            :label-width="formLabelWidth"
+            prop="isRespondent"
+          >
+            <el-radio-group v-model="classEditForm.isRespondent" class="ml-4">
+              <el-radio label="2">允许任课教师修改考核方式</el-radio>
+              <el-radio label="0">不允许任课教师修改考核方式</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            label="备注"
+            :label-width="formLabelWidth"
+            prop="remark"
+          >
+            <el-input
+              :rows="2"
+              type="textarea"
+              v-model="classEditForm.remark"
+              autocomplete="off"
+            />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="editVisible = false">取消</el-button>
+            <el-button type="primary" @click="confirmEditClass(classEditForm)">
+              确定
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+    <!-- 弹出分配课程大纲 -->
+    <div class="assignDialog">
+      <el-dialog
+        v-model="isAssign"
+        title="设置课程大纲"
+        width="330px"
+        :show-close="false"
+        :align-center="true"
+      >
+        <el-select
+          v-model="assignedDetail"
+          style="width: 250px; margin-left: 20px"
+          placeholder="选择课程大纲版本"
+        >
+          <el-option
+            v-for="(datail, index) in detailList"
+            :key="index"
+            :label="datail.versionInfo"
+            :value="datail.detailId"
+          >
+          </el-option>
+        </el-select>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="isAssign = false">取消</el-button>
+            <el-button type="primary" @click="confirmAssign()">
+              确定
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+    <!-- 教学班展示列表 -->
+    <el-table
+      v-show="hasClass"
+      ref="multipleTable"
+      class="classesTable"
+      :data="classTable"
+      @selection-change="handleSelectionChange"
+      style="width: 1720px; max-width: 80%"
+      :header-cell-class-name="cellClass"
+      :header-cell-style="{
+        'padding-left': '20px',
+        'font-size': '14.4px',
+        height: '48px',
+        'font-weight': 'bold',
+        color: 'black',
+      }"
+      :cell-style="{
+        'padding-left': '20px',
+        'font-size': '16px',
+        height: '60px',
+      }"
+      highlight-current-row
+      :row-key="rowKey"
+    >
+      <el-table-column
+        type="selection"
+        width="50"
+        :selectable="canSelect"
+        :reserve-selection="true"
+      />
+      <el-table-column prop="className" label="课程名" width="210" />
+      <el-table-column prop="teacherName" label="任课教师" width="160" />
+      <el-table-column prop="courseCode" label="课程号" width="180" />
+      <el-table-column prop="versionName" label="大纲版本" width="170" />
+      <el-table-column prop="identifier" label="开课号" width="220" />
+      <el-table-column prop="academicYear" label="学年" width="180" />
+      <el-table-column prop="semester" label="学期" width="180" />
+      <el-table-column prop="remark" label="备注" width="160" />
+      <el-table-column prop="isRespondent" label="" width="60">
+        <template #default="scope">
+          <div v-if="scope.row.isRespondent == 2">
+            <el-tooltip content="允许任课教师修改考核方式" :hide-after="0">
+              <el-button link style="color: #3f51b5; cursor: default"
+                ><el-icon style="color: #3f51b5"><SetUp /></el-icon>
+              </el-button>
             </el-tooltip>
-          </el-col>
-          <el-col :span="12" v-show="identity === '学院管理员'">
-            <el-tooltip content="删除" :hide-after="0">
-              <el-button
-                link
-                style="color: #3f51b5"
-                @click="deleteClass(scope.$index, scope.row)"
-                ><el-icon><Delete /></el-icon
-              ></el-button>
-            </el-tooltip>
-          </el-col>
-        </el-row>
-      </template>
-    </el-table-column>
-  </el-table>
-  <!-- 分页 -->
-  <div class="pagination-container" flex>
-    <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
-      <el-button v-show="showLoadmore" @click="loadMore()">加载更多</el-button>
-    </el-row>
+          </div>
+
+          <span v-else></span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="150">
+        <template #default="scope">
+          <el-row>
+            <el-col :span="8">
+              <el-tooltip content="修改" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click="editClass(scope.$index, scope.row)"
+                  ><el-icon><Edit /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="12" v-show="identity === '学院管理员'">
+              <el-tooltip content="删除" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click="deleteClass(scope.$index, scope.row)"
+                  ><el-icon><Delete /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="no-class" v-show="noClass">没有教学班</div>
+    <!-- <div class="no-class" v-show="!noClass"></div> -->
+    <!-- 分页 -->
+    <div class="pagination-container" flex>
+      <el-row
+        type="flex"
+        justify="center"
+        align="middle"
+        style="margin-top: 8px"
+      >
+        <el-button v-show="hasClass && showLoadmore" @click="loadMore()"
+          >加载更多</el-button
+        >
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -413,6 +435,8 @@ export default {
   },
   data() {
     return {
+      hasClass: false,
+      noClass: false,
       isRespondent: "0",
       showLoadmore: true,
       isAssign: false,
@@ -480,6 +504,7 @@ export default {
       pageNum: 1,
       pageSize: 8,
       total: 0,
+      loading: true,
     };
   },
   mounted() {
@@ -588,7 +613,16 @@ export default {
       ).then((res) => {
         console.log("getClassList", res);
         if (res.code == 200) {
+          this.loading = false;
           this.classTable = res.rows;
+          // console.log("!", this.classTable);
+          if (this.classTable.length == 0) {
+            this.noClass = true;
+            this.hasClass = false;
+          } else {
+            this.hasClass = true;
+            this.noClass = false;
+          }
           this.total = res.total;
           if (this.pageSize >= res.total) {
             this.showLoadmore = false;
@@ -861,6 +895,10 @@ export default {
 </script>
 
 <style scoped>
+.content {
+  height: 100vh;
+  background-color: #f2f2f2;
+}
 .classesTable {
   margin: 0 auto;
   margin-top: 85px;
@@ -900,6 +938,9 @@ export default {
   width: 70%;
   margin-top: 10px;
 }
+.el-loading-mask {
+  z-index: 9;
+}
 :deep().el-pagination button:disabled {
   cursor: default;
 }
@@ -936,5 +977,12 @@ export default {
 }
 .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
+}
+.no-class {
+  padding-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+  background-color: #f2f2f2;
 }
 </style>

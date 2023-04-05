@@ -82,7 +82,7 @@
         </div>
       </div>
     </div>
-    <div v-show="!hasProgram" class="no-program">
+    <div v-show="noProgram" class="no-program">
       <h2 style="display: flex; justify-content: center; margin-top: 100px">
         未创建培养方案
       </h2>
@@ -217,7 +217,8 @@ export default {
   },
   data() {
     return {
-      hasProgram: Boolean,
+      hasProgram: false,
+      noProgram:false,
       hasAttribute: Boolean,
       currentMajorId: Number,
       currentMajorName: "",
@@ -282,9 +283,11 @@ export default {
         // console.log("checkProgram", res);
         if (res.msg == "未查到" && res.code == 200) {
           this.hasProgram = false;
+          this.noProgram = true;
           this.$store.commit("major/setProgramId", "");
         }
         if (res.msg == "操作成功" && res.code == 200) {
+          this.noProgram = false;
           this.hasProgram = true;
           this.programId = res.data.programId;
           this.$store.commit("major/setProgramId", this.programId);
