@@ -35,12 +35,16 @@
     </el-row>
     </div>
 
+    <div v-show="!hasBaseCourse" class="no-class">
+      没有教师
+    </div>
     <div layout="row" flex class="md-padding">
       <addBtn @click="goAddTeacher"></addBtn>
       <div
         class="hot-table-container"
         layout="column"
         flex
+        v-show="hasBaseCourse" 
         layout-align="start center"
       >
         <el-table
@@ -111,6 +115,7 @@ registerAllModules();
 export default {
   data() {
     return {
+      hasBaseCourse:Boolean,
       departmentId: "",
       schoolId: "",
       tableData: reactive([]),
@@ -271,7 +276,14 @@ export default {
         },
       }).then(function (res) {
         console.log(res);
-        that.tableData = res.rows;
+        if(res.total == 0){
+          that.hasBaseCourse = false;
+        }
+        else{
+          that.hasBaseCourse = true;
+          that.tableData = res.rows;
+        }
+        
       });
     },
     activate() {
@@ -288,6 +300,12 @@ export default {
 </script>
 
 <style scoped>
+  .no-class {
+  margin-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+}
 .rowStyle{
   top: 10px;
 }

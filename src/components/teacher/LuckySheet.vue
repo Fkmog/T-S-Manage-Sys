@@ -172,9 +172,7 @@ export default{
         return;
       }
    
-    if (!this.postData.teachers || this.postData.teachers.length <= 0) {
-          return $q.reject('工号或姓名不能为空');
-        }
+    
         let teacherList = [];
         this.postData.teachers.forEach(function(teacher){
           teacherList.push(teacher);
