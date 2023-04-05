@@ -11,7 +11,7 @@
             class="searchInput"
             :class="active ? 'activeInput' : ''"
             v-model="searchInput"
-            :placeholder = "msg"
+            :placeholder="msg"
             @change="sendMessage"
             @focus="active = true"
             @blur="active = false"
@@ -31,9 +31,9 @@ import { Search } from "@element-plus/icons-vue";
 export default {
   name: "HeaderSearch",
   props: {
-      msg: String,
-      required: true
-    },
+    msg: String,
+    required: true,
+  },
   components: {
     Search,
   },
@@ -49,7 +49,6 @@ export default {
       this.msg(this.searchInput);
     },
   },
-
 };
 </script>
 
@@ -61,6 +60,7 @@ export default {
   height: 55px;
   border-bottom: 1px solid rgb(189, 189, 189);
   width: 100%;
+  background-color: #f2f2f2;
 }
 .iconSearch {
   margin-top: 18px;
@@ -97,11 +97,10 @@ export default {
   border-bottom-width: 1px;
   opacity: 1;
   transition: 0.3s;
-  margin-top:20px;
-
+  margin-top: 20px;
 }
 .searchBlock:hover .searchInput {
-  margin-top:20px;
+  margin-top: 20px;
   width: 220px;
   transition: all 0.3s;
   border-top-width: 0px;

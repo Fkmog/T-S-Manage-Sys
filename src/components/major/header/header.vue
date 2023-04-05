@@ -62,9 +62,9 @@ export default {
 
 <style  scoped>
 /* 设置所有字体为微软雅黑 */
-* {
+/* * {
   font-family: Microsoft Yahei;
-}
+} */
 .headerBgd {
   display: flex;
   background-color: #5c6bc0;

@@ -15,9 +15,9 @@ export default {
 
 <style scoped>
 /* 设置所有字体为微软雅黑 */
-*{
+/* *{
     font-family: Microsoft Yahei;;
-}
+} */
 /* 取消列表的点 */
 ul{
     list-style-type:none;
