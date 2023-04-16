@@ -176,10 +176,10 @@ export default {
   flex-direction: row;
   height: 60px;
 }
-/* 设置所有字体为微软雅黑
+/* 设置所有字体为微软雅黑 */
 * {
   font-family: Microsoft Yahei;
-} */
+}
 /* 取消列表的点 */
 ul {
   list-style-type: none;
@@ -190,8 +190,9 @@ ul {
   padding-left: 2px;
   padding-right: 2px;
   color: #fff;
+  font-size: 16px;
   line-height: 30px;
-  font-size: 17px;
+  font-size: 18px;
   text-decoration: none;
 }
 .pageNav > ul {

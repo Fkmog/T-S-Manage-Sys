@@ -62,6 +62,5 @@ export default {
 <style>
  html,body,#app{
   height: 100%;
-  font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
  }
 </style>
