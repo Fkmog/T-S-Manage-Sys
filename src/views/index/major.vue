@@ -1,54 +1,52 @@
 <template>
-  <div class="content">
-    <HeaderSearch msg="搜索专业名称"></HeaderSearch>
-    <addBtn @click="addMajor()"></addBtn>
-    <div class="cardList">
-      <div
-        class="card"
-        v-for="major in majorList"
-        :key="major.majorId"
-        @click="toMajor(major)"
+  <HeaderSearch msg="搜索专业名称"></HeaderSearch>
+  <addBtn @click="addMajor()"></addBtn>
+  <div class="cardList">
+    <div
+      class="card"
+      v-for="major in majorList"
+      :key="major.majorId"
+      @click="toMajor(major)"
+    >
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="删除"
+        placement="bottom"
+        :hide-after="0"
       >
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="删除"
-          placement="bottom"
-          :hide-after="0"
+        <el-icon
+          class="deleteIcon"
+          size="18px"
+          @click.stop="deleteMajor(major.majorId, major.majorName)"
         >
-          <el-icon
-            class="deleteIcon"
-            size="18px"
-            @click.stop="deleteMajor(major.majorId, major.majorName)"
-          >
-            <DeleteFilled />
-          </el-icon>
-        </el-tooltip>
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="修改"
-          placement="bottom"
-          :hide-after="0"
+          <DeleteFilled />
+        </el-icon>
+      </el-tooltip>
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="修改"
+        placement="bottom"
+        :hide-after="0"
+      >
+        <el-icon
+          class="toolsIcon"
+          size="18px"
+          @click.stop="changeMajor(major.majorId,major.majorName)"
         >
-          <el-icon
-            class="toolsIcon"
-            size="18px"
-            @click.stop="changeMajor(major.majorId, major.majorName)"
-          >
-            <Tools />
-          </el-icon>
-        </el-tooltip>
+          <Tools />
+        </el-icon>
+      </el-tooltip>
 
-        <div class="cardPic">
-          <img src="@/assets/bgimg.png" />
-          <div class="cardMask">
-            <button class="cardMaskBtn">进入专业</button>
-          </div>
+      <div class="cardPic">
+        <img src="@/assets/bgimg.png" />
+        <div class="cardMask">
+          <button class="cardMaskBtn">进入专业</button>
         </div>
-        <div class="cardText">
-          <h3>{{ major.majorName }}</h3>
-        </div>
+      </div>
+      <div class="cardText">
+        <h3>{{ major.majorName }}</h3>
       </div>
     </div>
   </div>
@@ -121,7 +119,7 @@ export default {
       ElMessageBox.prompt("专业名称：", "新建专业", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        customClass: "add-major-box",
+        customClass: 'add-major-box',
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入新增专业名称",
@@ -138,7 +136,9 @@ export default {
             this.getMajorList();
           });
         })
-        .catch(() => {});
+        .catch(() => {
+         
+        });
     },
     //删除专业
     deleteMajor(majorId, majorName) {
@@ -161,11 +161,11 @@ export default {
       });
     },
     //修改专业
-    changeMajor(majorId, majorName) {
+    changeMajor(majorId,majorName) {
       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        inputValue: majorName,
+        inputValue:majorName,
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入修改后的专业名称",
@@ -184,7 +184,9 @@ export default {
             }
           );
         })
-        .catch(() => {});
+        .catch(() => {
+          
+        });
     },
   },
 };
@@ -324,8 +326,5 @@ export default {
   margin-top: 20px;
   transition: 0.3s;
 }
-.content {
-  height: 100vh;
-  background-color: #f2f2f2;
-}
+
 </style>

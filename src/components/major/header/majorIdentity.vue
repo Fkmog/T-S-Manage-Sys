@@ -14,7 +14,7 @@ name:"MajorIdentity"
 
 <style scoped>
 .info{
-  /* font-family: Microsoft Yahei; */
+  font-family: Microsoft Yahei;
   color: white;
   font-size: 14px;
   /* 定位 */

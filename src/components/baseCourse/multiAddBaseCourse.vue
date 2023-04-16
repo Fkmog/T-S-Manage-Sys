@@ -69,6 +69,7 @@ import {
 } from "@element-plus/icons-vue";
 import Handsontable from "handsontable";
 import request from "@/utils/request/request";
+import { getDictionary } from "@/api/dictionary";
 
 import "element-plus/dist/index.css";
 import "handsontable/dist/handsontable.full.css";
@@ -90,8 +91,8 @@ export default {
       saving: false,
       departmentId: "",
       schoolId: "",
-      courseTypeSource: ["学科基础课", "还未确定"], //课程类型
-      courseNatureSource: ["专业任选", "还未确定"], //课程性质
+      courseTypeSource: [], //课程类型
+      courseNatureSource: [], //课程性质
 
       firstActivities:true,
 
@@ -104,60 +105,60 @@ export default {
       fromCourseBatchAdd: false,
       hotInstance: undefined,
 
-      columns: [
-        {
-          data: "courseName",
-          title: "课程名",
-          width: 260,
-          height: 20,
-          validator: /^(.){1,50}$/,
-          allowEmpty: false,
-        },
-        {
-          data: "courseCode",
-          title: "课程号",
-          width: 180,
-          height: 20,
-          validator: /^(.){1,50}$/,
-          allowEmpty: false,
-        },
-        {
-          data: "courseType",
-          title: "课程类型",
-          width: 180,
-          height: 20,
-          _key: "courseTypes",
-          validator: /^(.){1,50}$/,
-          type: "dropdown",
-          source: self.courseTypeSource,
-          allowEmpty: false,
-        },
-        {
-          data: "courseNature",
-          title: "课程性质",
-          width: 120,
-          height: 20,
-          _key: "courseNatures",
-          type: "dropdown",
-          source: self.courseNaturesSource,
-          allowEmpty: false,
-        },
-        {
-          data: "credit",
-          title: "学分",
-          width: 40,
-          height: 20,
-          type: "numeric",
-          format: "0[.]0",
-          allowEmpty: true,
-        }, //需要添加validator
-        //   { data: 'courseYear', title: '学年', width: 120, height: 20, type: 'dropdown', _key: 'courseYears', source:['2021-2022','2022-2023'],allowEmpty: false },
+      // columns: [
+      //   {
+      //     data: "courseName",
+      //     title: "课程名",
+      //     width: 260,
+      //     height: 20,
+      //     validator: /^(.){1,50}$/,
+      //     allowEmpty: false,
+      //   },
+      //   {
+      //     data: "courseCode",
+      //     title: "课程号",
+      //     width: 180,
+      //     height: 20,
+      //     validator: /^(.){1,50}$/,
+      //     allowEmpty: false,
+      //   },
+      //   {
+      //     data: "courseType",
+      //     title: "课程类型",
+      //     width: 180,
+      //     height: 20,
+      //     _key: "courseTypes",
+      //     // validator: /^(.){1,50}$/,
+      //     type: "dropdown",
+      //     source: self.courseTypeSource,
+      //     allowEmpty: true,
+      //   },
+      //   {
+      //     data: "courseNature",
+      //     title: "课程性质",
+      //     width: 120,
+      //     height: 20,
+      //     _key: "courseNatures",
+      //     type: "dropdown",
+      //     source: self.courseNaturesSource,
+      //     allowEmpty: true,
+      //   },
+      //   {
+      //     data: "credit",
+      //     title: "学分",
+      //     width: 40,
+      //     height: 20,
+      //     type: "numeric",
+      //     format: "0[.]0",
+      //     allowEmpty: true,
+      //   }, //需要添加validator
+      //   //   { data: 'courseYear', title: '学年', width: 120, height: 20, type: 'dropdown', _key: 'courseYears', source:['2021-2022','2022-2023'],allowEmpty: false },
 
-        //   { data: 'semester', title: '学期', width: 80, height: 20, _key: 'semesters',type: 'dropdown', source:['上学期','下学期'], allowEmpty: false},
-        // { data: 'type', title: '课程类型', width: 100, height: 20, type: 'dropdown', source: vm.types, _key: 'courseTypes', allowEmpty: true},
-        // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
-        //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
-      ],
+      //   //   { data: 'semester', title: '学期', width: 80, height: 20, _key: 'semesters',type: 'dropdown', source:['上学期','下学期'], allowEmpty: false},
+      //   // { data: 'type', title: '课程类型', width: 100, height: 20, type: 'dropdown', source: vm.types, _key: 'courseTypes', allowEmpty: true},
+      //   // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
+      //   //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
+      // ],
     };
   },
   components: {
@@ -188,6 +189,7 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       let self = this;
+      this.getDict();
       // let hotInstance = this.$refs.courseHot;
       // console.log('hotInstance:',hotInstance);
       // let hotRegisterer = new Handsontable();
@@ -238,20 +240,20 @@ export default {
             title: "课程类型",
             width: 180,
             height: 20,
-            validator: /^(.){1,50}$/,
+            // validator: /^(.){1,50}$/,
             type: "dropdown",
             source: this.courseTypeSource,
-            allowEmpty: false,
+            allowEmpty: true,
           },
           { 
             data: "courseNature",
             title: "课程性质",
             width: 120,
             height: 20,
-            validator: /^(.){1,50}$/,
+            // validator: /^(.){1,50}$/,
             type: "dropdown",
             source: this.courseNatureSource,
-            allowEmpty: false,
+            allowEmpty: true,
           },
           {
             data: "credit",
@@ -264,13 +266,16 @@ export default {
         afterChange(changes, source) {
           if (source === "loadData") {
             console.log("same");
+            console.log('db.items',self.db.items);
           } else {
             if (self.count == 0) {
               self.dirty = false;
+              console.log('db.items',self.db.items);
               console.log("console:", self.count);
               console.log("different", self.dirty);
             } else {
               self.dirty = true;
+              console.log('db.items',self.db.items);
               self.firstActivities = false;
               console.log("console:", self.count);
               console.log("different", self.dirty);
@@ -281,6 +286,19 @@ export default {
         },
       });
       this.hotInstance = hotRegisterer;
+    },
+    getDict(){
+      let that = this;
+      getDictionary().then((res)=>{
+        console.log(res);
+        res.course_nature.forEach((nature)=>{
+          that.courseNatureSource.push(nature.dictLabel);
+        })
+        res.course_type.forEach((type)=>{
+          that.courseTypeSource.push(type.dictLabel);
+        })
+        // that.courseTypeSource = res.
+      })
     },
     isValid() {
 
@@ -302,10 +320,12 @@ export default {
         this.saving = false;
         return;
       }
-
-     
-      
       let that = this;
+
+      this.postData.courses.forEach(function(course){
+        course.courseType = that.courseTypeSource.indexOf(course.courseType);
+        course.courseNature = that.courseNatureSource.indexOf(course.courseNature);
+      });
 
       this.addBaseCourses(this.postData.courses).then(function (res) {
         console.log("res:", res);
@@ -342,20 +362,20 @@ export default {
         course.courseName = course.courseName;
         course.courseType = course.courseType; //that.courseTypeSource.map(item => item).indexOf(course.courseType)
         course.courseNature = course.courseNature;
-        course.credit = course.credit;
+        course.credit = parseInt(course.credit);
 
         if (
           !course.courseCode||
           !course.courseName||
-         !course.courseType||
-          !course.courseNature||
+          // !course.courseType||
+          // !course.courseNature||
           !course.credit
         ) {
           if (
             !course.courseCode &&
             !course.courseName&&
-            !course.courseType&&
-            !course.courseNature&&
+            // !course.courseType&&
+            // !course.courseNature&&
             !course.credit
           ) {
             return;
@@ -366,17 +386,27 @@ export default {
           }
         } else {
           // both are not empty: post
+          // if(course.courseType){
+          //   console.log('has course.courseType:',course.courseType);
+          //   course.courseType = that.courseTypeSource.indexOf(course.courseType);
+          //   };
+          // if(course.courseNature){
+          //   console.log('has course.courseNature:',course.courseNature);
+          //   course.courseNature = that.courseNatureSource.indexOf(course.courseNature);
+          // };
           let distCourse = {
             departmentId: that.departmentId,
             schoolId: that.schoolId,
             courseName: course.courseName,
             courseCode: course.courseCode,
-            courseType: that.courseTypeSource
-              .map((item) => item)
-              .indexOf(course.courseType),
-            courseNature: that.courseNatureSource
-              .map((item) => item)
-              .indexOf(course.courseNature),
+            courseType: course.courseType,
+            courseNature: course.courseNature,
+            // courseType: that.courseTypeSource
+            //   .map((item) => item)
+            //   .indexOf(course.courseType),
+            // courseNature: that.courseNatureSource
+            //   .map((item) => item)
+            //   .indexOf(course.courseNature),
             credit: course.credit,
           };
 
@@ -433,6 +463,14 @@ export default {
         return localres;
       });
     },
+    async handleEvent(event){
+      switch (event.keyCode) {
+        case 86:
+          console.log('ctrl + v');
+          this.firstActivities = false;
+          break;
+      }
+    }
     // getCourseTypeDict() {
     //   return request({
     //     url: "/dict/data/school/type",
@@ -446,8 +484,11 @@ export default {
   },
   mounted() {
     this.activate();
-    
+    window.addEventListener('keydown', this.handleEvent)
   },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleEvent) // 在页面销毁的时候记得解除
+},
 };
 </script>
     

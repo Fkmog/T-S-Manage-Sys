@@ -43,6 +43,7 @@
   import { ref, onMounted, reactive } from "vue";
   import { HotTable, HotColumn } from "@handsontable/vue3";
   import { registerAllModules } from "handsontable/registry";
+  import { getDictionary } from "@/api/dictionary";
   import {
     ElTooltip,
     ElIcon,
@@ -195,14 +196,11 @@
     },
     methods: {
         //getDictionary()
-getDictionary(){
+getDict(){
     let that = this;
     let academicYear = [];
     let semester = [];
-    return request({
-    url: 'system/dict/data/school/type',
-    method: 'get',
-}).then((res)=>{
+    getDictionary().then((res)=>{
     console.log(res.academic_year);
     res.academic_year.forEach(function(year){
         var dict = {
@@ -231,7 +229,7 @@ getDictionary(){
       activate() {
         this.departmentId = this.$store.state.currentInfo.departmentId;
         this.schoolId = this.$store.state.currentInfo.schoolId;
-        this.getDictionary();
+        this.getDict();
         let self = this;
         // let hotInstance = this.$refs.courseHot;
         // console.log('hotInstance:',hotInstance);
@@ -384,7 +382,7 @@ getDictionary(){
           } else {
             ElMessage({
                   type: "error",
-                  message: `添加失败`,
+                  message: res.msg,
                   duration: 1000,
                 });
   
@@ -414,8 +412,8 @@ getDictionary(){
             !course.instructor||
             !course.identifier||
             !course.chosenYear||
-            !course.chosenSemester||
-            !course.remark
+            !course.chosenSemester
+            // ||!course.remark
           ) {
             if (
               !course.courseCode &&
@@ -423,8 +421,8 @@ getDictionary(){
               !course.instructor&&
               !course.identifier &&
               !course.chosenYear &&
-              !course.chosenSemester&&
-              !course.remark
+              !course.chosenSemester
+              // &&!course.remark
             ) {
               return;
             } else {
@@ -529,6 +527,14 @@ getDictionary(){
           return localres;
         });
       },
+      async handleEvent(event){
+      switch (event.keyCode) {
+        case 86:
+          console.log('ctrl + v');
+          this.firstActivities = false;
+          break;
+      }
+    }
       // getCourseTypeDict() {
       //   return request({
       //     url: "/dict/data/school/type",
@@ -542,8 +548,11 @@ getDictionary(){
     },
     mounted() {
       this.activate();
-      
+      window.addEventListener('keydown', this.handleEvent)
     },
+    beforeDestroy() {
+    window.removeEventListener('keydown', this.handleEvent) // 在页面销毁的时候记得解除
+},
   };
   </script>
       

@@ -60,7 +60,7 @@
         </div>
       </div>
     </div>
-    <div v-show="noProgram" class="no-program">
+    <div v-show="!hasProgram" class="no-program">
       <h2 style="display: flex; justify-content: center; margin-top: 100px">
         未创建培养方案
       </h2>
@@ -124,8 +124,7 @@ export default {
   },
   data() {
     return {
-      hasProgram: false,
-      noProgram: false,
+      hasProgram: Boolean,
       hasAttribute: Boolean,
       currentMajorId: Number,
       currentMajorName: "",
@@ -184,26 +183,25 @@ export default {
         console.log("checkProgram", res);
         if (res.msg == "未查到" && res.code == 200) {
           this.hasProgram = false;
-          this.noProgram = true;
-
-          this.$store.commit("major/setProgramId", "");
+          this.$store.commit("major/setProgramId", '');
         }
         if (res.msg == "操作成功" && res.code == 200) {
-          this.noProgram = false;
-          this.hasProgram = true;
+          this.hasProgram = true
           this.programId = res.data.programId;
           this.$store.commit("major/setProgramId", this.programId);
           this.requirements = res.data.graduateAttributes;
-          if (this.requirements == null) {
+          if( this.requirements == null){
             this.hasAttribute = false;
           }
           console.log("requirements", this.requirements);
-          if (this.requirements !== null && this.requirements.length == 0) {
+          if (this.requirements !== null&&this.requirements.length == 0) {
             this.hasAttribute = false;
-          }
-          if (this.requirements !== null) {
+          } 
+          if(this.requirements!==null)
+          {
             this.hasAttribute = true;
           }
+
         }
       });
     },
@@ -241,6 +239,7 @@ export default {
 .content {
   height: 100vh;
   background-color: #f2f2f2;
+ 
 }
 .body-check {
   display: flex;
