@@ -6,10 +6,7 @@
     </div>
     
   
-    <div
-      v-show="closeShow"
-      class="submenu"
-    >
+    <div v-show="closeShow" class="submenu">
     <el-row class="rowStyle">
       <el-col :span="6">
         <el-button
@@ -65,8 +62,9 @@
       'font-size': '16px',
       height: '60px',
     }"
+    :row-key="rowKey"
         >
-          <el-table-column type="selection" width="55" />
+          <el-table-column type="selection" width="55" :reserve-selection="true"/>
           <el-table-column property="teacherId" label="工号" width="120" />
           <el-table-column property="teacherName" label="姓名" width="120" />
           <el-table-column
@@ -77,6 +75,13 @@
           />
         </el-table>
       </div>
+    </div>
+
+    <div  class="pagination-container" flex>
+      <el-row type="flex" justify="center" align="middle">
+        <el-button v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+      </el-row>
+      
     </div>
   
 </template>
@@ -116,8 +121,11 @@ export default {
   data() {
     return {
       hasBaseCourse:Boolean,
+      showLoadmore:true,
       departmentId: "",
       schoolId: "",
+      pageNum:1,
+      pageSize:10,
       tableData: reactive([]),
       multipleSelection: [],
       numSelected: 0,
@@ -180,6 +188,21 @@ export default {
     addBtn,
   },
   methods: {
+    rowKey(row) {
+      return row.teacherId;
+    },
+    loadmoreCourse(){
+    if(this.result.total-this.pageSize>=10){
+      this.pageSize +=10;
+      this.getTeacherList();
+    }
+    else{
+      this.pageSize +=(this.result.total-this.pageSize);
+      this.getTeacherList();
+    }
+    
+
+  },
     toggleSelection(rows) {
       if (rows) {
         rows.forEach((row) => {
@@ -271,8 +294,10 @@ export default {
         url: "/teacher/list",
         method: "get",
         params: {
-          schoolId: this.schoolId,
-          departmentId: this.departmentId,
+          'schoolId': this.schoolId,
+          'departmentId': this.departmentId,
+          'pageNum':this.pageNum,
+          'pageSize':this.pageSize
         },
       }).then(function (res) {
         console.log(res);
@@ -282,7 +307,12 @@ export default {
         else{
           that.hasBaseCourse = true;
           that.tableData = res.rows;
+          that.result = res;
+          if(that.pageSize>=res.total){
+              that.showLoadmore = false;
+            }
         }
+
         
       });
     },
@@ -300,6 +330,10 @@ export default {
 </script>
 
 <style scoped>
+  .pagination-container{
+    width: 100%;
+    margin-top: 10px;
+  }
   .no-class {
   margin-top: 120px;
   display: flex;
