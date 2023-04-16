@@ -1,10 +1,5 @@
 <template>
-<<<<<<< HEAD
-  <div>
-    <div  v-show="!closeShow">
-=======
   <div  v-show="!closeShow">
->>>>>>> hxj
     <HeaderSearch msg="搜索课程名称">
       <template #rightTime>
         <div class="selectionBar">
@@ -30,37 +25,6 @@
     </HeaderSearch>
     </div>
 
-<<<<<<< HEAD
-    <div v-show="closeShow" class="submenu" >
-      <el-row>
-        <el-col :span="6" class="columnstyle">
-          <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
-        </el-col>
-        <el-col :span="6" class="columnstyle">
-          <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
-        </el-col>
-    
-        
-        <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
-          <el-tooltip content="添加课程负责人">
-            <el-button   link ><el-icon class="submenudeleteButton" @click="this.setDetail()"><Plus /></el-icon></el-button>
-          </el-tooltip>
-          
-        </el-col>
-        <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
-          <el-tooltip content="添加课程负责人">
-            <el-button   link ><el-icon class="submenudeleteButton" @click="this.addPrincipal()"><Plus /></el-icon></el-button>
-          </el-tooltip>
-        </el-col>
-        <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
-          <el-tooltip content="删除课程负责人">
-            <el-button   link ><el-icon class="submenudeleteButton" @click="this.deleteRespondent()" ><Delete /></el-icon></el-button>
-          </el-tooltip>
-        </el-col>
-      
-      </el-row>
-    </div>
-=======
   <div v-show="closeShow" class="submenu" >
     <el-row>
       <el-col :span="6" class="columnstyle">
@@ -90,7 +54,6 @@
      
     </el-row>
   </div>
->>>>>>> hxj
    
   
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
@@ -302,11 +265,6 @@
    <div v-show="!hasBaseCourse" class="no-class">
     没有课程
    </div>
-<<<<<<< HEAD
-  </div>
-  
-=======
->>>>>>> hxj
   
     <el-dialog v-model="dialogFormVisible" title="添加基础课程" >
       <el-form :model="form" :rules="rules" ref="ruleForm">
