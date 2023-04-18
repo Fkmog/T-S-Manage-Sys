@@ -38,7 +38,7 @@
     <div layout="row" flex class="md-padding">
       <addBtn @click="goAddTeacher"></addBtn>
       <div
-        class="hot-table-container"
+        class="el-table-container"
         layout="column"
         flex
         v-show="hasBaseCourse" 
@@ -65,7 +65,7 @@
     :row-key="rowKey"
         >
           <el-table-column type="selection" width="55" :reserve-selection="true"/>
-          <el-table-column property="teacherId" label="工号" width="120" />
+          <el-table-column property="teacherNumber" label="工号" width="120" />
           <el-table-column property="teacherName" label="姓名" width="120" />
           <el-table-column
             property="email"
@@ -330,6 +330,12 @@ export default {
 </script>
 
 <style scoped>
+ .el-table-container{
+    width: 50%;
+    color:black;
+    margin-left: 25%;
+    box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+  }
   .pagination-container{
     width: 100%;
     margin-top: 10px;
@@ -402,11 +408,11 @@ export default {
   top: -34px;
   right: 40px;
 }
-.elTable {
-  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
-}
+
 .md-padding {
   margin-top: 120px;
+  /* display: flex;
+  justify-content: center; */
 }
 
 [layout="row"] {
@@ -418,11 +424,7 @@ export default {
 .el-input-group__append {
   padding: 0;
 }
-.elTable {
-  width: 800px;
-  top: 20%;
-  left: 25%;
-}
+
 .numSelectedTeacher {
   min-height: 36px;
   color: #3f51b5;
@@ -529,7 +531,7 @@ export default {
     left: 0px;
     width: 100%;
     border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+    background-color: #f2f2f2;
 }
 
 /* .el-button {
