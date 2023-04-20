@@ -101,74 +101,7 @@
         fromCourseBatchAdd: false,
         hotInstance: undefined,
   
-        columns: [
-          {
-            data: "className",
-            title: "课程名",
-            width: 260,
-            height: 20,
-            validator: /^(.){1,50}$/,
-            allowEmpty: false,
-          },
-          {
-            data: "instructor",
-            title: "任课教师",
-            width: 180,
-            height: 20,
-            validator: /^(.){1,50}$/,
-            allowEmpty: false,
-          },
-          {
-            data: "courseCode",
-            title: "课程号",
-            width: 180,
-            height: 20,
-            validator: /^(.){1,50}$/,
-            
-            allowEmpty: false,
-          },
-          {
-            data: "identifier",
-            title: "开课号",
-            width: 180,
-            height: 20,
-            validator: /^(.){1,50}$/,
-            allowEmpty: false,
-          },
-          {
-            data: "chosenYear",
-            title: "开课学年",
-            width: 120,
-            height: 20,
-            _key: "chosenYear",
-            type: "dropdown",
-            source: self.academicYear,
-            allowEmpty: false,
-          },
-          {
-            data: "chosenSemester",
-            title: "选择开课学期",
-            width: 120,
-            height: 20,
-            _key: "chosenYear",
-            type: "dropdown",
-            source: self.semester,
-            allowEmpty: false,
-          },
-          {
-            data: "remark",
-            title: "备注",
-            width: 40,
-            height: 20,
-            allowEmpty: true,
-          }, //需要添加validator
-          //   { data: 'courseYear', title: '学年', width: 120, height: 20, type: 'dropdown', _key: 'courseYears', source:['2021-2022','2022-2023'],allowEmpty: false },
-  
-          //   { data: 'semester', title: '学期', width: 80, height: 20, _key: 'semesters',type: 'dropdown', source:['上学期','下学期'], allowEmpty: false},
-          // { data: 'type', title: '课程类型', width: 100, height: 20, type: 'dropdown', source: vm.types, _key: 'courseTypes', allowEmpty: true},
-          // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
-          //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
-        ],
+        
       };
     },
     components: {
@@ -231,6 +164,7 @@ getDict(){
         this.schoolId = this.$store.state.currentInfo.schoolId;
         this.getDict();
         let self = this;
+        let that = this;
         // let hotInstance = this.$refs.courseHot;
         // console.log('hotInstance:',hotInstance);
         // let hotRegisterer = new Handsontable();
@@ -288,7 +222,7 @@ getDict(){
           {
             data: "identifier",
             title: "开课号",
-            width: 180,
+            width: 200,
             height: 20,
             validator: /^(.){1,50}$/,
             allowEmpty: false,
@@ -339,11 +273,21 @@ getDict(){
               console.log("console:", self.count);
             }
           },
+          afterRemoveRow(index, amount, physicalRows, source){
+          that.dirty=true;
+          that.firstActivities = false;
+          
+        },
+        afterCreateRow(){
+          that.dirty=true;
+          that.firstActivities = false;
+          
+        }
         });
         this.hotInstance = hotRegisterer;
       },
       isValid() {
-  
+       
         if(this.firstActivities){
           return false;
         }
@@ -369,6 +313,7 @@ getDict(){
   
         this.addBaseCourses(this.postData.courses).then(function (res) {
           console.log("res:", res);
+          
           that.firstActivities = true;    
           if (res.code == "200") {
             ElMessage({
@@ -380,11 +325,57 @@ getDict(){
             that.goBackandClean();
             that.isNotDirty();
           } else {
-            ElMessage({
+            if(res.msg == '课程已存在'){
+              res.data.forEach(function(teacher){
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+            });
+              ElMessage({
+                  type: "error",
+                  message: "添加失败，部分课程已存在",
+                  duration: 1000,
+                });
+              that.hotInstance.validateCells((valid) =>{
+              if(valid){
+                
+              }
+            });
+            }
+            if(res.msg == '教师不存在'){
+              let teacherID = []
+              res.data.forEach(function(teacher){
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+            });
+              ElMessage({
+                  type: "error",
+                  message: "添加失败，标红教师不存在",
+                  duration: 1000,
+                });
+                that.hotInstance.validateCells((valid) =>{
+              if(valid){
+                
+              }
+            });
+            }
+            else{
+              ElMessage({
                   type: "error",
                   message: "添加失败",
                   duration: 1000,
                 });
+            }
+            
   
             that.goBackandClean();
             that.isNotDirty();
@@ -481,13 +472,13 @@ getDict(){
         return valid;
       },
       goBackandClean() {
-        this.db.items = [];
-        this.postData.courses = [];
+        // this.db.items = [];
+        // this.postData.courses = [];
   
-        console.log("datas has cleaned:", this.db.items, this.postData.course);
-        this.hotInstance.updateSettings({
-          data: this.db.items,
-        });
+        // console.log("datas has cleaned:", this.db.items, this.postData.course);
+        // this.hotInstance.updateSettings({
+        //   data: this.db.items,
+        // });
         
       },
       
@@ -516,7 +507,7 @@ getDict(){
           courseList.push(course);
         });
         console.log("courseList:", courseList);
-  
+        
         return request({
           url: "/classes/addClasses",
           method: "post",
@@ -566,7 +557,7 @@ getDict(){
   
   .hot-table-container {
    
-    width: 1130px;
+    width: 115 0px;
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
   .submenu {
