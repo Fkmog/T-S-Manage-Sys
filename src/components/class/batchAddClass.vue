@@ -382,7 +382,7 @@ getDict(){
           } else {
             ElMessage({
                   type: "error",
-                  message: res.msg,
+                  message: "添加失败",
                   duration: 1000,
                 });
   

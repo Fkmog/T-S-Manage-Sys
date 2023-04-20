@@ -23,7 +23,7 @@
        
       </template>
     </HeaderSearch>
-  </div>
+    </div>
 
   <div v-show="closeShow" class="submenu" >
     <el-row>
@@ -1288,8 +1288,8 @@
       this.preform.courseId = val.courseId;
       this.preform.courseName = val.courseName;
       this.preform.courseCode = val.courseCode;
-      this.preform.courseType = val.courseType == "学科基础课" ? "0" : "1";
-      this.preform.courseNature = val.courseNature == "专业任选" ? "0" : "1";
+      this.preform.courseType = (this.courseTypeSource.indexOf(val.courseType)> -1 ) ? this.courseTypeSource.indexOf(val.courseType):'';
+      this.preform.courseNature = (this.courseNatureSource.indexOf(val.courseNature)> -1) ? this.courseNatureSource.indexOf(val.courseNature):'';
       this.preform.credit = val.credit;
       this.preform.respondentName = val.respondentName;
       this.preform.courseYear = val.courseYear == "2022" ? "0" : "1";
@@ -1298,8 +1298,8 @@
     dataTransfrom(course){
       course.courseName=course.courseName;
       course.courseCode=course.courseCode;
-      course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-      course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+      course.courseType=(course.courseType == '') ? '':this.courseTypeSource[course.courseType];
+      course.courseNature=(course.courseNature == '')? '':this.courseNatureSource[course.courseNature];
       course.respondentName = course.respondentName;
       course.credit=course.credit;
       course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
@@ -1506,10 +1506,12 @@
     left: 0px;
     width: 100%;
     border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+    background-color: #f2f2f2;
      
   }
-  
+  .color{
+    background-color: #f2f2f2;
+  }
   .deleteButton{
     margin-right: 10px;
     margin-top: 0;

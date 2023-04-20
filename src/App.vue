@@ -63,4 +63,8 @@ export default {
  html,body,#app{
   height: 100%;
  }
+ body {
+    font-family: Helvetica Neue,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
+    background-color: #f2f2f2
+}
 </style>

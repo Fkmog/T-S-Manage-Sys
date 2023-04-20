@@ -307,6 +307,7 @@
   </div>
   <!-- 教学班展示列表 -->
   <el-table
+    v-show="hasClass"
     ref="multipleTable"
     class="classesTable"
     :data="classTable"
@@ -383,10 +384,13 @@
       </template>
     </el-table-column>
   </el-table>
+  <div class="no-class" v-show="noClass">没有教学班</div>
   <!-- 分页 -->
   <div class="pagination-container" flex>
     <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
-      <el-button v-show="showLoadmore" @click="loadMore()">加载更多</el-button>
+      <el-button v-show="hasClass && showLoadmore" @click="loadMore()"
+        >加载更多</el-button
+      >
     </el-row>
   </div>
 </template>
@@ -413,6 +417,8 @@ export default {
   },
   data() {
     return {
+      hasClass: false,
+      noClass: false,
       isRespondent: "0",
       showLoadmore: true,
       isAssign: false,
@@ -589,6 +595,13 @@ export default {
         console.log("getClassList", res);
         if (res.code == 200) {
           this.classTable = res.rows;
+          if (this.classTable.length == 0) {
+            this.noClass = true;
+            this.hasClass = false;
+          } else {
+            this.hasClass = true;
+            this.noClass = false;
+          }
           this.total = res.total;
           if (this.pageSize >= res.total) {
             this.showLoadmore = false;
@@ -602,7 +615,9 @@ export default {
               if (this.classTable[i].additionalTeacherList !== null) {
                 this.classTable[i].additionalTeacherList.forEach((teacher) => {
                   this.classTable[i].allTeacherName =
-                    this.classTable[i].allTeacherName + "," + teacher.teacherName;
+                    this.classTable[i].allTeacherName +
+                    "," +
+                    teacher.teacherName;
                 });
               }
 
@@ -839,8 +854,8 @@ export default {
       });
     },
     loadMore() {
-      if (this.total - this.pageSize >= 10) {
-        this.pageSize += 10;
+      if (this.total - this.pageSize >= 20) {
+        this.pageSize += 20;
         this.getClassList();
       } else {
         this.pageSize += this.total - this.pageSize;
@@ -945,5 +960,12 @@ export default {
 }
 .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
+}
+.no-class {
+  padding-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+  background-color: #f2f2f2;
 }
 </style>

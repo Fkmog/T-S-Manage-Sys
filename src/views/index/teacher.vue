@@ -6,10 +6,7 @@
     </div>
     
   
-    <div
-      v-show="closeShow"
-      class="submenu"
-    >
+    <div v-show="closeShow" class="submenu">
     <el-row class="rowStyle">
       <el-col :span="6">
         <el-button
@@ -35,12 +32,16 @@
     </el-row>
     </div>
 
+    <div v-show="!hasBaseCourse" class="no-class">
+      没有教师
+    </div>
     <div layout="row" flex class="md-padding">
       <addBtn @click="goAddTeacher"></addBtn>
       <div
-        class="hot-table-container"
+        class="el-table-container"
         layout="column"
         flex
+        v-show="hasBaseCourse" 
         layout-align="start center"
       >
         <el-table
@@ -61,9 +62,10 @@
       'font-size': '16px',
       height: '60px',
     }"
+    :row-key="rowKey"
         >
-          <el-table-column type="selection" width="55" />
-          <el-table-column property="teacherId" label="工号" width="120" />
+          <el-table-column type="selection" width="55" :reserve-selection="true"/>
+          <el-table-column property="teacherNumber" label="工号" width="120" />
           <el-table-column property="teacherName" label="姓名" width="120" />
           <el-table-column
             property="email"
@@ -73,6 +75,13 @@
           />
         </el-table>
       </div>
+    </div>
+
+    <div  class="pagination-container" flex>
+      <el-row type="flex" justify="center" align="middle">
+        <el-button v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+      </el-row>
+      
     </div>
   
 </template>
@@ -111,8 +120,12 @@ registerAllModules();
 export default {
   data() {
     return {
+      hasBaseCourse:Boolean,
+      showLoadmore:true,
       departmentId: "",
       schoolId: "",
+      pageNum:1,
+      pageSize:10,
       tableData: reactive([]),
       multipleSelection: [],
       numSelected: 0,
@@ -175,6 +188,21 @@ export default {
     addBtn,
   },
   methods: {
+    rowKey(row) {
+      return row.teacherId;
+    },
+    loadmoreCourse(){
+    if(this.result.total-this.pageSize>=10){
+      this.pageSize +=10;
+      this.getTeacherList();
+    }
+    else{
+      this.pageSize +=(this.result.total-this.pageSize);
+      this.getTeacherList();
+    }
+    
+
+  },
     toggleSelection(rows) {
       if (rows) {
         rows.forEach((row) => {
@@ -266,12 +294,26 @@ export default {
         url: "/teacher/list",
         method: "get",
         params: {
-          schoolId: this.schoolId,
-          departmentId: this.departmentId,
+          'schoolId': this.schoolId,
+          'departmentId': this.departmentId,
+          'pageNum':this.pageNum,
+          'pageSize':this.pageSize
         },
       }).then(function (res) {
         console.log(res);
-        that.tableData = res.rows;
+        if(res.total == 0){
+          that.hasBaseCourse = false;
+        }
+        else{
+          that.hasBaseCourse = true;
+          that.tableData = res.rows;
+          that.result = res;
+          if(that.pageSize>=res.total){
+              that.showLoadmore = false;
+            }
+        }
+
+        
       });
     },
     activate() {
@@ -288,6 +330,22 @@ export default {
 </script>
 
 <style scoped>
+ .el-table-container{
+    width: 50%;
+    color:black;
+    margin-left: 25%;
+    box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+  }
+  .pagination-container{
+    width: 100%;
+    margin-top: 10px;
+  }
+  .no-class {
+  margin-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+}
 .rowStyle{
   top: 10px;
 }
@@ -350,11 +408,11 @@ export default {
   top: -34px;
   right: 40px;
 }
-.elTable {
-  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
-}
+
 .md-padding {
   margin-top: 120px;
+  /* display: flex;
+  justify-content: center; */
 }
 
 [layout="row"] {
@@ -366,11 +424,7 @@ export default {
 .el-input-group__append {
   padding: 0;
 }
-.elTable {
-  width: 800px;
-  top: 20%;
-  left: 25%;
-}
+
 .numSelectedTeacher {
   min-height: 36px;
   color: #3f51b5;
@@ -477,7 +531,7 @@ export default {
     left: 0px;
     width: 100%;
     border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+    background-color: #f2f2f2;
 }
 
 /* .el-button {

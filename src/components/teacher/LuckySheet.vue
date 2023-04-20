@@ -25,13 +25,17 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
-      <div class="hot-table-container" layout="column" flex layout-align="start center" >
+      <div class="hot-table-container" 
+      layout="column" 
+      flex 
+      layout-align="start center"
+      id="courseHot" >
         
-          <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
+          <!-- <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
             <hot-column  data="teacherNumber" title="工号" width="200" height="20" ></hot-column>
             <hot-column  data="teacherName" title="姓名" width="200" height="20" ></hot-column>
             <hot-column  data="email" title="邮箱" width="200" height="20" validator="emailcheck" ></hot-column>
-          </hot-table>
+          </hot-table> -->
        
       </div>
     </div>
@@ -73,7 +77,7 @@ export default{
       schoolId:'',
 
       firstActivities:true,
-
+      hotInstance:undefined,
       isRouterAlive:true,
       dirty:false,
       saving:false,
@@ -83,59 +87,59 @@ export default{
       db: { items: [] },
       
       fromCourseBatchAdd:false,
-      hotSettings:{
-        // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
+      // hotSettings:{
+      //   // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
         
-        licenseKey: 'non-commercial-and-evaluation',
-        colHeaders: true,
-        rowHeaders: true,
-        minSpareRows: 1,
-        preventOverflow: 'horizontal',
-        manualColumnMove: true,
-        // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-        // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
-        // contextMenu: ['row_above', 'row_below', 'remove_row'],
-        // columns:[
-        //   {type: 'numeric',},
-        //   {type:'text'},
-        //   {allowInvalid: false}
-        // ],
-        contextMenu: {
-          items:{
-              'row_above': {
-                  name: '在上方插入行'
-              },
-              'row_below': {
-                  name: '在下方插入行'
-              },
-              'remove_row': {
-                  name: '删除行'
-              }
-          }
-        },
-        afterChange(changes, source) {
-          if (source === 'loadData') { 
-            console.log('same');
+      //   licenseKey: 'non-commercial-and-evaluation',
+      //   colHeaders: true,
+      //   rowHeaders: true,
+      //   minSpareRows: 1,
+      //   preventOverflow: 'horizontal',
+      //   manualColumnMove: true,
+      //   // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
+      //   maxRows: 500,
+      //   // contextMenu: ['row_above', 'row_below', 'remove_row'],
+      //   // columns:[
+      //   //   {type: 'numeric',},
+      //   //   {type:'text'},
+      //   //   {allowInvalid: false}
+      //   // ],
+      //   contextMenu: {
+      //     items:{
+      //         'row_above': {
+      //             name: '在上方插入行'
+      //         },
+      //         'row_below': {
+      //             name: '在下方插入行'
+      //         },
+      //         'remove_row': {
+      //             name: '删除行'
+      //         }
+      //     }
+      //   },
+      //   afterChange(changes, source) {
+      //     if (source === 'loadData') { 
+      //       console.log('same');
             
-          } else { 
-            if(self.count==0){
-              self.dirty=false;
-              self.isValid();
-              console.log('console:',self.count);
-              console.log('different',self.dirty);
-            }
-            else{
-              self.dirty=true;
-              self.isValid();
-              self.firstActivities = false;
-              console.log('console:',self.count);
-              console.log('different',self.dirty);
-            }
-            self.count++;
-            console.log('console:',self.count);
+      //     } else { 
+      //       if(self.count==0){
+      //         self.dirty=false;
+      //         self.isValid();
+      //         console.log('console:',self.count);
+      //         console.log('different',self.dirty);
+      //       }
+      //       else{
+      //         self.dirty=true;
+      //         self.isValid();
+      //         self.firstActivities = false;
+      //         console.log('console:',self.count,'different',self.dirty,'db.items',self.db.items);
+      //         console.log('different',self.dirty);
+      //       }
+      //       self.count++;
+      //       console.log('console:',self.count);
             
-            }
-        }},
+      //       }
+      //   }},
          
 
     }
@@ -149,7 +153,80 @@ export default{
     activate(){
             this.departmentId = this.$store.state.currentInfo.departmentId;
             this.schoolId = this.$store.state.currentInfo.schoolId;
+            this.hottableInit();
         },
+  hottableInit(){
+    let container = document.querySelector("#courseHot");
+    let hotRegisterer = new Handsontable(container, {
+        data: this.db.items,
+        licenseKey: "non-commercial-and-evaluation",
+        colHeaders: true,
+        rowHeaders: true,
+        minSpareRows: 2,
+        preventOverflow: "horizontal",
+        manualColumnMove: true,
+        contextMenu: {
+          items: {
+            row_above: {
+              name: "在上方插入行",
+            },
+            row_below: {
+              name: "在下方插入行",
+            },
+            remove_row: {
+              name: "删除行",
+            },
+          },
+        },
+        columns: [
+          {
+            data: "teacherNumber",
+            title: "工号",
+            width: 200,
+            height: 20,
+            allowEmpty: false,
+          },
+          {
+            data: "teacherName",
+            title: "姓名",
+            width: 200,
+            height: 20,
+            allowEmpty: false,
+          },
+          {
+            data: "email",
+            title: "邮箱",
+            width: 200,
+            height: 20,
+            validator:/.+@.+/,
+            allowEmpty: false,
+          },
+          
+        ],
+        afterChange(changes, source) {
+          if (source === 'loadData') { 
+            console.log('same');
+            
+          } else { 
+            if(self.count==0){
+              self.dirty=false;
+              console.log('console:',self.count);
+              console.log('different',self.dirty);
+            }
+            else{
+              self.dirty=true;
+              self.firstActivities = false;
+              console.log('console:',self.count,'different',self.dirty);
+              console.log('different',self.dirty);
+            }
+            self.count++;
+            console.log('console:',self.count);
+            
+            }
+        },
+      });
+    this.hotInstance = hotRegisterer;
+  },
   isValid(){
     if(this.firstActivities){
         return false;
@@ -171,10 +248,6 @@ export default{
         this.saving = false;
         return;
       }
-   
-    if (!this.postData.teachers || this.postData.teachers.length <= 0) {
-          return $q.reject('工号或姓名不能为空');
-        }
         let teacherList = [];
         this.postData.teachers.forEach(function(teacher){
           teacherList.push(teacher);
@@ -238,7 +311,7 @@ export default{
 goBackandClean(){
   this.db.items = [];
   this.postData.teachers = [];
-  
+  this.hottableInit();
   console.log('datas:', this.db.items,this.postData.teachers);
   this.reload();
   
@@ -288,11 +361,23 @@ addTeacher(postData){
           return localres;
         });
 },
+async handleEvent(event){
+      switch (event.keyCode) {
+        case 86:
+          console.log('ctrl + v');
+          this.firstActivities = false;
+          break;
+      }
+    }
 
   },
   mounted:function(){
     this.activate();
+    window.addEventListener('keydown', this.handleEvent)
   },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleEvent) // 在页面销毁的时候记得解除
+},
  
 
   
@@ -306,11 +391,17 @@ addTeacher(postData){
 </script>
 
 <style  scoped>
+.hot-table-container {
+ 
+ box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
 .hotTable{
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding{
   margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .submenu{
