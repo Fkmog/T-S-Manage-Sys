@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     sendMessage() {
-     
+      this.$emit('SearchValue',this.searchInput)
     },
   },
 
