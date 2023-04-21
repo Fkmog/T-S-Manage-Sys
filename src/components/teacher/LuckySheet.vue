@@ -1,4 +1,5 @@
 <template>
+
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
@@ -25,6 +26,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
+     
      
       <div class="hot-table-container" 
       layout="column" 
@@ -256,16 +258,23 @@ export default{
                 
               }
             });
-            
+            ElMessage({
+                type: 'error',
+                message: `添加失败,标红教师已存在`,
+                duration:1500,
+              })
             
             
 
           }
-          ElMessage({
+          else{
+            ElMessage({
                 type: 'error',
                 message: `添加失败`,
                 duration:1000,
               })
+          }
+          
             that.count = 0;
     }
         });
@@ -366,8 +375,7 @@ addTeacher(postData){
           console.log('localres',localres);
           return localres;
         }).catch(e=>{
-          console.log('e',e);
-          return e
+          return e;
         });
 },
 async handleEvent(event){

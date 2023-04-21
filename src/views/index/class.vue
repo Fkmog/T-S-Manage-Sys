@@ -560,6 +560,9 @@ export default {
     },
     getSearchValue(data){
       this.keyword = data
+      console.log("keyword", this.keyword,
+       this.currentInfo.schoolId
+      );
       this.getClassList()
       },
     //获取数据字典
@@ -595,7 +598,6 @@ export default {
         this.chosenSemester,
         this.currentInfo.departmentId,
         this.currentInfo.schooldId,
-
         this.pageSize,
         this.pageNum,
         this.keyword
@@ -641,7 +643,7 @@ export default {
               });
             }
           }
-          console.log("#", this.classTable);
+          // console.log("#", this.classTable);
         }
       });
     },

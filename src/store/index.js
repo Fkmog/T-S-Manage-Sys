@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import user from './modules/user'
 
 export default createStore({
   state: {},
@@ -72,12 +73,11 @@ export default createStore({
         changeIsTeacher(state) {
           if (state.role.roleName == "教师") {
             state.identity = "教师";
-          }
-          else if (state.role.roleName == "学院管理员") {
+          } else if (state.role.roleName == "学院管理员") {
             state.identity = "学院管理员";
           } else if (state.role.roleName == "课程负责人") {
             state.identity = "课程负责人";
-          }else if(state.role.roleName == "web管理员") {
+          } else if (state.role.roleName == "web管理员") {
             state.identity = "web管理员";
           }
           return state.identity;
@@ -181,7 +181,7 @@ export default createStore({
     baseCourseDetailProgram: {
       namespaced: true,
       state: {
-        majorNum: '',
+        majorNum: "",
       },
       getters: {},
       mutations: {
@@ -192,5 +192,6 @@ export default createStore({
       actions: {},
       modules: {},
     },
+    user,
   },
 });

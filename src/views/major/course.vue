@@ -1562,7 +1562,7 @@ left:-46px;
     font-size: 14px;
     font-style: inherit;
     font-variant: inherit;
-    font-family: inherit;
+
     text-decoration: none;
     overflow: hidden;
     transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
@@ -1570,7 +1570,7 @@ left:-46px;
 .clearSelected{
   min-height:36px; 
   color: #3f51b5;
-  float: left;
+
   display: inline-block;
     position: relative;
     cursor: pointer;

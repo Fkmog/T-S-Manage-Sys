@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch :msg="searchMsg"></HeaderSearch>
+  <HeaderSearch :msg="searchMsg" @SearchValue='getSearchValue'></HeaderSearch>
   <addBtn @click="addMajor()"></addBtn>
   <div class="cardList">
     <div
@@ -101,6 +101,12 @@ export default {
   },
 
   methods: {
+    getSearchValue(data){
+       getMajor(this.currentDepartmentId,this.currentSchoolId,data).then((res) => {
+        this.majorList = res.rows;
+        console.log("majorList", res);
+      });
+    },
     //获取专业列表
     getMajorList() {
       getMajor(this.currentDepartmentId,this.currentSchoolId).then((res) => {
@@ -131,7 +137,7 @@ export default {
             message: `成功新建专业:${value}`,
             duration: 1000,
           });
-          addMajor(addMajorName, this.currentDepartmentId).then((res) => {
+          addMajor(addMajorName, this.currentDepartmentId,this.currentSchoolId).then((res) => {
             console.log("addMajor", res);
             this.getMajorList();
           });
