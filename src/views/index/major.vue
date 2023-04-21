@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch msg="搜索专业名称"></HeaderSearch>
+  <HeaderSearch :msg="searchMsg"></HeaderSearch>
   <addBtn @click="addMajor()"></addBtn>
   <div class="cardList">
     <div
@@ -33,7 +33,7 @@
         <el-icon
           class="toolsIcon"
           size="18px"
-          @click.stop="changeMajor(major.majorId,major.majorName)"
+          @click.stop="changeMajor(major.majorId, major.majorName)"
         >
           <Tools />
         </el-icon>
@@ -69,18 +69,18 @@ export default {
   },
   data() {
     return {
-      //addMajor
+      searchMsg: "搜索专业名称",
       addMajorName: "",
       majorList: [],
       currentDepartmentId: Number,
+      currentSchoolId: Number,
     };
   },
   mounted() {
-    this.currentDepartmentId =
-      this.$store.state.userInfo.identity[0].departmentId;
+    this.currentDepartmentId = this.$store.state.currentInfo.departmentId;
+    this.currentSchoolId = this.$store.state.currentInfo.schoolId;
     //获取专业列表
-    // this.getMajorList();
-    this.getMajorList(this.currentDepartmentId);
+    this.getMajorList();
   },
 
   computed: {
@@ -103,7 +103,7 @@ export default {
   methods: {
     //获取专业列表
     getMajorList() {
-      getMajor(this.currentDepartmentId).then((res) => {
+      getMajor(this.currentDepartmentId,this.currentSchoolId).then((res) => {
         this.majorList = res.rows;
         console.log("majorList", res);
       });
@@ -119,7 +119,7 @@ export default {
       ElMessageBox.prompt("专业名称：", "新建专业", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        customClass: 'add-major-box',
+        customClass: "add-major-box",
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入新增专业名称",
@@ -136,9 +136,7 @@ export default {
             this.getMajorList();
           });
         })
-        .catch(() => {
-         
-        });
+        .catch(() => {});
     },
     //删除专业
     deleteMajor(majorId, majorName) {
@@ -161,11 +159,11 @@ export default {
       });
     },
     //修改专业
-    changeMajor(majorId,majorName) {
+    changeMajor(majorId, majorName) {
       ElMessageBox.prompt("新的专业名称：", "修改专业名称", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        inputValue:majorName,
+        inputValue: majorName,
         //校验规则
         inputPattern: /^.+$/,
         inputErrorMessage: "请输入修改后的专业名称",
@@ -184,9 +182,7 @@ export default {
             }
           );
         })
-        .catch(() => {
-          
-        });
+        .catch(() => {});
     },
   },
 };
@@ -326,5 +322,4 @@ export default {
   margin-top: 20px;
   transition: 0.3s;
 }
-
 </style>

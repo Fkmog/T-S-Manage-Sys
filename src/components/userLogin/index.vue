@@ -19,7 +19,7 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item prop="passWord">
+        <el-form-item prop="passWord" :error="errorMsg">
           <el-input
             v-model="loginForm.passWord"
             placeholder="请输入密码"
@@ -27,6 +27,7 @@
             show-password
             clearable
             style="margin-top: 10px"
+            @keyup.enter="userLogin()"
           >
             <template #prefix>
               <el-icon><lock /></el-icon>
@@ -76,12 +77,14 @@ export default {
           { required: true, message: "密码不能为空", trigger: "blur" },
         ],
       },
+      errorMsg: "",
     };
   },
   methods: {
     userLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
+          this.errorMsg = "";
           login(this.loginForm.userName, this.loginForm.passWord).then(
             (res) => {
               if (res.code == 200) {
@@ -114,26 +117,31 @@ export default {
                     );
                     this.$store.commit("currentInfo/setRole", res.roles[0]);
                   }
-                  this.$store.getters["currentInfo/changeIsTeacher"]
-                  if(this.$store.state.currentInfo.identity =='学院管理员'){
-                  this.$router.replace("major");}
-                   if(this.$store.state.currentInfo.identity =='教师'){
-                  this.$router.replace("teacherClasses");}
-                   if(this.$store.state.currentInfo.identity =='课程负责人'){
-                  this.$router.replace("BaseCourse");}
-                  if(this.$store.state.currentInfo.identity =='web管理员'){
-                  this.$router.replace("Schools");}
+                  this.$store.getters["currentInfo/changeIsTeacher"];
+                  if (this.$store.state.currentInfo.identity == "学院管理员") {
+                    this.$router.replace("major");
+                  }
+                  if (this.$store.state.currentInfo.identity == "教师") {
+                    this.$router.replace("teacherClasses");
+                  }
+                  if (this.$store.state.currentInfo.identity == "课程负责人") {
+                    this.$router.replace("BaseCourse");
+                  }
+                  if (this.$store.state.currentInfo.identity == "web管理员") {
+                    this.$router.replace("Schools");
+                  }
                 });
               }
               if (res.code != 200) {
-                alert("用户名密码不正确！请重新登陆");
-                this.loginForm.userName = "";
+                // this.loginForm.userName = "";
+                this.errorMsg = "密码不正确，请重新输入";
                 this.loginForm.passWord = "";
+                return;
               }
             }
           );
         } else {
-          alert("请输入正确信息");
+          // alert("请输入正确信息");
           return false;
         }
       });
@@ -142,7 +150,7 @@ export default {
 };
 </script>
 
-<style  scoped>
+<style scoped>
 .bg {
   position: fixed;
   top: 0px;

@@ -1,11 +1,13 @@
 import request from '@/utils/request/request'
 //查询专业列表
-export function getMajor(departmentId) {
+export function getMajor(departmentId,schoolId,majorName) {
   return request({
     url: '/major/list' ,
     method: 'get',
     params: {
       departmentId: departmentId,
+      schoolId:schoolId,
+      majorName:majorName,
     }
   })
 }

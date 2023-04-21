@@ -30,6 +30,11 @@
       flex 
       layout-align="start center"
       id="courseHot" >
+      <div class="hot-table-container" 
+      layout="column" 
+      flex 
+      layout-align="start center"
+      id="courseHot" >
         
           <!-- <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
             <hot-column  data="teacherNumber" title="工号" width="200" height="20" ></hot-column>
