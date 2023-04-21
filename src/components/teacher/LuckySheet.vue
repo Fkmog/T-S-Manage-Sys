@@ -366,7 +366,7 @@ addTeacher(postData){
           console.log('localres',localres);
           return localres;
         }).catch(e=>{
-          console.log('e',e);
+          return e;
         });
 },
 async handleEvent(event){
