@@ -25,11 +25,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
-      <div class="hot-table-container" 
-      layout="column" 
-      flex 
-      layout-align="start center"
-      id="courseHot" >
+     
       <div class="hot-table-container" 
       layout="column" 
       flex 
@@ -234,6 +230,7 @@ export default{
           let teacherColumn = [];
           let refresh = [];
           if(res.msg == '教师已存在'){
+            console.log('教师已存在');
             res.data.forEach(function(teacher){
               
               teacherColumn.push(Object.keys(teacher)[0]);
@@ -368,6 +365,8 @@ addTeacher(postData){
           localres = res;
           console.log('localres',localres);
           return localres;
+        }).catch(e=>{
+          console.log('e',e);
         });
 },
 async handleEvent(event){

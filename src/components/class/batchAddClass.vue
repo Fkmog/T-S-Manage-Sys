@@ -333,7 +333,7 @@ getDict(){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
             });
               ElMessage({
                   type: "error",
@@ -355,7 +355,7 @@ getDict(){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
             });
               ElMessage({
                   type: "error",
