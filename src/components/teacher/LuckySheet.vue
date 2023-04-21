@@ -1,5 +1,5 @@
 <template>
-<div layout="column" flex class="ng-scope layout-column flex" >
+
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
