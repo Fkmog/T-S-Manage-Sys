@@ -1,5 +1,6 @@
 <template>
 <div layout="column" flex class="ng-scope layout-column flex" >
+<div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
@@ -25,6 +26,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
+     
      
       <div class="hot-table-container" 
       layout="column" 

@@ -1,6 +1,6 @@
 <template>
   <!-- 顶部搜索栏 -->
-  <HeaderSearch msg="搜索课程名称">
+  <HeaderSearch msg="搜索课程名称"  @SearchValue='getSearchValue'>
     <template #rightTime>
       <div class="rightSlot">
         <div class="selects">
@@ -423,6 +423,7 @@ export default {
       showLoadmore: true,
       isAssign: false,
       showAdd: false,
+      keyword:'',
       detailList: [],
       assignedDetail: "",
       multipleSelection: [],
@@ -557,6 +558,10 @@ export default {
     goBatchAddClass() {
       this.$router.push({ path: "/batchClassAdd" });
     },
+    getSearchValue(data){
+      this.keyword = data
+      this.getClassList()
+      },
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -589,8 +594,11 @@ export default {
         this.chosenYear,
         this.chosenSemester,
         this.currentInfo.departmentId,
+        this.currentInfo.schooldId,
+
         this.pageSize,
-        this.pageNum
+        this.pageNum,
+        this.keyword
       ).then((res) => {
         console.log("getClassList", res);
         if (res.code == 200) {
@@ -638,22 +646,28 @@ export default {
       });
     },
     //新增教学班
-    addClass(classAddForm) {
+     addClass(classAddForm) {
       this.$refs["classAddForm"].validate((valid) => {
         if (valid) {
+          console.log("classAddForm", classAddForm);
+          let array = classAddForm.instructor.split("(");
+          let teacherName = array[0];
+          let teacherNumber = array[1].substr(0, array[1].length - 1);
           addClass(
             this.classAddForm.chosenYear,
             this.classAddForm.chosenSemester,
             this.currentInfo.departmentId,
             this.classAddForm.className,
             this.classAddForm.identifier,
-            this.classAddForm.instructor,
+            teacherName,
+            teacherNumber,
             this.classAddForm.courseCode,
             this.classAddForm.remark,
             this.currentInfo.schoolId
           ).then((res) => {
             this.addVisible = false;
             console.log("addClass", res);
+            this.getClassList();
           });
         } else {
           // console.log("error submit!!");
