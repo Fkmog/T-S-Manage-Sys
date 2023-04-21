@@ -114,7 +114,7 @@ export default{
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: true,
         rowHeaders: true,
-        minSpareRows: 2,
+        minSpareRows: 1,
         preventOverflow: "horizontal",
         manualColumnMove: true,
         contextMenu: {
@@ -180,11 +180,7 @@ export default{
           that.firstActivities = false;
           
         },
-        afterCreateRow(){
-          that.dirty=true;
-          that.firstActivities = false;
-          
-        }
+        
       });
     this.hotInstance = hotRegisterer;
   },
@@ -240,24 +236,19 @@ export default{
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
             });
-            console.log('teacherColumn',teacherColumn);
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
             
-            // that.goBackandClean();
-            // that.getHotCellsFunction(teacherColumn);
-            // that.hotInstance.updateSettings({
-            //   cell:that.getHotCellsFunction(teacherColumn),
-            //   })
             
-            // let cellmata = that.hotInstance.getCellMeta(1,1);
-            // console.log('cell meta:',cellmata);
-            // that.hotInstance.setCellMetaObject(1,1,{validator:/.+@.+/});
-            // console.log('cell meta:',cellmata.readOnly);
+            
             
             that.hotInstance.validateCells((valid) =>{
               if(valid){
                 
               }
             });
+
             ElMessage({
                 type: 'error',
                 message: `添加失败,标红教师已存在`,

@@ -2,7 +2,7 @@
 <template>
   
     <div v-show="!closeShow">
-      <HeaderSearch></HeaderSearch>
+      <HeaderSearch msg="搜索教师名称" @SearchValue='getSearchValue'></HeaderSearch>
     </div>
     
   
@@ -35,21 +35,17 @@
     <div v-show="!hasBaseCourse" class="no-class">
       没有教师
     </div>
-    <div layout="row" flex class="md-padding">
+    
       <addBtn @click="goAddTeacher"></addBtn>
-      <div
-        class="el-table-container"
-        layout="column"
-        flex
-        v-show="hasBaseCourse" 
-        layout-align="start center"
-      >
+      
         <el-table
+        v-show="hasBaseCourse" 
           ref="multipleTable"
           :data="tableData"
           tooltip-effect="dark"
           @selection-change="handleSelectionChange"
-          class="elTable"
+          style="width:895px"
+          class="el-table-container"
           :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -70,12 +66,11 @@
           <el-table-column
             property="email"
             label="邮箱"
-            show-overflow-tooltip
-            width="480"
+            width="600"
           />
         </el-table>
-      </div>
-    </div>
+      
+    
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
@@ -124,6 +119,7 @@ export default {
       showLoadmore:true,
       departmentId: "",
       schoolId: "",
+      keyword:'',
       pageNum:1,
       pageSize:10,
       tableData: reactive([]),
@@ -165,6 +161,10 @@ export default {
     addBtn,
   },
   methods: {
+    getSearchValue(data){
+      this.keyword = data;
+      this.getTeacherList();
+      },
     rowKey(row) {
       return row.teacherId;
     },
@@ -274,7 +274,8 @@ export default {
           'schoolId': this.schoolId,
           'departmentId': this.departmentId,
           'pageNum':this.pageNum,
-          'pageSize':this.pageSize
+          'pageSize':this.pageSize,
+          'selectKeyWord':this.keyword
         },
       }).then(function (res) {
         console.log(res);
@@ -308,8 +309,8 @@ export default {
 
 <style scoped>
  .el-table-container{
-    width: 50%;
-    color:black;
+    
+  margin-top: 85px;
     margin-left: 25%;
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }

@@ -105,60 +105,7 @@ export default {
       fromCourseBatchAdd: false,
       hotInstance: undefined,
 
-      // columns: [
-      //   {
-      //     data: "courseName",
-      //     title: "课程名",
-      //     width: 260,
-      //     height: 20,
-      //     validator: /^(.){1,50}$/,
-      //     allowEmpty: false,
-      //   },
-      //   {
-      //     data: "courseCode",
-      //     title: "课程号",
-      //     width: 180,
-      //     height: 20,
-      //     validator: /^(.){1,50}$/,
-      //     allowEmpty: false,
-      //   },
-      //   {
-      //     data: "courseType",
-      //     title: "课程类型",
-      //     width: 180,
-      //     height: 20,
-      //     _key: "courseTypes",
-      //     // validator: /^(.){1,50}$/,
-      //     type: "dropdown",
-      //     source: self.courseTypeSource,
-      //     allowEmpty: true,
-      //   },
-      //   {
-      //     data: "courseNature",
-      //     title: "课程性质",
-      //     width: 120,
-      //     height: 20,
-      //     _key: "courseNatures",
-      //     type: "dropdown",
-      //     source: self.courseNaturesSource,
-      //     allowEmpty: true,
-      //   },
-      //   {
-      //     data: "credit",
-      //     title: "学分",
-      //     width: 40,
-      //     height: 20,
-      //     type: "numeric",
-      //     format: "0[.]0",
-      //     allowEmpty: true,
-      //   }, //需要添加validator
-      //   //   { data: 'courseYear', title: '学年', width: 120, height: 20, type: 'dropdown', _key: 'courseYears', source:['2021-2022','2022-2023'],allowEmpty: false },
-
-      //   //   { data: 'semester', title: '学期', width: 80, height: 20, _key: 'semesters',type: 'dropdown', source:['上学期','下学期'], allowEmpty: false},
-      //   // { data: 'type', title: '课程类型', width: 100, height: 20, type: 'dropdown', source: vm.types, _key: 'courseTypes', allowEmpty: true},
-      //   // { data: 'selectType', title: '选课类型', width: 100, height: 20, type: 'dropdown', source: vm.selectTypes, _key: 'courseSelectTypes', allowEmpty: true},
-      //   //   { data: 'memo', title: '备注', width: 100, height: 20, validator: /^(.){0,200}$/, allowEmpty: true}
-      // ],
+      
     };
   },
   components: {
@@ -188,6 +135,7 @@ export default {
     activate() {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
+      let that = this;
       let self = this;
       this.getDict();
       // let hotInstance = this.$refs.courseHot;
@@ -202,7 +150,7 @@ export default {
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: true,
         rowHeaders: true,
-        minSpareRows: 2,
+        minSpareRows: 1,
         preventOverflow: "horizontal",
         manualColumnMove: true,
         contextMenu: {
@@ -260,7 +208,7 @@ export default {
             title: "学分",
             width: 120,
             height: 20,
-            allowEmpty: false,
+            allowEmpty: true,
           }, //需要添加validator
         ],
         afterChange(changes, source) {
@@ -283,6 +231,11 @@ export default {
             self.count++;
             console.log("console:", self.count);
           }
+        },
+        afterRemoveRow(index, amount, physicalRows, source){
+          that.dirty=true;
+          that.firstActivities = false;
+          
         },
       });
       this.hotInstance = hotRegisterer;
@@ -337,16 +290,47 @@ export default {
                 duration: 1000,
               });
 
-          that.goBackandClean();
+          // that.goBackandClean();
           that.isNotDirty();
         } else {
-          ElMessage({
+          if(res.msg == '课程已存在'){
+            res.data.forEach(function(teacher){
+              
+              
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+@.+/});
+            });
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,2,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,3,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,4,{validator:undefined});
+            that.hotInstance.validateCells((valid) =>{
+              if(valid){
+                
+              }
+            });
+            ElMessage({
+                type: 'error',
+                message: `添加失败,标红课程已存在`,
+                duration:1500,
+              })
+
+          }
+          else{
+            ElMessage({
                 type: "error",
                 message: `添加失败`,
                 duration: 1000,
               });
+          }
 
-          that.goBackandClean();
+          
+          
+          // that.goBackandClean();
           that.isNotDirty();
         }
       });
@@ -362,7 +346,10 @@ export default {
         course.courseName = course.courseName;
         course.courseType = course.courseType; //that.courseTypeSource.map(item => item).indexOf(course.courseType)
         course.courseNature = course.courseNature;
-        course.credit = parseInt(course.credit);
+        if(course.credit){
+          course.credit = parseInt(course.credit);
+        }
+        
 
         if (
           !course.courseCode||
@@ -461,7 +448,9 @@ export default {
         localres = res;
         console.log("localres", localres);
         return localres;
-      });
+      }).catch(e =>{
+        return e;
+      })
     },
     async handleEvent(event){
       switch (event.keyCode) {

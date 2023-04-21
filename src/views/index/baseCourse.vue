@@ -1,6 +1,6 @@
 <template>
   <div  v-show="!closeShow">
-    <HeaderSearch msg="搜索课程名称">
+    <HeaderSearch msg="搜索课程名称" @SearchValue='getSearchValue'>
       <template #rightTime>
         <div class="selectionBar">
           <el-select
@@ -58,11 +58,16 @@
   
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'" >
       <addBtn @click="dialogFormVisible = true"></addBtn>
-      <div v-show="hasBaseCourse" v-loading="isloading">
-          <div class="el-table-container" layout="column" flex layout-align="start center" >
-            <el-table :data="tableData"  ref="multipleTable"  style="width: 100%;" 
-            :filter-change="filterChange"
+      
           
+            <el-table 
+            :data="tableData"  
+            v-loading="isloading"
+            v-show="hasBaseCourse"
+            ref="multipleTable" 
+            class="el-table-container" 
+            style="width: 1375px" 
+            :filter-change="filterChange"
             :header-cell-style="{
           'padding-left': '20px',
           'font-size': '14.4px',
@@ -126,7 +131,7 @@
               </el-table-column>
             
             
-              <el-table-column  label="操作" >
+              <el-table-column  label="操作" width="300">
                 <template #default="scope">
                 
                     <el-tooltip  content="删除课程" >
@@ -150,18 +155,19 @@
               </el-table-column>
               
             </el-table>
-        </div>
-      </div>
+        
+      
     </div>
     <div class="md-padding" layout="row" flex  v-show="identity == '课程负责人'">
-      <div class="el-table-container" layout="column" flex layout-align="start center" >
+      
         <el-table 
         :data="tableData"  
         ref="multipleTable" 
-        style="width: 100%" 
+        
+        class="el-table-container"
         @selection-change="handleSelectionChange" 
         @row-dblclick="editTrigger"
-        
+        style="width: 1400px" 
         
         :header-cell-style="{
       'padding-left': '20px',
@@ -232,7 +238,7 @@
          
          
          
-          <el-table-column  label="操作" >
+          <el-table-column  label="操作" width="300">
             <template #default="scope">
               <!-- <el-tooltip content="删除">
                 <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
@@ -258,7 +264,7 @@
           </el-table-column>
           
         </el-table>
-      </div>
+      
         
      </div>
   
@@ -427,6 +433,7 @@
   name:"BaseCourse",
   data(){
     return{
+      keyword:'',
       isloading:true,
       hasBaseCourse:Boolean,
       courseTypeSource:[],
@@ -594,6 +601,10 @@
   }, 
   methods: 
   {
+    getSearchValue(data){
+      this.keyword = data;
+      this.getBaseCourse(this.pageSize,this.pageNum);
+      },
     getDict(){
       let that = this;
       getDictionary().then((res)=>{
@@ -896,21 +907,7 @@
       })
       })
     },
-    // remoteMethod(version){
-    //   let that = this;
-    //   if (version) {
-    //   this.loading = true
-    //   setTimeout(() => {
-    //     that.loading = false
-    //     that.options = that.versionLabel.filter((item) => {
-    //       return item.includes(version)
-    //     })
-    //   }, 200)
-    // } else {
-    //   that.options = []
-    // }
-  
-    // },
+
     getCourseByYear(label){
       this.currentVersionValue = label;
       
@@ -985,15 +982,7 @@
       let that = this;
       let postData = this.formTopostData(this.form);
       console.log('postData:',postData);
-      // console.log('psotData:',postData);
-      // postData.courseName=this.form.courseName;
-      // postData.courseCode=this.form.courseCode;
-      // postData.courseType=this.form.courseType;
-      // postData.courseNature=this.form.courseNature;
-      // postData.credit=this.form.credit;
-      // postData.courseYear=this.form.courseYear;
-      // postData.semester=this.form.semester;
-      // console.log('postData:',postData);
+   
       return request({
               url:'/baseCourse/add',
               method:'post',
@@ -1037,7 +1026,9 @@
               'pageNum':pageNum,
               'versionId':that.currentVersionValue,
               'departmentId':that.departmentId,
-              'schoolId':that.schoolId}
+              'schoolId':that.schoolId,
+              'selectKeyWord':that.keyword
+            }
           }).then(function(res){
             that.isloading = false;
             console.log('courseDetails:',res);
@@ -1091,9 +1082,7 @@
             });
             that.tableData = courses;
             that.result = res;
-            if(pageSize>=res.total){
-              that.showLoadmore = false;
-            }
+            console.log('pageSize:',pageSize,'res.total:',res.total);
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
@@ -1346,6 +1335,7 @@
   
   <style scoped>
   .no-class {
+    width: 80%;
   margin-top: 120px;
   display: flex;
   justify-content: center;
@@ -1408,13 +1398,9 @@
     width: 100px;
   }
   .clearSelected{
-    min-height:36px; 
+    
     color: #3f51b5;
     
-     
-      
-      min-height: 36px;
-      min-width: 88px;
       line-height: 55px;
      
       align-items: center;
@@ -1430,9 +1416,7 @@
       text-transform: uppercase;
       font-weight: 500;
       font-size: 14px;
-      font-style: inherit;
-      font-variant: inherit;
-      font-family: inherit;
+     
       text-decoration: none;
       overflow: hidden;
       transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
@@ -1460,7 +1444,7 @@
     margin-top: 10px;
   }
   .deleteButton, .editButton{
-    min-width: 10px;
+   
     line-height:55px;
     padding: 0;
     margin: 0;
@@ -1479,7 +1463,7 @@
   .addCourseButton{
     background-color:rgb(33,150,243);
     min-height: 56px;
-    min-width: 56px;
+    
     float: right;
     top: -34px;
     right: 40px;
@@ -1491,8 +1475,8 @@
   }
   
   .el-table-container{
-    width: 80%;
-    color:black;
+    
+   
     margin-left: 10%;
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
@@ -1518,13 +1502,13 @@
     margin-bottom: 0;
   }
   .numSelectedTeacher{
-    min-height:36px; 
+    
     color: #3f51b5;
     
       position: relative;
       cursor: pointer;
-      min-height: 36px;
-      min-width: 88px;
+      
+      
       line-height: 55px;
     
       border-radius: 2px;
