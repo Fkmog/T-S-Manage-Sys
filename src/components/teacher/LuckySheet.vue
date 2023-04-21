@@ -1,5 +1,5 @@
 <template>
-<div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+<div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
@@ -25,6 +25,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
+     
       <div class="hot-table-container" 
       layout="column" 
       flex 
@@ -64,7 +65,6 @@ import 'handsontable/dist/handsontable.full.css'
 
 export default{
   name:'addTeacher',
-  inject:['reload'], 
   provide(){
       return{
         reload:this.reload
@@ -78,7 +78,9 @@ export default{
 
       firstActivities:true,
       hotInstance:undefined,
-      isRouterAlive:true,
+      
+
+      
       dirty:false,
       saving:false,
       count:0,
@@ -87,60 +89,7 @@ export default{
       db: { items: [] },
       
       fromCourseBatchAdd:false,
-      // hotSettings:{
-      //   // data:{id:222050308,name:'切·格瓦拉',email:'1073638314@qq.com',},
-        
-      //   licenseKey: 'non-commercial-and-evaluation',
-      //   colHeaders: true,
-      //   rowHeaders: true,
-      //   minSpareRows: 1,
-      //   preventOverflow: 'horizontal',
-      //   manualColumnMove: true,
-      //   // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-      //   maxRows: 500,
-      //   // contextMenu: ['row_above', 'row_below', 'remove_row'],
-      //   // columns:[
-      //   //   {type: 'numeric',},
-      //   //   {type:'text'},
-      //   //   {allowInvalid: false}
-      //   // ],
-      //   contextMenu: {
-      //     items:{
-      //         'row_above': {
-      //             name: '在上方插入行'
-      //         },
-      //         'row_below': {
-      //             name: '在下方插入行'
-      //         },
-      //         'remove_row': {
-      //             name: '删除行'
-      //         }
-      //     }
-      //   },
-      //   afterChange(changes, source) {
-      //     if (source === 'loadData') { 
-      //       console.log('same');
-            
-      //     } else { 
-      //       if(self.count==0){
-      //         self.dirty=false;
-      //         self.isValid();
-      //         console.log('console:',self.count);
-      //         console.log('different',self.dirty);
-      //       }
-      //       else{
-      //         self.dirty=true;
-      //         self.isValid();
-      //         self.firstActivities = false;
-      //         console.log('console:',self.count,'different',self.dirty,'db.items',self.db.items);
-      //         console.log('different',self.dirty);
-      //       }
-      //       self.count++;
-      //       console.log('console:',self.count);
-            
-      //       }
-      //   }},
-         
+      
 
     }
   },
@@ -157,6 +106,7 @@ export default{
         },
   hottableInit(){
     let container = document.querySelector("#courseHot");
+    let that = this;
     let hotRegisterer = new Handsontable(container, {
         data: this.db.items,
         licenseKey: "non-commercial-and-evaluation",
@@ -206,24 +156,33 @@ export default{
         afterChange(changes, source) {
           if (source === 'loadData') { 
             console.log('same');
-            
           } else { 
-            if(self.count==0){
-              self.dirty=false;
-              console.log('console:',self.count);
-              console.log('different',self.dirty);
+            if(that.count==0){
+              that.dirty=false;
+              console.log('console:',that.count);
+              console.log('different',that.dirty);
             }
             else{
-              self.dirty=true;
-              self.firstActivities = false;
-              console.log('console:',self.count,'different',self.dirty);
-              console.log('different',self.dirty);
+              that.dirty=true;
+              that.firstActivities = false;
+              console.log('console:',that.count,'different',that.dirty);
+              console.log('different',that.dirty);
             }
-            self.count++;
-            console.log('console:',self.count);
+            that.count++;
+            console.log('console:',that.count);
             
             }
         },
+        afterRemoveRow(index, amount, physicalRows, source){
+          that.dirty=true;
+          that.firstActivities = false;
+          
+        },
+        afterCreateRow(){
+          that.dirty=true;
+          that.firstActivities = false;
+          
+        }
       });
     this.hotInstance = hotRegisterer;
   },
@@ -254,7 +213,7 @@ export default{
         });
         console.log('teacherList:',teacherList);
         let that =this;
-
+        
         this.addTeacher(teacherList).then(function(res){
           console.log('res:',res);
           that.firstActivities = true; 
@@ -265,14 +224,49 @@ export default{
                 duration:1000,
               })
             that.isNotDirty();
-            that.goBackandClean();}
+            that.goBackandClean();
+          }
          else{
+          let teacherColumn = [];
+          let refresh = [];
+          if(res.msg == '教师已存在'){
+            console.log('教师已存在');
+            res.data.forEach(function(teacher){
+              
+              teacherColumn.push(Object.keys(teacher)[0]);
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
+            });
+            console.log('teacherColumn',teacherColumn);
+            
+            // that.goBackandClean();
+            // that.getHotCellsFunction(teacherColumn);
+            // that.hotInstance.updateSettings({
+            //   cell:that.getHotCellsFunction(teacherColumn),
+            //   })
+            
+            // let cellmata = that.hotInstance.getCellMeta(1,1);
+            // console.log('cell meta:',cellmata);
+            // that.hotInstance.setCellMetaObject(1,1,{validator:/.+@.+/});
+            // console.log('cell meta:',cellmata.readOnly);
+            
+            that.hotInstance.validateCells((valid) =>{
+              if(valid){
+                
+              }
+            });
+            
+            
+            
+
+          }
           ElMessage({
                 type: 'error',
                 message: `添加失败`,
                 duration:1000,
               })
-          that.goBackandClean();
+            that.count = 0;
     }
         });
 },
@@ -308,20 +302,32 @@ export default{
      
       return valid;
   },
-goBackandClean(){
-  this.db.items = [];
-  this.postData.teachers = [];
-  this.hottableInit();
-  console.log('datas:', this.db.items,this.postData.teachers);
-  this.reload();
+getHotCellsFunction(existTeacher){
+  console.log('updating hotcolumn');
+  return function(row,col,prop){
+    console.log('return function...')
+    var cellProperties = {};
+    let that = this;
+    if(row>1 && col >1){
+      cellProperties.className = 'cell-disallow';
+    }
+    // existTeacher.forEach(function(teacherRow){
+    //   if(row==teacherRow+1 && col>0){
+    //     cellProperties.className = 'cell-exist';
+    //   }
+    // })
+    return cellProperties;
+  }
   
 },
-reload(){
-  this.isRouterAlive = false;
+goBackandClean(existTeacher){
+  // this.db.items = [];
+  // this.postData.teachers = [];
   this.count = 0;
-  this.$nextTick(function () {
-    this.isRouterAlive = true;
-  });
+  // this.hotInstance.updateSettings({
+  //     cell:this.getHotCellsFunction(existTeacher),
+  // })
+  console.log('datas:', this.db.items,this.postData.teachers);
 },
 goTeacher(){
   console.log('goteacher:'+this.saving+this.dirty);
@@ -359,6 +365,9 @@ addTeacher(postData){
           localres = res;
           console.log('localres',localres);
           return localres;
+        }).catch(e=>{
+          console.log('e',e);
+          return e
         });
 },
 async handleEvent(event){
@@ -391,6 +400,9 @@ async handleEvent(event){
 </script>
 
 <style  scoped>
+.cell-exist{
+  background-color: red;
+}
 .hot-table-container {
  
  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);

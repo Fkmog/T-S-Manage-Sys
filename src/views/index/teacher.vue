@@ -135,30 +135,7 @@ export default {
       form: reactive({
         queryString: "",
       }),
-      hotSettings: {
-        licenseKey: "non-commercial-and-evaluation",
-        colHeaders: true,
-        rowHeaders: true,
-        minSpareRows: 1,
-        preventOverflow: "horizontal",
-        manualColumnMove: true,
-        // copyRowsLimit: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,  // TODO: minus current #teachers in department
-        // maxRows: settings.MAX_TEACHERS_IN_ONE_DEPARTMENT,
-        // contextMenu: ['row_above', 'row_below', 'remove_row'],
-        contextMenu: {
-          items: {
-            row_above: {
-              name: "在上方插入行",
-            },
-            row_below: {
-              name: "在下方插入行",
-            },
-            remove_row: {
-              name: "删除行",
-            },
-          },
-        },
-      },
+     
     };
   },
   components: {
@@ -262,10 +239,10 @@ export default {
       })
         .then(() => {
           return request({
-            url: "/teacher/delete",
-            method: "post",
-            data: {
-              teacherId,
+            url: "/teacher",
+            method: 'delete',
+            data:{
+              teacherId
             },
           }).then(function (res) {
             let localres = res;
