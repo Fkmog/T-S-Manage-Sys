@@ -1,5 +1,6 @@
 <template>
 
+
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
@@ -26,6 +27,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
+     
      
      
       <div class="hot-table-container" 
@@ -254,7 +256,6 @@ export default{
                 message: `添加失败,标红教师已存在`,
                 duration:1500,
               })
-            
             
 
           }

@@ -1,6 +1,10 @@
 import axios from "axios";
+import Cookies from "js-cookie";
+
 import { getToken } from "@/utils/request/auth";
 import cache from "@/plugins/cache";
+import store from  "@/store"
+import router from  "@/router"
 import errorCode from '@/utils/request/errorCode';
 import { ElNotification, ElMessageBox, ElMessage, Loading } from 'element-plus'
 
@@ -115,9 +119,14 @@ service.interceptors.response.use(res => {
       }
     ).then(() => {
       isRelogin.show = false;
-      store.dispatch('LogOut').then(() => {
-        location.href = '/index';
-      })
+     Cookies.remove("Admin-Token")
+      router.replace({path:'/login'})
+      console.log("123",router.options.routes);
+      // store.dispatch('LogOut').then(() => {
+      //   location.href = '/index';
+      //   console.log("123");
+      // })
+      
     }).catch(() => {
       isRelogin.show = false;
     });

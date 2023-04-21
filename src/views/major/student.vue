@@ -284,7 +284,7 @@ ElMessageBox.confirm("即将删除学神信息", "注意", {
       font-size: 14px;
       font-style: inherit;
       font-variant: inherit;
-      font-family: inherit;
+
       text-decoration: none;
       overflow: hidden;
       transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
