@@ -121,7 +121,7 @@ export default {
       schoolId: "",
       keyword:'',
       pageNum:1,
-      pageSize:10,
+      pageSize:20,
       tableData: reactive([]),
       multipleSelection: [],
       numSelected: 0,
@@ -169,8 +169,8 @@ export default {
       return row.teacherId;
     },
     loadmoreCourse(){
-    if(this.result.total-this.pageSize>=10){
-      this.pageSize +=10;
+    if(this.result.total-this.pageSize>=20){
+      this.pageSize +=20;
       this.getTeacherList();
     }
     else{
@@ -231,19 +231,20 @@ export default {
     searchTeacher() {
       alert("search");
     },
-    deleteTeacher(teacherId) {
+    deleteTeacher() {
+      let that = this;
+      let teacherId = this.teacherId;
       ElMessageBox.confirm("即将删除教师数据", "注意", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
+          console.log('teacherID:',teacherId,'typeof this.teacherID',this.teacherId);
           return request({
             url: "/teacher",
             method: 'delete',
-            data:{
-              teacherId
-            },
+            data:teacherId
           }).then(function (res) {
             let localres = res;
             console.log("localres", localres);
@@ -253,6 +254,12 @@ export default {
                     message: `删除成功`,
                     duration:1000,
                   });
+              that.getTeacherList();
+              that.$refs.multipleTable.clearSelection();
+            if (that.clickState == 1) {
+              that.clickState = 0;
+              that.closeShow = !that.closeShow;
+            }
             } else {
               ElMessage({
                     type: "error",
@@ -263,7 +270,10 @@ export default {
             return localres;
           });
         })
-        .catch(() => {});
+        .catch(e => {
+          console.log(e);
+          return e;
+        });
     },
     getTeacherList() {
       let that = this;
@@ -309,10 +319,9 @@ export default {
 
 <style scoped>
  .el-table-container{
-    
+  margin: 0 auto;
   margin-top: 85px;
-    margin-left: 25%;
-    box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
   .pagination-container{
     width: 100%;

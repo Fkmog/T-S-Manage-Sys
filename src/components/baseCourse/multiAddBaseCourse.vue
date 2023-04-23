@@ -290,7 +290,7 @@ export default {
                 duration: 1000,
               });
 
-          // that.goBackandClean();
+          that.goBackandClean();
           that.isNotDirty();
         } else {
           if(res.msg == '课程已存在'){
@@ -407,7 +407,7 @@ export default {
       this.db.items = [];
       this.postData.courses = [];
 
-      console.log("datas has cleaned:", this.db.items, this.postData.course);
+      // console.log("datas has cleaned:", this.db.items, this.postData.course);
       this.hotInstance.updateSettings({
         data: this.db.items,
       });

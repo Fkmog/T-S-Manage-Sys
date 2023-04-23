@@ -127,8 +127,8 @@ ElMessageBox.confirm("即将删除学神信息", "注意", {
         },
     //loadmoreCourse
     loadmoreCourse(){
-      if(this.result.total-this.pageSize>=10){
-      this.pageSize +=10;
+      if(this.result.total-this.pageSize>=20){
+      this.pageSize +=20;
       this.getStudents(this.pageSize,this.pageNum);
     }
     else{
@@ -188,7 +188,7 @@ ElMessageBox.confirm("即将删除学神信息", "注意", {
       multipleSelection:[],
       //result
       result:{},
-    pageSize:10,
+    pageSize:20,
     pageNum:1,
       //showLoadmore
       showLoadmore:true,

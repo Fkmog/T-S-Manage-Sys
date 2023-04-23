@@ -561,7 +561,7 @@
       remark:'',
       versionId:'',
     },]),
-    pageSize:ref(10),
+    pageSize:ref(20),
     pageNum:ref(1),
     departmentId:'',
     schoolId:'',
@@ -811,8 +811,8 @@
     },
     //load more course
     loadmoreCourse(){
-    if(this.result.total-this.pageSize>=10){
-      this.pageSize +=10;
+    if(this.result.total-this.pageSize>=20){
+      this.pageSize +=20;
       this.getBaseCourse(this.pageSize,this.pageNum);
     }
     else{
@@ -1178,8 +1178,14 @@
                   message: `删除成功`,
                   duration:1000,
                 });
-              
-              that.getBaseCourse(that.pageSize,that.pageNum);
+                
+                that.getBaseCourse(that.pageSize,that.pageNum);
+                // that.$refs.multipleTable.clearSelection();
+                that.numSelected = 0;
+                // if (that.clickState == 1) {
+                //   that.clickState = 0;
+                //   that.closeShow = !that.closeShow;
+                // }
             }
             else{
               ElMessage({
@@ -1317,9 +1323,6 @@
       this.currentVersionValue = this.routeVersionId;
     }
     }
-    
-    
-    
     this.getBaseCourse(this.pageSize,this.pageNum);
   
   },
@@ -1475,9 +1478,7 @@
   }
   
   .el-table-container{
-    
-   
-    margin-left: 10%;
+    margin: 0 auto;
     box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
   }
   .submenu {

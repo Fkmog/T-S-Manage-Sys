@@ -54,3 +54,10 @@ export function setPermission(array) {
     data:array,
   })
 }
+//删除教学班
+export function deleteClass(classId) {
+  return request({
+    url: '/classes/'+classId,
+    method: 'DELETE',
+  })
+}

@@ -350,7 +350,7 @@ getDict(){
               }
             });
             }
-            if(res.msg == '教师不存在'){
+            else if(res.msg == '教师不存在'){
               let teacherID = []
               res.data.forEach(function(teacher){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
@@ -379,7 +379,7 @@ getDict(){
               }
             });
             }
-            if(res.msg == '课程不存在'){
+            else if(res.msg == '课程号不存在'){
               res.data.forEach(function(teacher){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
@@ -398,7 +398,7 @@ getDict(){
             that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
-                  message: "添加失败，标红课程不存在",
+                  message: "添加失败，标红课程号不存在",
                   duration: 1500,
                 });
               that.hotInstance.validateCells((valid) =>{
@@ -415,9 +415,7 @@ getDict(){
                   duration: 1000,
                 });
             }
-            
-  
-            that.goBackandClean();
+            // that.goBackandClean();
             that.isNotDirty();
           }
         });
@@ -512,13 +510,13 @@ getDict(){
         return valid;
       },
       goBackandClean() {
-        // this.db.items = [];
-        // this.postData.courses = [];
+        this.db.items = [];
+        this.postData.courses = [];
   
         // console.log("datas has cleaned:", this.db.items, this.postData.course);
-        // this.hotInstance.updateSettings({
-        //   data: this.db.items,
-        // });
+        this.hotInstance.updateSettings({
+          data: this.db.items,
+        });
         
       },
       

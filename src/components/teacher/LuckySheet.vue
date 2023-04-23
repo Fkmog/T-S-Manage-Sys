@@ -321,14 +321,14 @@ getHotCellsFunction(existTeacher){
   }
   
 },
-goBackandClean(existTeacher){
-  // this.db.items = [];
-  // this.postData.teachers = [];
+goBackandClean(){
+  this.db.items = [];
+  this.postData.teachers = [];
   this.count = 0;
-  // this.hotInstance.updateSettings({
-  //     cell:this.getHotCellsFunction(existTeacher),
-  // })
-  console.log('datas:', this.db.items,this.postData.teachers);
+  this.hotInstance.updateSettings({
+      data:this.db.items
+  })
+  // console.log('datas:', this.db.items,this.postData.teachers);
 },
 goTeacher(){
   console.log('goteacher:'+this.saving+this.dirty);

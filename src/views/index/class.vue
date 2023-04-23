@@ -397,7 +397,7 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass, editClass, setPermission } from "@/api/class";
+import { getClass, addClass, editClass, setPermission,deleteClass } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
@@ -755,7 +755,10 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        this.classTable.pop(row);
+         deleteClass(row.classId).then((res) => {
+          console.log("deleteClass", res);
+          this.getClassList();
+        });
       });
     },
     //远程模糊搜索教师

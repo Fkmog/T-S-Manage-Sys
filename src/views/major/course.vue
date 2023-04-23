@@ -397,7 +397,7 @@ data(){
    
 
   //分页参数
-  pageSize:ref(10),
+  pageSize:ref(20),
   pageNum:ref(1),
 
   //搜索
@@ -551,8 +551,8 @@ methods:{
     },
   //load course
   loadmoreCourse(){
-    if(this.result.total-this.pageSize>=10){
-      this.pageSize +=10;
+    if(this.result.total-this.pageSize>=20){
+      this.pageSize +=20;
       this.getBaseCourse(this.pageSize,this.pageNum);
     }
     else{
