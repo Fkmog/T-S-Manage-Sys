@@ -407,7 +407,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button type="primary" plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>

@@ -353,19 +353,19 @@ export default {
         major.courseIndicators = major.indicators;
         saveIndicators(major).then((res) => {
           console.log("save", res);
-          if (res.code == 200) {
+          if (res.code === 'SUCCESS') {
             this.successNum = this.successNum + 1;
             ElMessage({
               type: "success",
               message: `保存成功`,
-              duration: 1000,
+              duration: 1500,
             });
             this.back();
           } else {
             ElMessage({
               type: "error",
               message: `保存失败`,
-              duration: 1000,
+              duration: 1500,
             });
           }
         });

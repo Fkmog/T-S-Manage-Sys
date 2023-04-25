@@ -502,7 +502,7 @@ export default {
         ],
       },
       pageNum: 1,
-      pageSize: 8,
+      pageSize: 20,
       total: 0,
       // errorMsg
       E_ErrorMsg: "",
@@ -698,14 +698,14 @@ export default {
                 ElMessage({
                   type: "error",
                   message: "课程号不存在",
-                  duration: 1000,
+                  duration: 1500,
                 });
                 this.E_ErrorMsg = "课程号不存在，请重新输入";
               } else if (e.code === "E_TEACHER_NOT_EXIST") {
                 ElMessage({
                   type: "error",
                   message: "教师不存在",
-                  duration: 1000,
+                  duration: 1500,
                 });
                 this.T_ErrorMsg = "教师不存在，请重新输入";
               }
@@ -714,7 +714,7 @@ export default {
           ElMessage({
             type: "error",
             message: "还没写完",
-            duration: 1000,
+            duration: 1500,
           });
           return;
         }
@@ -787,7 +787,7 @@ export default {
             ElMessage({
               type: "success",
               message: "修改成功",
-              duration: 1000,
+              duration: 1500,
             });
             this.editVisible = false;
             this.getClassList();
@@ -799,14 +799,14 @@ export default {
             ElMessage({
               type: "error",
               message: "课程号不存在",
-              duration: 1000,
+              duration: 1500,
             });
             this.E_ErrorMsg = "课程号不存在，请重新输入";
           } else if (e.code === "E_TEACHER_NOT_EXIST") {
             ElMessage({
               type: "error",
               message: "教师不存在",
-              duration: 1000,
+              duration: 1500,
             });
           }
         });
@@ -824,7 +824,7 @@ export default {
           ElMessage({
             type: "success",
             message: "删除成功",
-            duration: 1000,
+            duration: 1500,
           });
           this.getClassList();
         });
@@ -927,7 +927,7 @@ export default {
           ElMessage({
             type: "success",
             message: "分配成功",
-            duration: 1000,
+            duration: 1500,
           });
           this.multipleSelection = [];
           this.$refs.multipleTable.clearSelection();
@@ -936,7 +936,7 @@ export default {
           ElMessage({
             type: "error",
             message: "分配失败",
-            duration: 1000,
+            duration: 1500,
           });
         }
       });
@@ -965,9 +965,6 @@ export default {
       setPermission(arr).then((res) => {
         console.log("setPermission", res);
       });
-    },
-    afv() {
-      console.log("123", this.isRespondent);
     },
   },
 };
@@ -1016,11 +1013,19 @@ export default {
 :deep().el-pagination button:disabled {
   cursor: default;
 }
-:deep().el-icon {
+:deep() .el-icon  {
   height: 18px;
   width: 18px;
 }
-:deep().el-icon svg {
+:deep() .el-icon  svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().searchBlock .el-icon .el-icon__clear {
+  height: 18px;
+  width: 18px;
+}
+:deep().searchBlock .el-icon .el-icon__clear svg {
   height: 18px;
   width: 18px;
 }

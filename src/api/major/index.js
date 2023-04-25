@@ -19,13 +19,14 @@ export function getMajorInfo(majorId) {
   })
 }
 //新增专业
-export function addMajor(majorName, departmentId) {
+export function addMajor(majorName, departmentId,schoolId) {
   return request({
     url: '/major/add',
     method: 'post',
     data: {
       majorName: majorName,
       departmentId: departmentId,
+      schoolId:schoolId
     }
   })
 }

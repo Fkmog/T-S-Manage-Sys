@@ -74,7 +74,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button type="primary" plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
@@ -348,7 +348,6 @@ export default {
 .clearSelected {
   min-height: 36px;
   color: #3f51b5;
-  float: left;
   display: inline-block;
   position: relative;
   cursor: pointer;
@@ -415,7 +414,6 @@ export default {
 .numSelectedTeacher {
   min-height: 36px;
   color: #3f51b5;
-  float: left;
   display: inline-block;
   position: relative;
   cursor: pointer;
@@ -435,7 +433,6 @@ export default {
   padding: 0 6px;
   margin: 0;
   background: transparent;
-
   white-space: nowrap;
   text-transform: uppercase;
   font-weight: 500;

@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch :msg="searchMsg" @SearchValue='getSearchValue'></HeaderSearch>
+  <HeaderSearch :msg="searchMsg" @SearchValue="getSearchValue"></HeaderSearch>
   <addBtn @click="addMajor()"></addBtn>
   <div class="cardList">
     <div
@@ -101,15 +101,17 @@ export default {
   },
 
   methods: {
-    getSearchValue(data){
-       getMajor(this.currentDepartmentId,this.currentSchoolId,data).then((res) => {
-        this.majorList = res.rows;
-        console.log("majorList", res);
-      });
+    getSearchValue(data) {
+      getMajor(this.currentDepartmentId, this.currentSchoolId, data).then(
+        (res) => {
+          this.majorList = res.rows;
+          console.log("majorList", res);
+        }
+      );
     },
     //获取专业列表
     getMajorList() {
-      getMajor(this.currentDepartmentId,this.currentSchoolId).then((res) => {
+      getMajor(this.currentDepartmentId, this.currentSchoolId).then((res) => {
         this.majorList = res.rows;
         console.log("majorList", res);
       });
@@ -132,13 +134,17 @@ export default {
       })
         .then(({ value }) => {
           let addMajorName = value;
-          ElMessage({
-            type: "success",
-            message: `成功新建专业:${value}`,
-            duration: 1000,
-          });
-          addMajor(addMajorName, this.currentDepartmentId,this.currentSchoolId).then((res) => {
+          addMajor(
+            addMajorName,
+            this.currentDepartmentId,
+            this.currentSchoolId
+          ).then((res) => {
             console.log("addMajor", res);
+            ElMessage({
+              type: "success",
+              message: `成功新建专业:${value}`,
+              duration: 1500,
+            });
             this.getMajorList();
           });
         })
@@ -154,11 +160,11 @@ export default {
         deleteMajor(majorId)
           .then((res) => {
             console.log("deleteMajor", res);
-            this.getMajorList(this.currentDepartmentId);
+            this.getMajorList();
             ElMessage({
               type: "success",
               message: "删除成功",
-              duration: 1000,
+              duration: 1500,
             });
           })
           .catch(() => {});
@@ -176,13 +182,14 @@ export default {
       })
         .then(({ value }) => {
           let changeMajorName = value;
-          ElMessage({
-            type: "success",
-            message: `成功修改专业名称:${value}`,
-            duration: 1000,
-          });
+
           changeMajor(changeMajorName, majorId, this.currentDepartmentId).then(
             (res) => {
+              ElMessage({
+                type: "success",
+                message: `成功修改专业名称:${value}`,
+                duration: 1500,
+              });
               console.log("changeMajor", res);
               this.getMajorList();
             }
@@ -327,5 +334,21 @@ export default {
   text-align: center;
   margin-top: 20px;
   transition: 0.3s;
+}
+:deep() .el-icon  {
+  height: 18px;
+  width: 18px;
+}
+:deep() .el-icon  svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
 }
 </style>

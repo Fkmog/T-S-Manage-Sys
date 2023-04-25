@@ -73,7 +73,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 弹出表单 -->
+    <!-- 弹出修改表单 -->
     <el-dialog
       v-model="dialogFormVisible"
       title="修改教学班"
@@ -332,7 +332,7 @@ export default {
       // console.log("修改后", classEditForm);
       editClass(classEditForm).then((res) => {
         console.log("confirmEditClass", res);
-        if (res.code == 200) {
+        if (res.code == 'SUCCESS') {
           this.dialogFormVisible = false;
           this.getClassList();
         }

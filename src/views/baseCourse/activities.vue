@@ -380,7 +380,7 @@
         that.firstActivities = true;
         
         that.getActivities();
-        if(res.code == 200){
+        if(res.code == 'SUCCESS'){
           ElMessage({
                 type: 'success',
                 message: `添加成功`,

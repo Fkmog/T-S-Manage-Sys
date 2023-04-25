@@ -73,7 +73,7 @@ export default {
           ElMessage({
             type: "success",
             message: "已退出登录！",
-            duration: 1000,
+            duration: 1500,
           });
           Cookies.remove("Admin-Token");
           this.$router.push("/login");

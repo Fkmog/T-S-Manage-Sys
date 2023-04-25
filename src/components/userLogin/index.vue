@@ -132,15 +132,15 @@ export default {
                   }
                 });
               }
+              
               if (res.code === 'ERROR') {
-                this.errorMsg = "密码不正确，请重新输入";
+                this.errorMsg = "账号/密码不正确，请重新输入";
                 this.loginForm.passWord = "";
                 return;
               }
             }
           );
         } else {
-          // alert("请输入正确信息");
           return false;
         }
       });

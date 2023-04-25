@@ -96,7 +96,6 @@
                           maxlength="20"
                           show-word-limit
                           placeholder="简称"
-                          @change="changeDetail(detail)"
                         />
                       </el-form-item>
                       <el-form-item label="描述" class="title">
@@ -106,7 +105,6 @@
                           type="textarea"
                           maxlength="1000"
                           placeholder="描述"
-                          @change="changeDetail(detail)"
                         />
                       </el-form-item>
                     </div>
@@ -217,15 +215,14 @@ export default {
     },
     // 删除要求点
     deleteAttributeId() {
-      if (this.requirements&&this.requirements.length > 0) {
+      if (this.requirements && this.requirements.length > 0) {
         this.attributeIdDelete =
           this.requirements[this.requirements.length - 1].serialNum;
       }
-      
     },
     // 新增要求点
     newAttributeId() {
-      if (this.requirements&&this.requirements.length > 0) {
+      if (this.requirements && this.requirements.length > 0) {
         let v = this.requirements[this.requirements.length - 1].serialNum;
         this.attributeIdNew = ++v;
       } else {
@@ -320,7 +317,7 @@ export default {
       currentObj.name = null;
       currentObj.description = null;
       currentObj.programIndicators = [];
-      if (this.requirements.length > 0) {
+      if (this.requirements !== null && this.requirements.length > 0) {
         // 确定Id
         let currentId =
           Number(this.requirements[this.requirements.length - 1].id) + 1;
@@ -406,19 +403,19 @@ export default {
       console.log("save", this.programInfo);
       editProgram(this.programInfo).then((res) => {
         console.log(res);
-        if(res.code == 200){
-        ElMessage({
-          type: "success",
-          message: `保存成功`,
-          duration: 1000,
-        });
-        this.backGoal();
-        }else{
-           ElMessage({
-          type: "error",
-          message: `保存失败`,
-          duration: 1000,
-        });
+        if (res.code == "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `保存成功`,
+            duration: 1500,
+          });
+          this.backGoal();
+        } else {
+          ElMessage({
+            type: "error",
+            message: `保存失败`,
+            duration: 1500,
+          });
         }
       });
     },

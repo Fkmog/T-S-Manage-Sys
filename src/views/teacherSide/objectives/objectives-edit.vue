@@ -355,18 +355,18 @@ export default {
     save() {
       saveObjectives(this.list).then((res) => {
         console.log("save", res);
-        if (res.code == 200) {
+        if (res.code == 'SUCCESS') {
           ElMessage({
             type: "success",
             message: `保存成功`,
-            duration: 1000,
+            duration: 1500,
           });
           this.backObjectives();
         } else {
           ElMessage({
             type: "error",
             message: `保存失败`,
-            duration: 1000,
+            duration: 1500,
           });
         }
       });
