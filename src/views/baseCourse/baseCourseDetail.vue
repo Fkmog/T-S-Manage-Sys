@@ -207,7 +207,7 @@ export default {
           },
         }).then(function (res) {
           console.log(res);
-          if (res.code == "200") {
+          if (res.code == "SUCCESS") {
             ElMessage({
                   type: "success",
                   message: `新增成功`,

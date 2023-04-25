@@ -1,6 +1,6 @@
 <template>
   <!-- 顶部搜索栏 -->
-  <HeaderSearch msg="搜索课程名称"  @SearchValue='getSearchValue'>
+  <HeaderSearch msg="搜索课程名称" @SearchValue="getSearchValue">
     <template #rightTime>
       <div class="rightSlot">
         <div class="selects">
@@ -72,6 +72,7 @@
           label="任课教师"
           :label-width="formLabelWidth"
           prop="instructor"
+          :error="T_ErrorMsg"
         >
           <el-autocomplete
             style="width: 540px"
@@ -83,6 +84,7 @@
           label="课程号"
           :label-width="formLabelWidth"
           prop="courseCode"
+          :error="E_ErrorMsg"
         >
           <el-input v-model="classAddForm.courseCode" autocomplete="off" />
         </el-form-item>
@@ -103,7 +105,7 @@
             placeholder="选择开课学年"
           >
             <el-option
-              v-for="item in academicYear"
+              v-for="item in onlyAcademicYear"
               :key="item.dictValue"
               :label="item.dictLabel"
               :value="item.dictValue"
@@ -120,7 +122,7 @@
             placeholder="选择开课学期"
           >
             <el-option
-              v-for="item in semester"
+              v-for="item in onlySemester"
               :key="item.dictValue"
               :label="item.dictLabel"
               :value="item.dictValue"
@@ -173,6 +175,7 @@
           label="任课教师"
           :label-width="formLabelWidth"
           prop="instructor"
+          :error="T_ErrorMsg"
         >
           <el-autocomplete
             style="width: 540px"
@@ -185,6 +188,7 @@
           label="课程号"
           :label-width="formLabelWidth"
           prop="courseCode"
+          :error="E_ErrorMsg"
         >
           <el-input v-model="classEditForm.courseCode" autocomplete="off" />
         </el-form-item>
@@ -385,10 +389,17 @@
     </el-table-column>
   </el-table>
   <div class="no-class" v-show="noClass">没有教学班</div>
+  <div class="no-class-detail" v-show="noClass">
+    请先点击右上角圆形按钮添加教学班
+  </div>
   <!-- 分页 -->
   <div class="pagination-container" flex>
     <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
-      <el-button v-show="hasClass && showLoadmore" @click="loadMore()"
+      <el-button
+        type="primary"
+        plain
+        v-show="hasClass && showLoadmore"
+        @click="loadMore()"
         >加载更多</el-button
       >
     </el-row>
@@ -397,7 +408,13 @@
 
 <script>
 import HeaderSearch from "@/components/general/headerSearch.vue";
-import { getClass, addClass, editClass, setPermission,deleteClass } from "@/api/class";
+import {
+  getClass,
+  addClass,
+  editClass,
+  setPermission,
+  deleteClass,
+} from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
@@ -423,7 +440,7 @@ export default {
       showLoadmore: true,
       isAssign: false,
       showAdd: false,
-      keyword:'',
+      keyword: "",
       detailList: [],
       assignedDetail: "",
       multipleSelection: [],
@@ -487,6 +504,9 @@ export default {
       pageNum: 1,
       pageSize: 8,
       total: 0,
+      // errorMsg
+      E_ErrorMsg: "",
+      T_ErrorMsg: "",
     };
   },
   mounted() {
@@ -558,13 +578,11 @@ export default {
     goBatchAddClass() {
       this.$router.push({ path: "/batchClassAdd" });
     },
-    getSearchValue(data){
-      this.keyword = data
-      console.log("keyword", this.keyword,
-       this.currentInfo.schoolId
-      );
-      this.getClassList()
-      },
+    getSearchValue(data) {
+      this.keyword = data;
+      console.log("keyword", this.keyword, this.currentInfo.schoolId);
+      this.getClassList();
+    },
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -597,13 +615,13 @@ export default {
         this.chosenYear,
         this.chosenSemester,
         this.currentInfo.departmentId,
-        this.currentInfo.schooldId,
+        this.currentInfo.schoolId,
         this.pageSize,
         this.pageNum,
         this.keyword
       ).then((res) => {
         console.log("getClassList", res);
-        if (res.code == 200) {
+        if (res.code === "SUCCESS") {
           this.classTable = res.rows;
           if (this.classTable.length == 0) {
             this.noClass = true;
@@ -648,9 +666,12 @@ export default {
       });
     },
     //新增教学班
-     addClass(classAddForm) {
+    addClass(classAddForm) {
       this.$refs["classAddForm"].validate((valid) => {
         if (valid) {
+          //error信息处理
+          this.T_ErrorMsg = "";
+          this.E_ErrorMsg = "";
           console.log("classAddForm", classAddForm);
           let array = classAddForm.instructor.split("(");
           let teacherName = array[0];
@@ -666,13 +687,35 @@ export default {
             this.classAddForm.courseCode,
             this.classAddForm.remark,
             this.currentInfo.schoolId
-          ).then((res) => {
-            this.addVisible = false;
-            console.log("addClass", res);
-            this.getClassList();
-          });
+          )
+            .then((res) => {
+              this.addVisible = false;
+              console.log("addClass", res);
+              this.getClassList();
+            })
+            .catch((e) => {
+              if (e.code === "E_CODE_NOT_EXIST") {
+                ElMessage({
+                  type: "error",
+                  message: "课程号不存在",
+                  duration: 1000,
+                });
+                this.E_ErrorMsg = "课程号不存在，请重新输入";
+              } else if (e.code === "E_TEACHER_NOT_EXIST") {
+                ElMessage({
+                  type: "error",
+                  message: "教师不存在",
+                  duration: 1000,
+                });
+                this.T_ErrorMsg = "教师不存在，请重新输入";
+              }
+            });
         } else {
-          // console.log("error submit!!");
+          ElMessage({
+            type: "error",
+            message: "还没写完",
+            duration: 1000,
+          });
           return;
         }
       });
@@ -727,6 +770,9 @@ export default {
     },
     //提交修改教学班信息
     confirmEditClass(classEditForm) {
+      //error信息处理
+      this.E_ErrorMsg = "";
+      this.T_ErrorMsg = "";
       classEditForm.academicYear = classEditForm.chosenYear;
       classEditForm.semester = classEditForm.chosenSemester;
       classEditForm.departmentId = this.currentInfo.departmentId;
@@ -734,18 +780,36 @@ export default {
       // this.classEditForm.isRespondent = this.isRespondent
       this.giveRespondentPermission(classEditForm);
       // console.log("修改后", classEditForm);
-      editClass(classEditForm).then((res) => {
-        console.log("confirmEditClass", res);
-        if (res.code == 200) {
-          ElMessage({
-            type: "success",
-            message: "修改成功",
-            duration: 1000,
-          });
-          this.editVisible = false;
-          this.getClassList();
-        }
-      });
+      editClass(classEditForm)
+        .then((res) => {
+          console.log("confirmEditClass", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: "修改成功",
+              duration: 1000,
+            });
+            this.editVisible = false;
+            this.getClassList();
+          }
+        })
+        .catch((e) => {
+          console.log("3", e);
+          if (e.code === "E_CODE_NOT_EXIST") {
+            ElMessage({
+              type: "error",
+              message: "课程号不存在",
+              duration: 1000,
+            });
+            this.E_ErrorMsg = "课程号不存在，请重新输入";
+          } else if (e.code === "E_TEACHER_NOT_EXIST") {
+            ElMessage({
+              type: "error",
+              message: "教师不存在",
+              duration: 1000,
+            });
+          }
+        });
     },
     //删除教学班
     deleteClass(index, row) {
@@ -755,8 +819,13 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-         deleteClass(row.classId).then((res) => {
+        deleteClass(row.classId).then((res) => {
           console.log("deleteClass", res);
+          ElMessage({
+            type: "success",
+            message: "删除成功",
+            duration: 1000,
+          });
           this.getClassList();
         });
       });
@@ -853,7 +922,7 @@ export default {
       });
       assign(this.multipleSelection).then((res) => {
         // console.log("assign",res);
-        if (res.code == 200) {
+        if (res.code === "SUCCESS") {
           this.isAssign = false;
           ElMessage({
             type: "success",
@@ -884,6 +953,7 @@ export default {
     rowKey(row) {
       return row.classId;
     },
+    //设置是否允许任课老师修改考核方式
     giveRespondentPermission(classEditForm) {
       let msg = {};
       msg.classId = classEditForm.classId;
@@ -986,5 +1056,12 @@ export default {
   justify-content: center;
   font-size: 22px;
   background-color: #f2f2f2;
+}
+.no-class-detail {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: #828d96;
 }
 </style>

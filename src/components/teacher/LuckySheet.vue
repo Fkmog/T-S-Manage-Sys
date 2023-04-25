@@ -217,7 +217,7 @@ export default{
         this.addTeacher(teacherList).then(function(res){
           console.log('res:',res);
           that.firstActivities = true; 
-          if(res.code == '200'){
+          if(res.code == 'SUCCESS'){                                                                
             ElMessage({
                 type: 'success',
                 message: `添加成功`,
@@ -227,13 +227,13 @@ export default{
             that.goBackandClean();
           }
          else{
-          let teacherColumn = [];
-          let refresh = [];
-          if(res.msg == '教师已存在'){
-            console.log('教师已存在');
+          
+          
+          if(res.code == 'E_TEACHER_EXIST'){
+            
             res.data.forEach(function(teacher){
               
-              teacherColumn.push(Object.keys(teacher)[0]);
+             
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
@@ -241,10 +241,7 @@ export default{
             that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
             that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
             that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
-            
-            
-            
-            
+
             that.hotInstance.validateCells((valid) =>{
               if(valid){
                 
@@ -254,10 +251,54 @@ export default{
             ElMessage({
                 type: 'error',
                 message: `添加失败,标红教师已存在`,
-                duration:1500,
+                duration:2000,
               })
             
 
+          }
+          else if(res.code == 'E_TEACHER_DUPLICATE'){
+            res.data.forEach(function(teacher){
+              
+             
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
+            });
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
+
+            that.hotInstance.validateCells((valid) =>{
+              if(valid){
+              }
+            });
+
+            ElMessage({
+                type: 'error',
+                message: `添加失败,标红教师重复`,
+                duration:2000,
+              })
+          }
+          else if(res.code == 'DATA_DUPLICATED'){
+            res.data.forEach(function(teacher){
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
+            });
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
+
+            that.hotInstance.validateCells((valid) =>{
+              if(valid){
+              }
+            });
+
+            ElMessage({
+                type: 'error',
+                message: `添加失败,标红数据重复`,
+                duration:2000,
+              })
           }
           else{
             ElMessage({

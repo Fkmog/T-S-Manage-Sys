@@ -248,7 +248,7 @@ export default {
           }).then(function (res) {
             let localres = res;
             console.log("localres", localres);
-            if (res.code == "200") {
+            if (res === 204) {
               ElMessage({
                     type: "success",
                     message: `删除成功`,
