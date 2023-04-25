@@ -1,5 +1,6 @@
 <template>
 
+
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
       <el-tooltip content="返回" style="float:left;">
@@ -26,6 +27,7 @@
     </div>
 
     <div layout="row" flex class="md-padding" >
+     
      
      
       <div class="hot-table-container" 
@@ -114,7 +116,7 @@ export default{
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: true,
         rowHeaders: true,
-        minSpareRows: 2,
+        minSpareRows: 1,
         preventOverflow: "horizontal",
         manualColumnMove: true,
         contextMenu: {
@@ -180,11 +182,7 @@ export default{
           that.firstActivities = false;
           
         },
-        afterCreateRow(){
-          that.dirty=true;
-          that.firstActivities = false;
-          
-        }
+        
       });
     this.hotInstance = hotRegisterer;
   },
@@ -240,30 +238,24 @@ export default{
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
             });
-            console.log('teacherColumn',teacherColumn);
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
             
-            // that.goBackandClean();
-            // that.getHotCellsFunction(teacherColumn);
-            // that.hotInstance.updateSettings({
-            //   cell:that.getHotCellsFunction(teacherColumn),
-            //   })
             
-            // let cellmata = that.hotInstance.getCellMeta(1,1);
-            // console.log('cell meta:',cellmata);
-            // that.hotInstance.setCellMetaObject(1,1,{validator:/.+@.+/});
-            // console.log('cell meta:',cellmata.readOnly);
+            
             
             that.hotInstance.validateCells((valid) =>{
               if(valid){
                 
               }
             });
+
             ElMessage({
                 type: 'error',
                 message: `添加失败,标红教师已存在`,
                 duration:1500,
               })
-            
             
 
           }
@@ -329,14 +321,14 @@ getHotCellsFunction(existTeacher){
   }
   
 },
-goBackandClean(existTeacher){
-  // this.db.items = [];
-  // this.postData.teachers = [];
+goBackandClean(){
+  this.db.items = [];
+  this.postData.teachers = [];
   this.count = 0;
-  // this.hotInstance.updateSettings({
-  //     cell:this.getHotCellsFunction(existTeacher),
-  // })
-  console.log('datas:', this.db.items,this.postData.teachers);
+  this.hotInstance.updateSettings({
+      data:this.db.items
+  })
+  // console.log('datas:', this.db.items,this.postData.teachers);
 },
 goTeacher(){
   console.log('goteacher:'+this.saving+this.dirty);

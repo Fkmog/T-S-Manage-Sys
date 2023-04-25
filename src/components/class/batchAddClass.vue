@@ -177,7 +177,7 @@ getDict(){
           licenseKey: "non-commercial-and-evaluation",
           colHeaders: true,
           rowHeaders: true,
-          minSpareRows: 2,
+          minSpareRows: 1,
           preventOverflow: "horizontal",
           manualColumnMove: true,
           contextMenu: {
@@ -273,26 +273,22 @@ getDict(){
               console.log("console:", self.count);
             }
           },
-          afterRemoveRow(index, amount, physicalRows, source){
+        afterRemoveRow(index, amount, physicalRows, source){
           that.dirty=true;
           that.firstActivities = false;
-          
         },
-        afterCreateRow(){
-          that.dirty=true;
-          that.firstActivities = false;
-          
-        }
+       
         });
         this.hotInstance = hotRegisterer;
       },
       isValid() {
-       
+        console.log('firstActivities',this.firstActivities)
         if(this.firstActivities){
           return false;
         }
         else{
           let result = this.toPostData();
+        console.log('result',result)
             return !(!result);
         }
       },
@@ -325,7 +321,7 @@ getDict(){
             that.goBackandClean();
             that.isNotDirty();
           } else {
-            if(res.msg == '课程已存在'){
+            if(res.msg == '教学班已存在'){
               res.data.forEach(function(teacher){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
@@ -335,18 +331,26 @@ getDict(){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
             });
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,2,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,3,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,4,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,5,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
-                  message: "添加失败，部分课程已存在",
-                  duration: 1000,
+                  message: "添加失败，标红教学班已存在",
+                  duration: 1500,
                 });
+              
               that.hotInstance.validateCells((valid) =>{
               if(valid){
                 
               }
             });
             }
-            if(res.msg == '教师不存在'){
+            else if(res.msg == '教师不存在'){
               let teacherID = []
               res.data.forEach(function(teacher){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
@@ -357,12 +361,47 @@ getDict(){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
             });
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,2,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,3,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,4,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,5,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
                   message: "添加失败，标红教师不存在",
-                  duration: 1000,
+                  duration: 1500,
                 });
                 that.hotInstance.validateCells((valid) =>{
+              if(valid){
+                
+              }
+            });
+            }
+            else if(res.msg == '课程号不存在'){
+              res.data.forEach(function(teacher){
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
+            });
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,2,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,3,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,4,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,5,{validator:undefined});
+            that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
+              ElMessage({
+                  type: "error",
+                  message: "添加失败，标红课程号不存在",
+                  duration: 1500,
+                });
+              that.hotInstance.validateCells((valid) =>{
               if(valid){
                 
               }
@@ -372,13 +411,11 @@ getDict(){
               ElMessage({
                   type: "error",
                   message: "添加失败",
-                  message: "添加失败",
+                  
                   duration: 1000,
                 });
             }
-            
-  
-            that.goBackandClean();
+            // that.goBackandClean();
             that.isNotDirty();
           }
         });
@@ -473,13 +510,13 @@ getDict(){
         return valid;
       },
       goBackandClean() {
-        // this.db.items = [];
-        // this.postData.courses = [];
+        this.db.items = [];
+        this.postData.courses = [];
   
         // console.log("datas has cleaned:", this.db.items, this.postData.course);
-        // this.hotInstance.updateSettings({
-        //   data: this.db.items,
-        // });
+        this.hotInstance.updateSettings({
+          data: this.db.items,
+        });
         
       },
       
@@ -517,7 +554,9 @@ getDict(){
           localres = res;
           console.log("localres", localres);
           return localres;
-        });
+        }).catch(e => {
+          return e;
+        })
       },
       async handleEvent(event){
       switch (event.keyCode) {

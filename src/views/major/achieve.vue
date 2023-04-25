@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <!-- 头部栏 -->
-    <div class="Block"></div>
+    <!-- <div class="Block"></div>
     <div v-show="hasProgram" class="body-check">
       <div class="card">
         <div class="noAttribute" v-if="!hasAttribute">
@@ -60,10 +60,6 @@
                   </div>
                 </div>
                 <div class="methods" style="margin: 20px 0 20px 100px">
-                  <!-- <div
-                    v-for="method in indicator.supportMethodVos"
-                    :key="method.id"
-                  > -->
                   <el-row class="method-detail">
                     <el-col :span="6" class="method-weight"
                       >(&nbsp; weight %&nbsp;)</el-col
@@ -83,13 +79,13 @@
       </div>
     </div>
     <div v-show="noProgram" class="no-program">
-      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
         未创建培养方案
-      </h2>
-      <div style="display: flex; justify-content: center; color: grey">
+      </div>
+      <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
         请先创建培养方案
       </div>
-    </div>
+    </div> -->
     <!-- 弹出对话框 -->
     <div>
       <el-dialog
@@ -281,12 +277,12 @@ export default {
         this.$store.state.currentInfo.year
       ).then((res) => {
         // console.log("checkProgram", res);
-        if (res.msg == "未查到" && res.code == 200) {
+        if (res.msg == "未查到" && res.code == 'SUCCESS') {
           this.hasProgram = false;
           this.noProgram = true;
           this.$store.commit("major/setProgramId", "");
         }
-        if (res.msg == "操作成功" && res.code == 200) {
+        if (res.msg == "操作成功" && res.code == 'SUCCESS') {
           this.noProgram = false;
           this.hasProgram = true;
           this.programId = res.data.programId;

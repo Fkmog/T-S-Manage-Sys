@@ -321,7 +321,7 @@ export default {
       remark:'',
       versionId:'',
     },]),
-    pageSize:ref(10),
+    pageSize:ref(20),
     pageNum:ref(1),
     departmentId:'',
     schoolId:'',

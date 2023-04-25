@@ -7,14 +7,15 @@
           <Search />
         </el-icon>
         <div class="searchLine">
-          <input
+          <el-input
             class="searchInput"
             :class="active ? 'activeInput' : ''"
             v-model="searchInput"
-            :placeholder = "msg"
+            :placeholder="msg"
             @change="sendMessage"
             @focus="active = true"
             @blur="active = false"
+            clearable
           />
         </div>
       </div>
@@ -31,9 +32,9 @@ import { Search } from "@element-plus/icons-vue";
 export default {
   name: "HeaderSearch",
   props: {
-      msg: String,
-      required: true
-    },
+    msg: String,
+    required: true,
+  },
   components: {
     Search,
   },
@@ -46,10 +47,9 @@ export default {
   },
   methods: {
     sendMessage() {
-      this.$emit('SearchValue',this.searchInput)
+      this.$emit("SearchValue", this.searchInput);
     },
   },
-
 };
 </script>
 
@@ -97,11 +97,8 @@ export default {
   border-bottom-width: 1px;
   opacity: 1;
   transition: 0.3s;
-  margin-top:20px;
-
 }
 .searchBlock:hover .searchInput {
-  margin-top:20px;
   width: 220px;
   transition: all 0.3s;
   border-top-width: 0px;
@@ -114,5 +111,13 @@ export default {
 .searchInput:focus {
   width: 220px;
   outline: 0;
+}
+.searchInput >>> .el-input__wrapper {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  border-bottom: 1px solid #d5d5d5;
+  box-shadow: 0 0 0 0px;
+  background-color: inherit;
 }
 </style>

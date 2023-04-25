@@ -61,10 +61,10 @@
       </div>
     </div>
     <div v-show="noProgram" class="no-program">
-      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
         未创建培养方案
-      </h2>
-      <div style="display: flex; justify-content: center; color: grey">
+      </div>
+      <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
         请先点击右上角圆形按钮创建培养方案
       </div>
 
@@ -182,13 +182,13 @@ export default {
         this.$store.state.currentInfo.year
       ).then((res) => {
         console.log("checkProgram", res);
-        if (res.msg == "未查到" && res.code == 200) {
+        if (res.msg == "未查到" && res.code === 'SUCCESS') {
           this.hasProgram = false;
           this.noProgram = true;
 
           this.$store.commit("major/setProgramId", "");
         }
-        if (res.msg == "操作成功" && res.code == 200) {
+        if (res.msg == "操作成功" && res.code === 'SUCCESS') {
           this.noProgram = false;
           this.hasProgram = true;
           this.programId = res.data.programId;

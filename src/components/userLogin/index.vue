@@ -87,7 +87,7 @@ export default {
           this.errorMsg = "";
           login(this.loginForm.userName, this.loginForm.passWord).then(
             (res) => {
-              if (res.code == 200) {
+              if (res.code == 'SUCCESS') {
                 //存储token -> cookie
                 Cookies.set("Admin-Token", res.token);
                 //存用户信息 ->vuex
@@ -132,16 +132,15 @@ export default {
                   }
                 });
               }
-              if (res.code != 200) {
-                // this.loginForm.userName = "";
-                this.errorMsg = "密码不正确，请重新输入";
+              
+              if (res.code === 'ERROR') {
+                this.errorMsg = "账号/密码不正确，请重新输入";
                 this.loginForm.passWord = "";
                 return;
               }
             }
           );
         } else {
-          // alert("请输入正确信息");
           return false;
         }
       });
