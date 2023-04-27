@@ -142,7 +142,7 @@
         <span class="dialog-footer">
           <el-button @click="goBatchAddClass">批量添加</el-button>
           <el-button @click="addVisible = false">取消</el-button>
-          <el-button type="primary" @click="addClass(classAddForm)">
+          <el-button link plain @click="addClass(classAddForm)">
             确定
           </el-button>
         </span>
@@ -338,7 +338,17 @@
       width="50"
       :selectable="canSelect"
       :reserve-selection="true"
-    />
+    >
+      <!-- <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="选择所有相同课程号的教学班"
+          placement="bottom"
+          :hide-after="0"
+        >
+        <span> 选择所有相同课程号的教学班</span>
+        </el-tooltip> -->
+    </el-table-column>
     <el-table-column prop="className" label="课程名" width="210" />
     <el-table-column prop="allTeacherName" label="任课教师" width="200" />
     <el-table-column prop="courseCode" label="课程号" width="170" />
@@ -396,7 +406,7 @@
   <div class="pagination-container" flex>
     <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
       <el-button
-        type="primary"
+        link
         plain
         v-show="hasClass && showLoadmore"
         @click="loadMore()"
@@ -1013,19 +1023,11 @@ export default {
 :deep().el-pagination button:disabled {
   cursor: default;
 }
-:deep() .el-icon  {
+:deep() .el-icon {
   height: 18px;
   width: 18px;
 }
-:deep() .el-icon  svg {
-  height: 18px;
-  width: 18px;
-}
-:deep().searchBlock .el-icon .el-icon__clear {
-  height: 18px;
-  width: 18px;
-}
-:deep().searchBlock .el-icon .el-icon__clear svg {
+:deep() .el-icon svg {
   height: 18px;
   width: 18px;
 }
