@@ -20,7 +20,7 @@
             <Back />
           </el-icon>
         </el-tooltip>
-        <div class="title">{{ course.name }}</div>
+        <div class="title">毕业要求指标点</div>
       </el-row>
     </div>
     <!-- <editBtn @click="goEdit()"></editBtn> -->

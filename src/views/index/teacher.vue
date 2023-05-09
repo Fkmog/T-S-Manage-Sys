@@ -74,7 +74,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button type="primary" plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button  link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
@@ -248,7 +248,7 @@ export default {
           }).then(function (res) {
             let localres = res;
             console.log("localres", localres);
-            if (res.code == "200") {
+            if (res === 204) {
               ElMessage({
                     type: "success",
                     message: `删除成功`,

@@ -283,7 +283,7 @@ export default {
       this.addBaseCourses(this.postData.courses).then(function (res) {
         console.log("res:", res);
         that.firstActivities = true;    
-        if (res.code == "200") {
+        if (res.code == "SUCCESS") {
           ElMessage({
                 type: "success",
                 message: `添加成功`,
@@ -293,7 +293,7 @@ export default {
           that.goBackandClean();
           that.isNotDirty();
         } else {
-          if(res.msg == '课程已存在'){
+          if(res.code == 'E_CODE_EXIST'){
             res.data.forEach(function(teacher){
               
               
@@ -316,7 +316,7 @@ export default {
             ElMessage({
                 type: 'error',
                 message: `添加失败,标红课程已存在`,
-                duration:1500,
+                duration:2000,
               })
 
           }

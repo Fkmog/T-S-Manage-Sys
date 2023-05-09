@@ -14,8 +14,9 @@
             :placeholder="msg"
             @change="sendMessage"
             @focus="active = true"
-            @blur="active = false"
+            @blur="inputBlur()"
             clearable
+            @clear="clearInput()"
           />
         </div>
       </div>
@@ -48,6 +49,17 @@ export default {
   methods: {
     sendMessage() {
       this.$emit("SearchValue", this.searchInput);
+    },
+    inputBlur() {
+      if (this.searchInput === "") {
+        this.active = false;
+      } else {
+        this.active = true;
+      }
+    },
+    clearInput() {
+      this.searchInput = "";
+      this.inputBlur();
     },
   },
 };

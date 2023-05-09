@@ -277,7 +277,7 @@
         <el-form-item label="课程名称" :label-width="formLabelWidth" prop="courseName">
           <el-input v-model="form.courseName" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="课程代码" :label-width="formLabelWidth" prop="courseCode">
+        <el-form-item label="课程代码" :label-width="formLabelWidth" prop="courseCode" :error="C_ErrorMsg">
           <el-input v-model="form.courseCode" autocomplete="off" />
         </el-form-item>
         <el-form-item label="学分" :label-width="formLabelWidth" prop="credit">
@@ -319,7 +319,7 @@
           <el-input v-model="preform.courseName" autocomplete="off" v-show="identity == '学院管理员'"/>
           <span v-show="identity == '课程负责人'">{{ preform.courseName }}</span>
         </el-form-item>
-        <el-form-item label="课程代码" :label-width="formLabelWidth">
+        <el-form-item label="课程代码" :label-width="formLabelWidth" :error="C_ErrorMsg_edit">
           <el-input v-model="preform.courseCode" autocomplete="off" v-show="identity == '学院管理员'"/>
           <span v-show="identity == '课程负责人'">{{ preform.courseCode }}</span>
         </el-form-item>
@@ -407,7 +407,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button type="primary" plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
@@ -433,6 +433,14 @@
   name:"BaseCourse",
   data(){
     return{
+
+      C_ErrorMsg:'',
+      C_ErrorMsg_edit:'',
+
+
+
+
+
       keyword:'',
       isloading:true,
       hasBaseCourse:Boolean,
@@ -686,7 +694,7 @@
       that.getBaseCourse(that.pageSize,that.pageNum);
       that.editPrinciple = false;
       that.editRespondentPostdata = [];
-      if(res.code == '200'){
+      if(res.code == 'SUCCESS'){
           ElMessage({
                     type: 'success',
                     message: `修改负责人成功`,
@@ -729,7 +737,7 @@
       that.getBaseCourse(that.pageSize,that.pageNum);
       that.editPrinciple = false;
       that.editRespondentPostdata = [];
-      if(res.code == '200'){
+      if(res.code == 'SUCCESS'){
           ElMessage({
                     type: 'success',
                     message: `删除负责人成功`,
@@ -768,7 +776,7 @@
         that.getBaseCourse(that.pageSize,that.pageNum);
         that.showPrinciple = false;
         that.respondentPostdata = [];
-        if(res.code == '200'){
+        if(res.code == 'SUCCESS'){
           ElMessage({
                     type: 'success',
                     message: `添加负责人成功`,
@@ -886,7 +894,7 @@
         }
       }).then(function(res){
         console.log(res);
-        if(res.code == '200'){
+        if(res.code == 'SUCCESS'){
           ElMessage({
                   type: 'success',
                   message: `新增成功`,
@@ -895,15 +903,16 @@
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
-            else{
-              ElMessage({
+            
+      }).catch(e=>{
+        console.log('e',e);
+        ElMessage({
                     type: 'error',
                     message: `新增失败`,
                     duration:1000,
                   });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize,that.pageNum);
-            }
       })
       })
     },
@@ -972,11 +981,9 @@
      
     },
     
-    // currentPage(val){
-    //   console.log(`当前页: ${val}`);
-    // },
     addBaseCourse(){
-      this.dialogFormVisible = false;
+      
+      this.C_ErrorMsg = '';
       console.log(this.form);
       
       let that = this;
@@ -989,7 +996,8 @@
               data:postData
           }).then(function(res){
             
-            if(res.code == '200'){
+            if(res.code == 'SUCCESS'){
+              that.dialogFormVisible = false;
               ElMessage({
                   type: 'success',
                   message: `添加成功`,
@@ -998,14 +1006,34 @@
               that.clearForm();
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
+           
+          }).catch(e=>{
+            console.log('e',e);
+            that.dialogFormVisible = true;
+              if(e.code == 'E_CODE_EXIST'){
+                ElMessage({
+                  type: "error",
+                  message: "添加失败，课程已存在",
+                  duration: 2000,
+                });
+                that.C_ErrorMsg = "课程已存在，请重新输入"
+               }
+               else if(e.code == 'DATA_DUPLICATED'){
+                ElMessage({
+                  type: "error",
+                  message: "添加失败，数据重复",
+                  duration: 2000,
+                });
+                that.C_ErrorMsg = "课程已存在，请重新输入"
+               }
+            
             else{
               ElMessage({
-                    type: 'error',
-                    message: `添加失败`,
-                    duration:1000,
-                  });
-              that.clearForm();
-              that.getBaseCourse(that.pageSize,that.pageNum);
+                  type: "error",
+                  message: "添加失败",
+                  
+                  duration: 1000,
+                });
             }
           })
   
@@ -1091,6 +1119,8 @@
               that.hasBaseCourse = false;
             }
             
+          }).catch(e=>{
+            console.log('e',e);
           });
       }
       if(identity == '课程负责人'){
@@ -1146,6 +1176,8 @@
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
+          }).catch(e=>{
+            console.log('e',e);
           });
       }
       if(identity == '教师'){
@@ -1172,7 +1204,7 @@
         
       }).then(function(res){
         console.log(res);
-        if(res.code == '200'){
+        if(res === 204){
           ElMessage({
                   type: 'success',
                   message: `删除成功`,
@@ -1187,19 +1219,24 @@
                 //   that.closeShow = !that.closeShow;
                 // }
             }
-            else{
-              ElMessage({
+            
+             
+            
+      })
+      .catch(e=>{
+            console.log('e',e);
+            ElMessage({
                     type: 'error',
                     message: `删除失败`,
                     duration:1000,
                   });
               that.getBaseCourse(that.pageSize,that.pageNum);
-            }
+          });
       })
+      .catch(e =>{
+        console.log('e',e);
       })
-      .catch(() => {
-        
-      })
+      
       
     },
     goBaseCourseDetail(index, row){
@@ -1232,16 +1269,18 @@
       // })
     },
     editBaseCourse(){
-      this.dialogFormVisible1 = false;
+      
+      this.C_ErrorMsg_edit = '';
       let that = this;
       console.log('preform:',this.preform);
       return request({
-        url:'/baseCourse/edit',
-        method:'post',
+        url:'/baseCourse',
+        method:'put',
         data: this.preform
       }).then(function(res){
         console.log('res:',res);
-        if(res.code == '200'){
+        if(res.code == 'SUCCESS'){
+          that.dialogFormVisible1 = false;
           ElMessage({
                   type: 'success',
                   message: `修改成功`,
@@ -1250,15 +1289,38 @@
               
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
-            else{
+            
+
+              
+              // that.getBaseCourse(that.pageSize,that.pageNum);
+            
+      }).catch(e=>{
+        that.dialogFormVisible1 = true;
+            console.log('e',e);
+            if(e.code == 'E_CODE_EXIST'){
+                ElMessage({
+                  type: "error",
+                  message: "修改失败，课程已存在",
+                  duration: 2000,
+                });
+                that.C_ErrorMsg_edit = "课程已存在，请重新输入"
+               }
+              else if(e.code=='UNAUTHENTICATED'){
+                ElMessage({
+                  type: "error",
+                  message: "修改失败，无权限",
+                  duration: 2000,
+                });
+              }
+               else{
               ElMessage({
-                    type: 'error',
-                    message: `修改失败`,
-                    duration:1000,
-                  });
-              that.getBaseCourse(that.pageSize,that.pageNum);
+                  type: "error",
+                  message: "修改失败",
+                  
+                  duration: 1000,
+                });
             }
-      })
+          });
   
     },
     goAddBaseCourses() {
@@ -1338,7 +1400,7 @@
   
   <style scoped>
   .no-class {
-    width: 80%;
+  
   margin-top: 120px;
   display: flex;
   justify-content: center;

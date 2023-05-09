@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import user from './modules/user'
+import user from "./modules/user";
 
 export default createStore({
   state: {},
@@ -187,6 +187,32 @@ export default createStore({
       mutations: {
         setmajorNum(state, newVal) {
           state.majorNum = newVal;
+        },
+      },
+      actions: {},
+      modules: {},
+    },
+    navInfo: {
+      namespaced: true,
+      state: {
+        activeDisplay1: 0,
+        activeDisplay2: 0,
+        activeDisplay3: 0,
+        activeDisplay4: 0,
+      },
+      getters: {},
+      mutations: {
+        setActiveDisplay1(state, newVal) {
+          state.activeDisplay1 = newVal;
+        },
+         setActiveDisplay2(state, newVal) {
+          state.activeDisplay2 = newVal;
+        },
+         setActiveDisplay3(state, newVal) {
+          state.activeDisplay3 = newVal;
+        },
+         setActiveDisplay4(state, newVal) {
+          state.activeDisplay4 = newVal;
         },
       },
       actions: {},

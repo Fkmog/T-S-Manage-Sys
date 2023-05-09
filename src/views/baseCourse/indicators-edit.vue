@@ -100,7 +100,7 @@
                       <div class="method-weight">
                         (&nbsp;{{ method.weight }}%&nbsp;)
                       </div>
-                      <div class="method-desc" style="margin-left: 80px">
+                      <div class="method-desc">
                         {{ method.name }}
                       </div>
                     </div>
@@ -109,7 +109,7 @@
               </div>
               <el-row
                 class="noSupport"
-                v-if="indicator.supportMethodVos.length == 0"
+                v-if="indicator.supportMethodVos.length === 0"
               >
                 <div>
                   <el-button
@@ -215,8 +215,8 @@
               <el-option
                 v-for="object in objectives"
                 :key="object.id"
-                :label="object.name"
-                :value="object.name"
+                :label="object.description"
+                :value="object.description"
               >
               </el-option>
             </el-select>
@@ -288,7 +288,7 @@ export default {
       searchValue: "",
       allIndicators: [],
       newIndicator: false,
-      chosenMajor: '',
+      chosenMajor: "",
       course: {
         name: "",
         detailId: Number,
@@ -296,6 +296,7 @@ export default {
         schoolId: Number,
       },
       majorList: [],
+      majorListCopy: [],
       programId: Number,
       index1: Number, //确定哪一专业
       index2: Number, //确定哪一指标点
@@ -320,7 +321,22 @@ export default {
   },
   methods: {
     back() {
-      this.$router.push("/baseCourseIndicators");
+      // console.log( JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList));
+      if (
+        !(JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList))
+      ) {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push("/baseCourseIndicators");
+          })
+          .catch(() => {});
+      } else {
+        this.$router.push("/baseCourseIndicators");
+      }
     },
     judgeBeforeSave() {
       //判断有无未编辑支撑方式的指标点，有则不能保存
@@ -353,13 +369,15 @@ export default {
         major.courseIndicators = major.indicators;
         saveIndicators(major).then((res) => {
           console.log("save", res);
-          if (res.code === 'SUCCESS') {
+          if (res.code === "SUCCESS") {
             this.successNum = this.successNum + 1;
             ElMessage({
               type: "success",
               message: `保存成功`,
               duration: 1500,
             });
+            //更新副本
+            this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
             this.back();
           } else {
             ElMessage({
@@ -401,7 +419,6 @@ export default {
           this.majorList[i].indicators = res.data;
           this.majorList[i].schoolId = this.course.schoolId;
           this.majorList[i].departmentId = this.course.departmentId;
-
           //处理id->serialNum
           for (let j = 0; j < this.majorList[i].indicators.length; j++) {
             let serialNum = [];
@@ -425,6 +442,8 @@ export default {
           });
         });
       }
+      // 定义一个基本的majorList副本，用作判断有无修改
+      this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
     },
     //获取课程目标
     checkObjectives() {
@@ -531,9 +550,9 @@ export default {
         } else {
           newIndicator.id = newIndicator.id + "0" + i[1];
         }
-        console.log("#",newIndicator);
+        console.log("#", newIndicator);
         this.majorList[index1].indicators.push(newIndicator);
-        console.log("##",this.majorList[index1]);
+        console.log("##", this.majorList[index1]);
 
         this.newIndicator = false;
         this.searchValue = "";
@@ -603,7 +622,8 @@ export default {
       dialogIndicator.supportMethodVos.forEach((support) => {
         //处理supportMethodVos下的id赋值
         this.objectives.forEach((item) => {
-          if (item.name == support.name) {
+          // console.log("item便利",item);
+          if (item.description == support.name) {
             support.id = item.id;
           }
         });

@@ -1,89 +1,97 @@
 <template>
-<div class="content">
-  <!-- 顶部导航栏 -->
-  <div class="block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="backBaseCourseDetail()"
-        >
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <div class="title">{{ course.name }}</div>
-    </el-row>
-  </div>
-  <!-- <editBtn @click="goEdit()"></editBtn> -->
-  <div class="body">
-    <div class="card">
-      <el-row class="card-head" style="margin-top: 30px">
-        <span style="color: grey; font-size: 14px">课程目标</span>
+  <div class="content">
+    <!-- 顶部导航栏 -->
+    <div class="block">
+      <el-row class="block-row">
         <el-tooltip
           class="box-item"
           effect="dark"
-          content="编辑"
+          content="返回"
           placement="bottom"
           :hide-after="0"
         >
-          <el-icon class="edit-pen" style="margin-top: -10px" @click="goEdit()"
-            ><EditPen
-          /></el-icon>
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 50px"
+            @click="backBaseCourseDetail()"
+          >
+            <Back />
+          </el-icon>
         </el-tooltip>
+        <div class="title">课程目标</div>
       </el-row>
-      <div v-for="objective in list.objectives" :key="objective.id">
-        <el-row>
-          <el-col :span="2" class="objective-num">{{
-            objective.serialNum
-          }}</el-col>
-          <el-col :span="20">
-            <div class="objective-name">
-              {{ objective.name }}
-            </div>
-            <div class="objective-description">
-              {{ objective.description }}
-            </div>
-            <div style="margin-top: 30px">
-              <span style="color: grey; font-size: 14px">考核方式</span>
-            </div>
-            <div
-              v-for="(assessment, index) in objective.assessmentMethods"
-              :key="index"
-            >
-              <el-row class="assessments">
-                <el-col :span="5">
-                  {{ assessment.name }}
-                </el-col>
-                <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                <el-col
-                  :span="2"
-                  v-for="(activity, index) in assessment.activities.item"
-                  :key="index"
-                >
-                  {{ activity }}
-                </el-col>
-              </el-row>
-            </div>
-          </el-col>
+    </div>
+    <!-- <editBtn @click="goEdit()"></editBtn> -->
+    <div class="body">
+      <div class="card">
+        <el-row class="card-head" style="margin-top: 30px">
+          <span style="color: grey; font-size: 14px">课程目标</span>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="编辑"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="edit-pen"
+              style="margin-top: -10px"
+              @click="goEdit()"
+              ><EditPen
+            /></el-icon>
+          </el-tooltip>
         </el-row>
-        <div style="height: 30px"></div>
+        <div v-for="objective in list.objectives" :key="objective.id">
+          <el-row>
+            <el-col :span="2" class="objective-num">{{
+              objective.serialNum
+            }}</el-col>
+            <el-col :span="20">
+              <div class="objective-name">
+                {{ objective.name }}
+              </div>
+              <div class="objective-description">
+                {{ objective.description }}
+              </div>
+              <div style="margin-top: 30px">
+                <span style="color: grey; font-size: 14px">考核方式</span>
+              </div>
+              <div
+                v-for="(assessment, index) in objective.assessmentMethods"
+                :key="index"
+              >
+                <el-row class="assessments">
+                  <el-col :span="5">
+                    {{ assessment.name }}
+                  </el-col>
+                  <el-col :span="5">( {{ assessment.weight }}% )</el-col>
+                  <el-col :span="12">
+                    <el-row>
+                      <el-col
+                        :span="6"
+                        v-for="(activity, index) in assessment.activities.item"
+                        :key="index"
+                      >
+                      {{ activity }}
+
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-col>
+          </el-row>
+          <div style="height: 30px"></div>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
 <script>
-import { Back,EditPen } from "@element-plus/icons-vue";
+import { Back, EditPen } from "@element-plus/icons-vue";
 import editBtn from "@/components/general/editBtn.vue";
 import { getObjectives } from "@/api/basecourse";
 
@@ -92,7 +100,7 @@ export default {
   components: {
     Back,
     editBtn,
-    EditPen
+    EditPen,
   },
   data() {
     return {

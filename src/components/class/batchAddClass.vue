@@ -311,7 +311,7 @@ getDict(){
           console.log("res:", res);
           
           that.firstActivities = true;    
-          if (res.code == "200") {
+          if (res.code == "SUCCESS") {
             ElMessage({
                   type: "success",
                   message: `添加成功`,
@@ -321,7 +321,7 @@ getDict(){
             that.goBackandClean();
             that.isNotDirty();
           } else {
-            if(res.msg == '教学班已存在'){
+            if(res.code == 'E_CLASS_EXIST'){
               res.data.forEach(function(teacher){
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
@@ -341,7 +341,7 @@ getDict(){
               ElMessage({
                   type: "error",
                   message: "添加失败，标红教学班已存在",
-                  duration: 1500,
+                  duration: 2000,
                 });
               
               that.hotInstance.validateCells((valid) =>{
@@ -350,16 +350,16 @@ getDict(){
               }
             });
             }
-            else if(res.msg == '教师不存在'){
-              let teacherID = []
+            else if(res.code == 'E_TEACHER_NOT_EXIST'){
+              
               res.data.forEach(function(teacher){
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:undefined});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:undefined});
             });
             that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
             that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
@@ -371,7 +371,7 @@ getDict(){
               ElMessage({
                   type: "error",
                   message: "添加失败，标红教师不存在",
-                  duration: 1500,
+                  duration: 2000,
                 });
                 that.hotInstance.validateCells((valid) =>{
               if(valid){
@@ -381,13 +381,13 @@ getDict(){
             }
             else if(res.msg == '课程号不存在'){
               res.data.forEach(function(teacher){
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:undefined});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:/.+fkmog@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:/.+fkmog@.+/});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],5,{validator:undefined});
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],6,{validator:undefined});
             });
             that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
             that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
@@ -399,7 +399,7 @@ getDict(){
               ElMessage({
                   type: "error",
                   message: "添加失败，标红课程号不存在",
-                  duration: 1500,
+                  duration: 2000,
                 });
               that.hotInstance.validateCells((valid) =>{
               if(valid){

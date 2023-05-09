@@ -1,7 +1,7 @@
 <template>
   <HeaderSearch :msg="searchMsg" @SearchValue="getSearchValue"></HeaderSearch>
   <addBtn @click="addMajor()"></addBtn>
-  <div class="cardList">
+  <div v-show="!noMajor" class="cardList">
     <div
       class="card"
       v-for="major in majorList"
@@ -50,6 +50,29 @@
       </div>
     </div>
   </div>
+  <div v-show="noMajor" class="no-major">
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        margin-top: 100px;
+        font-size: 22px;
+      "
+    >
+      没有专业
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        color: grey;
+        font-size: 13px;
+        margin-top: 30px;
+      "
+    >
+      请点击右上角圆形按钮添加专业
+    </div>
+  </div>
 </template>
 
 <script>
@@ -69,6 +92,7 @@ export default {
   },
   data() {
     return {
+      noMajor: false,
       searchMsg: "搜索专业名称",
       addMajorName: "",
       majorList: [],
@@ -114,6 +138,11 @@ export default {
       getMajor(this.currentDepartmentId, this.currentSchoolId).then((res) => {
         this.majorList = res.rows;
         console.log("majorList", res);
+        if (res.total == 0) {
+          this.noMajor = true;
+        } else {
+          this.noMajor = false;
+        }
       });
     },
     //跳转专业视图
@@ -142,7 +171,7 @@ export default {
             console.log("addMajor", res);
             ElMessage({
               type: "success",
-              message: `成功新建专业:${value}`,
+              message: `创建成功`,
               duration: 1500,
             });
             this.getMajorList();
@@ -187,7 +216,7 @@ export default {
             (res) => {
               ElMessage({
                 type: "success",
-                message: `成功修改专业名称:${value}`,
+                message: `更新成功`,
                 duration: 1500,
               });
               console.log("changeMajor", res);
@@ -335,11 +364,11 @@ export default {
   margin-top: 20px;
   transition: 0.3s;
 }
-:deep() .el-icon  {
+:deep() .el-icon {
   height: 18px;
   width: 18px;
 }
-:deep() .el-icon  svg {
+:deep() .el-icon svg {
   height: 18px;
   width: 18px;
 }
@@ -350,5 +379,9 @@ export default {
 :deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
+}
+.no-major {
+  display: flex;
+  flex-direction: column;
 }
 </style>
