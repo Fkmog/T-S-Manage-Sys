@@ -123,7 +123,6 @@ export default {
           value: "学校",
           path: "./schools",
         },
-        
       ],
     };
   },
@@ -152,19 +151,27 @@ export default {
   },
   mounted() {
     // console.log("看我", this.$store.state.currentInfo.identity);
+    this.activeDisplay1 = this.$store.state.navInfo.activeDisplay1
+    this.activeDisplay2 = this.$store.state.navInfo.activeDisplay2
+    this.activeDisplay3 = this.$store.state.navInfo.activeDisplay3
+    this.activeDisplay4 = this.$store.state.navInfo.activeDisplay4
   },
   methods: {
     show1(index) {
       this.activeDisplay1 = index;
+      this.$store.commit("navInfo/setActiveDisplay1", index);
     },
     show2(index) {
       this.activeDisplay2 = index;
+      this.$store.commit("navInfo/setActiveDisplay2", index);
     },
     show3(index) {
       this.activeDisplay3 = index;
+      this.$store.commit("navInfo/setActiveDisplay3", index);
     },
     show4(index) {
       this.activeDisplay4 = index;
+      this.$store.commit("navInfo/setActiveDisplay4", index);
     },
   },
 };

@@ -91,12 +91,17 @@
                         {{ assessment.name }}
                       </el-col>
                       <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                      <el-col
-                        :span="2"
-                        v-for="(activity, index) in assessment.activities.item"
-                        :key="index"
-                      >
-                        {{ activity }}
+                      <el-col :span="12">
+                        <el-row>
+                          <el-col
+                            :span="6"
+                            v-for="(activity, index) in assessment.activities
+                              .item"
+                            :key="index"
+                          >
+                            {{ activity }}
+                          </el-col>
+                        </el-row>
                       </el-col>
                     </el-row>
                   </el-col>
@@ -211,7 +216,7 @@
                 v-for="(item, index2) in allActivities.itemObject"
                 :key="index2"
                 :label="item.value"
-                :value="index2"
+                :value="item.value"
               >
               </el-option>
             </el-select>
@@ -283,6 +288,7 @@ export default {
         schoolId: Number,
       },
       list: [],
+      listCopy: [],
       objectives: [],
       assessmentMethods: [],
       dialogFormVisible: false,
@@ -312,7 +318,22 @@ export default {
   },
   methods: {
     backObjectives() {
-      this.$router.push("/baseCourseObjectives");
+      // console.log(
+      // this.listCopy,this.list,!(JSON.stringify(this.listCopy) === JSON.stringify(this.list))
+      // );
+      if (!(JSON.stringify(this.listCopy) === JSON.stringify(this.list))) {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push("/baseCourseObjectives");
+          })
+          .catch(() => {});
+      } else {
+        this.$router.push("/baseCourseObjectives");
+      }
     },
     judgeBeforeSave() {
       try {
@@ -345,12 +366,14 @@ export default {
       saveObjectives(this.list).then((res) => {
         console.log("保存的内容", this.list);
         console.log("save", res);
-        if (res.code == 200) {
+        if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
             message: `保存成功`,
             duration: 1500,
           });
+          // 更新副本
+          this.listCopy = JSON.parse(JSON.stringify(this.list));
           this.backObjectives();
         } else {
           ElMessage({
@@ -395,7 +418,6 @@ export default {
             assessment.isEditWeight = false;
           });
         });
-
         console.log("objectives:", this.objectives);
         //保存成绩项
         if (this.objectives.length > 0) {
@@ -420,10 +442,9 @@ export default {
       let assess = {};
       assess.name = "";
       assess.weight = 0;
-      // 每一项的成绩项都是一样的吗？这里暂时当作一样 所以直接把某一项的成绩项存到data里用
       assess.activities = {};
       // assess.activities = this.activities;
-      // console.log("新增考核方式的activities", assess.activities);
+      console.log("新增考核方式", assess);
       // console.log("addAssessment:", assess, this.dialogObject);
       this.dialogObject.assessmentMethods.push(assess);
     },
@@ -432,8 +453,8 @@ export default {
       this.index = index;
       // 深克隆
       this.dialogObject = JSON.parse(JSON.stringify(objective));
-      // console.log("objective", this.dialogObject);
       this.dialogFormVisible = true;
+      console.log("新创建的课程目标下 新建考核方式", this.dialogObject);
     },
     //删除考核方式
     deleteAssessment(assessment) {
@@ -476,24 +497,55 @@ export default {
         haveZero == false
       ) {
         // 处理activities
-        let array = this.dialogObject.assessmentMethods[0].activities.item;
-        console.log(array);
-        // console.log("all",this.allActivities);
-        this.dialogObject.assessmentMethods[0].activities.item=[]
-        this.dialogObject.assessmentMethods[0].activities.value=[]
-        this.dialogObject.assessmentMethods[0].activities.remark=[]
-        array.forEach((index)=>{
-          this.dialogObject.assessmentMethods[0].activities.item.push(this.allActivities.item[index])
-          this.dialogObject.assessmentMethods[0].activities.value.push(this.allActivities.value[index])
-          this.dialogObject.assessmentMethods[0].activities.remark.push(this.allActivities.remark[index])
-        })
+        // console.log("dialogObject",dialogObject);zhiy
+        this.dialogObject.assessmentMethods.forEach((assessmentMethod) => {
+          console.log("assessmentMethod", assessmentMethod);
+          if (!assessmentMethod.hasOwnProperty("itemObject")) {
+            assessmentMethod.activities.itemObject =
+              assessmentMethod.activities.item.map((item) => ({ value: item }));
+          }
+          let array = assessmentMethod.activities.itemObject;
+          console.log("arrat", array);
+          if (array.length === 1) {
+            let index = this.allActivities.item.indexOf(array[0]);
+            if (index > -1) {
+              assessmentMethod.activities.item.push(
+                this.allActivities.item[index]
+              );
+              assessmentMethod.activities.value.push(
+                this.allActivities.value[index]
+              );
+              assessmentMethod.activities.remark.push(
+                this.allActivities.remark[index]
+              );
+            }
+          }
+          if (array.length > 1) {
+            array.forEach((singleActivity) => {
+              let index = this.allActivities.item.indexOf(singleActivity);
+              if (index > -1) {
+                assessmentMethod.activities.item.push(
+                  this.allActivities.item[index]
+                );
+                assessmentMethod.activities.value.push(
+                  this.allActivities.value[index]
+                );
+                assessmentMethod.activities.remark.push(
+                  this.allActivities.remark[index]
+                );
+              }
+            });
+          }
 
+          // console.log("arrar", array[0]);
+          console.log("all", this.allActivities);
+        });
         this.objectives[this.index].assessmentMethods =
           this.dialogObject.assessmentMethods;
         this.dialogFormVisible = false;
         console.log(
           "确定编辑考核方式assessmentMethods",
-          this.dialogObject.assessmentMethods[0]
+          this.dialogObject.assessmentMethods
         );
       }
     },
@@ -544,11 +596,11 @@ export default {
         this.deleteSerialNum =
           this.objectives[this.objectives.length - 1].serialNum;
         this.canDelete = true;
-
       } else {
         this.deleteSerialNum = 0;
         this.canDelete = false;
       }
+      this.listCopy = JSON.parse(JSON.stringify(this.list));
     },
     // 编辑权重
     editWeight(assessment) {

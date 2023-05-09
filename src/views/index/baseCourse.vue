@@ -1409,7 +1409,10 @@
       })
       .catch(e =>{
         console.log('e',e);
+      .catch(e =>{
+        console.log('e',e);
       })
+      
       
       
     },
