@@ -185,8 +185,8 @@
             rowHeaders: true,
             rowHeaders: ['成绩项', '分值','设置'],
             copyPaste: true,
-            colWidths: 52,
-      
+            colWidths: 100,
+            
             contextMenu: {
               items: {
                 col_left: {
@@ -195,8 +195,8 @@
                 col_right: {
                   name: "在右侧插入列",
                 },
-                remove_col: {
-                  name: "删除列",
+                clear_column: {
+                  name: "清空列",
                 },
               },
             },afterChange(changes, source) {

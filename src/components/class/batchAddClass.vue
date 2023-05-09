@@ -250,7 +250,7 @@ getDict(){
           {
             data: "remark",
             title: "备注",
-            width: 40,
+            width: 120,
             height: 20,
             allowEmpty: true,
           }, //需要添加validator

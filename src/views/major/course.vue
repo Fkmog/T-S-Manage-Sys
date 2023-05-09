@@ -1,7 +1,7 @@
 <template>
   <div v-show="hasProgram">
     <div v-show="hasCourse" >
-      <HeaderSearch v-show="!closeShow">
+      <HeaderSearch msg="搜索课程名称" v-show="!closeShow" >
     <template #rightTime>
         <div class="selectionBar">
           
@@ -135,8 +135,8 @@
         请先点击右上角圆形按钮添加课程
       </div>
     </div>
-    <el-drawer v-model="drawer" :direction="direction" size="50%">
-    <template #header class="drawerHeader">
+    <el-drawer v-model="drawer" :direction="direction" size="50%" :with-header="false">
+    
       <el-col :span="24">
         <el-row>
         <el-col :span="12">
@@ -145,7 +145,7 @@
           </el-row>
          
           <el-row >
-            <HeaderSearch class="searchIndrawer"  :msg="searchCourse" ></HeaderSearch>
+            <HeaderSearch class="searchIndrawer"  msg="搜索课程名称" @SearchValue='getSearchValue'></HeaderSearch>
           </el-row>
          
          
@@ -183,7 +183,7 @@
       
      
       
-    </template>
+    
 
    <!-- 具体basecourse页面，分页 可搜索-->
       
@@ -261,7 +261,7 @@ import { ref,reactive,}from 'vue';
 import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag,ElCheckbox } from 'element-plus'
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
-
+import { getDictionary } from "@/api/dictionary";
 
 
 export default {
@@ -273,6 +273,9 @@ components:{
 },
 data(){
   return{
+    courseTypeSource:[],
+    courseNatureSource:[],
+    keyword:'',
     //show loadmore
     showLoadmore:true,
 
@@ -500,14 +503,41 @@ result:reactive({}),
   }
 },
 methods:{
+  async getDict(){
+      let that = this;
+      getDictionary().then((res)=>{
+        console.log(res);
+        res.course_nature.forEach((nature)=>{
+          that.courseNatureSource.push(nature.dictLabel);
+        })
+        res.course_type.forEach((type)=>{
+          that.courseTypeSource.push(type.dictLabel);
+        })
+        // that.courseTypeSource = res.
+      })
+    },
+  getSearchValue(data){
+      this.keyword = data;
+      this.getBaseCourse(this.pageSize,this.pageNum);
+      },
+  getSearchValueforClass(data){
+    this.keyword = data;
+    this.getBaseCourse(this.pageSize,this.pageNum);
+  },
   rowKey(row) {
       return row.courseId;
     },
   //直接添加课程大纲
   addBaseCourseDetail(row){
       let that = this;
+      this.versions.forEach((version)=>{
+        if(version['value']==that.currentVersionValue){
+          that.currentVersion = version['label']
+        }
+      });
+      let versionMessage = '是否添加 '+this.currentVersion+' 本课程大纲？'
       ElMessageBox.confirm(
-      '尚未添加版本信息是否添加？',
+      versionMessage,
       '注意',
       {
         confirmButtonText: '确定',
@@ -528,7 +558,7 @@ methods:{
         }
       }).then(function(res){
         console.log(res);
-        if(res.code == '200'){
+        if(res.code == 'SUCCESS'){
           ElMessage({
                   type: 'success',
                   message: `新增成功`,
@@ -537,7 +567,9 @@ methods:{
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
-            else{
+            
+      }).catch((e)=>{
+        console.log('e',e);
               ElMessage({
                     type: 'error',
                     message: `新增失败`,
@@ -545,7 +577,7 @@ methods:{
                   });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize,that.pageNum);
-            }
+            
       })
       })
     },
@@ -681,11 +713,10 @@ methods:{
             
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
-            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
             
-            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-            course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            course.courseType = that.courseTypeSource[course.courseType];
+            course.courseNature= that.courseNatureSource[course.courseNature];
+           
             course.versionId = course.bcDetails[0].versionId;
             course.versionName = course.bcDetails[0].versionName;
             courses.push(course);
@@ -765,132 +796,132 @@ methods:{
     
   },
   //搜索一门课
-  searchCourse(msg){
-    let that = this;
-    let courses = [];
-    let count=0;
-    let countofSelected =0;//查找得到的课中，和已经添加过的课的交集数
-    let flag = Boolean;
-    let searchCourseId = [];
-    console.log('searchMsg:',msg);
-    return request({
-      url:'baseCourse/list',
-      method:'get',
-      params:{
-        'courseName':msg,
-        'pageSize':that.pageSize,
-        'pageNum':that.pageNum,
-        'departmentId':that.departmentId,
-        'schoolId':that.schoolId,
-        'majorId':that.majorId
-      }
-    }).then(function(res){
-      if(res.code == '200'){
-        flag = true;
-            ElMessage({
-                type: 'success',
-                message: `搜索成功`,
-                duration:1000,
-              });
-            res.rows.forEach(function(course){
-            course.courseName=course.courseName;
-            course.courseCode=course.courseCode;
-            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-            course.remark = '';
-            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-            course.semester=(course.semester == '0') ? '上学期' : '下学期';
-            course.trueversionId = course.versionId;
-            if(course.bcDetails.length){
+  // searchCourse(msg){
+  //   let that = this;
+  //   let courses = [];
+  //   let count=0;
+  //   let countofSelected =0;//查找得到的课中，和已经添加过的课的交集数
+  //   let flag = Boolean;
+  //   let searchCourseId = [];
+  //   console.log('searchMsg:',msg);
+  //   return request({
+  //     url:'baseCourse/list',
+  //     method:'get',
+  //     params:{
+  //       'courseName':msg,
+  //       'pageSize':that.pageSize,
+  //       'pageNum':that.pageNum,
+  //       'departmentId':that.departmentId,
+  //       'schoolId':that.schoolId,
+  //       'majorId':that.majorId
+  //     }
+  //   }).then(function(res){
+  //     if(res.code == '200'){
+  //       flag = true;
+  //           ElMessage({
+  //               type: 'success',
+  //               message: `搜索成功`,
+  //               duration:1000,
+  //             });
+  //           res.rows.forEach(function(course){
+  //           course.courseName=course.courseName;
+  //           course.courseCode=course.courseCode;
+  //           course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
+  //           course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+  //           course.remark = '';
+  //           course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
+  //           course.semester=(course.semester == '0') ? '上学期' : '下学期';
+  //           course.trueversionId = course.versionId;
+  //           if(course.bcDetails.length){
                
-                for(let i=0;i<course.bcDetails.length;i++){
-                  if(course.bcDetails[i].versionId == that.currentVersionValue){
-                    course.versionId = true;
-                    break;
-                  }
-                  else{
-                    course.versionId = false;
-                  }
-                }
+  //               for(let i=0;i<course.bcDetails.length;i++){
+  //                 if(course.bcDetails[i].versionId == that.currentVersionValue){
+  //                   course.versionId = true;
+  //                   break;
+  //                 }
+  //                 else{
+  //                   course.versionId = false;
+  //                 }
+  //               }
                 
-              };
-              if(course.respondentInfos){
+  //             };
+  //             if(course.respondentInfos){
                 
-                // let teacherName =[];
-                course.respondentInfos.forEach(function(respondent){
-                  course.respondentName = respondent.respondentName;
-                  // teacherName.push(respondent.respondentName);
-                });
-                // course.respondentName = teacherName;
+  //               // let teacherName =[];
+  //               course.respondentInfos.forEach(function(respondent){
+  //                 course.respondentName = respondent.respondentName;
+  //                 // teacherName.push(respondent.respondentName);
+  //               });
+  //               // course.respondentName = teacherName;
               
-            }
-            // course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
-            course.index = count;
-            courses.push(course);
-            searchCourseId.push(course.courseId);
-            count++;
-          });
-          that.searchCourseId = searchCourseId;
-          that.programeCourseInfo.forEach(function(courseInfo){
-              try{
+  //           }
+  //           // course.versionId = (course.versionId == that.currentVersionVale) ? true : false;
+  //           course.index = count;
+  //           courses.push(course);
+  //           searchCourseId.push(course.courseId);
+  //           count++;
+  //         });
+  //         that.searchCourseId = searchCourseId;
+  //         that.programeCourseInfo.forEach(function(courseInfo){
+  //             try{
                  
-              courses.forEach(function(course){
-                console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
-                if(!course.remark){
+  //             courses.forEach(function(course){
+  //               console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+  //               if(!course.remark){
                   
-                if(courseInfo.courseId == course.courseId ){
+  //               if(courseInfo.courseId == course.courseId ){
                     
-                      course.remark = true;
-                      throw new Error("remark")
+  //                     course.remark = true;
+  //                     throw new Error("remark")
                     
-                  }
-                  else{
-                    course.remark = false;
-                  }
-                }
+  //                 }
+  //                 else{
+  //                   course.remark = false;
+  //                 }
+  //               }
                 
-              });
-          }catch(e){
-            if(e.message!='remark') throw e;
-          }
-          });
+  //             });
+  //         }catch(e){
+  //           if(e.message!='remark') throw e;
+  //         }
+  //         });
 
-          that.searchCourseId.forEach(function(courseId){
-            if(that.programInfoCourseId.includes(courseId)){
-              countofSelected++;
-            }
-          });
+  //         that.searchCourseId.forEach(function(courseId){
+  //           if(that.programInfoCourseId.includes(courseId)){
+  //             countofSelected++;
+  //           }
+  //         });
 
-          that.tableData = courses;
-          that.programInfoCourseCount = countofSelected;
-          that.result = res;
+  //         that.tableData = courses;
+  //         that.programInfoCourseCount = countofSelected;
+  //         that.result = res;
 
 
-          }
-          else{
-            flag = false;
-            ElMessage({
-                  type: 'error',
-                  message: `搜索失败`,
-                  duration:1000,
-                });
+  //         }
+  //         else{
+  //           flag = false;
+  //           ElMessage({
+  //                 type: 'error',
+  //                 message: `搜索失败`,
+  //                 duration:1000,
+  //               });
            
-          }
-    }).then(function(){
-      if(flag){
-        that.tableData.forEach(function(data){
-      if(data.remark){
-        console.log('data.remark:',data.remark);
-        that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
-      }
-      else{
-        console.log('data.remark is null',data.remark);
-      }
-    })
-      }
+  //         }
+  //   }).then(function(){
+  //     if(flag){
+  //       that.tableData.forEach(function(data){
+  //     if(data.remark){
+  //       console.log('data.remark:',data.remark);
+  //       that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
+  //     }
+  //     else{
+  //       console.log('data.remark is null',data.remark);
+  //     }
+  //   })
+  //     }
       
-    });
-  },
+  //   });
+  // },
   confirmClick() {
   ElMessageBox.confirm(`Are you confirm to chose ${this.drawernumSelected} ?`)
     .then(() => {
@@ -928,7 +959,7 @@ methods:{
             data:postData
         }).then(function(res){
           
-          if(res.code == '200'){
+          if(res.code == 'SUCCESS'){
             ElMessage({
                 type: 'success',
                 message: `添加成功`,
@@ -937,7 +968,10 @@ methods:{
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
-          else{
+          
+        }).catch((e)=>{
+          console.log('e',e);
+          
             ElMessage({
                   type: 'error',
                   message: `添加失败`,
@@ -945,7 +979,7 @@ methods:{
                 });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
-          }
+          
         })
 
   },
@@ -1016,7 +1050,7 @@ ElMessageBox.confirm(
       method:'delete',
       data: that.deleteProgrameInfo,
     }).then(function(res){
-      if(res.code == '200'){
+      if(res == 204){
         ElMessage({
                 type: 'success',
                 message: `删除成功`,
@@ -1024,8 +1058,16 @@ ElMessageBox.confirm(
               });
             // that.clearForm();
             that.getProgramCourse();
+            that.$refs.multipleTable.clearSelection();
+                that.numSelected = 0;
+                if (that.clickState == 1) {
+                  that.clickState = 0;
+                  that.closeShow = !that.closeShow;
+                }
           }
-          else{
+          
+    }).catch((e)=>{
+      console.log('e',e);
             ElMessage({
                   type: 'error',
                   message: `删除失败`,
@@ -1033,7 +1075,7 @@ ElMessageBox.confirm(
                 });
             // that.clearForm();
             // that.getProgramCourse();
-          }
+          
     })
     }) 
   },
@@ -1098,7 +1140,7 @@ ElMessageBox.confirm(
     });
 
     ElMessageBox.confirm(
-    '是否添加选中的培养计划课程？',
+    '是否将所选版本的课程大纲添加到培养方案中？',
     '注意',
     {
       confirmButtonText: '确定',
@@ -1118,7 +1160,7 @@ ElMessageBox.confirm(
       method:'post',
       data:this.programeInfo,
     }).then(function(res){
-      if(res.code == '200'){
+      if(res.code == 'SUCCESS'){
         ElMessage({
                 type: 'success',
                 message: `添加成功`,
@@ -1136,7 +1178,9 @@ ElMessageBox.confirm(
             };
             
           }
-          else{
+          
+    }).catch((e)=>{
+      console.log('e',e);
             ElMessage({
                   type: 'error',
                   message: `添加失败`,
@@ -1149,8 +1193,8 @@ ElMessageBox.confirm(
               that.drawerclickState=0;
               that.drawercloseShow = !that.drawercloseShow;
             };
-          }
-    });
+          
+    })
   },
   editTrigger(val){
     console.log('选中的信息：',val.courseId);
@@ -1173,7 +1217,7 @@ ElMessageBox.confirm(
       data: this.preform
     }).then(function(res){
       console.log('res:',res);
-      if(res.code == '200'){
+      if(res.code == 'SUCCESS'){
         ElMessage({
                 type: 'success',
                 message: `修改成功`,
@@ -1182,14 +1226,17 @@ ElMessageBox.confirm(
             
             that.getBaseCourse(that.pageSize,that.pageNum);
           }
-          else{
+          
+    }).catch((e)=>{
+      console.log('e',e);
+      
             ElMessage({
                   type: 'error',
                   message: `修改失败`,
                   duration:1000,
                 });
             that.getBaseCourse(that.pageSize,that.pageNum);
-          }
+          
     })
 
   },
@@ -1317,7 +1364,7 @@ ElMessageBox.confirm(
             'departmentId':that.departmentId,
             'versionId':that.currentVersionValue,
             'schoolId':that.schoolId,
-            
+            'selectKeyWord':that.keyword
             },
         }).then(function(res){
           console.log('courseDetails:',res);
@@ -1327,11 +1374,10 @@ ElMessageBox.confirm(
             
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
-            course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-            course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+            
+            
             course.remark = '';//用remark来判断是否选课
-            course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-            course.semester=(course.semester == '0') ? '上学期' : '下学期';
+            
             course.trueversionId = course.versionId;
             if(course.bcDetails.length){
                 
@@ -1409,21 +1455,29 @@ ElMessageBox.confirm(
     }
     
   },
-  activate(){
+  async activate(){
             this.departmentId = this.$store.state.currentInfo.departmentId;
             this.schoolId = this.$store.state.currentInfo.schoolId;
             this.majorId = this.$store.state.major.majorId;
             this.majorName = this.$store.state.major.majorName;
             this.programId = this.$store.state.major.programId;
+            this.getDict();
             console.log('schoolId+departmentId+majorId',this.schoolId,this.departmentId,this.majorId);
         },
 },
 mounted:function(){
+  
+  let that = this;
   this.checkProgram();
+  
   if(this.hasProgram){
-    this.activate();
-    this.getProgramCourse();
+    this.activate().then(()=>{
+      that.getProgramCourse();
+    })
+   
   }
+  
+  
   
   // this.getBaseCourse(this.pageSize,this.pageNum);
    

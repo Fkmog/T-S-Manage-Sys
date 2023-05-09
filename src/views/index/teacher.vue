@@ -17,17 +17,29 @@
         >取消选择</el-button
       >
       </el-col>
-      <el-col :span="6">
+      <el-col :span="12">
         <div class="numSelectedTeacher">已选中 {{ numSelected }} 个教师</div>
       </el-col>
       <el-col :span="6">
-        <el-button
-        @click="deleteTeacher"
-        
-        class="deleteButton "
-        link
-        ><el-icon><Delete /></el-icon
-      ></el-button>
+       <el-dropdown >
+
+          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="deleteTeacher" >
+                删除教师&nbsp
+                
+                  <el-icon  >
+                    <Delete />
+                  </el-icon>
+                
+              </el-dropdown-item>
+              <!-- <el-dropdown-item>Action 3</el-dropdown-item>
+              <el-dropdown-item disabled>Action 4</el-dropdown-item>
+              <el-dropdown-item divided>Action 5</el-dropdown-item> -->
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </el-col>
     </el-row>
     </div>
@@ -74,7 +86,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button  link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
@@ -96,6 +108,7 @@ import {
   ElTable,
   ElMessage,
   ElMessageBox,
+  ElDropdown
 } from "element-plus";
 import Action from "element-plus";
 import {
@@ -107,6 +120,7 @@ import {
   Close,
   Plus,
   Delete,
+  MoreFilled
 } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import request from "@/utils/request/request";
@@ -115,6 +129,7 @@ registerAllModules();
 export default {
   data() {
     return {
+      loadmoreDisabled:Boolean,
       hasBaseCourse:Boolean,
       showLoadmore:true,
       departmentId: "",
@@ -153,12 +168,14 @@ export default {
     Close,
     Plus,
     Delete,
+    MoreFilled,
     request,
     ElMessage,
     ElMessageBox,
     Action,
     HeaderSearch,
     addBtn,
+    ElDropdown
   },
   methods: {
     getSearchValue(data){
@@ -277,6 +294,7 @@ export default {
     },
     getTeacherList() {
       let that = this;
+      this.loadmoreDisabled = true;
       return request({
         url: "/teacher/list",
         method: "get",
@@ -288,6 +306,7 @@ export default {
           'selectKeyWord':this.keyword
         },
       }).then(function (res) {
+        that.loadmoreDisabled = false;
         console.log(res);
         if(res.total == 0){
           that.hasBaseCourse = false;
@@ -318,6 +337,10 @@ export default {
 </script>
 
 <style scoped>
+.dropdownIcon{
+  margin-top: 9px;
+  margin-left: 1200%;
+}
  .el-table-container{
   margin: 0 auto;
   margin-top: 85px;
@@ -365,7 +388,7 @@ export default {
   outline: none;
   border: 0;
   padding: 0 6px;
-  margin: 0;
+  margin-left: 20%;
   background: transparent;
 
   white-space: nowrap;
