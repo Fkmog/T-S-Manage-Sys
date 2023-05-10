@@ -316,7 +316,7 @@
     class="classesTable"
     :data="classTable"
     @selection-change="handleSelectionChange"
-    style="width: 1670px"
+    style="width: 1720px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
@@ -339,6 +339,15 @@
       :selectable="canSelect"
       :reserve-selection="true"
     >
+      <!-- <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="选择所有相同课程号的教学班"
+          placement="bottom"
+          :hide-after="0"
+        >
+        <span> 选择所有相同课程号的教学班</span>
+        </el-tooltip> -->
     </el-table-column>
     <el-table-column prop="className" label="课程名" width="210" />
     <el-table-column prop="allTeacherName" label="任课教师" width="200" />
@@ -347,7 +356,7 @@
     <el-table-column prop="identifier" label="开课号" width="270" />
     <el-table-column prop="academicYear" label="学年" width="150" />
     <el-table-column prop="semester" label="学期" width="150" />
-    <el-table-column prop="remark" label="备注" width="100" />
+    <el-table-column prop="remark" label="备注" width="150" />
     <el-table-column prop="isRespondent" label="" width="60">
       <template #default="scope">
         <div v-if="scope.row.isRespondent == 2">
@@ -362,9 +371,9 @@
       </template>
     </el-table-column>
 
-    <el-table-column width="150" >
+    <el-table-column width="150">
       <template #default="scope">
-        <el-row  v-show="canAction">
+        <el-row>
           <el-col :span="8">
             <el-tooltip content="修改" :hide-after="0">
               <el-button
@@ -395,16 +404,15 @@
   </div>
   <!-- 分页 -->
   <div class="pagination-container" flex>
-    <el-row type="flex" justify="center" align="middle" style="margin-top: 8px">
+    <div class="loadMore">
       <el-button
         link
         plain
         v-show="hasClass && showLoadmore"
         @click="loadMore()"
-        :disabled="disabledFlag"
         >加载更多</el-button
       >
-    </el-row>
+    </div>
   </div>
 </template>
 
@@ -436,8 +444,6 @@ export default {
   },
   data() {
     return {
-      disabledFlag:false,
-      canAction:true,
       hasClass: false,
       noClass: false,
       isRespondent: "0",
@@ -667,7 +673,6 @@ export default {
           }
           // console.log("#", this.classTable);
         }
-        this.disabledFlag = false
       });
     },
     //新增教学班
@@ -875,14 +880,11 @@ export default {
       // console.log(this.multipleSelection);
       if (this.multipleSelection.length > 0) {
         this.selectedCourseId = this.multipleSelection[0].courseId;
-        this.canAction=false
         // console.log("this.selectedCourseId", this.selectedCourseId);
         this.canSelectAll = false;
       } else {
         this.selectedCourseId = "";
         this.canSelectAll = true;
-        this.canAction=true
-
       }
     },
     //disable控制
@@ -950,7 +952,6 @@ export default {
       });
     },
     loadMore() {
-      this.disabledFlag= true
       if (this.total - this.pageSize >= 20) {
         this.pageSize += 20;
         this.getClassList();
@@ -995,7 +996,7 @@ export default {
   position: absolute;
   right: 20%;
   width: 300px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 .selects {
   display: flex;
@@ -1069,5 +1070,11 @@ export default {
   margin-top: 30px;
   font-size: 13px;
   color: #828d96;
+}
+.loadMore{
+  display: flex;
+  justify-content: center;
+  padding-top:24px;
+  padding-bottom: 24px;
 }
 </style>

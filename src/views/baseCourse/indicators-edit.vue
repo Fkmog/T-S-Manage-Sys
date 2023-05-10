@@ -47,7 +47,7 @@
           v-model="chosenMajor"
           v-for="(major, index1) in majorList"
           :key="major.majorId"
-          :label="major.majorName"
+          :label="major.programVersion"
         >
           <div class="card">
             <span style="color: grey; font-size: 14px; margin-top: 20px"
@@ -96,14 +96,14 @@
                     v-for="method in indicator.supportMethodVos"
                     :key="method.id"
                   >
-                    <div class="method-detail">
-                      <div class="method-weight">
+                    <el-row class="method-detail">
+                      <el-col :span="4" class="method-weight">
                         (&nbsp;{{ method.weight }}%&nbsp;)
-                      </div>
-                      <div class="method-desc">
-                        {{ method.name }}
-                      </div>
-                    </div>
+                      </el-col>
+                      <el-col :span="18" class="method-desc">
+                        {{ method.description }}
+                      </el-col>
+                    </el-row>
                   </div>
                 </div>
               </div>
@@ -206,16 +206,16 @@
             </el-row>
           </el-col>
 
-          <el-col :span="16">
+          <el-col :span="18">
             <el-select
               v-model="support.name"
-              style="width: 400px"
+              style="width: 450px"
               placeholder="课程目标"
             >
               <el-option
                 v-for="object in objectives"
                 :key="object.id"
-                :label="object.description"
+                :label="object.complete"
                 :value="object.description"
               >
               </el-option>
@@ -401,6 +401,11 @@ export default {
         for (let i = 0; i < this.majorList.length; i++) {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
+              this.majorList[i].programVersion =
+              this.majorList[i].majorName +
+              "-" +
+              this.majorList[i].enrollyear +
+              "级";
           });
         }
         this.checkIndicators();
@@ -451,6 +456,7 @@ export default {
         //list存放初始数据
         this.objectives = res.data.objectives;
         //处理数据-serialNum
+        console.log("this.objectives",this.objectives);
         if (this.objectives) {
           this.objectives.forEach((value) => {
             if (value.id.charAt(0) == "0") {
@@ -458,6 +464,8 @@ export default {
             } else {
               value.serialNum = value.id;
             }
+            value.complete = "课程目标"+value.serialNum+":"+value.description
+            // console.log("1232134234",value.complete,value.name);
           });
         }
         // this.objectives.forEach((object) => {
@@ -521,41 +529,71 @@ export default {
       this.dialogFormVisible = true;
     },
     //新增支持指标点
-    addIndicator(searchValue, index1) {
+     addIndicator(searchValue, index1) {
       try {
         let info = searchValue.split(" ");
         // 判断选中的指标点是否已存在
-        console.log("!", this.majorList[index1].indicators, info);
-        this.majorList[index1].indicators.forEach((item) => {
-          if (item.serialNum == info[2]) {
-            ElMessage.error("指标点" + info[2] + "已存在");
-            this.searchValue = "";
-            throw "true";
+        // console.log("!info", info, info.length);
+        //有简称的时候 info：[毕业要求1，简称,1.1，描述]
+        if (info.length == 4) {
+          this.majorList[index1].indicators.forEach((item) => {
+            if (item.serialNum == info[2]) {
+              ElMessage.error("指标点" + info[2] + "已存在");
+              this.searchValue = "";
+              throw "true";
+            }
+          });
+          let newIndicator = {};
+          newIndicator.supportMethodVos = [];
+          newIndicator.achievement = Number;
+          newIndicator.name = info[1];
+          newIndicator.description = info[3];
+          newIndicator.serialNum = info[2];
+          let i = info[2].split(".");
+          if (Number(i[0]) > 9) {
+            newIndicator.id = i[0];
+          } else {
+            newIndicator.id = "0" + i[0];
           }
-        });
-        let newIndicator = {};
-        newIndicator.supportMethodVos = [];
-        newIndicator.achievement = Number;
-        newIndicator.name = "";
-        newIndicator.description = info[3];
-        newIndicator.serialNum = info[2];
-        let i = info[2].split(".");
-        if (Number(i[0]) > 9) {
-          newIndicator.id = i[0];
-        } else {
-          newIndicator.id = "0" + i[0];
+          if (Number(i[1]) > 9) {
+            newIndicator.id = newIndicator.id + i[1];
+          } else {
+            newIndicator.id = newIndicator.id + "0" + i[1];
+          }
+          this.majorList[index1].indicators.push(newIndicator);
+          this.newIndicator = false;
+          this.searchValue = "";
         }
-        if (Number(i[1]) > 9) {
-          newIndicator.id = newIndicator.id + i[1];
-        } else {
-          newIndicator.id = newIndicator.id + "0" + i[1];
+        //没有简称的时候  info：[毕业要求1，1.1，描述]
+        if (info.length == 3) {
+          this.majorList[index1].indicators.forEach((item) => {
+            if (item.serialNum == info[1]) {
+              ElMessage.error("指标点" + info[1] + "已存在");
+              this.searchValue = "";
+              throw "true";
+            }
+          });
+          let newIndicator = {};
+          newIndicator.supportMethodVos = [];
+          newIndicator.achievement = Number;
+          newIndicator.name = "";
+          newIndicator.description = info[2];
+          newIndicator.serialNum = info[1];
+          let i = info[1].split(".");
+          if (Number(i[0]) > 9) {
+            newIndicator.id = i[0];
+          } else {
+            newIndicator.id = "0" + i[0];
+          }
+          if (Number(i[1]) > 9) {
+            newIndicator.id = newIndicator.id + i[1];
+          } else {
+            newIndicator.id = newIndicator.id + "0" + i[1];
+          }
+          this.majorList[index1].indicators.push(newIndicator);
+          this.newIndicator = false;
+          this.searchValue = "";
         }
-        console.log("#", newIndicator);
-        this.majorList[index1].indicators.push(newIndicator);
-        console.log("##", this.majorList[index1]);
-
-        this.newIndicator = false;
-        this.searchValue = "";
       } catch (stat) {
         if (stat == "true") {
           return;
@@ -570,22 +608,32 @@ export default {
       });
     },
     //远程查询实现
-    querySearch(queryString, cb) {
+  querySearch(queryString, cb) {
       var allIndicators = this.allIndicators;
       var results = queryString
         ? allIndicators.filter(this.createStateFilter(queryString))
         : allIndicators;
 
       results.map((item) => {
-        return (item.value =
-          "毕业要求" +
-          item.requirementSerialNum +
-          " " +
-          item.requirementName +
-          " " +
-          item.indicatorSerialNum +
-          " " +
-          item.indicatorDescription);
+        if (item.requirementName === null) {
+          return (item.value =
+            "毕业要求" +
+            item.requirementSerialNum +
+            " " +
+            item.indicatorSerialNum +
+            " " +
+            item.indicatorDescription);
+        } else {
+          return (item.value =
+            "毕业要求" +
+            item.requirementSerialNum +
+            " " +
+            item.requirementName +
+            " " +
+            item.indicatorSerialNum +
+            " " +
+            item.indicatorDescription);
+        }
       });
       cb(results);
       clearTimeout(this.timeout);

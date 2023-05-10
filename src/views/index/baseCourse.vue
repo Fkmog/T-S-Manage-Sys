@@ -30,27 +30,78 @@
       <el-col :span="6" class="columnstyle">
         <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
       </el-col>
-      <el-col :span="6" class="columnstyle">
+      <el-col :span="12" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
       </el-col>
    
       
-      <el-col :span="6" class="columnstyle" v-show="identity == '课程负责人'">
-        <el-tooltip content="添加课程负责人">
-          <el-button   link ><el-icon class="submenudeleteButton" @click="this.setDetail()"><Plus /></el-icon></el-button>
-        </el-tooltip>
-        
+      <el-col :span="6" v-show="identity == '学院管理员'" class="columnstyle">
+       
+        <el-dropdown >
+   
+          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+    
+        <template #dropdown>
+          <el-dropdown-menu>
+            
+            <el-dropdown-item @click="this.addPrincipal()">
+              添加课程负责人&nbsp
+
+                <el-icon >
+                  <Plus />
+                </el-icon>
+
+            </el-dropdown-item>
+
+            <el-dropdown-item @click="this.deleteRespondent()" >
+              删除课程负责人&nbsp
+              
+                <el-icon  >
+                  <Delete />
+                </el-icon>
+              
+            </el-dropdown-item>
+            <el-dropdown-item @click="this.multideleteBaseCourse(this.courseId)" >
+              删除课程&nbsp
+              
+                <el-icon  >
+                  <Delete />
+                </el-icon>
+              
+            </el-dropdown-item>
+            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
+            <el-dropdown-item disabled>Action 4</el-dropdown-item>
+            <el-dropdown-item divided>Action 5</el-dropdown-item> -->
+          </el-dropdown-menu>
+        </template>
+        </el-dropdown>
       </el-col>
-      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
-        <el-tooltip content="添加课程负责人">
-          <el-button   link ><el-icon class="submenudeleteButton" @click="this.addPrincipal()"><Plus /></el-icon></el-button>
-        </el-tooltip>
-      </el-col>
-      <el-col :span="3" class="columnstyle" v-show="identity == '学院管理员'">
-        <el-tooltip content="删除课程负责人">
-          <el-button   link ><el-icon class="submenudeleteButton" @click="this.deleteRespondent()" ><Delete /></el-icon></el-button>
-        </el-tooltip>
-      </el-col>
+      
+      <el-col :span="6" v-show="identity == '课程负责人'">
+       
+       <el-dropdown class="columnstyle">
+  
+         <el-icon><MoreFilled /></el-icon>
+   
+       <template #dropdown>
+         <el-dropdown-menu>
+           <el-dropdown-item >
+             添加课程负责人
+             <el-button   link >
+               <el-icon @click="this.setDetail()">
+                 <Plus />
+               </el-icon>
+             </el-button>
+           </el-dropdown-item>
+           
+           
+           <!-- <el-dropdown-item>Action 3</el-dropdown-item>
+           <el-dropdown-item disabled>Action 4</el-dropdown-item>
+           <el-dropdown-item divided>Action 5</el-dropdown-item> -->
+         </el-dropdown-menu>
+       </template>
+     </el-dropdown>
+     </el-col>
      
     </el-row>
   </div>
@@ -64,10 +115,12 @@
             :data="tableData"  
             v-loading="isloading"
             v-show="hasBaseCourse"
-            ref="multipleTable" 
+            ref="multipleTable1" 
+            @selection-change="handleSelectionChange"
+            @row-dblclick="editTrigger"
             class="el-table-container" 
             style="width: 1375px" 
-            :filter-change="filterChange"
+            
             :header-cell-style="{
           'padding-left': '20px',
           'font-size': '14.4px',
@@ -81,8 +134,8 @@
           height: '60px',
         }"
         :row-key="rowKey"
-        @selection-change="handleSelectionChange"
-        @row-dblclick="editTrigger">
+        
+        >
             <el-table-column width="55" type="selection" :reserve-selection="true">
                 </el-table-column>
               <el-table-column  label="课程名" width="250" label-class-name="textbold" >
@@ -135,7 +188,7 @@
                 <template #default="scope">
                 
                     <el-tooltip  content="删除课程" >
-                      <el-button  @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+                      <el-button  @click="deleteBaseCourse(scope.$index, scope.row.courseId)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
                     </el-tooltip>
 
                   <el-tooltip content="修改课程">
@@ -148,7 +201,7 @@
                   </el-tooltip>
 
                   <el-tooltip content="添加信息">
-                  <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                  <el-tag v-show="!scope.row.versionId" class="noBaseCourseDetail" type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
                 </el-tooltip>
 
                 </template>
@@ -162,7 +215,7 @@
       
         <el-table 
         :data="tableData"  
-        ref="multipleTable" 
+        ref="multipleTable2" 
         
         class="el-table-container"
         @selection-change="handleSelectionChange" 
@@ -356,6 +409,7 @@
      <span>
       请选择负责人姓名：
      </span>
+     
           <el-select v-model="selectedRespondent" 
           :remote-method="remoteMethodinADD" 
           :loading="loading" 
@@ -407,7 +461,7 @@
 
     <div  class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore&&hasBaseCourse&&!isloading" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
@@ -440,8 +494,9 @@
 
 
 
-
+      loadmoreDisabled:Boolean,
       keyword:'',
+      Respondentkeyword:'',
       isloading:true,
       hasBaseCourse:Boolean,
       courseTypeSource:[],
@@ -492,10 +547,10 @@
             // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
           ],
           courseNature:[
-            { required: true, message: '请选择课程性质', trigger: 'change' }
+            { required: false, message: '请选择课程性质', trigger: 'change' }
           ],
           courseType:[
-            { required: true, message: '请选择课程类型', trigger: 'change' }
+            { required: false, message: '请选择课程类型', trigger: 'change' }
           ],
 
       },
@@ -543,10 +598,27 @@
         value:8,
         label:'2023版'
       },
+      // {
+      //   value:9,
+      //   label:'2024版'
+      // },
+      // {
+      //   value:10,
+      //   label:'2025版'
+      // },
+      // {
+      //   value:11,
+      //   label:'2026版'
+      // },
+      // {
+      //   value:12,
+      //   label:'2027版'
+      // },
       ],
       versionLabel:[
       '2016版','2017版','2018版',
-      '2019版','2020版','2021版','2022版','2023版'
+      '2019版','2020版','2021版','2022版','2023版',
+      // '2024版','2025版','2026版','2027版'
       ],
   
       // isRouterAlive:true,
@@ -609,6 +681,10 @@
   }, 
   methods: 
   {
+    getSearchValueforRespondent(data){
+      this.Respondentkeyword = data;
+      this.getPrincipleInfo();
+    },
     getSearchValue(data){
       this.keyword = data;
       this.getBaseCourse(this.pageSize,this.pageNum);
@@ -627,9 +703,7 @@
       })
     },
 
-    filterChange(){
-      
-    },
+
     rowKey(row) {
       return row.courseId;
     },
@@ -639,77 +713,80 @@
 },
     //remotemethod
     remoteMethodinADD(query){
+      let that = this;
       if (query !== '') {
           this.loading = true;
           setTimeout(() => {
             this.loading = false;
-            this.principleForm = this.remoteteacher.filter(item => {
-              return item.respondentName
-                .indexOf(query) > -1;
-            });
+            this.Respondentkeyword = query;
+            this.getPrincipleInfo().then(()=>{
+              that.principleForm = that.remoteteacher;
+            })
+            
           }, 200);
         } else {
           this.principleForm = [];
         }
     },
-    remoteMethodinEdit(query){
-      if (query !== '') {
-          this.loading = true;
-          setTimeout(() => {
-            this.loading = false;
-            this.principleForm = this.remoteteacher.filter(item => {
-              return item.respondentName
-                .indexOf(query) > -1;
-            });
-          }, 200);
-        } else {
-          this.principleForm = [];
-        }
-    },
+    // remoteMethodinEdit(query){
+    //   if (query !== '') {
+    //       this.loading = true;
+    //       setTimeout(() => {
+    //         this.loading = false;
+           
+    //         this.principleForm = this.remoteteacher.filter(item => {
+    //           return item.respondentName
+    //             .indexOf(query) > -1;
+    //         });
+    //       }, 200);
+    //     } else {
+    //       this.principleForm = [];
+    //     }
+    // },
     
     //showEditRespondent
-    showEditRespondent(row){
-      this.editPrinciple = true;
-      this.currentEditRow = row;
-    },
+    // showEditRespondent(row){
+    //   this.editPrinciple = true;
+    //   this.currentEditRow = row;
+    // },
     //修改课程负责人
-    editRespondent(){
-      let that = this;
-      let row = this.currentEditRow;
-      console.log('修改课程负责人：',row);
-      this.respondentInfos = row.respondentInfos;
-      var courseRespondentDict={
-        "courseId": row.courseId,
-        "departmentId": this.departmentId,
-        "schoolId": this.schoolId,
-        "userId": this.editRespondentInfo
-      }
-    this.editRespondentPostdata.push(courseRespondentDict);
-    return request({
-    url:'/system/role/editRespondent',
-    method:'post',
-    data:this.editRespondentPostdata
-    }).then(function(res){
-      console.log('edit respondent res:',res);
-      that.getBaseCourse(that.pageSize,that.pageNum);
-      that.editPrinciple = false;
-      that.editRespondentPostdata = [];
-      if(res.code == 'SUCCESS'){
-          ElMessage({
-                    type: 'success',
-                    message: `修改负责人成功`,
-                    duration:1000,
-                  });
-        }
-        else{
-          ElMessage({
-                    type: 'error',
-                    message: `修改负责人失败`,
-                    duration:1000,
-                  });
-        }
-    })
-    },
+    // editRespondent(){
+    //   let that = this;
+    //   let row = this.currentEditRow;
+    //   console.log('修改课程负责人：',row);
+    //   this.respondentInfos = row.respondentInfos;
+    //   var courseRespondentDict={
+    //     "courseId": row.courseId,
+    //     "departmentId": this.departmentId,
+    //     "schoolId": this.schoolId,
+    //     "userId": this.editRespondentInfo
+    //   }
+    // this.editRespondentPostdata.push(courseRespondentDict);
+    // return request({
+    // url:'/system/role/editRespondent',
+    // method:'post',
+    // data:this.editRespondentPostdata
+    // }).then(function(res){
+    //   console.log('edit respondent res:',res);
+    //   that.getBaseCourse(that.pageSize,that.pageNum);
+    //   that.editPrinciple = false;
+    //   that.editRespondentPostdata = [];
+    //   if(res.code == 'SUCCESS'){
+    //       ElMessage({
+    //                 type: 'success',
+    //                 message: `修改负责人成功`,
+    //                 duration:1000,
+    //               });
+    //     }
+    //     else{
+    //       ElMessage({
+    //                 type: 'error',
+    //                 message: `修改负责人失败`,
+    //                 duration:1000,
+    //               });
+    //     }
+    // })
+    // },
     //删除课程负责人
     deleteRespondent(){
       let that = this;
@@ -800,15 +877,16 @@
         url:'/teacher/list',
         method:'get',
         params: {
-          schoolId: this.schoolId,
-          departmentId: this.departmentId,
+          'schoolId': this.schoolId,
+          'departmentId': this.departmentId,
+          'selectKeyWord':this.Respondentkeyword
         },
       }).then(function(res){
         
         that.remoteteacher = res.rows.map(item =>{
           return {userId:item.userId,respondentName:item.teacherName}
         });
-        console.log('principle INfo :',that.remoteteacher);
+        console.log('principle INfo :',res.rows);
         // res.rows.forEach(function(teacher){
         //   if(teacher.userId){
         //     // that.principleForm.push(teacher);
@@ -872,8 +950,14 @@
     },
     addBaseCourseDetail(row){
       let that = this;
+      this.versions.forEach((version)=>{
+        if(version['value']==that.currentVersionValue){
+          that.currentVersion = version['label']
+        }
+      });
+      let versionMessage = '是否添加 '+this.currentVersion+' 本课程大纲？'
       ElMessageBox.confirm(
-      '尚未添加版本信息是否添加？',
+        versionMessage,
       '注意',
       {
         confirmButtonText: '确定',
@@ -937,10 +1021,13 @@
     toggleSelection(rows) {
           if (rows) {
             rows.forEach(row => {
-              this.$refs.multipleTable.toggleRowSelection(row);
+              this.$refs.multipleTable1.toggleRowSelection(row);
+              this.$refs.multipleTable2.toggleRowSelection(row);
             });
           } else {
-            this.$refs.multipleTable.clearSelection();
+            this.$refs.multipleTable1.clearSelection();
+            this.$refs.multipleTable2.clearSelection();
+            console.log('清空选择触发');
             if(this.clickState == 1){
               this.clickState=0;
               this.closeShow = !this.closeShow;
@@ -1046,6 +1133,7 @@
       let that = this;
       let courses = [];
       this.isloading = true;
+      this.loadmoreDisabled = true;
       return request({
               url:'/baseCourse/list',
               method:'get',
@@ -1059,6 +1147,7 @@
             }
           }).then(function(res){
             that.isloading = false;
+            that.loadmoreDisabled = false;
             console.log('courseDetails:',res);
             console.log('department:',that.departmentId,'schoolId:',that.schoolId);
             if(res.total != 0){
@@ -1110,10 +1199,14 @@
             });
             that.tableData = courses;
             that.result = res;
-            console.log('pageSize:',pageSize,'res.total:',res.total);
+            
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
+            else{
+              that.showLoadmore = true;
+            }
+            console.log('pageSize:',pageSize,'res.total:',res.total,'showloadmore:',that.showLoadmore);
             }
             else{
               that.hasBaseCourse = false;
@@ -1184,8 +1277,79 @@
 
       }
     },
+    multideleteBaseCourse(row){
+      let that = this;
+      ElMessageBox.confirm(
+      '将要删除基础课程，是否确定删除？',
+      '注意',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+      .then(() => {
+        return request({
+        url:'/baseCourse',
+        method:'delete',
+        data:row
+        
+      }).then(function(res){
+        console.log(res);
+        if(res === 204){
+          ElMessage({
+                  type: 'success',
+                  message: `删除成功`,
+                  duration:1500,
+                });
+                
+                that.getBaseCourse(that.pageSize,that.pageNum);
+                that.$refs.multipleTable1.clearSelection();
+                that.numSelected = 0;
+                if (that.clickState == 1) {
+                  that.clickState = 0;
+                  that.closeShow = !that.closeShow;
+                }
+            }
+            
+             
+            
+      })
+      .catch(e=>{
+            console.log('e',e);
+            if(e.code == 'ALREADY_ADD_TO_PROGRAM'){
+              ElMessage({
+                    type: 'error',
+                    message: `删除失败,已加入培养方案`,
+                    duration:1500,
+                  });
+            }
+            else if(e.code == 'ADD_TO_PROGRAM'){
+              // let emessage = '删除失败'+e.data.courseName+"课程已被添加到培养计划中"
+              let emessage = '删除失败,课程已被添加到培养计划中'
+              ElMessage({
+                    type: 'error',
+                    message: emessage,
+                    duration:2000,
+                  });
+            }
+            else{
+              ElMessage({
+                    type: 'error',
+                    message: `删除失败`,
+                    duration:1500,
+                  });
+            }
+            
+              that.getBaseCourse(that.pageSize,that.pageNum);
+          });
+      })
+      .catch(e =>{
+        console.log('e',e);
+      })
+    },
     deleteBaseCourse(index, row){
-      console.log('deleteCourse',row.courseId);
+      console.log('deleteCourse',row);
       let that = this;
   
       ElMessageBox.confirm(
@@ -1199,7 +1363,7 @@
     )
       .then(() => {
         return request({
-        url:'/baseCourse'+'/'+row.courseId,
+        url:'/baseCourse'+'/'+row,
         method:'delete',
         
       }).then(function(res){
@@ -1212,12 +1376,12 @@
                 });
                 
                 that.getBaseCourse(that.pageSize,that.pageNum);
-                // that.$refs.multipleTable.clearSelection();
+                that.$refs.multipleTable1.clearSelection();
                 that.numSelected = 0;
-                // if (that.clickState == 1) {
-                //   that.clickState = 0;
-                //   that.closeShow = !that.closeShow;
-                // }
+                if (that.clickState == 1) {
+                  that.clickState = 0;
+                  that.closeShow = !that.closeShow;
+                }
             }
             
              
@@ -1225,11 +1389,21 @@
       })
       .catch(e=>{
             console.log('e',e);
-            ElMessage({
+            if(e.code == 'ALREADY_ADD_TO_PROGRAM'){
+              ElMessage({
+                    type: 'error',
+                    message: `删除失败,该课程已加入培养方案`,
+                    duration:1000,
+                  });
+            }
+            else{
+              ElMessage({
                     type: 'error',
                     message: `删除失败`,
                     duration:1000,
                   });
+            }
+            
               that.getBaseCourse(that.pageSize,that.pageNum);
           });
       })
@@ -1380,7 +1554,7 @@
     let identity = this.identity;
     if(identity == '学院管理员'){
     this.getRouter();
-    this.getPrincipleInfo();
+    // this.getPrincipleInfo();
     if(this.routeVersionId){
       this.currentVersionValue = this.routeVersionId;
     }
@@ -1399,6 +1573,14 @@
   </script>
   
   <style scoped>
+  .noBaseCourseDetail:hover{
+    cursor:pointer
+  }
+  .dropdownIcon{
+    margin-top: 18px;
+    margin-left: 1200%;
+  }
+
   .no-class {
   
   margin-top: 120px;
@@ -1422,6 +1604,7 @@
     float:right;
     margin-top:16px;
   }
+ 
   .columnstyle{
     height:50px;
     
@@ -1474,7 +1657,7 @@
       outline: none;
       border: 0;
       padding: 0 6px;
-      margin: 0;
+      margin-left: 20%;
       background: transparent;
       
       white-space: nowrap;
