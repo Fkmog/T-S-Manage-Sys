@@ -85,7 +85,7 @@
     
 
     <div  class="pagination-container" flex>
-      <el-row type="flex" justify="center" align="middle">
+      <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
         <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
@@ -337,6 +337,10 @@ export default {
 </script>
 
 <style scoped>
+.loadmorestyle{
+  padding-top:24px;
+  padding-bottom: 24px;
+}
 .dropdownIcon{
   margin-top: 9px;
   margin-left: 1000%;
@@ -348,8 +352,6 @@ export default {
   }
   .pagination-container{
     width: 100%;
-    margin-top: 48px;
-    margin-bottom: 48px;
   }
   .no-class {
   margin-top: 120px;

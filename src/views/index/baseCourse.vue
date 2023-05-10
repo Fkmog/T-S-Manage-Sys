@@ -1588,8 +1588,8 @@
   
   <style scoped>
   .loadmorestyle{
-    margin-top: 48px;
-    margin-bottom: 48px;
+  padding-top:24px;
+  padding-bottom: 24px;
   }
   .noBaseCourseDetail:hover{
     cursor:pointer
