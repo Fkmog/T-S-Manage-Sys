@@ -244,6 +244,7 @@ export default {
         console.log("requirements", this.requirements);
       });
     },
+
     //新增指标点
     addDetail(attribute) {
       let currentObj = new Object();
@@ -251,44 +252,40 @@ export default {
       currentObj.name = null;
       currentObj.description = null;
       currentObj.achievement = null;
-      console.log("attribute", attribute, attribute.programIndicators.length);
+
       //确定serialNum以及id
       if (attribute.programIndicators.length > 0) {
         currentObj.serialNum =
-          attribute.programIndicators[attribute.programIndicators.length-1].serialNum;
-          // attribute.programIndicators.length
-        let parent = currentObj.serialNum.split("\.");
-        //这里第二个元素变成number了 不是string
-        parent[1]=(++parent[1]).toString();
+          attribute.programIndicators[
+            attribute.programIndicators.length - 1
+          ].serialNum;
+        let parent = currentObj.serialNum.split(".");
+        ++parent[1];
         //确定id
-        console.log("parent", parent);
         if (parent[0].length == 1 && parent[1].length == 1) {
           currentObj.id = "0" + parent[0] + "0" + parent[1];
-          console.log("id", currentObj.id);
         }
         if (parent[0].length == 2 && parent[1].length == 1) {
           currentObj.id = parent[0] + "0" + parent[1];
-          console.log("id", currentObj.id);
         }
         if (parent[0].length == 1 && parent[1].length == 2) {
           currentObj.id = "0" + parent[0] + parent[1];
-          console.log("id", currentObj.id);
         }
         if (parent[0].length == 2 && parent[1].length == 2) {
           currentObj.id = parent[0] + parent[1];
-          console.log("id", currentObj.id);
         }
         currentObj.serialNum = parent.join(".");
         this.requirements[parent[0] - 1].programIndicators.push(currentObj);
       }
-      // if (attribute.programIndicators.length == 0)
-      else {
-        console.log("进入else");
+      if (attribute.programIndicators.length == 0) {
         currentObj.serialNum = attribute.serialNum + ".1";
-        console.log(currentObj,typeof(currentObj.serialNum),currentObj.serialNum.length);
         //确定id
-        let a =  currentObj.serialNum.split("\.")
-        currentObj.id = "0"+a[0]+"0"+a[1]
+        if (attribute.serialNum.length == 2) {
+          currentObj.id = attribute.serialNum;
+        }
+        if (attribute.serialNum.length == 1) {
+          currentObj.id = "0" + attribute.serialNum;
+        }
         let num = Number(attribute.serialNum);
         this.requirements[num - 1].programIndicators.push(currentObj);
       }
@@ -320,17 +317,15 @@ export default {
       currentObj.name = null;
       currentObj.description = null;
       currentObj.programIndicators = [];
-      if (!(this.requirements === null) && this.requirements.length > 0) {
+      if (this.requirements !== null && this.requirements.length > 0) {
         // 确定Id
-        // let currentId =
-        //   Number(this.requirements[this.requirements.length - 1].id) + 1;
-        //   console.log("jinlaile ",currentId,this.requirements);
-        // if (currentId < 10) {
-        //   currentObj.Id = "0" + currentId;
-        // } else {
-        //   currentObj.Id = currentId.toString;
-        // }
-        console.log("id", currentObj.Id);
+        let currentId =
+          Number(this.requirements[this.requirements.length - 1].id) + 1;
+        if (currentId < 10) {
+          currentObj.Id = "0" + currentId;
+        } else {
+          currentObj.Id = currentId.toString;
+        }
         // 确定serialNum
         if (this.requirements.length == 0) {
           currentObj.serialNum = "1";
@@ -340,11 +335,9 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
-        currentObj.id = "0"+ currentObj.serialNum
-
         this.requirements.push(currentObj);
       } else {
-        currentObj.id = "01";
+        currentObj.Id = "01";
         currentObj.serialNum = "1";
         this.requirements = [];
         this.requirements.push(currentObj);

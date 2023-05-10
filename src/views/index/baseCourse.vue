@@ -889,7 +889,7 @@
         that.remoteteacher = res.rows.map(item =>{
           return {userId:item.userId,respondentName:item.teacherName+"("+item.teacherNumber+")"}
         });
-        console.log('principle INfo :',that.remoteteacher);
+        console.log('principle INfo :',res.rows);
         // res.rows.forEach(function(teacher){
         //   if(teacher.userId){
         //     // that.principleForm.push(teacher);

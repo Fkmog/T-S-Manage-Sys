@@ -52,14 +52,6 @@
                 </el-tooltip>
               </div>
             </el-row>
-            <!-- <div v-show="!hasIndicators" class="noIndicator">
-              <el-button
-                style="color: #6573c0"
-                text
-                @click="goEdit()"
-                >添加考核方式
-              </el-button>
-            </div> -->
             <div
               class="attribute"
               v-for="indicator in major.indicators"
@@ -82,14 +74,14 @@
                     v-for="method in indicator.supportMethodVos"
                     :key="method.id"
                   >
-                    <div class="method-detail">
-                      <div class="method-weight">
+                   <el-row class="method-detail">
+                      <el-col :span="4" class="method-weight">
                         (&nbsp;{{ method.weight }}%&nbsp;)
-                      </div>
-                      <div class="method-desc" style="margin-left: 80px">
-                        {{ method.name }}
-                      </div>
-                    </div>
+                      </el-col>
+                      <el-col :span="18" class="method-desc">
+                        {{ method.description }}
+                      </el-col>
+                    </el-row>
                   </div>
                 </div>
               </div>

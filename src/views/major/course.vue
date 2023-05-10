@@ -1479,9 +1479,9 @@ mounted:function(){
    
   }
   
-  
-  
- 
+  // this.getBaseCourse(this.pageSize,this.pageNum);
+   
+  // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
   
 }
 
