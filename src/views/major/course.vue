@@ -30,8 +30,8 @@
 
 <div v-show="closeShow" class="submenu" >
   <el-row class="rowStyle">
-    <el-col :span="6">
-      <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
+    <el-col :span="4">
+      <el-button @click="this.toggleSelection()" style="float:right;" class="clearSelected" >取消选择</el-button>
     </el-col>
     <el-col :span="6">
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
@@ -1439,6 +1439,9 @@ ElMessageBox.confirm(
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
+            else{
+              that.showLoadmore = true;
+            }
           
           
         }).then(function(){
@@ -1586,68 +1589,53 @@ left:-46px;
     /* border-bottom: 1px solid #d0d0d0; */
     background-color: transparent;
 }
-.numSelectedTeacher{
-  min-height:36px; 
+.numSelectedTeacher {
+  min-height: 36px;
   color: #3f51b5;
-  
   display: inline-block;
-    position: relative;
-    cursor: pointer;
-    min-height: 36px;
-    min-width: 88px;
-    line-height: 36px;
-    vertical-align: middle;
-    align-items: center;
-    text-align: center;
-    border-radius: 2px;
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    outline: none;
-    border: 0;
-    padding: 0 6px;
-    margin: 0;
-    background: transparent;
-    
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-weight: 500;
-    font-size: 14px;
-    font-style: inherit;
-    font-variant: inherit;
+  position: relative;
+  
+  min-height: 36px;
+  min-width: 88px;
+  line-height: 36px;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  box-sizing: border-box;
+  
+  
+  user-select: none;
+  
+  border: 0;
+  padding: 0 6px;
+  margin: 0;
+  
+  
+  font-weight: 500;
+  font-size: 14px;
+  
 
-    text-decoration: none;
-    overflow: hidden;
-    transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  
+  transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .clearSelected{
-  min-height:36px; 
-  color: #3f51b5;
-
-  display: inline-block;
-    position: relative;
-    cursor: pointer;
-    min-height: 36px;
-    min-width: 88px;
-    line-height: 36px;
-    vertical-align: middle;
-    align-items: center;
-    text-align: center;
-    border-radius: 2px;
-    box-sizing: border-box;
-  
-    border: 0;
-    padding: 0 6px;
-    margin: 0;
-    background: transparent;
-    
-   
-    font-weight: 500;
-    font-size: 14px;
-    
-    transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
-}
+  color: black;
+  line-height: 55px;
+  float: right;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  outline: none;
+  border: 0;
+  padding: 0 6px;
+  background-color:#f2f2f2;
+  transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  }
+  .clearSelected:hover{
+    background-color:#c4c4c4;
+  }
 .submenu {
     color: #3f51b5;
     font-size: 14px;
@@ -1658,7 +1646,7 @@ left:-46px;
     left: 0px;
     width: 100%;
     border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+    background-color: #f2f2f2;
    
 }
 .md-padding {
