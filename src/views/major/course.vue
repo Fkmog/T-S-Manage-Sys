@@ -226,17 +226,8 @@
        
         
         <div class="pagination-container" flex>
-        <!-- <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            class="pagination"
-            :page-sizes="[10, 12]"
-            :page-size="10"
-            layout="total,sizes,prev, pager, next, jumper"
-            :total="result.total">
-        </el-pagination> -->
-        <el-row type="flex" justify="center" align="middle">
-          <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
+        <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
+          <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
         </el-row>
         
       </div>
@@ -273,6 +264,8 @@ components:{
 },
 data(){
   return{
+    loadmoreDisabled:Boolean,
+
     courseTypeSource:[],
     courseNatureSource:[],
     keyword:'',
@@ -1037,7 +1030,7 @@ methods:{
   deleteBaseCourse(){
     let that = this;
 ElMessageBox.confirm(
-    '是否删除选中的培养计划课程？',
+    '是否将所选课程从培养方案中移除？',
     '注意',
     {
       confirmButtonText: '确定',
@@ -1138,9 +1131,14 @@ ElMessageBox.confirm(
             }
           });
     });
-
+    this.versions.forEach((version)=>{
+        if(version['value']==that.currentVersionValue){
+          that.currentVersion = version['label']
+        }
+      });
+    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中'
     ElMessageBox.confirm(
-    '是否将所选版本的课程大纲添加到培养方案中？',
+      message,
     '注意',
     {
       confirmButtonText: '确定',
@@ -1331,14 +1329,14 @@ ElMessageBox.confirm(
     let realurl ='';
     let courseBCDMId = '';
     let count=0;
-    
+    this.loadmoreDisabled = true;
     if(majorId){
       realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       return request({
             url:realurl+'?'+'majorId='+this.majorId,
             method:'get',
         }).then(function(res){
-          
+          that.loadmoreDisabled = false;
           if(res.rows){
             res.rows.forEach(function(course){
               
@@ -1367,6 +1365,7 @@ ElMessageBox.confirm(
             'selectKeyWord':that.keyword
             },
         }).then(function(res){
+          that.loadmoreDisabled = false;
           console.log('courseDetails:',res);
           console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionValue',that.currentVersionValue);
           console.log('已经选择的课：',that.programeCourseInfo);
@@ -1482,9 +1481,7 @@ mounted:function(){
   
   
   
-  // this.getBaseCourse(this.pageSize,this.pageNum);
-   
-  // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
+ 
   
 }
 
@@ -1492,6 +1489,10 @@ mounted:function(){
 </script>
 
 <style scoped> 
+.loadmorestyle{
+    margin-top: 48px;
+    margin-bottom: 48px;
+  }
 .rowStyle{
   top: 10px;
 }
