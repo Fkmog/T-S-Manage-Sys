@@ -8,12 +8,12 @@
   
     <div v-show="closeShow" class="submenu">
     <el-row class="rowStyle">
-      <el-col :span="6">
+      <el-col :span="4">
         <el-button
         @click="this.toggleSelection()"
-        style="float: left"
+        style="float: right"
         class="clearSelected"
-        link
+        
         >取消选择</el-button
       >
       </el-col>
@@ -85,7 +85,7 @@
     
 
     <div  class="pagination-container" flex>
-      <el-row type="flex" justify="center" align="middle">
+      <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
         <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore&&hasBaseCourse" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
@@ -337,9 +337,13 @@ export default {
 </script>
 
 <style scoped>
+.loadmorestyle{
+  padding-top:24px;
+  padding-bottom: 24px;
+}
 .dropdownIcon{
   margin-top: 9px;
-  margin-left: 1200%;
+  margin-left: 1000%;
 }
  .el-table-container{
   margin: 0 auto;
@@ -348,7 +352,6 @@ export default {
   }
   .pagination-container{
     width: 100%;
-    margin-top: 10px;
   }
   .no-class {
   margin-top: 120px;
@@ -368,42 +371,23 @@ export default {
   width: 100%;
   border: 1px solid rgb(189, 189, 189);
 }
-.clearSelected {
-  min-height: 36px;
-  color: #3f51b5;
-  display: inline-block;
-  position: relative;
-  cursor: pointer;
-  min-height: 36px;
-  min-width: 88px;
-  line-height: 36px;
-  vertical-align: middle;
+.clearSelected{
+  color: black;
+  
+  line-height: 55px;
+  float: right;
   align-items: center;
   text-align: center;
   border-radius: 2px;
-  box-sizing: border-box;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
   outline: none;
   border: 0;
   padding: 0 6px;
-  margin-left: 20%;
-  background: transparent;
-
-  white-space: nowrap;
-  text-transform: uppercase;
-  font-weight: 500;
-  font-size: 14px;
-  font-style: inherit;
-  font-variant: inherit;
-
-  text-decoration: none;
-  overflow: hidden;
-  transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.addIcon {
+  background-color:#f2f2f2;
+  transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  }
+  .clearSelected:hover{
+    background-color:#c4c4c4;
+  }.addIcon {
   color: white;
   width: 24px;
   height: 24px;
@@ -439,7 +423,7 @@ export default {
   color: #3f51b5;
   display: inline-block;
   position: relative;
-  cursor: pointer;
+  
   min-height: 36px;
   min-width: 88px;
   line-height: 36px;
@@ -448,23 +432,20 @@ export default {
   text-align: center;
   border-radius: 2px;
   box-sizing: border-box;
-  -webkit-user-select: none;
-  -moz-user-select: none;
+  
+  
   user-select: none;
-  outline: none;
+  
   border: 0;
   padding: 0 6px;
   margin: 0;
-  background: transparent;
-  white-space: nowrap;
-  text-transform: uppercase;
+  
+  
   font-weight: 500;
   font-size: 14px;
-  font-style: inherit;
-  font-variant: inherit;
+  
 
-  text-decoration: none;
-  overflow: hidden;
+  
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }

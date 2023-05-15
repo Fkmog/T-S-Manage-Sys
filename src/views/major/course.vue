@@ -30,8 +30,8 @@
 
 <div v-show="closeShow" class="submenu" >
   <el-row class="rowStyle">
-    <el-col :span="6">
-      <el-button @click="this.toggleSelection()" style="float:left;" class="clearSelected" link>取消选择</el-button>
+    <el-col :span="4">
+      <el-button @click="this.toggleSelection()" style="float:right;" class="clearSelected" >取消选择</el-button>
     </el-col>
     <el-col :span="6">
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
@@ -226,17 +226,8 @@
        
         
         <div class="pagination-container" flex>
-        <!-- <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            class="pagination"
-            :page-sizes="[10, 12]"
-            :page-size="10"
-            layout="total,sizes,prev, pager, next, jumper"
-            :total="result.total">
-        </el-pagination> -->
-        <el-row type="flex" justify="center" align="middle">
-          <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
+        <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
+          <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
         </el-row>
         
       </div>
@@ -273,6 +264,8 @@ components:{
 },
 data(){
   return{
+    loadmoreDisabled:Boolean,
+
     courseTypeSource:[],
     courseNatureSource:[],
     keyword:'',
@@ -1037,7 +1030,7 @@ methods:{
   deleteBaseCourse(){
     let that = this;
 ElMessageBox.confirm(
-    '是否删除选中的培养计划课程？',
+    '是否将所选课程从培养方案中移除？',
     '注意',
     {
       confirmButtonText: '确定',
@@ -1138,9 +1131,14 @@ ElMessageBox.confirm(
             }
           });
     });
-
+    this.versions.forEach((version)=>{
+        if(version['value']==that.currentVersionValue){
+          that.currentVersion = version['label']
+        }
+      });
+    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中'
     ElMessageBox.confirm(
-    '是否将所选版本的课程大纲添加到培养方案中？',
+      message,
     '注意',
     {
       confirmButtonText: '确定',
@@ -1331,14 +1329,14 @@ ElMessageBox.confirm(
     let realurl ='';
     let courseBCDMId = '';
     let count=0;
-    
+    this.loadmoreDisabled = true;
     if(majorId){
       realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       return request({
             url:realurl+'?'+'majorId='+this.majorId,
             method:'get',
         }).then(function(res){
-          
+          that.loadmoreDisabled = false;
           if(res.rows){
             res.rows.forEach(function(course){
               
@@ -1367,6 +1365,7 @@ ElMessageBox.confirm(
             'selectKeyWord':that.keyword
             },
         }).then(function(res){
+          that.loadmoreDisabled = false;
           console.log('courseDetails:',res);
           console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionValue',that.currentVersionValue);
           console.log('已经选择的课：',that.programeCourseInfo);
@@ -1439,6 +1438,9 @@ ElMessageBox.confirm(
             if(pageSize>=res.total){
               that.showLoadmore = false;
             }
+            else{
+              that.showLoadmore = true;
+            }
           
           
         }).then(function(){
@@ -1477,8 +1479,6 @@ mounted:function(){
    
   }
   
-  
-  
   // this.getBaseCourse(this.pageSize,this.pageNum);
    
   // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
@@ -1489,6 +1489,10 @@ mounted:function(){
 </script>
 
 <style scoped> 
+.loadmorestyle{
+  padding-top:24px;
+  padding-bottom: 24px;
+  }
 .rowStyle{
   top: 10px;
 }
@@ -1586,68 +1590,53 @@ left:-46px;
     /* border-bottom: 1px solid #d0d0d0; */
     background-color: transparent;
 }
-.numSelectedTeacher{
-  min-height:36px; 
+.numSelectedTeacher {
+  min-height: 36px;
   color: #3f51b5;
-  
   display: inline-block;
-    position: relative;
-    cursor: pointer;
-    min-height: 36px;
-    min-width: 88px;
-    line-height: 36px;
-    vertical-align: middle;
-    align-items: center;
-    text-align: center;
-    border-radius: 2px;
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    outline: none;
-    border: 0;
-    padding: 0 6px;
-    margin: 0;
-    background: transparent;
-    
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-weight: 500;
-    font-size: 14px;
-    font-style: inherit;
-    font-variant: inherit;
+  position: relative;
+  
+  min-height: 36px;
+  min-width: 88px;
+  line-height: 36px;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  box-sizing: border-box;
+  
+  
+  user-select: none;
+  
+  border: 0;
+  padding: 0 6px;
+  margin: 0;
+  
+  
+  font-weight: 500;
+  font-size: 14px;
+  
 
-    text-decoration: none;
-    overflow: hidden;
-    transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  
+  transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .clearSelected{
-  min-height:36px; 
-  color: #3f51b5;
-
-  display: inline-block;
-    position: relative;
-    cursor: pointer;
-    min-height: 36px;
-    min-width: 88px;
-    line-height: 36px;
-    vertical-align: middle;
-    align-items: center;
-    text-align: center;
-    border-radius: 2px;
-    box-sizing: border-box;
-  
-    border: 0;
-    padding: 0 6px;
-    margin: 0;
-    background: transparent;
-    
-   
-    font-weight: 500;
-    font-size: 14px;
-    
-    transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
-}
+  color: black;
+  line-height: 55px;
+  float: right;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  outline: none;
+  border: 0;
+  padding: 0 6px;
+  background-color:#f2f2f2;
+  transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  }
+  .clearSelected:hover{
+    background-color:#c4c4c4;
+  }
 .submenu {
     color: #3f51b5;
     font-size: 14px;
@@ -1658,7 +1647,7 @@ left:-46px;
     left: 0px;
     width: 100%;
     border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+    background-color: #f2f2f2;
    
 }
 .md-padding {

@@ -27,15 +27,15 @@
 
   <div v-show="closeShow" class="submenu" >
     <el-row>
-      <el-col :span="6" class="columnstyle">
-        <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
+      <el-col :span="4" class="columnstyle">
+        <el-button @click="this.toggleSelection()"  class="clearSelected" >取消选择</el-button>
       </el-col>
       <el-col :span="12" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
       </el-col>
    
       
-      <el-col :span="6" v-show="identity == '学院管理员'" class="columnstyle">
+      <el-col :span="8" v-show="identity == '学院管理员'" class="columnstyle">
        
         <el-dropdown >
    
@@ -43,35 +43,18 @@
     
         <template #dropdown>
           <el-dropdown-menu>
-            
             <el-dropdown-item @click="this.addPrincipal()">
-              添加课程负责人&nbsp
-
-                <el-icon >
-                  <Plus />
-                </el-icon>
-
+              <el-icon><User /></el-icon>
+              &nbsp添加课程负责人
             </el-dropdown-item>
-
             <el-dropdown-item @click="this.deleteRespondent()" >
-              删除课程负责人&nbsp
-              
-                <el-icon  >
-                  <Delete />
-                </el-icon>
-              
+              <el-icon><CircleClose /></el-icon>
+              &nbsp删除课程负责人
             </el-dropdown-item>
             <el-dropdown-item @click="this.multideleteBaseCourse(this.courseId)" >
-              删除课程&nbsp
-              
-                <el-icon  >
-                  <Delete />
-                </el-icon>
-              
+              <el-icon><Delete /></el-icon>
+              &nbsp删除课程
             </el-dropdown-item>
-            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
-            <el-dropdown-item disabled>Action 4</el-dropdown-item>
-            <el-dropdown-item divided>Action 5</el-dropdown-item> -->
           </el-dropdown-menu>
         </template>
         </el-dropdown>
@@ -185,24 +168,37 @@
             
             
               <el-table-column  label="操作" width="300">
-                <template #default="scope">
-                
-                    <el-tooltip  content="删除课程" >
-                      <el-button  @click="deleteBaseCourse(scope.$index, scope.row.courseId)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
-                    </el-tooltip>
+                <template #default="scope" >
+                  <el-row v-show="showToolIcon">
+                    <el-col :span="4">
+                      <el-tooltip  content="删除课程" >
+                        <el-button  @click="deleteBaseCourse(scope.$index, scope.row.courseId)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
+                      </el-tooltip>
+                    </el-col>
+                    <el-col :span="4">
+                      <el-tooltip content="修改课程">
+                        <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
+                      </el-tooltip>
+                    </el-col>
+                    <el-col :span="4" v-show="scope.row.versionId">
+                      <el-tooltip content="查看信息">
+                        <el-button  @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
+                      </el-tooltip>
+                    </el-col>
+                    <el-col :span="8" v-show="!scope.row.versionId">
+                      <el-tooltip content="添加课程大纲">
+                        <el-tag  class="noBaseCourseDetail" type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                      </el-tooltip>
+                    </el-col>
+                </el-row>
+                    
 
-                  <el-tooltip content="修改课程">
-                    <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
-                  </el-tooltip>
+                  
                 
       
-                  <el-tooltip content="查看信息">
-                    <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
-                  </el-tooltip>
+                  
 
-                  <el-tooltip content="添加信息">
-                  <el-tag v-show="!scope.row.versionId" class="noBaseCourseDetail" type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
-                </el-tooltip>
+                  
 
                 </template>
               </el-table-column>
@@ -292,23 +288,23 @@
          
          
           <el-table-column  label="操作" width="300">
-            <template #default="scope">
+            <template #default="scope" >
               <!-- <el-tooltip content="删除">
                 <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
               </el-tooltip> -->
-              <el-tooltip content="修改">
+              <el-tooltip content="修改" >
                 <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
               </el-tooltip>
               <!-- <el-tooltip content="修改课程负责人">
                 <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
               </el-tooltip> -->
   
-              <el-tooltip content="查看信息">
+              <el-tooltip content="查看信息" >
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
 
 
-              <el-tooltip content="添加信息">
+              <el-tooltip content="添加课程大纲" >
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
 
@@ -431,7 +427,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="editPrinciple" title="修改负责人">
+    <!-- <el-dialog v-model="editPrinciple" title="修改负责人">
      <span>
       请选择负责人姓名：
      </span>
@@ -457,10 +453,10 @@
               </el-button>
             </span>
       </template>
-    </el-dialog>
+    </el-dialog> -->
 
     <div  class="pagination-container" flex>
-      <el-row type="flex" justify="center" align="middle">
+      <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
         <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore&&hasBaseCourse&&!isloading" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
@@ -477,7 +473,7 @@
   import addBtn from "@/components/general/addBtn.vue";
   import { ref,reactive, version,}from 'vue';
   import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown,ElTag } from 'element-plus'
-  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document,Avatar,DocumentChecked} from '@element-plus/icons-vue'
+  import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document,Avatar,DocumentChecked,User,CircleClose} from '@element-plus/icons-vue'
   import { getDictionary } from "@/api/dictionary";
   
   
@@ -485,12 +481,19 @@
   
   export default {
   name:"BaseCourse",
+  components:{
+    request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
+    Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
+    ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
+    Document,ElTag,Avatar,DocumentChecked,User,CircleClose
+  },
   data(){
     return{
 
       C_ErrorMsg:'',
       C_ErrorMsg_edit:'',
 
+      showToolIcon:Boolean,
 
 
 
@@ -884,7 +887,7 @@
       }).then(function(res){
         
         that.remoteteacher = res.rows.map(item =>{
-          return {userId:item.userId,respondentName:item.teacherName}
+          return {userId:item.userId,respondentName:item.teacherName+"("+item.teacherNumber+")"}
         });
         console.log('principle INfo :',res.rows);
         // res.rows.forEach(function(teacher){
@@ -1020,11 +1023,13 @@
     },
     toggleSelection(rows) {
           if (rows) {
+            
             rows.forEach(row => {
               this.$refs.multipleTable1.toggleRowSelection(row);
               this.$refs.multipleTable2.toggleRowSelection(row);
             });
           } else {
+            
             this.$refs.multipleTable1.clearSelection();
             this.$refs.multipleTable2.clearSelection();
             console.log('清空选择触发');
@@ -1043,6 +1048,15 @@
             let res = course.courseId;
             courseId.push(res);
           });
+          if(val.length>0){
+            this.showToolIcon = false;
+            console.log('showToolIcon',this.showToolIcon);
+          }
+          else{
+            this.showToolIcon = true;
+            console.log('showToolIcon',this.showToolIcon);
+          }
+          
           this.numSelected = this.multipleSelection.length;
           if(this.clickState != 1){
             this.closeShow = !this.closeShow;
@@ -1053,6 +1067,9 @@
             this.clickState=0;
               this.closeShow = !this.closeShow;
           }
+          
+            
+        
           this.courseId = courseId;
           console.log('courseId:',this.courseId);
         },
@@ -1409,7 +1426,9 @@
       })
       .catch(e =>{
         console.log('e',e);
+      
       })
+      
       
       
     },
@@ -1562,23 +1581,22 @@
     this.getBaseCourse(this.pageSize,this.pageNum);
   
   },
-  components:{
-    request,ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,
-    Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,ElDialog,
-    ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
-    Document,ElTag,Avatar,DocumentChecked
-  }
+  
   
   }
   </script>
   
   <style scoped>
+  .loadmorestyle{
+  padding-top:24px;
+  padding-bottom: 24px;
+  }
   .noBaseCourseDetail:hover{
     cursor:pointer
   }
   .dropdownIcon{
     margin-top: 18px;
-    margin-left: 1200%;
+    margin-left: 1000%;
   }
 
   .no-class {
@@ -1646,28 +1664,21 @@
     width: 100px;
   }
   .clearSelected{
-    
-    color: #3f51b5;
-    
-      line-height: 55px;
-     
-      align-items: center;
-      text-align: center;
-      border-radius: 2px;
-      outline: none;
-      border: 0;
-      padding: 0 6px;
-      margin-left: 20%;
-      background: transparent;
-      
-      white-space: nowrap;
-      text-transform: uppercase;
-      font-weight: 500;
-      font-size: 14px;
-     
-      text-decoration: none;
-      overflow: hidden;
-      transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  color: black;
+  margin-top: 11px;
+  line-height: 55px;
+  float: right;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  outline: none;
+  border: 0;
+  padding: 0 6px;
+  background-color:#f2f2f2;
+  transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
+  }
+  .clearSelected:hover{
+    background-color:#c4c4c4;
   }
   .headerSearch{
     border: 0;
@@ -1689,7 +1700,6 @@
   }
   .pagination-container{
     width: 100%;
-    margin-top: 10px;
   }
   .deleteButton, .editButton{
    
@@ -1748,25 +1758,15 @@
     margin-bottom: 0;
   }
   .numSelectedTeacher{
-    
     color: #3f51b5;
-    
       position: relative;
-      cursor: pointer;
-      
-      
       line-height: 55px;
-    
       border-radius: 2px;
-     
       border: 0;
       padding: 0 6px;
       margin: 0;
+      user-select: none;
       background: transparent;
-      
-     
-    
-      
       transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
   }
   

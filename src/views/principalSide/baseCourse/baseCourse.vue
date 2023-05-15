@@ -117,7 +117,7 @@
               <el-tooltip content="查看信息">
                 <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
               </el-tooltip>
-              <el-tooltip content="添加信息">
+              <el-tooltip content="添加课程大纲">
               <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
             </el-tooltip>
             </template>
@@ -860,7 +860,8 @@ export default {
   }
   .pagination-container{
     width: 100%;
-    margin-top: 10px;
+    margin-top: 48px;
+    margin-bottom: 48px;
   }
   .deleteButton, .editButton{
     min-width: 10px;
@@ -925,7 +926,7 @@ export default {
     color: #3f51b5;
     
       position: relative;
-      cursor: pointer;
+     
       min-height: 36px;
       min-width: 88px;
       line-height: 55px;

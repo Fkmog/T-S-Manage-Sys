@@ -42,7 +42,8 @@
       </el-row>
     </div>
     <div class="body">
-      <el-tabs class="major-tab">
+      <el-tabs class="major-tab" v-model="chosenMajor" 
+        @tab-change="tabChange()">
         <el-tab-pane
           v-model="chosenMajor"
           v-for="(major, index1) in majorList"
@@ -208,7 +209,7 @@
 
           <el-col :span="18">
             <el-select
-              v-model="support.name"
+              v-model="support.description"
               style="width: 450px"
               placeholder="课程目标"
             >
@@ -288,7 +289,7 @@ export default {
       searchValue: "",
       allIndicators: [],
       newIndicator: false,
-      chosenMajor: "",
+      chosenMajor: "0",
       course: {
         name: "",
         detailId: Number,
@@ -296,6 +297,8 @@ export default {
         schoolId: Number,
       },
       majorList: [],
+      currentProgramId: "",
+      programIdList: [],
       majorListCopy: [],
       programId: Number,
       index1: Number, //确定哪一专业
@@ -308,20 +311,32 @@ export default {
       wrongNum: 0,
     };
   },
+  computed: {
+    currentProgramIdChange() {
+      return this.currentProgramId;
+    },
+  },
+  watch: {
+    currentProgramIdChange: {
+      deep: true,
+      handler(value) {
+        this.checkPullIndicators();
+      },
+    },
+  },
   mounted() {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     this.course.departmentId = this.$store.state.currentInfo.departmentId;
     this.course.schoolId = this.$store.state.currentInfo.schoolId;
-    this.programId = this.$store.state.major.programId;
+    // this.programId = this.$store.state.major.programId;
     this.chosenMajor = this.$store.state.baseCourseDetailProgram.majorNum;
     this.checkMajors();
-    this.checkPullIndicators();
     this.checkObjectives();
   },
   methods: {
     back() {
-      // console.log( JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList));
+      console.log( this.majorListCopy,this.majorList,JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList));
       if (
         !(JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList))
       ) {
@@ -401,11 +416,12 @@ export default {
         for (let i = 0; i < this.majorList.length; i++) {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
-              this.majorList[i].programVersion =
+            this.majorList[i].programVersion =
               this.majorList[i].majorName +
               "-" +
               this.majorList[i].enrollyear +
               "级";
+            this.programIdList[i] = this.majorList[i].programId;
           });
         }
         this.checkIndicators();
@@ -443,12 +459,15 @@ export default {
           this.majorList[i].indicators.forEach((support) => {
             support.supportMethodVos.forEach((item) => {
               item.isEditWeight = false;
+              console.log("展示的item", item);
             });
           });
+          this.currentProgramId = this.programIdList[this.chosenMajor];
+ // 定义一个基本的majorList副本，用作判断有无修改
+      this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
         });
       }
-      // 定义一个基本的majorList副本，用作判断有无修改
-      this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
+     
     },
     //获取课程目标
     checkObjectives() {
@@ -456,7 +475,7 @@ export default {
         //list存放初始数据
         this.objectives = res.data.objectives;
         //处理数据-serialNum
-        console.log("this.objectives",this.objectives);
+        console.log("this.objectives", this.objectives);
         if (this.objectives) {
           this.objectives.forEach((value) => {
             if (value.id.charAt(0) == "0") {
@@ -464,7 +483,8 @@ export default {
             } else {
               value.serialNum = value.id;
             }
-            value.complete = "课程目标"+value.serialNum+":"+value.description
+            value.complete =
+              "课程目标" + value.serialNum + "：" + value.description;
             // console.log("1232134234",value.complete,value.name);
           });
         }
@@ -529,7 +549,7 @@ export default {
       this.dialogFormVisible = true;
     },
     //新增支持指标点
-     addIndicator(searchValue, index1) {
+    addIndicator(searchValue, index1) {
       try {
         let info = searchValue.split(" ");
         // 判断选中的指标点是否已存在
@@ -563,6 +583,7 @@ export default {
           this.majorList[index1].indicators.push(newIndicator);
           this.newIndicator = false;
           this.searchValue = "";
+          console.log("newIndicator", newIndicator);
         }
         //没有简称的时候  info：[毕业要求1，1.1，描述]
         if (info.length == 3) {
@@ -593,6 +614,7 @@ export default {
           this.majorList[index1].indicators.push(newIndicator);
           this.newIndicator = false;
           this.searchValue = "";
+          console.log("newIndicator", newIndicator);
         }
       } catch (stat) {
         if (stat == "true") {
@@ -602,13 +624,14 @@ export default {
     },
     //查询新增指标点列表
     checkPullIndicators() {
-      getPullIndicator(this.programId).then((res) => {
+      getPullIndicator(this.currentProgramId).then((res) => {
         console.log("getPullIndicator", res);
-        this.allIndicators = res.data;
+        this.allIndicators[this.chosenMajor] = res.data;
+        // this.allIndicators = res.data;
       });
     },
     //远程查询实现
-  querySearch(queryString, cb) {
+    querySearch(queryString, cb) {
       var allIndicators = this.allIndicators;
       var results = queryString
         ? allIndicators.filter(this.createStateFilter(queryString))
@@ -671,13 +694,15 @@ export default {
         //处理supportMethodVos下的id赋值
         this.objectives.forEach((item) => {
           // console.log("item便利",item);
-          if (item.description == support.name) {
+          if (item.description == support.description) {
             support.id = item.id;
+            support.serialNum = item.serialNum;
+            console.log("赋id,serialNum后的item", support);
           }
         });
         //逻辑校验处理
         sum = sum + Number(support.weight);
-        if (support.name == "") {
+        if (support.description == "") {
           isItemNull = true;
         }
         if (support.weight == "0") {
@@ -696,9 +721,18 @@ export default {
       if (sum == 100 && isItemNull == false && haveZero == false) {
         this.majorList[this.index1].indicators[this.index2].supportMethodVos =
           this.dialogIndicator.supportMethodVos;
-        // console.log("~",this.majorList[this.index1].indicators[this.index2].supportMethodVos);
+        console.log(
+          "~",
+          this.majorList[this.index1].indicators[this.index2].supportMethodVos
+        );
         this.dialogFormVisible = false;
       }
+    },
+      //切换tab
+    tabChange() {
+      this.currentProgramId = this.programIdList[this.chosenMajor];
+      console.log(this.programIdList);
+      console.log("tab", 'currentProgramId',this.currentProgramId,'chosen',this.chosenMajor);
     },
   },
 };

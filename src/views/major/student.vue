@@ -242,7 +242,7 @@ ElMessageBox.confirm("即将删除学神信息", "注意", {
     color: #3f51b5;
     
       position: relative;
-      cursor: pointer;
+      
       min-height: 36px;
       min-width: 88px;
       line-height: 55px;
@@ -308,7 +308,8 @@ ElMessageBox.confirm("即将删除学神信息", "注意", {
   }
 .pagination-container{
     width: 100%;
-    margin-top: 10px;
+    margin-top: 48px;
+    margin-bottom: 48px;
   }
 .studentsTable{
   margin: 0 auto;

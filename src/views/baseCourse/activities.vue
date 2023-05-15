@@ -76,8 +76,8 @@
   
      
 
-      <div layout="row" flex class="md-padding">
-            <div class="hot-table-container" flex id="courseHot"></div>
+      <div  flex class="md-padding">
+            <div class="hot-table-container"  id="courseHot"></div>
         </div>
   
       
@@ -185,7 +185,7 @@
             rowHeaders: true,
             rowHeaders: ['成绩项', '分值','设置'],
             copyPaste: true,
-            colWidths: 100,
+            colWidths: 70,
             
             contextMenu: {
               items: {
@@ -489,6 +489,7 @@
   .hot-table-container{
     float: left;
     margin-left: 5%;
+    
   }
 .divider {
   margin-left: 20px;
@@ -517,6 +518,7 @@
   }
   .md-padding{
     margin-top: 10%;
+    height: 80%;
   }
   .ng-scope layout-column flex{
   display: flex;
