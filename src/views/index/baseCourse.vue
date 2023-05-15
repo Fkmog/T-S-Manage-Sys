@@ -30,16 +30,16 @@
       <el-col :span="4" class="columnstyle">
         <el-button @click="this.toggleSelection()"  class="clearSelected" >取消选择</el-button>
       </el-col>
-      <el-col :span="12" class="columnstyle">
-        <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
+      <el-col :span="14" class="columnstyle">
+        <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
       </el-col>
    
       
-      <el-col :span="8" v-show="identity == '学院管理员'" class="columnstyle">
+      <el-col :span="6" v-show="identity == '学院管理员'" class="columnstyle">
        
-        <el-dropdown >
+        <el-dropdown class="dropdownstyle">
    
-          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+          <el-icon class="dropdownIcon" ><MoreFilled /></el-icon>
     
         <template #dropdown>
           <el-dropdown-menu>
@@ -958,7 +958,7 @@
           that.currentVersion = version['label']
         }
       });
-      let versionMessage = '是否添加 '+this.currentVersion+' 本课程大纲？'
+      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）'
       ElMessageBox.confirm(
         versionMessage,
       '注意',
@@ -1596,7 +1596,10 @@
   }
   .dropdownIcon{
     margin-top: 18px;
-    margin-left: 1000%;
+    cursor:pointer;
+  }
+  .dropdownstyle{
+    position: absolute;
   }
 
   .no-class {
@@ -1625,7 +1628,6 @@
  
   .columnstyle{
     height:50px;
-    
   }
 :deep().searchBlock .el-icon {
   height: 24px;
@@ -1759,7 +1761,7 @@
   }
   .numSelectedTeacher{
     color: #3f51b5;
-      position: relative;
+      float: left;
       line-height: 55px;
       border-radius: 2px;
       border: 0;

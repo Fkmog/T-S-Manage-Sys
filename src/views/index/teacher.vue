@@ -343,7 +343,7 @@ export default {
 }
 .dropdownIcon{
   margin-top: 9px;
-  margin-left: 1000%;
+  cursor:pointer;
 }
  .el-table-container{
   margin: 0 auto;
@@ -373,7 +373,7 @@ export default {
 }
 .clearSelected{
   color: black;
-  
+  margin-top: 2px;
   line-height: 55px;
   float: right;
   align-items: center;

@@ -695,7 +695,7 @@ methods:{
     }).then(function(res){
       console.log('courseInPrograme:',res);
       console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
-      that.programInfoCourseCount = res.total;
+      
           if(res.total){
             res.rows.forEach(function(course){
             that.hasCourse = true;
@@ -1136,7 +1136,7 @@ ElMessageBox.confirm(
           that.currentVersion = version['label']
         }
       });
-    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中'
+    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中 ？'
     ElMessageBox.confirm(
       message,
     '注意',
@@ -1283,6 +1283,7 @@ ElMessageBox.confirm(
           courseIndex.push(index);
         });
         this.drawernumSelected = this.drawermultipleSelection.length;
+
         if(this.drawerclickState != 1){
           this.drawercloseShow = !this.drawercloseShow;
           this.drawerclickState = 1;
@@ -1330,6 +1331,7 @@ ElMessageBox.confirm(
     let courseBCDMId = '';
     let count=0;
     this.loadmoreDisabled = true;
+    this.programInfoCourseCount = 0;
     if(majorId){
       realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       return request({
@@ -1371,6 +1373,7 @@ ElMessageBox.confirm(
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
+           
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
             
@@ -1416,7 +1419,7 @@ ElMessageBox.confirm(
                 if(!course.remark){
                   
                 if(courseInfo.courseId == course.courseId ){
-                    
+                  that.programInfoCourseCount = that.programInfoCourseCount +1;
                       course.remark = true;
                       throw new Error("remark")
                     
@@ -1539,9 +1542,9 @@ mounted:function(){
 }
 
 
-.drawerFooter{
+/* .drawerFooter{
   padding-bottom: 100px;
-}
+} */
 .pagination-container{
   bottom: 10px;
 }
