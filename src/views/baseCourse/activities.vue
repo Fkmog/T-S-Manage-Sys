@@ -441,6 +441,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   .hot-table-container{
     float: left;
     margin-left: 5%;
+    
   }
 .divider {
   margin-left: 20px;

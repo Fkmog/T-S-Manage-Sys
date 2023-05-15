@@ -181,12 +181,16 @@ export default createStore({
     baseCourseDetailProgram: {
       namespaced: true,
       state: {
-        majorNum: "",
+        majorNum: "0",
+        majorProgramId: Number,
       },
       getters: {},
       mutations: {
         setmajorNum(state, newVal) {
           state.majorNum = newVal;
+        },
+        setmajorProgramId(state, newVal) {
+          state.majorProgramId = newVal;
         },
       },
       actions: {},
