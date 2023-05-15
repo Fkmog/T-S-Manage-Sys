@@ -1760,12 +1760,8 @@
     margin-bottom: 0;
   }
   .numSelectedTeacher{
-    color: #3f51b5;
-    
-    float: left;
-      cursor: pointer;
-      
-      
+      color: #3f51b5; 
+      float: left;
       line-height: 55px;
       border-radius: 2px;
       border: 0;
