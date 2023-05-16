@@ -42,8 +42,11 @@
       </el-row>
     </div>
     <div class="body">
-      <el-tabs class="major-tab" v-model="chosenMajor" 
-        @tab-change="tabChange()">
+      <el-tabs
+        class="major-tab"
+        v-model="chosenMajor"
+        @tab-change="tabChange()"
+      >
         <el-tab-pane
           v-model="chosenMajor"
           v-for="(major, index1) in majorList"
@@ -336,7 +339,11 @@ export default {
   },
   methods: {
     back() {
-      console.log( this.majorListCopy,this.majorList,JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList));
+      console.log(
+        this.majorListCopy,
+        this.majorList,
+        JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList)
+      );
       if (
         !(JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList))
       ) {
@@ -463,11 +470,10 @@ export default {
             });
           });
           this.currentProgramId = this.programIdList[this.chosenMajor];
- // 定义一个基本的majorList副本，用作判断有无修改
-      this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
+          // 定义一个基本的majorList副本，用作判断有无修改
+          this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
         });
       }
-     
     },
     //获取课程目标
     checkObjectives() {
@@ -627,7 +633,6 @@ export default {
       getPullIndicator(this.currentProgramId).then((res) => {
         console.log("getPullIndicator", res);
         this.allIndicators[this.chosenMajor] = res.data;
-        // this.allIndicators = res.data;
       });
     },
     //远程查询实现
@@ -636,28 +641,35 @@ export default {
       var results = queryString
         ? allIndicators.filter(this.createStateFilter(queryString))
         : allIndicators;
+      console.log("result", results);
+      results.forEach((result) => {
+        result.map((item) => {
+          if (item.requirementName === null) {
+            console.log("sange", item);
 
-      results.map((item) => {
-        if (item.requirementName === null) {
-          return (item.value =
-            "毕业要求" +
-            item.requirementSerialNum +
-            " " +
-            item.indicatorSerialNum +
-            " " +
-            item.indicatorDescription);
-        } else {
-          return (item.value =
-            "毕业要求" +
-            item.requirementSerialNum +
-            " " +
-            item.requirementName +
-            " " +
-            item.indicatorSerialNum +
-            " " +
-            item.indicatorDescription);
-        }
+            return (item.value =
+              "毕业要求" +
+              item.requirementSerialNum +
+              " " +
+              item.indicatorSerialNum +
+              " " +
+              item.indicatorDescription);
+          } else {
+            console.log("四个", item);
+            return (item.value =
+              "毕业要求1" +
+              item.requirementSerialNum +
+              " " +
+              item.requirementName +
+              " " +
+              item.indicatorSerialNum +
+              " " +
+              item.indicatorDescription);
+          }
+        });
       });
+      results = results[0];
+      console.log("result后", results);
       cb(results);
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
@@ -728,11 +740,17 @@ export default {
         this.dialogFormVisible = false;
       }
     },
-      //切换tab
+    //切换tab
     tabChange() {
       this.currentProgramId = this.programIdList[this.chosenMajor];
       console.log(this.programIdList);
-      console.log("tab", 'currentProgramId',this.currentProgramId,'chosen',this.chosenMajor);
+      console.log(
+        "tab",
+        "currentProgramId",
+        this.currentProgramId,
+        "chosen",
+        this.chosenMajor
+      );
     },
   },
 };

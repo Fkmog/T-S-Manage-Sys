@@ -33,11 +33,22 @@
     <el-col :span="4">
       <el-button @click="this.toggleSelection()" style="float:right;" class="clearSelected" >取消选择</el-button>
     </el-col>
-    <el-col :span="6">
-      <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
+    <el-col :span="14">
+      <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
     </el-col>
-    <el-col :span="6">
-      <el-button @click="this.deleteBaseCourse()" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button> 
+    <el-col :span="4">
+       <el-dropdown class="dropdownstyle">
+        <el-icon class="dropdownIcon" ><MoreFilled /></el-icon>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="this.deleteBaseCourse()" >
+              <el-icon><Delete /></el-icon>
+              &nbsp删除课程
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+       </el-dropdown>
+      
     </el-col>
     
       
@@ -528,7 +539,7 @@ methods:{
           that.currentVersion = version['label']
         }
       });
-      let versionMessage = '是否添加 '+this.currentVersion+' 本课程大纲？'
+      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）?'
       ElMessageBox.confirm(
       versionMessage,
       '注意',

@@ -165,7 +165,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         this.db.items[1].push(null);
         this.db.items[2].push('');
         this.colNum = this.colNum+1;
-        this.dictTolist(this.db.items);
+        // this.dictTolist(this.db.items);
         this.hotInstance.updateSettings({
                 data:this.db.items,
               });
@@ -272,9 +272,12 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
         else {
           console.log('res has no activities');
-          that.db.items.push('');
-          that.db.items.push('');
-          that.db.items.push('');
+          let item = ['']
+          let value = ['']
+          let remark = ['']
+          that.db.items.push(item);
+          that.db.items.push(value);
+          that.db.items.push(remark);
           }
       })
     },

@@ -27,15 +27,15 @@
 
   <div v-show="closeShow" class="submenu" >
     <el-row>
-      <el-col :span="6" class="columnstyle">
-        <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
+      <el-col :span="4" class="columnstyle">
+        <el-button @click="this.toggleSelection()"  class="clearSelected">取消选择</el-button>
       </el-col>
       <el-col :span="14" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
       </el-col>
    
       
-      <el-col :span="8" v-show="identity == '学院管理员'" class="columnstyle">
+      <el-col :span="4" v-show="identity == '学院管理员'" class="columnstyle">
        
         <el-dropdown class="dropdownstyle">
    
@@ -958,7 +958,7 @@
           that.currentVersion = version['label']
         }
       });
-      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）'
+      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）?'
       ElMessageBox.confirm(
         versionMessage,
       '注意',
@@ -1761,7 +1761,7 @@
   }
   .numSelectedTeacher{
       color: #3f51b5; 
-      float: left;
+      
       line-height: 55px;
       border-radius: 2px;
       border: 0;
