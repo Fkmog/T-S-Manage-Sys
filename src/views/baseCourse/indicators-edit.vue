@@ -657,7 +657,7 @@ export default {
           } else {
             console.log("四个", item);
             return (item.value =
-              "毕业要求1" +
+              "毕业要求" +
               item.requirementSerialNum +
               " " +
               item.requirementName +

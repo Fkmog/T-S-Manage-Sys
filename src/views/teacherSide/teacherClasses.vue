@@ -85,8 +85,8 @@ export default {
 .classes-list {
   display: flex;
   flex-direction: row;
-  width: 80%;
-  margin-left: 10%;
+  width: 88%;
+  margin-left: 6%;
   flex-wrap: wrap;
   margin-top: 55px;
 }

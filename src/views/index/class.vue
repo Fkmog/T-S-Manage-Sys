@@ -936,7 +936,7 @@ export default {
           this.isAssign = false;
           ElMessage({
             type: "success",
-            message: "分配成功",
+            message: "设置成功",
             duration: 1500,
           });
           this.multipleSelection = [];
@@ -945,7 +945,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: "分配失败",
+            message: "设置失败",
             duration: 1500,
           });
         }
