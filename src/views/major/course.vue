@@ -30,10 +30,10 @@
 
 <div v-show="closeShow" class="submenu" >
   <el-row class="rowStyle">
-    <el-col :span="4">
+    <el-col :span="2">
       <el-button @click="this.toggleSelection()" style="float:right;" class="clearSelected" >取消选择</el-button>
     </el-col>
-    <el-col :span="14">
+    <el-col :span="16">
       <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
     </el-col>
     <el-col :span="4">
@@ -260,8 +260,8 @@
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive,}from 'vue';
-import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag,ElCheckbox } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document} from '@element-plus/icons-vue'
+import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag,ElCheckbox,ElDropdown } from 'element-plus'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document,MoreFilled} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
 import { getDictionary } from "@/api/dictionary";
 
@@ -271,7 +271,7 @@ name:"Courses",
 components:{
   HeaderSearch,ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption
   , Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, addBtn,
-  ElTag,ElCheckbox,Document
+  ElTag,ElCheckbox,Document,ElDropdown,MoreFilled
 },
 data(){
   return{
@@ -1503,6 +1503,14 @@ mounted:function(){
 </script>
 
 <style scoped> 
+ .dropdownstyle{
+   float: right;
+   margin-right: 70px;
+  }
+  .dropdownIcon{
+    margin-top: 10px;
+    cursor:pointer;
+  }
 .loadmorestyle{
   padding-top:24px;
   padding-bottom: 24px;
@@ -1637,6 +1645,7 @@ left:-46px;
 }
 .clearSelected{
   color: black;
+  margin-top: 2px;
   line-height: 55px;
   float: right;
   align-items: center;

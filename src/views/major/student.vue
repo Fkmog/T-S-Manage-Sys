@@ -3,13 +3,13 @@
     <div v-show="hasStudent">
       <div v-show="closeShow" class="submenu" >
         <el-row>
-          <el-col :span="6" class="columnstyle">
+          <el-col :span="2" class="columnstyle">
             <el-button @click="toggleSelection()"  class="clearSelected" link>取消选择</el-button>
           </el-col>
-          <el-col :span="6" class="columnstyle">
+          <el-col :span="16" class="columnstyle">
             <div class="numSelectedTeacher" >已选中 {{numSelected}} 位学生</div>
           </el-col>
-          <el-col :span="6" class="columnstyle">
+          <el-col :span="4" class="columnstyle">
             <el-button @click="deleteStudent()"  class="submenudeleteButton" link ><el-icon ><Delete /></el-icon></el-button>
           </el-col>
         </el-row>
