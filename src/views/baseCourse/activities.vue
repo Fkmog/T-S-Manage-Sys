@@ -1,5 +1,5 @@
 <template>
-  <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+  <div layout="column" flex class="ng-scope layout-column flex" >
     <!-- 顶部导航栏 -->
     <div class="block">
     <el-row class="block-row">
@@ -35,12 +35,13 @@
       <el-button 
       @click="save" 
       link
+      style="padding-left: 20px;"
       :disabled="!isValid()" >
         <el-icon
           
           size="22px"
           color="rgb(137, 137, 137)"
-          style="margin-left: 20px;top:-4px;"
+          style="top:-1px;"
           
         >
         <!-- :disabled="!isValid()" -->
@@ -56,15 +57,21 @@
         placement="bottom"
         :hide-after="0"
       >
+      <el-button 
+      @click="addActivities" 
+      link 
+      :disabled="!over25"
+      style="padding-left: 20px;"
+      >
         <el-icon
-          class="icon"
           size="22px"
           color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="addActivities"
+         
         >
           <CirclePlus />
         </el-icon>
+      </el-button>
+        
       </el-tooltip>
 
     </el-row>
@@ -77,11 +84,8 @@
      
 
       <div  flex class="md-padding">
-            <div class="hot-table-container"  id="courseHot"></div>
+          <div class="hot-table-container"  id="courseHot"></div>
         </div>
-  
-      
-      
     </div>
   
     
@@ -107,20 +111,18 @@
   
   
   import 'handsontable/dist/handsontable.full.css'
+import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/src/props/shared';
   
   
   
   export default{
     name:'addTeacher',
-    inject:['reload'], 
-    provide(){
-        return{
-          reload:this.reload
-        }
-      },
     data(){
       let self = this;
       return{
+        colNum:1,
+        over25:Boolean,
+        activityList:[],
         departmentId:'',
         schoolId:'',
         courseId:'',
@@ -129,7 +131,7 @@
   
         firstActivities:true,
   
-        isRouterAlive:true,
+        
         dirty:false,
         saving:false,
         count:0,
@@ -154,16 +156,21 @@
     },
     methods:{
       addActivities(){
+        // this.iscolover25();
+        if(this.colNum<25){
         this.firstActivities = false;
-        let length = Object.keys(this.db.items[0]).length;
         
-        this.db.items[0][length.toString()] = '';
-        this.db.items[1][length.toString()] = null;
-        this.db.items[2][length.toString()] = '';
+        
+        this.db.items[0].push('');
+        this.db.items[1].push(null);
+        this.db.items[2].push('');
+        this.colNum = this.colNum+1;
+        // this.dictTolist(this.db.items);
         this.hotInstance.updateSettings({
                 data:this.db.items,
-               
               });
+        }
+        
        
       },
       activate(){
@@ -182,10 +189,11 @@
             data: self.db.items,
             licenseKey: 'non-commercial-and-evaluation',
             colHeaders: false,
-            rowHeaders: true,
+            dragToScroll: true,
             rowHeaders: ['成绩项', '分值','设置'],
             copyPaste: true,
             colWidths: 70,
+            allowRemoveColumn: true,
             
             contextMenu: {
               items: {
@@ -195,8 +203,8 @@
                 col_right: {
                   name: "在右侧插入列",
                 },
-                clear_column: {
-                  name: "清空列",
+                remove_col: {
+                  name: "删除列",
                 },
               },
             },afterChange(changes, source) {
@@ -217,6 +225,9 @@
             console.log("console:", self.count);
           }
         },
+        afterRemoveCol(changes, source){
+          self.firstActivities = false;
+        }
         });
 
         that.hotInstance = hotRegisterer;
@@ -251,75 +262,26 @@
        
         let course = res.data;
         if(course.activities){
-          let activityNumber = course.activities.item.length;
-          that.currentNumberofActivities = activityNumber;
-          
-          var itemDict = {};
-          var valueDict = {};
-          var markDict = {};
-          
-            if(!course.activities.value){
-              for(let i=0;i<activityNumber;i++){
-                valueDict[i.toString()] = '';
-         }
-            }
-            else{
-              for(let i=0;i<activityNumber;i++){
-                valueDict[i.toString()] = course.activities.value[i];
-         }
-              
-            }
-            if(!course.activities.remark){
-              for(let i=0;i<activityNumber;i++){
-            markDict[i.toString()] = '';
-         }
-            }
-            else{
-              for(let i=0;i<activityNumber;i++){
-                markDict[i.toString()] = course.activities.remark[i];
-         }
-              
-            }
-            if(!course.activities.item){
-              for(let i=0;i<activityNumber;i++){
-                itemDict[i.toString()] = '';
-         }
-            }
-            else{
-              for(let i=0;i<activityNumber;i++){
-                itemDict[i.toString()] = course.activities.item[i];
-         }
-              
-            }
             
          
            
-          that.db.items.push(itemDict);
-          that.db.items.push(valueDict);
-          that.db.items.push(markDict);
+          that.db.items.push(course.activities.item);
+          that.db.items.push(course.activities.value);
+          that.db.items.push(course.activities.remark);
           console.log('res has activities:',that.db.items);
         }
         else {
           console.log('res has no activities');
-          var itemDict = {'0':''};
-          var valueDict = {'0':''};
-          var markDict = {'0':''};
-          that.db.items.push(itemDict);
-          that.db.items.push(valueDict);
-          that.db.items.push(markDict);
-              // add two columns (fail column, 1 score column)
-              // that.addColumn();
-              // that.addColumn();
+          let item = ['']
+          let value = ['']
+          let remark = ['']
+          that.db.items.push(item);
+          that.db.items.push(value);
+          that.db.items.push(remark);
           }
       })
     },
-    addColumn() {
-      for (var i = 0; i < this.db.items.length; i++) {
-        this.db.items[i].push('');
-      }
-    },
     isValid(){
-      
         if(this.firstActivities){
         console.log('isValid:this.firstActivities:',this.firstActivities)
         return false;
@@ -350,15 +312,15 @@
       let item = [];
       let value = [];
       let remark = [];
-      let length = Object.keys(this.db.items[0]).length;
+      let length = this.db.items[0].length;
      
       for(let i=0;i<length;i++){
-        if(typeof(this.db.items[1][i.toString()]) == 'string'){
-          this.db.items[1][i.toString()] = parseInt(this.db.items[1][i.toString()]);
-        }
-        item.push(this.db.items[0][i.toString()]);
-        value.push(this.db.items[1][i.toString()]);
-        remark.push(this.db.items[2][i.toString()])
+        // if(typeof(this.db.items[1][i]) == 'string'){
+        //   this.db.items[1][i] = parseInt(this.db.items[1][i]);
+        // }
+        item.push(this.db.items[0][i]);
+        value.push(this.db.items[1][i]);
+        remark.push(this.db.items[2][i])
       }
     
 
@@ -403,7 +365,7 @@
       var valid = true;
         
         
-        let length = Object.keys(this.db.items[0]).length;
+        let length =this.db.items[0].length;
         // let count=0;
         // let hasremark=false;
         // for(let i=0;i<length;i++){
@@ -415,7 +377,7 @@
         //   hasremark=true;
         // }
           for(let i=0;i<length;i++){
-            if (!this.db.items[0][i.toString()] ||!this.db.items[1][i.toString()]) {
+            if (!this.db.items[0][i] ||!this.db.items[1][i]) {
               
               valid = false;
               break;
@@ -432,13 +394,6 @@
     console.log('datas:', this.db.items,this.postData.activities);
     this.reload();
     
-  },
-  reload(){
-    this.isRouterAlive = false;
-    this.count = 0;
-    this.$nextTick(function () {
-      this.isRouterAlive = true;
-    });
   },
   gobaseCourseDetail(){
     console.log('gobaseCourseDetail:'+this.saving+this.dirty);

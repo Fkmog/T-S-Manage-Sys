@@ -391,7 +391,7 @@ export default {
         this.list = res.data;
         this.allActivities = this.list.activities;
         // console.log("初始list", this.list);
-        // console.log("初始allActivities", this.list.activities);
+        console.log("初始allActivities", this.list.activities);
         this.allActivities.itemObject = this.allActivities.item.map((item) => ({
           value: item,
         }));
@@ -505,16 +505,33 @@ export default {
               assessmentMethod.activities.item.map((item) => ({ value: item }));
           }
           let array = assessmentMethod.activities.itemObject;
-          console.log("arrat", array);
+          // console.log("arrat", array, array[0]);
           if (array.length === 1) {
-            let index = this.allActivities.item.indexOf(array[0]);
+            let index = this.allActivities.item.indexOf(array[0].value);
+            // console.log("index", index);
             if (index > -1) {
-              assessmentMethod.activities.item.push(
-                this.allActivities.item[index]
-              );
+                if (
+                  !(assessmentMethod.activities.item.length == array.length)
+                ) {
+                  assessmentMethod.activities.item.push(
+                    this.allActivities.item[index]
+                  );
+                }
+              if (
+                assessmentMethod.activities.value === null ||
+                !assessmentMethod.activities.hasOwnProperty("value")
+              ) {
+                assessmentMethod.activities.value = [];
+              }
               assessmentMethod.activities.value.push(
                 this.allActivities.value[index]
               );
+              if (
+                assessmentMethod.activities.remark === null ||
+                !assessmentMethod.activities.hasOwnProperty("remark")
+              ) {
+                assessmentMethod.activities.remark = [];
+              }
               assessmentMethod.activities.remark.push(
                 this.allActivities.remark[index]
               );
@@ -522,14 +539,32 @@ export default {
           }
           if (array.length > 1) {
             array.forEach((singleActivity) => {
-              let index = this.allActivities.item.indexOf(singleActivity);
+              let index = this.allActivities.item.indexOf(singleActivity.value);
+              // console.log("多于1项的时候，",singleActivity,"index",index);
               if (index > -1) {
-                assessmentMethod.activities.item.push(
-                  this.allActivities.item[index]
-                );
+                console.log("zheli执行了几次", array);
+                if (
+                  !(assessmentMethod.activities.item.length == array.length)
+                ) {
+                  assessmentMethod.activities.item.push(
+                    this.allActivities.item[index]
+                  );
+                }
+                if (
+                  assessmentMethod.activities.value === null ||
+                  !assessmentMethod.activities.hasOwnProperty("value")
+                ) {
+                  assessmentMethod.activities.value = [];
+                }
                 assessmentMethod.activities.value.push(
                   this.allActivities.value[index]
                 );
+                if (
+                  assessmentMethod.activities.remark === null ||
+                  !assessmentMethod.activities.hasOwnProperty("remark")
+                ) {
+                  assessmentMethod.activities.remark = [];
+                }
                 assessmentMethod.activities.remark.push(
                   this.allActivities.remark[index]
                 );

@@ -33,11 +33,22 @@
     <el-col :span="4">
       <el-button @click="this.toggleSelection()" style="float:right;" class="clearSelected" >取消选择</el-button>
     </el-col>
-    <el-col :span="6">
-      <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
+    <el-col :span="14">
+      <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
     </el-col>
-    <el-col :span="6">
-      <el-button @click="this.deleteBaseCourse()" style="float:right;" class="deleteButton" link><el-icon class="iconSize"><Delete /></el-icon></el-button> 
+    <el-col :span="4">
+       <el-dropdown class="dropdownstyle">
+        <el-icon class="dropdownIcon" ><MoreFilled /></el-icon>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="this.deleteBaseCourse()" >
+              <el-icon><Delete /></el-icon>
+              &nbsp删除课程
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+       </el-dropdown>
+      
     </el-col>
     
       
@@ -528,7 +539,7 @@ methods:{
           that.currentVersion = version['label']
         }
       });
-      let versionMessage = '是否添加 '+this.currentVersion+' 本课程大纲？'
+      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）?'
       ElMessageBox.confirm(
       versionMessage,
       '注意',
@@ -695,7 +706,7 @@ methods:{
     }).then(function(res){
       console.log('courseInPrograme:',res);
       console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
-      that.programInfoCourseCount = res.total;
+      
           if(res.total){
             res.rows.forEach(function(course){
             that.hasCourse = true;
@@ -1136,7 +1147,7 @@ ElMessageBox.confirm(
           that.currentVersion = version['label']
         }
       });
-    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中'
+    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中 ？'
     ElMessageBox.confirm(
       message,
     '注意',
@@ -1283,6 +1294,7 @@ ElMessageBox.confirm(
           courseIndex.push(index);
         });
         this.drawernumSelected = this.drawermultipleSelection.length;
+
         if(this.drawerclickState != 1){
           this.drawercloseShow = !this.drawercloseShow;
           this.drawerclickState = 1;
@@ -1330,6 +1342,7 @@ ElMessageBox.confirm(
     let courseBCDMId = '';
     let count=0;
     this.loadmoreDisabled = true;
+    this.programInfoCourseCount = 0;
     if(majorId){
       realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
       return request({
@@ -1371,6 +1384,7 @@ ElMessageBox.confirm(
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
+           
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
             
@@ -1416,7 +1430,7 @@ ElMessageBox.confirm(
                 if(!course.remark){
                   
                 if(courseInfo.courseId == course.courseId ){
-                    
+                  that.programInfoCourseCount = that.programInfoCourseCount +1;
                       course.remark = true;
                       throw new Error("remark")
                     
@@ -1539,9 +1553,9 @@ mounted:function(){
 }
 
 
-.drawerFooter{
+/* .drawerFooter{
   padding-bottom: 100px;
-}
+} */
 .pagination-container{
   bottom: 10px;
 }
