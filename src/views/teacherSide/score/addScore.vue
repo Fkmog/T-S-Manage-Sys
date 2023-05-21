@@ -799,7 +799,7 @@ async getActivities(){
                 ElMessage({
                     type: 'success',
                     message: `成绩保存成功`,
-                    duration:1000,
+                    duration:1500,
                   });
                  that.goBackandClean();
             }
@@ -807,7 +807,7 @@ async getActivities(){
               
       
         }).catch(e=>{
-          console.log(e);
+          console.log('e:',e);
         })
     }
     
