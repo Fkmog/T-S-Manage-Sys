@@ -35,9 +35,23 @@
     </template>
     <template #assignBtn>
       <div class="assignBtn" v-show="showAdd">
-        <el-button style="color: #6573c0" text @click="assignDetail()">
+        <el-dropdown style="margin-top: 10px; cursor: pointer">
+          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="assignDetail()">
+                设置课程大纲
+              </el-dropdown-item>
+              <el-dropdown-item @click="associateCourse()">
+                关联课程库课程
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+        <!-- <el-button style="color: #6573c0" text @click="assignDetail()">
           设置课程大纲
-        </el-button>
+        </el-button> -->
       </div>
     </template>
   </HeaderSearch>
@@ -342,7 +356,8 @@
     </el-table-column>
     <el-table-column prop="className" label="课程名" width="210" />
     <el-table-column prop="allTeacherName" label="任课教师" width="200" />
-    <el-table-column prop="courseCode" label="课程号" width="170" />
+    <el-table-column prop="courseCode" label="课程号" width="170">
+    </el-table-column>
     <el-table-column prop="versionName" label="大纲版本" width="160" />
     <el-table-column prop="identifier" label="开课号" width="270" />
     <el-table-column prop="academicYear" label="学年" width="150" />
@@ -364,26 +379,39 @@
 
     <el-table-column width="150">
       <template #default="scope">
-        <el-row v-show="canAction">
-          <el-col :span="8">
-            <el-tooltip content="修改" :hide-after="0">
-              <el-button
-                link
-                style="color: #3f51b5"
-                @click="editClass(scope.$index, scope.row)"
-                ><el-icon><Edit /></el-icon
-              ></el-button>
-            </el-tooltip>
+        <el-row>
+          <el-col :span="16">
+            <el-row v-show="canAction">
+              <el-col :span="12" v-show="identity === '学院管理员'">
+                <el-tooltip content="修改" :hide-after="0">
+                  <el-button
+                    link
+                    style="color: #3f51b5"
+                    @click="editClass(scope.$index, scope.row)"
+                    ><el-icon><Edit /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="12" v-show="identity === '学院管理员'">
+                <el-tooltip content="删除" :hide-after="0">
+                  <el-button
+                    link
+                    style="color: #3f51b5"
+                    @click="deleteClass(scope.$index, scope.row)"
+                    ><el-icon><Delete /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+            </el-row>
           </el-col>
-          <el-col :span="12" v-show="identity === '学院管理员'">
-            <el-tooltip content="删除" :hide-after="0">
-              <el-button
-                link
-                style="color: #3f51b5"
-                @click="deleteClass(scope.$index, scope.row)"
-                ><el-icon><Delete /></el-icon
-              ></el-button>
-            </el-tooltip>
+          <el-col :span="6" v-show="scope.row.courseIsDeleted === '2'">
+            <el-row>
+              <el-tooltip content="未关联课程库课程" :hide-after="0">
+                <el-icon style="color: #9d2a2e; margin-top: 4px">
+                  <Warning
+                /></el-icon>
+              </el-tooltip>
+            </el-row>
           </el-col>
         </el-row>
       </template>
@@ -415,13 +443,22 @@ import {
   editClass,
   setPermission,
   deleteClass,
+  associateCourses,
 } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
-import { Edit, Delete, Plus, SetUp } from "@element-plus/icons-vue";
+import {
+  Edit,
+  Delete,
+  Plus,
+  SetUp,
+  Warning,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getDetails, assign } from "@/api/basecourse";
+import { getPrincipalClassList } from "@/api/principal";
 
 export default {
   name: "Class",
@@ -432,12 +469,14 @@ export default {
     Delete,
     Plus,
     SetUp,
+    Warning,
+    MoreFilled,
   },
   data() {
     return {
       hasClass: false,
       noClass: false,
-      canAction:true,
+      canAction: true,
       isRespondent: "0",
       showLoadmore: true,
       isAssign: false,
@@ -516,6 +555,7 @@ export default {
     this.currentInfo.departmentId = this.$store.state.currentInfo.departmentId;
     this.currentInfo.schoolId = this.$store.state.currentInfo.schoolId;
     this.identity = this.$store.state.currentInfo.identity;
+    console.log("this.identity", this.identity);
     this.getDictionary();
   },
   computed: {
@@ -538,6 +578,7 @@ export default {
       handler(value) {
         this.currentInfo.departmentId =
           this.$store.state.currentInfo.departmentId;
+           this.identity = this.$store.state.currentInfo.identity;
         this.getClassList();
       },
     },
@@ -613,59 +654,117 @@ export default {
     },
     //获取教学班列表
     getClassList() {
-      getClass(
-        this.chosenYear,
-        this.chosenSemester,
-        this.currentInfo.departmentId,
-        this.currentInfo.schoolId,
-        this.pageSize,
-        this.pageNum,
-        this.keyword
-      ).then((res) => {
-        console.log("getClassList", res);
-        if (res.code === "SUCCESS") {
-          this.classTable = res.rows;
-          if (this.classTable.length == 0) {
-            this.noClass = true;
-            this.hasClass = false;
-          } else {
-            this.hasClass = true;
-            this.noClass = false;
-          }
-          this.total = res.total;
-          if (this.pageSize >= res.total) {
-            this.showLoadmore = false;
-          } else {
-            this.showLoadmore = true;
-          }
-          if (this.classTable.length > 0) {
-            for (let i = 0; i < this.classTable.length; i++) {
-              this.classTable[i].allTeacherName =
-                this.classTable[i].teacherName;
-              if (this.classTable[i].additionalTeacherList !== null) {
-                this.classTable[i].additionalTeacherList.forEach((teacher) => {
-                  this.classTable[i].allTeacherName =
-                    this.classTable[i].allTeacherName +
-                    "," +
-                    teacher.teacherName;
+      if (this.identity === "学院管理员") {
+        getClass(
+          this.chosenYear,
+          this.chosenSemester,
+          this.currentInfo.departmentId,
+          this.currentInfo.schoolId,
+          this.pageSize,
+          this.pageNum,
+          this.keyword
+        ).then((res) => {
+          console.log("getClassList", res);
+          if (res.code === "SUCCESS") {
+            this.classTable = res.rows;
+            if (this.classTable.length == 0) {
+              this.noClass = true;
+              this.hasClass = false;
+            } else {
+              this.hasClass = true;
+              this.noClass = false;
+            }
+            this.total = res.total;
+            if (this.pageSize >= res.total) {
+              this.showLoadmore = false;
+            } else {
+              this.showLoadmore = true;
+            }
+            if (this.classTable.length > 0) {
+              for (let i = 0; i < this.classTable.length; i++) {
+                this.classTable[i].allTeacherName =
+                  this.classTable[i].teacherName;
+                if (this.classTable[i].additionalTeacherList !== null) {
+                  this.classTable[i].additionalTeacherList.forEach(
+                    (teacher) => {
+                      this.classTable[i].allTeacherName =
+                        this.classTable[i].allTeacherName +
+                        "," +
+                        teacher.teacherName;
+                    }
+                  );
+                }
+
+                this.academicYear.forEach((year) => {
+                  if (year.dictValue == this.classTable[i].academicYear) {
+                    this.classTable[i].academicYear = year.dictLabel;
+                  }
+                });
+                this.semester.forEach((semester) => {
+                  if (semester.dictValue == this.classTable[i].semester) {
+                    this.classTable[i].semester = semester.dictLabel;
+                  }
                 });
               }
-
-              this.academicYear.forEach((year) => {
-                if (year.dictValue == this.classTable[i].academicYear) {
-                  this.classTable[i].academicYear = year.dictLabel;
-                }
-              });
-              this.semester.forEach((semester) => {
-                if (semester.dictValue == this.classTable[i].semester) {
-                  this.classTable[i].semester = semester.dictLabel;
-                }
-              });
             }
+            // console.log("#", this.classTable);
           }
-          // console.log("#", this.classTable);
-        }
-      });
+        });
+      }
+      if (this.identity === "课程负责人") {
+        getPrincipalClassList(
+          this.chosenYear,
+          this.chosenSemester,
+          this.pageSize,
+          this.pageNum
+        ).then((res) => {
+          console.log("getClassList", res);
+          if (res.code === "SUCCESS") {
+            this.classTable = res.rows;
+            if (this.classTable.length == 0) {
+              this.noClass = true;
+              this.hasClass = false;
+            } else {
+              this.hasClass = true;
+              this.noClass = false;
+            }
+            this.total = res.total;
+            if (this.pageSize >= res.total) {
+              this.showLoadmore = false;
+            } else {
+              this.showLoadmore = true;
+            }
+            if (this.classTable.length > 0) {
+              for (let i = 0; i < this.classTable.length; i++) {
+                this.classTable[i].allTeacherName =
+                  this.classTable[i].teacherName;
+                if (this.classTable[i].additionalTeacherList !== null) {
+                  this.classTable[i].additionalTeacherList.forEach(
+                    (teacher) => {
+                      this.classTable[i].allTeacherName =
+                        this.classTable[i].allTeacherName +
+                        "," +
+                        teacher.teacherName;
+                    }
+                  );
+                }
+
+                this.academicYear.forEach((year) => {
+                  if (year.dictValue == this.classTable[i].academicYear) {
+                    this.classTable[i].academicYear = year.dictLabel;
+                  }
+                });
+                this.semester.forEach((semester) => {
+                  if (semester.dictValue == this.classTable[i].semester) {
+                    this.classTable[i].semester = semester.dictLabel;
+                  }
+                });
+              }
+            }
+            // console.log("#", this.classTable);
+          }
+        });
+      }
     },
     //新增教学班
     addClass(classAddForm) {
@@ -872,15 +971,14 @@ export default {
       // console.log(this.multipleSelection);
       if (this.multipleSelection.length > 0) {
         this.selectedCourseId = this.multipleSelection[0].courseId;
-        this.canAction=false
+        this.canAction = false;
 
         // console.log("this.selectedCourseId", this.selectedCourseId);
         this.canSelectAll = false;
       } else {
         this.selectedCourseId = "";
         this.canSelectAll = true;
-        this.canAction=true
-
+        this.canAction = true;
       }
     },
     //disable控制
@@ -920,6 +1018,7 @@ export default {
       // console.log("123", this.multipleSelection);
       this.isAssign = true;
     },
+    //确定分配课程大纲
     confirmAssign() {
       console.log("confirmAssign");
       // console.log("@#",this.assignedDetail,this.multipleSelection);
@@ -947,6 +1046,35 @@ export default {
         }
       });
     },
+    //关联课程库课程
+    associateCourse() {
+      console.log(" this.multipleSelection", this.multipleSelection);
+      associateCourses(this.multipleSelection).then((res) => {
+        console.log("associateCourses", res);
+        if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: "关联成功",
+            duration: 1500,
+          });
+          // this.multipleSelection.forEach((item)=>{
+          //   item.courseIsDeleted="0"
+          // })
+        }
+      })
+     .catch((e)=>{
+      console.log("e",e);
+       if(e.code==="NOT_FIND"){
+          ElMessage({
+            type: "error",
+            message: "请先添加课程库课程",
+            duration: 1500,
+          });
+        }
+     })
+
+    },
+    //加载更多
     loadMore() {
       if (this.total - this.pageSize >= 20) {
         this.pageSize += 20;
@@ -1067,10 +1195,10 @@ export default {
   font-size: 13px;
   color: #828d96;
 }
-.loadMore{
+.loadMore {
   display: flex;
   justify-content: center;
-  padding-top:24px;
+  padding-top: 24px;
   padding-bottom: 24px;
 }
 </style>

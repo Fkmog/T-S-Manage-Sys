@@ -68,3 +68,11 @@ export function getClassInfo(classId) {
     method: 'GET',
   })
 }
+//关联课程库课程
+export function associateCourses(array) {
+  return request({
+    url: '/classes/associateCourse',
+    method: 'POST',
+    data:array,
+  })
+}
