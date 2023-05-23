@@ -31,29 +31,43 @@
     <el-table
     class="studentsTable"
     :data="studentsTable"
-    style="width: 80%"
+    :style="{width: tableWidth}" 
     :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
     :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
     v-show="hasScores"
   >
     <el-table-column prop="studentNumber" label="学号"  width="180px"/>
     <el-table-column prop="studentName" label="姓名" width="100px"/>
-    <el-table-column  >
-      <template #header>
+    <!-- <el-table-column>
+      <template #header="scope1">
         <span>成绩</span>
       </template>
       <template #default="scope">
         <el-row>
           <el-col v-for="(item,i) in activityName" :key="item.name" :span="4">
           {{ item }}
-          <!-- <el-row>({{ activityScores[i] }})</el-row> -->
           <el-row>{{ scope.row.scores[i]}}/{{ activityScores[i]  }}</el-row>
         </el-col>
         </el-row>
+      </template>
+    </el-table-column> -->
+    <el-table-column v-for="(item,i) in activityName"  :label="item" :key="item" width="180px">
+      <template #header>
+        <el-col>
+          <el-row>
+            <span>{{item}}</span>
+          </el-row>
+          <el-row>
+            <span class="subtabletitle">({{activityScores[i]}})</span>
+          </el-row>
+        </el-col>
         
         
-       
-        
+      </template>
+      <template #default="scope">
+        <span class="scoreintable">
+          {{ scope.row.scores[i] }}
+        </span>
       </template>
     </el-table-column>
     
@@ -85,7 +99,8 @@ export default {
       classInfo: [],
       activityName:[],
       activityScores:[],
-      studentsTable:[]
+      studentsTable:[],
+      tableWidth:'',
     };
   },
   mounted() {
@@ -110,6 +125,7 @@ export default {
         console.log('class Info',res);
         
         let course = res.data;
+        let length = 0;
         if(course.scores){
           that.hasScores = true;
           if(course.activities){
@@ -117,6 +133,8 @@ export default {
           let activityNumber = course.activities.item.length;
           let studentNum = course.scores.length;
          that.activityName = course.activities.item;
+         length = (that.activityName.length+1)*180+100;
+         that.tableWidth = length.toString()+'px';
          that.activityScores = course.activities.value;
         for(let i=0;i<studentNum;i++){
           var student = {
@@ -146,14 +164,21 @@ export default {
 </script>
 
 <style scoped>
+.scoreintable{
+  margin-left: 19px;
+}
+.subtabletitle{
+  color: grey;
+  margin-left: 14px;
+  font-weight: 500;
+}
    .no-program {
   display: flex;
   flex-direction: column;
 }
 .studentsTable{
-  margin-left: 10%;
-  margin-top: 85px;
-  box-shadow: 0px 1px 3px rgb(164, 163, 163);
+  margin: 0 auto;
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding {
   margin-top: 120px;
