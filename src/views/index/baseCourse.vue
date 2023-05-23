@@ -27,10 +27,10 @@
 
   <div v-show="closeShow" class="submenu" >
     <el-row>
-      <el-col :span="4" class="columnstyle">
+      <el-col :span="2" class="columnstyle">
         <el-button @click="this.toggleSelection()"  class="clearSelected">取消选择</el-button>
       </el-col>
-      <el-col :span="14" class="columnstyle">
+      <el-col :span="16" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 门课程</div>
       </el-col>
    
@@ -1599,7 +1599,8 @@
     cursor:pointer;
   }
   .dropdownstyle{
-    position: absolute;
+   float: right;
+   margin-right: 70px;
   }
 
   .no-class {

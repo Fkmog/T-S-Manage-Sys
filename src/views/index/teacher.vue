@@ -8,7 +8,7 @@
   
     <div v-show="closeShow" class="submenu">
     <el-row class="rowStyle">
-      <el-col :span="4">
+      <el-col :span="2">
         <el-button
         @click="this.toggleSelection()"
         style="float: right"
@@ -17,11 +17,11 @@
         >取消选择</el-button
       >
       </el-col>
-      <el-col :span="12">
+      <el-col :span="16">
         <div class="numSelectedTeacher">已选中 {{ numSelected }} 个教师</div>
       </el-col>
-      <el-col :span="6">
-       <el-dropdown >
+      <el-col :span="4">
+       <el-dropdown class="dropdownstyle">
 
           <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
           <template #dropdown>
@@ -337,6 +337,10 @@ export default {
 </script>
 
 <style scoped>
+ .dropdownstyle{
+   float: right;
+   margin-right: 70px;
+  }
 .loadmorestyle{
   padding-top:24px;
   padding-bottom: 24px;

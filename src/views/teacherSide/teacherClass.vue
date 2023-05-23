@@ -22,23 +22,6 @@
         </el-tooltip>
         <div class="title">全部课程</div>
         <el-divider class="divider" direction="vertical" />
-        <!-- <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="学生"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toStudents()"
-        >
-          <Avatar />
-        </el-icon>
-      </el-tooltip> -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -73,22 +56,6 @@
             <Checked />
           </el-icon>
         </el-tooltip>
-        <!-- <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="下载报告"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-        >
-          <Download />
-        </el-icon>
-      </el-tooltip> -->
       </el-row>
     </div>
     <div class="body">
@@ -104,7 +71,7 @@
               <div class="detail-title">课程号</div>
               <div class="detail-info">{{ classInfo.courseCode }}</div>
             </el-col>
-            <el-col :span="6" style="margin-top: 10px">
+            <el-col :span="12" style="margin-top: 10px">
               <div class="detail-title">开课号</div>
               <div class="detail-info">{{ classInfo.identifier }}</div>
             </el-col>
@@ -119,6 +86,25 @@
               <div class="detail-info">{{ classInfo.semester }}</div>
             </el-col>
           </el-row>
+          <el-col style="margin-top: 25px">
+            <el-row>
+              <el-col class="detail-title">课程大纲</el-col>
+
+              <el-col :span="6" v-show="hasFile">
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="点击下载"
+                  placement="bottom"
+                  :hide-after="0"
+                >
+                  <el-col class="fileName" @click="downloadFile">{{
+                    objectInfo.fileName
+                  }}</el-col>
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </el-col>
         </el-col>
       </div>
     </div>
@@ -134,6 +120,7 @@ import {
   Download,
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
+import { getObjectives, downloadDetail } from "@/api/basecourse";
 
 export default {
   name: "TeacherClass",
@@ -149,13 +136,15 @@ export default {
       classInfo: {},
       academicYear: [],
       semester: [],
+      hasFile: false,
+      objectInfo: [],
     };
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-
     console.log("classInfo", this.classInfo);
     this.getDictionary();
+    this.getFile();
   },
   methods: {
     //返回教师端首页
@@ -183,7 +172,7 @@ export default {
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
-        console.log("getDictionary", res);
+        // console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
         this.academicYear.forEach((year) => {
@@ -196,6 +185,33 @@ export default {
             this.classInfo.semester = semester.dictLabel;
           }
         });
+      });
+    },
+    getFile() {
+      getObjectives(this.classInfo.detailId).then((res) => {
+        console.log("getObjectives", res);
+        this.objectInfo = res.data;
+        if (!(res.data.syllabusFileId === null||res.data.syllabusFileId===0)) {
+          this.hasFile = true;
+        } else {
+          this.hasFile = false;
+        }
+      });
+    },
+    downloadFile() {
+      downloadDetail(this.classInfo.detailId).then((res) => {
+        // console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        // console.log("blob",blob);
+        // saveAs(blob, this.objectInfo.fileName)
+        const link = document.createElement("a");
+        link.download = decodeURI(this.objectInfo.fileName);
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
       });
     },
   },
@@ -248,6 +264,15 @@ export default {
   font-size: 13px;
 }
 .detail-info {
-  margin-top: 5px;
+  margin-top: 10px;
+}
+.fileName {
+  color: #616981;
+  font-size: 14px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.fileName :hover {
+  color: #2857e4;
 }
 </style>

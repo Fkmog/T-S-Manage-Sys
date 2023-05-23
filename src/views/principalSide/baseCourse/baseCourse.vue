@@ -27,13 +27,13 @@
 
   <div v-show="closeShow" class="submenu" >
     <el-row>
-      <el-col :span="6" class="columnstyle">
+      <el-col :span="2" class="columnstyle">
         <el-button @click="this.toggleSelection()"  class="clearSelected" link>取消选择</el-button>
       </el-col>
-      <el-col :span="6" class="columnstyle">
+      <el-col :span="16" class="columnstyle">
         <div class="numSelectedTeacher" >已选中 {{numSelected}} 节基础课程</div>
       </el-col>
-      <el-col :span="6" class="columnstyle">
+      <el-col :span="4" class="columnstyle">
         <el-button @click="this.setDetail()"  class="submenudeleteButton" link ><el-icon ><Plus /></el-icon></el-button>
         
       </el-col>

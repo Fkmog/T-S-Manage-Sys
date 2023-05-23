@@ -241,7 +241,7 @@ activateHotcolumn(){
             preventOverflow: 'horizontal',
             manualColumnMove: false,
             copyPaste: true,
-            colWidths: 52,
+            colWidths: 70,
             
             contextMenu: {
               items:{
@@ -327,6 +327,12 @@ getHotCellsFunction() {
                 if(row >2){
                     cellProperties.readOnly = false;
                 }
+                }
+                if(col >=0 && col <= 2){
+                  if(row >= 0 && row <= 2){
+                    cellProperties.readOnly = true;
+
+                  }
                 }
 
                 if (col > 2 && row === 2) {
@@ -490,7 +496,6 @@ async getActivities(){
         this.dirty=false;
       },
       save() {
-
         this.saving = true;
         this.dirty = false;
         var result = this.isValid();
@@ -498,14 +503,7 @@ async getActivities(){
             this.saving = false;
             return;
           }
-       
-       
-            
-            
-
             let that =this;
-
-           
             var studentList = JSON.parse(JSON.stringify(that.db.items));
             let activityNumber = that.columnList.length;
             for(let m=0;m<3;m++){
@@ -797,22 +795,19 @@ async getActivities(){
         }).then(function(res){
             console.log('saving scores res:',res);
             that.firstActivities = true;
-            if(res.code == '200'){
+            if(res.code == 'SUCCESS'){
                 ElMessage({
                     type: 'success',
                     message: `成绩保存成功`,
-                    duration:1000,
+                    duration:1500,
                   });
                  that.goBackandClean();
             }
-             else{
-              ElMessage({
-                    type: 'error',
-                    message: `成绩保存失败`,
-                    duration:1000,
-                  })
-             that.goBackandClean();
-        }
+             
+              
+      
+        }).catch(e=>{
+          console.log('e:',e);
         })
     }
     

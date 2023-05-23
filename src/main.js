@@ -16,7 +16,7 @@ createApp(App)
 
 
 //判断配置文件是否开启日志调试 是否输出日志 True 输出 False 不输出
-// var logDebug = false;
+// var logDebug = true;
 // console.log = (function (oriLogFunc) {
 //   return function () {
 //     if (logDebug) {
@@ -24,3 +24,4 @@ createApp(App)
 //     }
 //   }
 // })(console.log);
+ 

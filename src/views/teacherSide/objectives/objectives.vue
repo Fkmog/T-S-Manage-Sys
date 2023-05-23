@@ -47,12 +47,19 @@
             </el-tooltip>
           </div>
         </el-row>
-        <div v-for="objective in list.objectives" :key="objective.id">
+        <div v-for="objective in objectives" :key="objective.id">
           <el-row>
-            <el-col :span="2" class="objective-num">{{
+            <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
-            <el-col :span="20">
+            <el-col
+              :span="4"
+              class="objective-achieve"
+              v-show="objective.hasAchieve"
+            >
+              {{ objective.achievement }}%
+            </el-col>
+            <el-col :span="16">
               <div class="objective-name">
                 {{ objective.name }}
               </div>
@@ -71,12 +78,16 @@
                     {{ assessment.name }}
                   </el-col>
                   <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                  <el-col
-                    :span="2"
-                    v-for="(activity, index) in assessment.activities.item"
-                    :key="index"
-                  >
-                    {{ activity }}
+                  <el-col :span="12">
+                    <el-row>
+                      <el-col
+                        :span="6"
+                        v-for="(activity, index) in assessment.activities.item"
+                        :key="index"
+                      >
+                        {{ activity }}
+                      </el-col>
+                    </el-row>
                   </el-col>
                 </el-row>
               </div>
@@ -90,8 +101,10 @@
       </div>
       <div v-show="hasDetailId && !hasObjective" class="card">
         <el-row class="no-info">
-          <el-col style="margin:10px 0 10px">暂未设置课程目标</el-col>
-          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent">去设置</el-col>
+          <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
+          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent"
+            >去设置</el-col
+          >
         </el-row>
       </div>
     </div>
@@ -101,6 +114,7 @@
 <script>
 import { Back, EditPen } from "@element-plus/icons-vue";
 import { getObjectives } from "@/api/basecourse";
+import { getClassInfo } from "@/api/class";
 
 export default {
   name: "Objectives",
@@ -112,13 +126,16 @@ export default {
     return {
       hasDetailId: true,
       hasObjective: true,
+      // hasAchieve:false,
       isRespondent: false,
       classInfo: [],
       list: [],
+      objectives: [],
     };
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    console.log("this.classinfo", this.classInfo);
     if (this.classInfo.isRespondent == 2) {
       this.isRespondent = true;
     } else {
@@ -129,7 +146,8 @@ export default {
       this.hasDetailId = false;
     } else {
       this.hasDetailId = true;
-      this.checkObjectives();
+      // this.checkObjectives();
+      this.checkClassInfo();
     }
   },
   methods: {
@@ -139,26 +157,31 @@ export default {
     backClass() {
       this.$router.push("/teacherClass");
     },
-    //获取课程目标
-    checkObjectives() {
-      getObjectives(this.classInfo.detailId).then((res) => {
-        this.list = res.data;
-        //处理数据-serialNum
-        if (this.list.objectives) {
-          if (this.list.objectives.length > 0) {
+    //获取教学班信息
+    checkClassInfo() {
+      getClassInfo(this.classInfo.classId).then((res) => {
+        // console.log("getClassInfo", res.data);
+        this.objectives = res.data.objectives;
+        if (this.objectives) {
+          if (this.objectives.length > 0) {
             this.hasObjective = true;
+            this.objectives.forEach((object) => {
+              if (object.id.charAt(0) == "0") {
+                object.serialNum = object.id.charAt(1);
+              } else {
+                object.serialNum = object.id;
+              }
+              if (object.hasOwnProperty("achievement")) {
+                object.hasAchieve = true;
+              } else {
+                object.hasAchieve = false;
+              }
+            });
           } else {
             this.hasObjective = false;
           }
-          this.list.objectives.forEach((value) => {
-            if (value.id.charAt(0) == "0") {
-              value.serialNum = value.id.charAt(1);
-            } else {
-              value.serialNum = value.id;
-            }
-          });
         }
-        // console.log("getObjectives:", this.list);
+        console.log("getClassInfo", this.objectives);
       });
     },
   },
@@ -223,6 +246,13 @@ export default {
   margin-top: 30px;
   padding-left: 16px;
 }
+.objective-achieve {
+  font-size: 1.6em;
+  color: #ff5722;
+  font-weight: bold;
+  margin-top: 30px;
+  padding-left: 16px;
+}
 .objective-name {
   font-size: 1.2em;
   font-weight: bold;
@@ -240,11 +270,10 @@ export default {
   color: grey;
   margin-left: 710px;
 }
-.go-edit{
+.go-edit {
   cursor: pointer;
 }
-.go-edit:hover  {
-  color:#5c6bc0 ;
-
+.go-edit:hover {
+  color: #5c6bc0;
 }
 </style>

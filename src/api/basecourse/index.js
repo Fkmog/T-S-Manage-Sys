@@ -91,3 +91,19 @@ export function assign(Array) {
     data: Array,
   });
 }
+//下载课程大纲
+export function downloadDetail(detailId) {
+  return request({
+    url: "/detail/download/syllabusFile/"+detailId,
+    method: "GET",
+    responseType: 'blob',
+  });
+}
+
+//移除课程大纲
+export function removeDetail(detailId) {
+  return request({
+    url: "/detail/remove/syllabusFile/"+detailId,
+    method: "DELETE",
+  });
+}
