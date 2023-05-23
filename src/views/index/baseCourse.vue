@@ -68,14 +68,14 @@
    
        <template #dropdown>
          <el-dropdown-menu>
-           <el-dropdown-item @click="this.addPrincipal()">
+           <!-- <el-dropdown-item @click="this.addPrincipal()">
             <el-icon><User /></el-icon>
               &nbsp添加课程负责人
            </el-dropdown-item>
            <el-dropdown-item @click="this.deleteRespondent()" >
               <el-icon><CircleClose /></el-icon>
               &nbsp删除课程负责人
-            </el-dropdown-item>
+            </el-dropdown-item> -->
            
            
            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
