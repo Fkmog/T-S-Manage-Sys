@@ -64,18 +64,18 @@
        
        <el-dropdown class="columnstyle">
   
-         <el-icon><MoreFilled /></el-icon>
+         <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
    
        <template #dropdown>
          <el-dropdown-menu>
-           <el-dropdown-item >
-             添加课程负责人
-             <el-button   link >
-               <el-icon @click="this.setDetail()">
-                 <Plus />
-               </el-icon>
-             </el-button>
+           <el-dropdown-item @click="this.addPrincipal()">
+            <el-icon><User /></el-icon>
+              &nbsp添加课程负责人
            </el-dropdown-item>
+           <el-dropdown-item @click="this.deleteRespondent()" >
+              <el-icon><CircleClose /></el-icon>
+              &nbsp删除课程负责人
+            </el-dropdown-item>
            
            
            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
@@ -276,37 +276,43 @@
             </template>
           </el-table-column>
           <el-table-column  label="负责人" width="150" >
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <span v-for="(item,index) in scope.row.respondentName" :key="index">{{ item }}&nbsp;&nbsp;</span>
-                <span >{{ scope.row.credit }}</span>
-              </div>
-            </template>
-          </el-table-column>
+                <template #default="scope">
+                  <div style="display: flex; align-items: center" >
+                    <span >{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+                  </div>
+                </template>
+              </el-table-column>
          
          
          
          
           <el-table-column  label="操作" width="300">
+            
             <template #default="scope" >
-              <!-- <el-tooltip content="删除">
-                <el-button @click="deleteBaseCourse(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Delete /></el-icon></el-button>
-              </el-tooltip> -->
-              <el-tooltip content="修改" >
-                <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
-              </el-tooltip>
-              <!-- <el-tooltip content="修改课程负责人">
-                <el-button v-show="scope.row.respondentInfos.length" @click="showEditRespondent(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Avatar /></el-icon></el-button>
-              </el-tooltip> -->
+             
+              <el-row v-show="showToolIcon">
+                <el-col :span="4">
+                  <el-tooltip content="修改" >
+                    <el-button @click="editTrigger(scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Edit /></el-icon></el-button>
+                  </el-tooltip></el-col>
+                <el-col :span="4" v-show="scope.row.versionId">
+                  <el-tooltip content="查看信息" >
+                    <el-button  @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
+                  </el-tooltip>
+                </el-col>
+                <el-col :span="12" v-show="!scope.row.versionId">
+                  <el-tooltip content="添加课程大纲" >
+                    <el-tag   type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                  </el-tooltip>
+                </el-col>
+            </el-row>
+              
+             
   
-              <el-tooltip content="查看信息" >
-                <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
-              </el-tooltip>
+              
 
 
-              <el-tooltip content="添加课程大纲" >
-              <el-tag v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
-            </el-tooltip>
+              
 
 
             </template>
@@ -1197,15 +1203,6 @@
                     // teacherName.push(respondent.respondentName);
                   });
                   // course.respondentName = teacherName;
-                
-                
-                  // let teacherName =[];
-                  course.respondentInfos.forEach(function(respondent){
-                    course.respondentName = respondent.respondentName;
-                    // teacherName.push(respondent.respondentName);
-                  });
-                  // course.respondentName = teacherName;
-                
               }
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
@@ -1253,17 +1250,14 @@
               
               course.courseName= course.courseName;
               course.courseCode= course.courseCode;
-              course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-              course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
+              course.courseType = that.courseTypeSource[course.courseType];
+              course.courseNature= that.courseNatureSource[course.courseNature];
               course.credit=course.credit;
-              course.courseName= course.courseName;
-              course.courseCode= course.courseCode;
-              course.courseType=(course.courseType == '0') ? '学科基础课' : '还未确定';
-              course.courseNature=(course.courseNature == '0') ? '专业任选' : '还未确定';
-              course.credit=course.credit;
+              
+
               // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
               // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-              course.semester=(course.semester == '0') ? '上学期' : '下学期';
+              
               if(course.bcDetails.length){
                 
                 for(let i=0;i<course.bcDetails.length;i++){
@@ -1277,6 +1271,15 @@
                 }
                 
               };
+              if(course.respondentInfos){
+                
+                // let teacherName =[];
+                course.respondentInfos.forEach(function(respondent){
+                  course.respondentName = respondent.respondentName;
+                  // teacherName.push(respondent.respondentName);
+                });
+                // course.respondentName = teacherName;
+            }
               // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
