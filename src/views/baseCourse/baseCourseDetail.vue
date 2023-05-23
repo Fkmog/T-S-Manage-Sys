@@ -1,134 +1,173 @@
 <template>
-<div class="content">
+  <div class="content">
+    <!-- 顶部导航栏 -->
+    <div class="block">
+      <el-row class="block-row">
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="返回"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 50px"
+            @click="backBaseCourse()"
+          >
+            <Back />
+          </el-icon>
+        </el-tooltip>
+        <div class="title">全部课程</div>
+        <el-divider class="divider" direction="vertical" />
+        <div class="title">{{ versionName }}</div>
 
-  <!-- 顶部导航栏 -->
-  <div class="block">
-    <el-row class="block-row">
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="返回"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="24px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 50px"
-          @click="backBaseCourse()"
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="成绩项"
+          placement="bottom"
+          :hide-after="0"
         >
-          <Back />
-        </el-icon>
-      </el-tooltip>
-      <div class="title">全部课程</div>
-      <el-divider class="divider" direction="vertical" />
-      <div class="title">{{ versionName }}</div>
-
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="成绩项"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="22px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toActivities()"
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toActivities()"
+          >
+            <Histogram />
+          </el-icon>
+        </el-tooltip>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="毕业要求指标点"
+          placement="bottom"
+          :hide-after="0"
         >
-          <Histogram />
-        </el-icon>
-      </el-tooltip>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="毕业要求指标点"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="22px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toIndicators()"
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toIndicators()"
+          >
+            <List />
+          </el-icon>
+        </el-tooltip>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="课程目标"
+          placement="bottom"
+          :hide-after="0"
         >
-          <List />
-        </el-icon>
-      </el-tooltip>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="课程目标"
-        placement="bottom"
-        :hide-after="0"
-      >
-        <el-icon
-          class="icon"
-          size="22px"
-          color="rgb(137, 137, 137)"
-          style="margin-left: 20px"
-          @click="toObjectives()"
-        >
-          <Checked />
-        </el-icon>
-      </el-tooltip>
-    </el-row>
-  </div>
-  <div class="body">
-    <!-- <el-tabs class="tabs" type="border-card" v-model="activeName"> -->
-    <!-- <el-tab-pane label="用户管理" name="first"> -->
-    <div class="card">
-      <h3>课程信息</h3>
-      <el-col>
-        <el-col style="margin-top: 15px">
-          <div class="detail-title">课程名</div>
-          <div class="detail-info" style="margin-top: 10px">
-            {{ form.courseName }}
-          </div>
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toObjectives()"
+          >
+            <Checked />
+          </el-icon>
+        </el-tooltip>
+      </el-row>
+    </div>
+    <div class="body">
+      <!-- <el-tabs class="tabs" type="border-card" v-model="activeName"> -->
+      <!-- <el-tab-pane label="用户管理" name="first"> -->
+      <div class="card">
+        <h3>课程信息</h3>
+        <el-col>
+          <el-col style="margin-top: 15px">
+            <div class="detail-title">课程名</div>
+            <div class="detail-info" style="margin-top: 10px">
+              {{ form.courseName }}
+            </div>
+          </el-col>
+          <el-row style="margin-top: 15px">
+            <el-col :span="12" style="margin-top: 10px">
+              <div class="detail-title">课程号</div>
+              <div class="detail-info" style="margin-top: 10px">
+                {{ form.courseCode }}
+              </div>
+            </el-col>
+            <el-col :span="6" style="margin-top: 10px">
+              <div class="detail-title">学分</div>
+              <div class="detail-info" style="margin-top: 10px">
+                {{ form.credit }}
+              </div>
+            </el-col>
+          </el-row>
+          <el-row style="margin-top: 15px">
+            <el-col :span="12" style="margin-top: 10px">
+              <div class="detail-title">课程类型</div>
+              <div class="detail-info" style="margin-top: 10px">
+                {{ form.courseNature }}
+              </div>
+            </el-col>
+            <el-col :span="6" style="margin-top: 10px">
+              <div class="detail-title">选课类型</div>
+              <div class="detail-info" style="margin-top: 10px">
+                {{ form.courseType }}
+              </div>
+            </el-col>
+          </el-row>
+          <el-col style="margin-top: 25px">
+            <div class="detail-title">备注</div>
+            <div class="detail-info" style="margin-top: 10px">
+              {{ form.remark }}
+            </div>
+          </el-col>
+          <el-col style="margin-top: 45px">
+            <el-row>
+              <el-col class="detail-title">课程大纲</el-col>
+              <el-col :span="6"  v-show="!hasFile">
+                <el-upload
+                  class="upload-demo"
+                  :action="action"
+                  :headers="headers"
+                  accept=".doc,.docx,.pdf,.rar,.zip"
+                  :file-list="fileList"
+                  :limit="1"
+                  show-file-list
+                  name="syllabusFile"
+                  :on-success="uploadSuccess"
+                  :on-exceed="uploadExceed"
+                  :before-remove="uploadBeforeRemove"
+                  :on-remove="uploadRemove"
+                >
+                  <el-button size="small" type="primary"
+                    >上传课程大纲</el-button
+                  >
+                </el-upload>
+              </el-col>
+              <el-col
+                :span="6"
+                v-show="hasFile"
+                class="fileName"
+                @click="beforeRemove"
+              >
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="点击移除"
+                  placement="bottom"
+                  :hide-after="0"
+                >
+                  {{ object.fileName }}
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </el-col>
         </el-col>
-        <el-row style="margin-top: 15px">
-          <el-col :span="12" style="margin-top: 10px">
-            <div class="detail-title">课程号</div>
-            <div class="detail-info" style="margin-top: 10px">
-              {{ form.courseCode }}
-            </div>
-          </el-col>
-          <el-col :span="6" style="margin-top: 10px">
-            <div class="detail-title">学分</div>
-            <div class="detail-info" style="margin-top: 10px">
-              {{ form.credit }}
-            </div>
-          </el-col>
-        </el-row>
-        <el-row style="margin-top: 15px">
-          <el-col :span="12" style="margin-top: 10px">
-            <div class="detail-title">课程类型</div>
-            <div class="detail-info" style="margin-top: 10px">
-              {{ form.courseNature }}
-            </div>
-          </el-col>
-          <el-col :span="6" style="margin-top: 10px">
-            <div class="detail-title">选课类型</div>
-            <div class="detail-info" style="margin-top: 10px">
-              {{ form.courseType }}
-            </div>
-          </el-col>
-        </el-row>
-        <el-col style="margin-top: 25px">
-          <div class="detail-title">备注</div>
-          <div class="detail-info" style="margin-top: 10px">
-            {{ form.remark }}
-          </div>
-        </el-col>
-      </el-col>
+      </div>
     </div>
   </div>
-</div>
-
 </template>
 
 <script>
@@ -137,7 +176,8 @@ import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElTooltip, ElMessage, ElMessageBox } from "element-plus";
 import { Back, Histogram, List, Checked } from "@element-plus/icons-vue";
-import { getMajorsProgram} from "@/api/basecourse";
+import Cookies from "js-cookie";
+import { getObjectives, downloadDetail, removeDetail } from "@/api/basecourse";
 
 export default {
   name: "baseCourseDetail",
@@ -155,6 +195,12 @@ export default {
   },
   data() {
     return {
+      //上传文件
+      fileList: [],
+      headers: {
+        Authorization: "Bearer " + Cookies.get("Admin-Token"),
+      },
+      action: "",
       //毕业要求
       indicators: [],
 
@@ -165,6 +211,8 @@ export default {
       currentMajorId: "",
       //详细信息
       detailId: "",
+      object: [],
+      hasFile: false,
       courseId: "",
       //版本信息
       versionName: "",
@@ -209,19 +257,19 @@ export default {
           console.log(res);
           if (res.code == "SUCCESS") {
             ElMessage({
-                  type: "success",
-                  message: `新增成功`,
-                  duration:1000,
-                });
+              type: "success",
+              message: `新增成功`,
+              duration: 1000,
+            });
             //成功后根据vesionId和basecouseId获取详细信息
             that.isVisiable = true;
             that.getDetail();
           } else {
             ElMessage({
-                  type: "error",
-                  message: `新增失败`,
-                  duration:1000,
-                });
+              type: "error",
+              message: `新增失败`,
+              duration: 1000,
+            });
             //失败后退回basecouse页面
             that.goBaseCourse();
           }
@@ -253,69 +301,13 @@ export default {
           }
         });
         console.log("detailId", that.detailId);
+        that.action =
+          "http://81.68.103.96:8080/detail/upload/syllabusFile/" +
+          that.detailId;
         that.$store.commit("course/setDetailId", that.detailId);
-        // that.getMajorId();
+        that.getFile();
       });
-    }, 
-    // //根据detailID获取majorId，bcdmId 第二步
-    // getMajorId() {
-    //   let that = this;
-    //   let majorList = [];
-    //   let majorNumber = 0;
-    //  getMajorsProgram(this.detailId,this.departmentId,this.schoolId).then(function (res) {
-    //     console.log("getMajorId:", res);
-    //     if (res.rows) {
-    //       res.rows.forEach(function (detail) {
-    //         majorList.push(detail.majorId);
-    //         majorNumber++;
-    //       });
-    //     } else {
-    //       majorList.push(res.data.majorId);
-    //       majorNumber = 1;
-    //     }
-    //     that.majorId = majorList;
-    //     that.majorNumber = majorNumber;
-    //     that.showMajor();
-    //   });
-    // },
-    //根据majorId显示major,没有考虑其他学校中majorId会重复的问题，默认Id唯一 第三步
-    // showMajor() {
-    //   let majorList = [];
-    //   let index = 0;
-    //   console.log("index Type:", typeof index.toString());
-    //   if(!this.majorList){
-    //     console.log('majorList is null ');
-    //     this.majorForm = [];
-    //   }
-    //   else{
-    //     if (this.majorNumber > 1) {
-    //     this.majorId.forEach(function (major) {
-    //       console.log("each majoId:", major);
-    //       return request({
-    //         url: "/major/" + major,
-    //         method: "get",
-    //       }).then(function (major) {
-    //         console.log("Each Major Detail:", major);
-    //         major.data.index = index.toString();
-    //         majorList.push(major.data);
-    //         index++;
-    //       });
-    //     });
-    //   } else {
-    //     return request({
-    //       url: "/major/" + this.majorId[0],
-    //       method: "get",
-    //     }).then(function (major) {
-    //       console.log("Each Major Detail:", major);
-    //       major.data.index = index.toString();
-    //       majorList.push(major.data);
-    //     });
-    //   }
-    //   console.log("majorList", majorList);
-    //   this.majorForm = majorList;
-    //   }
-      
-    // },
+    },
     //路由跳转
     backBaseCourse() {
       this.$router.push("/baseCourse");
@@ -344,6 +336,89 @@ export default {
       this.form.remark = this.$store.state.course.baseCourseRemark;
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
+    },
+    //上传成功
+    uploadSuccess(response, file, fileList) {
+      console.log("response", response, file, "file", fileList, "fileList");
+      if (response.code == "SUCCESS") {
+        ElMessage({
+          type: "success",
+          message: `上传成功`,
+          duration: 1500,
+        });
+        this.getFile();
+      }
+    },
+    uploadExceed() {
+      ElMessage({
+        type: "warning",
+        message: `最多上传一个文件`,
+        duration: 1500,
+      });
+    },
+    uploadBeforeRemove(file,fileList) {
+      console.log("fileList",fileList);
+
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    beforeRemove() {
+      console.log("fileList",this.fileList);
+      ElMessageBox.confirm(`确定移除${this.object.fileName}？`, "注意", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.fileList=[]
+          this.uploadRemove();
+        })
+        .catch(() => {});
+    },
+    uploadRemove(file,fileList) {
+      console.log("fileList",fileList);
+      removeDetail(this.detailId).then((res) => {
+        console.log("removeDetail", res);
+        if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `移除成功`,
+            duration: 1500,
+          });
+          this.getFile();
+
+        }
+      });
+    },
+    //查看有无文件
+    getFile() {
+      getObjectives(this.detailId).then((res) => {
+        console.log("getObjectives", res);
+        this.object = res.data;
+        if (
+          !(res.data.syllabusFileId === null || res.data.syllabusFileId === 0)
+        ) {
+          this.hasFile = true;
+        } else {
+          this.hasFile = false;
+        }
+      });
+    },
+    //下载文件
+    downloadFile() {
+      downloadDetail(this.detailId).then((res) => {
+        // console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        // console.log("blob",blob);
+        // saveAs(blob, this.objectInfo.fileName)
+        const link = document.createElement("a");
+        link.download = decodeURI(this.object.fileName);
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      });
     },
   },
 };
@@ -400,5 +475,17 @@ export default {
 }
 .detail-info {
   margin-top: 5px;
+}
+.upload-demo {
+  margin-top: 15px;
+}
+.fileName {
+  color: #616981;
+  font-size: 14px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.fileName :hover {
+  color: #2857e4;
 }
 </style>

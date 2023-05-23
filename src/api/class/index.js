@@ -61,3 +61,10 @@ export function deleteClass(classId) {
     method: 'DELETE',
   })
 }
+//查询教学班信息
+export function getClassInfo(classId) {
+  return request({
+    url: '/classes/'+classId,
+    method: 'GET',
+  })
+}

@@ -158,8 +158,10 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="4" class="object-name">{{ dialogObject.name }}</el-col>
-          <el-col :span="19" class="object-desc">{{
+          <el-col :span="3" class="object-name">课程目标{{ dialogObject.serialNum }}：
+          </el-col>
+          <el-col :span="3" class="object-name">{{ dialogObject.name }}</el-col>
+          <el-col :span="18" class="object-desc">{{
             dialogObject.description
           }}</el-col>
         </el-row>
@@ -195,7 +197,6 @@
               </el-col>
             </el-row>
           </el-col>
-
           <el-col :span="4">
             <el-input
               placeholder="考核方式"

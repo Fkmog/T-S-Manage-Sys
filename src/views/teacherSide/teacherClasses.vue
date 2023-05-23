@@ -42,24 +42,6 @@ export default {
   mounted() {
     this.getClassesList();
   },
-
-  //   computed: {
-  //     currentChange() {
-  //       return this.$store.state.currentInfo;
-  //     },
-  //   },
-
-  //   watch: {
-  //     // 监视currentInfo
-  //     currentChange: {
-  //       deep: true,
-  //       handler(value) {
-  //         this.currentDepartmentId = this.$store.state.currentInfo.departmentId;
-  //         this.getMajorList(this.currentDepartmentId);
-  //       },
-  //     },
-  //   },
-
   methods: {
     //获取课程列表
     getClassesList() {

@@ -102,7 +102,13 @@ service.interceptors.response.use(
     // console.log("http res",res);
     // 未设置状态码则默认成功状态
     // const code = res.data.code || 200;
-    console.log("res", res);
+    // console.log("res", res);
+    if (
+      res.headers["content-type"] === "application/octet-stream"
+    ) {
+      // console.log("res.data", res.data);
+      return res.data;
+    }
     const code = res.status || 200;
     // console.log("code",code);
     // 获取错误信息

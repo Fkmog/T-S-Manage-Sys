@@ -339,15 +339,6 @@
       :selectable="canSelect"
       :reserve-selection="true"
     >
-      <!-- <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="选择所有相同课程号的教学班"
-          placement="bottom"
-          :hide-after="0"
-        >
-        <span> 选择所有相同课程号的教学班</span>
-        </el-tooltip> -->
     </el-table-column>
     <el-table-column prop="className" label="课程名" width="210" />
     <el-table-column prop="allTeacherName" label="任课教师" width="200" />
@@ -373,7 +364,7 @@
 
     <el-table-column width="150">
       <template #default="scope">
-        <el-row>
+        <el-row v-show="canAction">
           <el-col :span="8">
             <el-tooltip content="修改" :hide-after="0">
               <el-button
@@ -446,6 +437,7 @@ export default {
     return {
       hasClass: false,
       noClass: false,
+      canAction:true,
       isRespondent: "0",
       showLoadmore: true,
       isAssign: false,
@@ -880,11 +872,15 @@ export default {
       // console.log(this.multipleSelection);
       if (this.multipleSelection.length > 0) {
         this.selectedCourseId = this.multipleSelection[0].courseId;
+        this.canAction=false
+
         // console.log("this.selectedCourseId", this.selectedCourseId);
         this.canSelectAll = false;
       } else {
         this.selectedCourseId = "";
         this.canSelectAll = true;
+        this.canAction=true
+
       }
     },
     //disable控制
@@ -912,7 +908,7 @@ export default {
         this.currentInfo.departmentId,
         this.currentInfo.schoolId
       ).then((res) => {
-        // console.log("getDetailList", res);
+        console.log("getDetailList", res);
         this.detailList = res.rows;
         this.detailList.forEach((item) => {
           item.versionInfo = item.courseName + "-" + item.versionName;
