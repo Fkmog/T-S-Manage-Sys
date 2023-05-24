@@ -158,7 +158,8 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="3" class="object-name">课程目标{{ dialogObject.serialNum }}：
+          <el-col :span="3" class="object-name"
+            >课程目标{{ dialogObject.serialNum }}：
           </el-col>
           <el-col :span="3" class="object-name">{{ dialogObject.name }}</el-col>
           <el-col :span="18" class="object-desc">{{
@@ -506,33 +507,16 @@ export default {
               assessmentMethod.activities.item.map((item) => ({ value: item }));
           }
           let array = assessmentMethod.activities.itemObject;
-          // console.log("arrat", array, array[0]);
+          console.log("arrat", array);
           if (array.length === 1) {
-            let index = this.allActivities.item.indexOf(array[0].value);
-            // console.log("index", index);
+            let index = this.allActivities.item.indexOf(array[0]);
             if (index > -1) {
-                if (
-                  !(assessmentMethod.activities.item.length == array.length)
-                ) {
-                  assessmentMethod.activities.item.push(
-                    this.allActivities.item[index]
-                  );
-                }
-              if (
-                assessmentMethod.activities.value === null ||
-                !assessmentMethod.activities.hasOwnProperty("value")
-              ) {
-                assessmentMethod.activities.value = [];
-              }
+              assessmentMethod.activities.item.push(
+                this.allActivities.item[index]
+              );
               assessmentMethod.activities.value.push(
                 this.allActivities.value[index]
               );
-              if (
-                assessmentMethod.activities.remark === null ||
-                !assessmentMethod.activities.hasOwnProperty("remark")
-              ) {
-                assessmentMethod.activities.remark = [];
-              }
               assessmentMethod.activities.remark.push(
                 this.allActivities.remark[index]
               );
@@ -540,32 +524,14 @@ export default {
           }
           if (array.length > 1) {
             array.forEach((singleActivity) => {
-              let index = this.allActivities.item.indexOf(singleActivity.value);
-              // console.log("多于1项的时候，",singleActivity,"index",index);
+              let index = this.allActivities.item.indexOf(singleActivity);
               if (index > -1) {
-                console.log("zheli执行了几次", array);
-                if (
-                  !(assessmentMethod.activities.item.length == array.length)
-                ) {
-                  assessmentMethod.activities.item.push(
-                    this.allActivities.item[index]
-                  );
-                }
-                if (
-                  assessmentMethod.activities.value === null ||
-                  !assessmentMethod.activities.hasOwnProperty("value")
-                ) {
-                  assessmentMethod.activities.value = [];
-                }
+                assessmentMethod.activities.item.push(
+                  this.allActivities.item[index]
+                );
                 assessmentMethod.activities.value.push(
                   this.allActivities.value[index]
                 );
-                if (
-                  assessmentMethod.activities.remark === null ||
-                  !assessmentMethod.activities.hasOwnProperty("remark")
-                ) {
-                  assessmentMethod.activities.remark = [];
-                }
                 assessmentMethod.activities.remark.push(
                   this.allActivities.remark[index]
                 );
@@ -585,6 +551,7 @@ export default {
         );
       }
     },
+
     //新增课程目标
     addObject() {
       let newObject = {};

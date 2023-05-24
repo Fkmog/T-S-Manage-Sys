@@ -57,7 +57,13 @@
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
-              {{ objective.achievement }}%
+              {{ objective.achievementTwo }}%
+            </el-col>
+            <el-col
+              :span="2"
+              class="objective-achieve"
+              v-show="!objective.hasAchieve"
+            >
             </el-col>
             <el-col :span="16">
               <div class="objective-name">
@@ -172,6 +178,7 @@ export default {
                 object.serialNum = object.id;
               }
               if (object.hasOwnProperty("achievement")) {
+                object.achievementTwo=object.achievement.toFixed()
                 object.hasAchieve = true;
               } else {
                 object.hasAchieve = false;

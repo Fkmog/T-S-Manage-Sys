@@ -71,7 +71,7 @@ export function getClassInfo(classId) {
 //关联课程库课程
 export function associateCourses(array) {
   return request({
-    url: '/classes/associateCourse',
+    url: '/dev-api/classes/associateCourse',
     method: 'POST',
     data:array,
   })
