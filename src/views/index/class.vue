@@ -330,7 +330,7 @@
     class="classesTable"
     :data="classTable"
     @selection-change="handleSelectionChange"
-    style="width: 1720px"
+    style="width: 1400px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
@@ -354,16 +354,15 @@
       :reserve-selection="true"
     >
     </el-table-column>
-    <el-table-column prop="className" label="课程名" width="210" />
-    <el-table-column prop="allTeacherName" label="任课教师" width="200" />
-    <el-table-column prop="courseCode" label="课程号" width="170">
+    <el-table-column prop="className" label="课程名" width="200" />
+    <el-table-column prop="allTeacherName" label="任课教师" width="150" />
+    <el-table-column prop="courseCode" label="课程号" width="150">
     </el-table-column>
-    <el-table-column prop="versionName" label="大纲版本" width="160" />
-    <el-table-column prop="identifier" label="开课号" width="270" />
-    <el-table-column prop="academicYear" label="学年" width="150" />
-    <el-table-column prop="semester" label="学期" width="150" />
-    <el-table-column prop="remark" label="备注" width="150" />
-    <el-table-column prop="isRespondent" label="" width="60">
+    <el-table-column prop="versionName" label="大纲版本" width="120" />
+    <el-table-column prop="identifier" label="开课号" width="260" />
+    <el-table-column prop="academicYear" label="学年" width="140" />
+    <el-table-column prop="semester" label="学期" width="120" />
+    <el-table-column prop="isRespondent" label="" width="50">
       <template #default="scope">
         <div v-if="scope.row.isRespondent == 2">
           <el-tooltip content="允许任课教师修改考核方式" :hide-after="0">
