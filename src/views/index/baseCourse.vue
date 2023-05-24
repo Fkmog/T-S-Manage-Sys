@@ -302,7 +302,7 @@
                 </el-col>
                 <el-col :span="12" v-show="!scope.row.versionId">
                   <el-tooltip content="添加课程大纲" >
-                    <el-tag   type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
+                    <el-tag  class="noBaseCourseDetail" type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-tag>
                   </el-tooltip>
                 </el-col>
             </el-row>
