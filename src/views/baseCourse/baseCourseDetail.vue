@@ -126,7 +126,7 @@
           <el-col style="margin-top: 45px">
             <el-row>
               <el-col class="detail-title">课程大纲</el-col>
-              <el-col :span="6"  v-show="!hasFile">
+              <el-col :span="6" v-show="!hasFile">
                 <el-upload
                   class="upload-demo"
                   :action="action"
@@ -140,27 +140,37 @@
                   :on-exceed="uploadExceed"
                   :before-remove="uploadBeforeRemove"
                   :on-remove="uploadRemove"
+                  :before-upload="beforeUpload"
                 >
                   <el-button size="small" type="primary"
                     >上传课程大纲</el-button
                   >
                 </el-upload>
               </el-col>
-              <el-col
-                :span="6"
-                v-show="hasFile"
-                class="fileName"
-                @click="beforeRemove"
-              >
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="点击移除"
-                  placement="bottom"
-                  :hide-after="0"
-                >
-                  {{ object.fileName }}
-                </el-tooltip>
+              <el-col :span="6" v-show="hasFile" class="fileName">
+                <el-row>
+                  <el-col :span="20" @click="downloadFile">
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
+                      content="点击下载"
+                      placement="bottom"
+                      :hide-after="0"
+                    >
+                      {{ object.fileName }}
+                    </el-tooltip>
+                  </el-col>
+                  <el-col :span="4" @click="beforeRemove" class="fileCloseIcon">
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
+                      content="点击移除"
+                      placement="bottom"
+                      :hide-after="0"
+                    >
+                      <el-icon><CircleClose /></el-icon> </el-tooltip
+                  ></el-col>
+                </el-row>
               </el-col>
             </el-row>
           </el-col>
@@ -175,7 +185,13 @@ import request from "@/utils/request/request";
 import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElTooltip, ElMessage, ElMessageBox } from "element-plus";
-import { Back, Histogram, List, Checked } from "@element-plus/icons-vue";
+import {
+  Back,
+  Histogram,
+  List,
+  Checked,
+  CircleClose,
+} from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import { getObjectives, downloadDetail, removeDetail } from "@/api/basecourse";
 
@@ -192,6 +208,7 @@ export default {
     Histogram,
     List,
     Checked,
+    CircleClose,
   },
   data() {
     return {
@@ -349,6 +366,7 @@ export default {
         this.getFile();
       }
     },
+    //文件上传数量限制
     uploadExceed() {
       ElMessage({
         type: "warning",
@@ -356,26 +374,29 @@ export default {
         duration: 1500,
       });
     },
-    uploadBeforeRemove(file,fileList) {
-      console.log("fileList",fileList);
+    //移除文件钩子前
+    uploadBeforeRemove(file, fileList) {
+      console.log("fileList", fileList);
 
       return this.$confirm(`确定移除 ${file.name}？`);
     },
+    //移除文件前
     beforeRemove() {
-      console.log("fileList",this.fileList);
+      console.log("fileList", this.fileList);
       ElMessageBox.confirm(`确定移除${this.object.fileName}？`, "注意", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          this.fileList=[]
+          this.fileList = [];
           this.uploadRemove();
         })
         .catch(() => {});
     },
-    uploadRemove(file,fileList) {
-      console.log("fileList",fileList);
+    //移除文件
+    uploadRemove(file, fileList) {
+      console.log("fileList", fileList);
       removeDetail(this.detailId).then((res) => {
         console.log("removeDetail", res);
         if (res.code === "SUCCESS") {
@@ -385,9 +406,18 @@ export default {
             duration: 1500,
           });
           this.getFile();
-
         }
       });
+    },
+    //文件上传钩子前
+    beforeUpload(file) {
+      if (file.size === 0) {
+        return ElMessage({
+          type: "warning",
+          message: `文件不能为空`,
+          duration: 1500,
+        });
+      }
     },
     //查看有无文件
     getFile() {
@@ -485,7 +515,11 @@ export default {
   margin-top: 10px;
   cursor: pointer;
 }
-.fileName :hover {
-  color: #2857e4;
+
+.fileCloseIcon {
+  opacity: 0;
+}
+.fileName:hover .fileCloseIcon {
+  opacity: 1;
 }
 </style>
