@@ -40,7 +40,6 @@
             >
               <el-icon
                 class="edit-pen"
-                style="margin-top: -13px"
                 @click="goEdit()"
                 ><EditPen
               /></el-icon>
@@ -102,10 +101,10 @@
           <div style="height: 30px"></div>
         </div>
       </div>
-      <div v-show="!hasDetailId" class="card">
+      <div v-show="!hasDetailId" >
         <div class="no-info">暂未设置课程大纲版本</div>
       </div>
-      <div v-show="hasDetailId && !hasObjective" class="card">
+      <div v-show="hasDetailId && !hasObjective">
         <el-row class="no-info">
           <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
           <el-col class="go-edit" @click="goEdit()" v-show="isRespondent"
@@ -150,8 +149,11 @@ export default {
     // console.log("classInfo", this.classInfo);
     if (this.classInfo.detailId === null) {
       this.hasDetailId = false;
+      console.log("this.hasDetailId",this.hasDetailId);
     } else {
       this.hasDetailId = true;
+      console.log("this.hasDetailId",this.hasDetailId);
+
       // this.checkObjectives();
       this.checkClassInfo();
     }
@@ -236,15 +238,12 @@ export default {
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
 }
 .no-info {
+  padding-top: 120px;
+
   display: flex;
   justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 70px;
-  text-align: center;
-  border-radius: 6px;
-  border: 1px dashed #bdbdbd;
-  margin: 16px auto;
+  font-size: 22px;
+  background-color: #f2f2f2;
 }
 .objective-num {
   font-size: 1.6em;
@@ -276,6 +275,7 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
+
 }
 .go-edit {
   cursor: pointer;

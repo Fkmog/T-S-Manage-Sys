@@ -2,7 +2,7 @@
   <!-- 顶部搜索栏 -->
   <HeaderSearch msg="搜索课程名称" @SearchValue="getSearchValue">
     <template #rightTime>
-      <div class="rightSlot">
+      <div class="rightSlot" v-show="!showAdd">
         <div class="selects">
           <el-select
             v-model="chosenYear"
@@ -32,8 +32,23 @@
           </el-select>
         </div>
       </div>
+       <div class="assignBtn" v-show="showAdd">
+        <el-dropdown style="margin-top: 10px; cursor: pointer">
+          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="assignDetail()">
+                设置课程大纲
+              </el-dropdown-item>
+              <el-dropdown-item @click="associateCourse()">
+                关联课程库课程
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </template>
-    <template #assignBtn>
+    <!-- <template #assignBtn>
       <div class="assignBtn" v-show="showAdd">
         <el-dropdown style="margin-top: 10px; cursor: pointer">
           <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
@@ -48,12 +63,8 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-
-        <!-- <el-button style="color: #6573c0" text @click="assignDetail()">
-          设置课程大纲
-        </el-button> -->
       </div>
-    </template>
+    </template> -->
   </HeaderSearch>
   <!-- 添加教学班按钮 -->
   <addBtn
@@ -359,7 +370,7 @@
     <el-table-column prop="courseCode" label="课程号" width="150">
     </el-table-column>
     <el-table-column prop="versionName" label="大纲版本" width="120" />
-    <el-table-column prop="identifier" label="开课号" width="260" />
+    <el-table-column prop="identifier" label="开课号" width="270" />
     <el-table-column prop="academicYear" label="学年" width="140" />
     <el-table-column prop="semester" label="学期" width="120" />
     <el-table-column prop="isRespondent" label="" width="50">
@@ -1056,14 +1067,15 @@ export default {
             message: "关联成功",
             duration: 1500,
           });
-          // this.multipleSelection.forEach((item)=>{
-          //   item.courseIsDeleted="0"
-          // })
+          this.multipleSelection.forEach((item)=>{
+            item.courseIsDeleted="0"
+          })
+          // this.getClassList()
         }
       })
      .catch((e)=>{
       console.log("e",e);
-       if(e.code==="NOT_FIND"){
+       if(e.code==="CODE_NOT_EXIST"){
           ElMessage({
             type: "error",
             message: "请先添加课程库课程",
@@ -1117,9 +1129,9 @@ export default {
 }
 .assignBtn {
   position: absolute;
-  right: 20%;
+  right: 10%;
   width: 300px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 .selects {
   display: flex;
