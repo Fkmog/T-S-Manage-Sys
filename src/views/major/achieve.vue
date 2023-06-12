@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <!-- 头部栏 -->
-    <!-- <div class="Block"></div>
+    <div class="Block"></div>
     <div v-show="hasProgram" class="body-check">
       <div class="card">
         <div class="noAttribute" v-if="!hasAttribute">
@@ -10,7 +10,7 @@
         <div v-if="hasAttribute">
           <div
             class="graduate-attribute"
-            v-for="attribute in requirements"
+            v-for="(attribute, index1) in requirements"
             :key="attribute.id"
           >
             <div class="attribute">
@@ -31,7 +31,10 @@
                 </div>
               </div>
             </div>
-            <div v-for="detail in attribute.programIndicators" :key="detail.id">
+            <div
+              v-for="(detail, index2) in attribute.programIndicators"
+              :key="detail.id"
+            >
               <div class="attribute-detail">
                 <div class="detail-num">
                   {{ detail.serialNum }}
@@ -53,23 +56,35 @@
                     >
                       <el-icon
                         class="pen-icon"
-                        @click="editSupportCourse(detail)"
+                        @click="
+                          editSupportCourse(attribute, detail, index1, index2)
+                        "
                         ><EditPen
                       /></el-icon>
                     </el-tooltip>
                   </div>
                 </div>
                 <div class="methods" style="margin: 20px 0 20px 100px">
-                  <el-row class="method-detail">
-                    <el-col :span="6" class="method-weight"
-                      >(&nbsp; weight %&nbsp;)</el-col
+                  <el-row
+                    v-for="coreBaseCourse in detail.coreBaseCourses"
+                    :key="coreBaseCourse.id"
+                  >
+                    <el-col :span="8" class="method-weight"
+                      >{{ coreBaseCourse.courseName }}
+                    </el-col>
+                       <el-tooltip
+                      effect="dark"
+                      content="权重"
+                      placement="bottom"
+                      :hide-after="0"
                     >
                     <el-col
-                      :span="10"
+                      :span="5"
                       class="method-desc"
                       style="margin-left: 80px"
-                      >123</el-col
+                      >（ {{ coreBaseCourse.weight }}% ）</el-col
                     >
+                       </el-tooltip>
                   </el-row>
                 </div>
               </div>
@@ -79,65 +94,81 @@
       </div>
     </div>
     <div v-show="noProgram" class="no-program">
-      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          margin-top: 100px;
+          font-size: 22px;
+        "
+      >
         未创建培养方案
       </div>
-      <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          color: grey;
+          font-size: 13px;
+          margin-top: 30px;
+        "
+      >
         请先创建培养方案
       </div>
-    </div> -->
-    <!-- 弹出对话框 -->
+    </div>
+    <!-- 弹出对话框-->
     <div>
       <el-dialog
         v-model="dialogFormVisible"
         title="设置支撑课程"
-        width="680px"
+        width="640px"
         :show-close="false"
         :align-center="true"
       >
-        <el-col
-          class="requirement"
-          v-for="requirement in requirements"
-          :key="requirement.id"
-          style="margin-bottom:30px"
-        >
-          <el-row style="margin-bottom: 20px">
-            <el-col :span="4" class="requirement-name"
-              >毕业要求{{ requirement.serialNum }}：{{
-                requirement.name
-              }}</el-col
-            >
-            <el-col :span="19" class="requirement-desc">{{
-              requirement.description
-            }}</el-col>
-          </el-row>
-          <el-col
-            class="indicator"
-            v-for="indicator in requirement.programIndicators"
-            :key="indicator.id"
+        <el-row style="margin-bottom: 10px">
+          <el-col :span="7" style="font-weight: bold; font-size: 16px">
+            毕业要求{{ dialogDetail.serialNum }}：{{ dialogDetail.name }}
+          </el-col>
+          <el-col :span="17" style="font-size: 16px">
+            {{ dialogDetail.description }}
+          </el-col>
+        </el-row>
+        <el-row style="margin-bottom: 20px">
+          <el-col :span="6" style="font-weight: bold; font-size: 16px"
+            >指标点{{ dialogDetail.programIndicators[0].serialNum }}：{{
+              dialogDetail.programIndicators[0].name
+            }}</el-col
           >
-            <el-row>
-              <el-col :span="4" class="indicator-name"
-                >毕业要求{{ indicator.serialNum }}：{{ indicator.name }}</el-col
-              >
-              <el-col :span="19" class="indicator-desc">{{
-                indicator.description
-              }}</el-col>
-              <el-col
-                class="coreBasecourse"
-                v-for="coreBasecourse in indicator.coreBaseCourses"
-                :key="coreBasecourse.id"
-                style="margin-top: 30px"
-              >
+          <el-col :span="17">{{
+            dialogDetail.programIndicators.description
+          }}</el-col>
+        </el-row>
+        <el-col
+          v-for="programIndicator in dialogDetail.programIndicators"
+          :key="programIndicator.id"
+        >
+          <el-row>
+            <el-col
+              class="coreBaseCourse"
+              v-for="(
+                coreBaseCourse, index
+              ) in programIndicator.coreBaseCourses"
+              :key="coreBaseCourse.id"
+              style="margin-top: 20px"
+            >
+              <el-row>
+                <el-col :span="1"></el-col>
                 <el-col
                   :span="4"
-                  v-show="!coreBasecourse.isEditWeight"
+                  v-show="!coreBaseCourse.isEditWeight"
                   class="showWeight"
                 >
                   <el-row>
-                    <el-col :span="10">{{ coreBasecourse.weight }}% </el-col>
+                    <el-col :span="12">{{ coreBaseCourse.weight }}% </el-col>
                     <el-col :span="12">
-                      <el-icon @click="editWeight(coreBasecourse)"
+                      <el-icon
+                        class="edit-icon"
+                        @click="editWeight(coreBaseCourse)"
                         ><Edit
                       /></el-icon>
                     </el-col>
@@ -145,45 +176,79 @@
                 </el-col>
                 <el-col
                   :span="4"
-                  v-show="coreBasecourse.isEditWeight"
+                  v-show="coreBaseCourse.isEditWeight"
                   class="editWeight"
                 >
                   <el-row>
                     <el-col :span="12">
-                      <el-input v-model="coreBasecourse.weight"></el-input>
+                      <el-input v-model="coreBaseCourse.weight"></el-input>
                     </el-col>
                     <el-col :span="12">
-                      <el-icon @click="saveWeight(coreBasecourse)"
+                      <el-icon
+                        class="edit-icon"
+                        @click="saveWeight(coreBaseCourse)"
                         ><DocumentChecked
                       /></el-icon>
                     </el-col>
                   </el-row>
                 </el-col>
-              </el-col>
-            </el-row>
-
-            <el-button
-              class="add-support-button"
-              style="color: #6573c0; margin-top: 30px"
-              text
-              @click="addCoreBaseCourse()"
-            >
-              <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
-              新增支撑课程
-            </el-button>
-            <template #footer>
-              <span class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button
-                  type="primary"
-                  @click="confirmAddSupport(dialogIndicator)"
-                >
-                  确定
-                </el-button>
-              </span>
-            </template>
-          </el-col>
+                <el-col :span="16" style="font-size: 16px">{{
+                  coreBaseCourse.courseName
+                }}</el-col>
+                <el-col :span="3">
+                  <el-icon
+                    class="close-icon"
+                    @click="deleteCourse(programIndicator, index)"
+                    ><Close
+                  /></el-icon>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
         </el-col>
+
+        <el-button
+          v-show="!newCoreCourse"
+          class="add-support-button"
+          style="color: #6573c0; margin-top: 30px"
+          text
+          @click="this.newCoreCourse = true"
+        >
+          <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
+          新增支撑课程
+        </el-button>
+        <div style="display: flex; flex-direction: row" v-show="newCoreCourse">
+          <el-autocomplete
+            popper-class="el-autocomplete-suggestion"
+            :popper-append-to-body="false"
+            v-model="searchValue"
+            :fetch-suggestions="querySearch"
+            placeholder="选择课程（筛选可输入文字）"
+            style="width: 680px; margin-left: 20px; margin-top: 30px"
+            :fit-input-width="true"
+            @select="addCoreBaseCourse(searchValue, index1, index2)"
+          ></el-autocomplete>
+          <div style="margin-top: 35px">
+            <el-icon
+              class="autocomplete-icon"
+              @click="this.newCoreCourse = false"
+              ><Close
+            /></el-icon>
+          </div>
+        </div>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="cancelAddCoreBaseCourse(dialogDetail)"
+              >取消</el-button
+            >
+            <el-button
+              type="primary"
+              @click="confirmAddCoreBaseCourse(dialogDetail)"
+            >
+              确定
+            </el-button>
+          </span>
+        </template>
       </el-dialog>
     </div>
   </div>
@@ -198,7 +263,13 @@ import {
   Close,
   Edit,
 } from "@element-plus/icons-vue";
-import { checkProgram, addProgram } from "@/api/program";
+import { ElMessageBox, ElMessage } from "element-plus";
+
+import {
+  checkProgram,
+  checkCoreBaseCourseList,
+  editProgram,
+} from "@/api/program";
 import addBtn from "@/components/general/addBtn.vue";
 export default {
   name: "Achieve",
@@ -214,7 +285,7 @@ export default {
   data() {
     return {
       hasProgram: false,
-      noProgram:false,
+      noProgram: false,
       hasAttribute: Boolean,
       currentMajorId: Number,
       currentMajorName: "",
@@ -227,8 +298,17 @@ export default {
         major: "",
         enrollyear: "",
       },
+      totalInfo: [],
       requirements: [],
       programId: "",
+      dialogDetail: [],
+      index1: Number,
+      index2: Number,
+      newCoreCourse: false,
+      searchValue: "",
+      allCoreBaseCourse: [],
+      programIndicatorId: "",
+      temp: [],
     };
   },
   mounted() {
@@ -265,10 +345,23 @@ export default {
       });
     },
     //编辑支撑课程
-    editSupportCourse(detail) {
-      console.log("1");
-
+    editSupportCourse(attribute, detail, index1, index2) {
       this.dialogFormVisible = true;
+      this.index1 = index1;
+      this.index2 = index2;
+      console.log('attribute',attribute);
+      this.dialogDetail = JSON.parse(JSON.stringify(attribute));
+      let temporary = this.dialogDetail.programIndicators[index2];
+      this.dialogDetail.programIndicators = [];
+      this.dialogDetail.programIndicators.push(temporary);
+      this.programIndicatorId = this.dialogDetail.programIndicators[0].id;
+      if (this.dialogDetail.programIndicators[0].coreBaseCourses === null) {
+        this.dialogDetail.programIndicators[0].coreBaseCourses = [];
+      }
+      this.getCoreBaseCourseList();
+      console.log("dialogDetail", this.dialogDetail);
+      this.temp = JSON.parse(JSON.stringify(this.dialogDetail.programIndicators[index2]));
+      console.log("temp",this.temp);
     },
     //查询有无培养计划
     checkProgram() {
@@ -277,20 +370,30 @@ export default {
         this.$store.state.currentInfo.year
       ).then((res) => {
         // console.log("checkProgram", res);
-        if (res.msg == "未查到" && res.code == 'SUCCESS') {
+        if (res.msg == "未查到" && res.code == "SUCCESS") {
           this.hasProgram = false;
           this.noProgram = true;
           this.$store.commit("major/setProgramId", "");
         }
-        if (res.msg == "操作成功" && res.code == 'SUCCESS') {
+        if (res.msg == "操作成功" && res.code == "SUCCESS") {
           this.noProgram = false;
           this.hasProgram = true;
           this.programId = res.data.programId;
           this.$store.commit("major/setProgramId", this.programId);
           this.requirements = res.data.graduateAttributes;
+          // 将为null的coreBaseCourses处理为空数组
+          this.requirements.forEach((requirement) => {
+            requirement.programIndicators.forEach((programIndicator) => {
+              if (programIndicator.coreBaseCourses === null) {
+                programIndicator.coreBaseCourses = [];
+              }
+            });
+          });
           if (this.requirements == null) {
             this.hasAttribute = false;
           }
+          this.totalInfo = res.data;
+          // console.log("this.totalInfo", this.totalInfo);
           console.log("requirements", this.requirements);
           if (this.requirements !== null && this.requirements.length == 0) {
             this.hasAttribute = false;
@@ -301,20 +404,185 @@ export default {
         }
       });
     },
-    //新增培养计划
-    addProgram() {
-      addProgram(
-        this.currentMajorId,
+    //查询可支撑某个毕业要求二级指标点的支撑课程列表
+    getCoreBaseCourseList() {
+      let that = this;
+      checkCoreBaseCourseList(
         this.currentDepartmentId,
-        this.currentSchoolId,
-        this.addProgramForm.enrollyear
+        this.programId,
+        this.programIndicatorId,
+        this.currentSchoolId
       ).then((res) => {
-        console.log("addProgram", res);
-        this.dialogFormVisible = false;
-        this.checkProgram();
+        // console.log("checkCoreBaseCourseList", res);
+        if (res.code == "SUCCESS") {
+          that.allCoreBaseCourse = res.data;
+          // console.log("allCoreBaseCourse", that.allCoreBaseCourse);
+        }
       });
     },
-   
+    //远程查询实现
+    querySearch(queryString, cb) {
+      var allCoreBaseCourse = this.allCoreBaseCourse;
+      var results = queryString
+        ? allCoreBaseCourse.filter(this.createStateFilter(queryString))
+        : allCoreBaseCourse;
+      results.forEach((result) => {
+        result.value = result.courseName;
+      });
+      // console.log("result后", results);
+      cb(results);
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        cb(results);
+      }, 3000 * Math.random());
+    },
+    //实现模糊搜索
+    createStateFilter(queryString) {
+      return (state) => {
+        return (
+          state.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
+        );
+      };
+    },
+    //新增支持课程
+    addCoreBaseCourse(searchValue, index1, index2) {
+      try {
+        // console.log(searchValue, index1, index2);
+        // console.log(
+        //   "一开始的requirements[index1].programIndicators",
+        //   this.requirements[index1].programIndicators
+        // );
+        //处理一下要存进去的coreBasecourse对象，searchValue中只有courseName
+        let newCoreBaseCourse = {};
+        newCoreBaseCourse.courseName = searchValue;
+        newCoreBaseCourse.id = Number;
+        this.allCoreBaseCourse.forEach((item) => {
+          if ((item.value = searchValue)) {
+            newCoreBaseCourse.id = item.courseId;
+          }
+        });
+        // 权重,达成度初始化
+        newCoreBaseCourse.weight = 0;
+        newCoreBaseCourse.achievement = Number;
+        newCoreBaseCourse.isEditWeight = false;
+
+        // console.log("!", this.requirements[index1].programIndicators[index2]);
+        //判断选中的课程是否已存在
+        this.requirements[index1].programIndicators[
+          index2
+        ].coreBaseCourses.forEach((item) => {
+          console.log("item", item, item.courseName == searchValue);
+          if (item.courseName == searchValue) {
+            ElMessage.error(searchValue + "已存在");
+            this.newCoreCourse = false;
+            this.searchValue = "";
+            throw "true";
+          }
+        });
+        //若该课程不存在，则加入coreBasecourses
+        // this.requirements[index1].programIndicators[
+        //   index2
+        // ].coreBaseCourses.push(newCoreBaseCourse);
+        this.dialogDetail.programIndicators[0].coreBaseCourses.push(
+          newCoreBaseCourse
+        );
+        //不存在coreBasecourse属性，则直接创建
+        this.newCoreCourse = false;
+        this.searchValue = "";
+
+        console.log(
+          "requirements.programIndicators",
+          this.requirements[index1].programIndicators[index2],
+          "dialogDetail",
+          this.dialogDetail,
+          "newCoreBaseCourse",
+          newCoreBaseCourse
+        );
+      } catch (stat) {
+        if (stat == "true") {
+          return;
+        }
+      }
+    },
+    // 确认添加支撑课程
+    confirmAddCoreBaseCourse(dialogDetail) {
+      // console.log("@", dialogDetail,this.index2);
+      // index2表示某毕业要求的第几个指标点,temp临时保存对应的指标点信息
+      let temp = dialogDetail.programIndicators[this.index2];
+      // console.log("temp",temp);
+      this.requirements[this.index1].programIndicators[this.index2] = temp;
+      let sum = 0;
+      let isItemNull = false;
+      let haveZero = false;
+      if (temp.coreBaseCourses.length == 0) {
+        isItemNull = true;
+        haveZero = false;
+        sum = 100;
+      }
+      if (!temp.coreBaseCourses.length == 0) {
+        isItemNull = false;
+        temp.coreBaseCourses.forEach((coreBaseCourse) => {
+          //逻辑校验处理
+          sum = sum + Number(coreBaseCourse.weight);
+          if (coreBaseCourse.weight == "0") {
+            haveZero = true;
+          }
+        });
+      }
+      if (isItemNull == true) {
+        ElMessage.error("请为指标点选择支撑课程");
+      }
+      if (haveZero == true) {
+        ElMessage.error("权重范围在1%-100%");
+      }
+      if (sum !== 100) {
+        ElMessage.error("权重之和必须为100%");
+      }
+
+      if (sum == 100 && isItemNull == false && haveZero == false) {
+        editProgram(this.totalInfo).then((res) => {
+          // console.log("confirmAddCoreBaseCourse", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `新增成功`,
+              duration: 1000,
+            });
+            this.dialogFormVisible = false;
+          }
+        });
+      }
+    },
+    //取消添加支撑课程
+    cancelAddCoreBaseCourse(dialogDetail) {
+      console.log("dialogDetail", dialogDetail);
+      this.requirements[this.index1].programIndicators[this.index2] = this.temp;
+      this.dialogFormVisible = false;
+    },
+    //编辑权重
+    editWeight(coreBaseCourse) {
+      coreBaseCourse.isEditWeight = true;
+    },
+    //保存权重
+    saveWeight(coreBaseCourse) {
+      if (
+        Number(coreBaseCourse.weight) > 100 ||
+        Number(coreBaseCourse.weight) <= 0
+      ) {
+        ElMessage.error("权重范围在1%-100%");
+      } else {
+        coreBaseCourse.isEditWeight = false;
+      }
+    },
+    //删除支撑课程
+    deleteCourse(programIndicator, index) {
+      //这个是编辑对话框中的数组，但不能影响到整体的requirement，因为是深克隆的
+      //对于整体的requirement处理，放在了cancelAddCoreBaseCourse()，temp保存起始内容
+      this.temp = JSON.parse(JSON.stringify(programIndicator));
+      programIndicator.coreBaseCourses.splice(index, 1);
+      this.requirements[this.index1].programIndicators[this.index2] =
+        programIndicator;
+    },
   },
 };
 </script>
@@ -459,5 +727,31 @@ export default {
   display: flex;
   justify-content: center;
   font-size: 20px;
+}
+.autocomplete-icon {
+  cursor: pointer;
+  color: #757575;
+  margin-left: 15px;
+  width: 24px;
+  height: 24px;
+}
+.showWeight {
+  font-size: 16px;
+}
+.editWeight .el-icon {
+  font-size: 16px;
+  margin-left: 10px;
+}
+:deep().edit-icon {
+  margin-top: 2px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  color: #757575;
+}
+.el-icon {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
 }
 </style>

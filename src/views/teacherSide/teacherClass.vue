@@ -56,6 +56,29 @@
             <Checked />
           </el-icon>
         </el-tooltip>
+        <el-divider class="divider" direction="vertical" />
+        <div v-show="status == '未提交'">
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="提交"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              style="margin-left: 10px"
+              @click="submit()"
+            >
+              <UploadFilled />
+            </el-icon>
+          </el-tooltip>
+        </div>
+        <div v-show="status == '已提交'" class="status_desc">已提交</div>
+        <div v-show="status == '已退回'">已退回</div>
+        <div v-show="status == '已审核'">已审核</div>
       </el-row>
     </div>
     <div class="body">
@@ -118,9 +141,12 @@ import {
   TrendCharts,
   Checked,
   Download,
+  UploadFilled,
 } from "@element-plus/icons-vue";
+import { submit, getClassInfo } from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import { getObjectives, downloadDetail } from "@/api/basecourse";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 export default {
   name: "TeacherClass",
@@ -130,6 +156,7 @@ export default {
     TrendCharts,
     Checked,
     Download,
+    UploadFilled,
   },
   data() {
     return {
@@ -138,10 +165,12 @@ export default {
       semester: [],
       hasFile: false,
       objectInfo: [],
+      status: "",
     };
   },
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    this.classStatus();
     console.log("classInfo", this.classInfo);
     this.getDictionary();
     this.getFile();
@@ -172,7 +201,7 @@ export default {
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
-        // console.log("getDictionary", res);
+        console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
         this.academicYear.forEach((year) => {
@@ -187,17 +216,29 @@ export default {
         });
       });
     },
+    //查看教学班信息
+    getClassInfo() {
+      getClassInfo(this.classInfo.classId).then((res) => {
+        console.log("getClassInfo", res.data);
+        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        this.classStatus()
+      });
+    },
+    //查看有无课程大纲文件
     getFile() {
       getObjectives(this.classInfo.detailId).then((res) => {
         console.log("getObjectives", res);
         this.objectInfo = res.data;
-        if (!(res.data.syllabusFileId === null||res.data.syllabusFileId===0)) {
+        if (
+          !(res.data.syllabusFileId === null || res.data.syllabusFileId === 0)
+        ) {
           this.hasFile = true;
         } else {
           this.hasFile = false;
         }
       });
     },
+    //下载课程大纲文件
     downloadFile() {
       downloadDetail(this.classInfo.detailId).then((res) => {
         // console.log("downloadFile", res);
@@ -213,6 +254,38 @@ export default {
         URL.revokeObjectURL(link.href);
         document.body.removeChild(link);
       });
+    },
+    //提交
+    submit() {
+      submit(this.classInfo.classId).then((res) => {
+        console.log("res", res);
+        if(res.code =="SUCCESS"){
+           ElMessage({
+              type: "success",
+              message: `提交成功`,
+              duration: 1000,
+            });
+        }
+        this.getClassInfo();
+        // this.
+      });
+    },
+    //确定提交状态
+    classStatus() {
+      switch (this.classInfo.status) {
+        case "1":
+          this.status = "未提交";
+          break;
+        case "2":
+          this.status = "已提交";
+          break;
+        case "3":
+          this.status = "已审核";
+          break;
+        case "4":
+          this.status = "已退回";
+          break;
+      }
     },
   },
 };
@@ -274,5 +347,9 @@ export default {
 }
 .fileName :hover {
   color: #2857e4;
+}
+.status_desc {
+  margin-left: 10px;
+  color: #616981;
 }
 </style>
