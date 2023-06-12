@@ -62,6 +62,7 @@ export default createStore({
         schoolName: "",
         schoolId: "",
         year: "",
+        currentVersionValue:1,
         role: {},
         isTeacher: false,
         //当前角色身份
@@ -108,6 +109,9 @@ export default createStore({
         setTeacherSideClassInfo(state, newVal) {
           state.teacherSideClassInfo = newVal;
         },
+        setCurrentVersionValue(state, newVal){
+          state.currentVersionValue = newVal;
+        }
       },
       actions: {},
       modules: {},
@@ -119,7 +123,7 @@ export default createStore({
         detailId: Number,
         baseCourseVersionName: "",
         baseCourseVersionFlag: "",
-        baseCourseVersionId: "",
+        baseCourseVersionId: 1,
         baseCourseCourseId: "",
         baseCourseCourseName: "",
         baseCourseCourseCode: "",

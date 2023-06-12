@@ -130,12 +130,12 @@ export default {
           that.hasScores = true;
           if(course.activities){
             that.hasActivities = true;
-          let activityNumber = course.activities.item.length;
+          let activityNumber = course.activities[0]['item'].length;
           let studentNum = course.scores.length;
-         that.activityName = course.activities.item;
+         that.activityName = course.activities[0]['item'];
          length = (that.activityName.length+1)*180+100;
          that.tableWidth = length.toString()+'px';
-         that.activityScores = course.activities.value;
+         that.activityScores = course.activities[0]['value'];
         for(let i=0;i<studentNum;i++){
           var student = {
           studentNumber:course.scores[i]['info'][0],

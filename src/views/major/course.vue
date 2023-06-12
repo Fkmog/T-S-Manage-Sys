@@ -264,6 +264,7 @@ import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOp
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document,MoreFilled} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
 import { getDictionary } from "@/api/dictionary";
+import { checkProgram } from "@/api/program";
 
 
 export default {
@@ -276,6 +277,7 @@ components:{
 data(){
   return{
     loadmoreDisabled:Boolean,
+    
 
     courseTypeSource:[],
     courseNatureSource:[],
@@ -356,7 +358,7 @@ data(){
     //学校部门专业信息
     departmentId:'',
     schoolId:'',
-    majorId:'',
+    majorId:Number,
     majorName:'',
     programId:'',
 
@@ -420,54 +422,10 @@ data(){
   searchCourseId:[0,0],
 
 
-  currentVersion:'2016版',
+  currentVersion:'',
   currentVersionValue:1,
-  versions:[{
-      label:'2016版',
-      value:1
-    },
-    {
-      label:'2017版',
-      value:2
-    },
-    {
-      value:3,
-      label:'2018版'
-    },
-    {
-      value:4,
-      label:'2019版'
-    },
-    {
-      value:5,
-      label:'2020版'
-    },
-    {
-      value:6,
-      label:'2021版'
-    },
-    {
-      value:7,
-      label:'2022版'
-    },
-    {
-      value:8,
-      label:'2023版'
-    },
-    {
-      value:9,
-      label:'2024版'
-    },
-    {
-      value:10,
-      label:'2025版'
-    },
-    {
-      value:11,
-      label:'2026版'
-    },
-    ],
-
+  versions:[],
+  versionLabel:[],
 
   
 
@@ -509,6 +467,7 @@ result:reactive({}),
 methods:{
   async getDict(){
       let that = this;
+      let num =1;
       getDictionary().then((res)=>{
         console.log(res);
         res.course_nature.forEach((nature)=>{
@@ -517,6 +476,17 @@ methods:{
         res.course_type.forEach((type)=>{
           that.courseTypeSource.push(type.dictLabel);
         })
+        res.enroll_year.forEach((year)=>{
+          let dict={
+            label:year.dictLabel+'版',
+            value:num
+          }
+          num=num+1;
+          that.versions.push(dict);
+          that.versionLabel.push(year.dictLabel+'版')
+
+        })
+        that.currentVersion = that.versionLabel[that.currentVersionValue-1];
         // that.courseTypeSource = res.
       })
     },
@@ -690,6 +660,7 @@ methods:{
   // },
   getCourseByYear(label){
     this.currentVersionValue = label;
+    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
     this.getBaseCourse(this.pageSize,this.pageNum);
   },
   async getProgramCourse(){
@@ -1471,12 +1442,26 @@ ElMessageBox.confirm(
     }
     
   },
+  checkCurrentProgram() {
+    checkProgram(
+        this.majorId,
+        this.$store.state.currentInfo.year
+      ).then((res)=>{
+        if (res.msg == "操作成功" && res.code === 'SUCCESS') {
+          this.programId = res.data.programId;
+          this.$store.commit("major/setProgramId", this.programId);
+        }
+      })
+  },
   async activate(){
             this.departmentId = this.$store.state.currentInfo.departmentId;
             this.schoolId = this.$store.state.currentInfo.schoolId;
             this.majorId = this.$store.state.major.majorId;
             this.majorName = this.$store.state.major.majorName;
             this.programId = this.$store.state.major.programId;
+           
+            this.currentVersionValue = this.$store.state.course.baseCourseVersionId;
+            this.checkCurrentProgram();
             this.getDict();
             console.log('schoolId+departmentId+majorId',this.schoolId,this.departmentId,this.majorId);
         },
@@ -1497,7 +1482,22 @@ mounted:function(){
    
   // this.getBaseCourse(this.pageSize,this.pageNum,this.majorId);
   
-}
+},
+computed: {
+    yearChange() {
+      return this.$store.state.currentInfo.year;
+    },
+  },
+watch: {
+    yearChange: {
+      deep: true,
+      handler(value) {
+        this.checkCurrentProgram();
+        this.getProgramCourse();
+      },
+    },
+  },
+  
 
 }
 </script>
