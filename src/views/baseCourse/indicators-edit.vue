@@ -191,7 +191,7 @@
           <!-- 编辑权重 -->
           <el-col :span="4" v-show="!support.isEditWeight" class="showWeight">
             <el-row>
-              <el-col :span="10">{{ support.weight }}% </el-col>
+              <el-col :span="12">{{ support.weight }}% </el-col>
               <el-col :span="12">
                 <el-icon @click="editWeight(support)"><Edit /></el-icon>
               </el-col>
@@ -905,9 +905,11 @@ export default {
   margin: 16px auto;
 }
 .showWeight {
+  font-size: 16px;
   margin-top: 5px;
 }
 .editWeight .el-icon {
+  font-size: 16px;
   margin-top: 5px;
   margin-left: 10px;
 }

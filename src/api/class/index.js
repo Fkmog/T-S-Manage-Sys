@@ -76,3 +76,11 @@ export function associateCourses(array) {
     data:array,
   })
 }
+//教师提交
+export function submit(classId) {
+  return request({
+    url: '/classes/submit/'+classId,
+    method: 'POST',
+ 
+  })
+}
