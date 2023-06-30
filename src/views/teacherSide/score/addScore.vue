@@ -294,10 +294,19 @@
 //         // this.db.items[0][activityName] = '';
 //       },
 activate(){
+        this.identity = this.$store.state.currentInfo.identity;
         this.departmentId = this.$store.state.currentInfo.departmentId;
         this.schoolId = this.$store.state.currentInfo.schoolId;
         this.programId = this.$store.state.major.programId;
-        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        if(this.identity == '学院管理员'){
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+          console.log('identity:',this.identity);
+        }
+        else{
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+          console.log('identity:',this.identity);
+        }
+        
         console.log('this.departmentId',this.departmentId,'this.schoolId',this.schoolId,'this.programId',this.programId,'this.classInfo',this.classInfo);
         this.activateHotcolumn();
             },
@@ -488,7 +497,7 @@ async getActivities(){
         console.log('class Info',res);
         
         let course = res.data;
-        if(course.objectives.length){
+        if(course.objectives){
           that.hasObjectives = true;
         }
         else{

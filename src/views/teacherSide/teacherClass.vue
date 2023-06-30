@@ -78,7 +78,7 @@
         </div>
         <div v-show="status == '未提交' && identity == '学院管理员'" class="status_desc">未提交</div>
         <div v-show="status == '已提交' && identity != '学院管理员'" class="status_desc">已提交</div>
-        <div v-show="status == '已提交' && status == '已提交'" class="status_desc">
+        <div v-show="status == '已提交' && identity == '学院管理员'" class="status_desc">
           <el-tooltip
           class="box-item"
           effect="dark"

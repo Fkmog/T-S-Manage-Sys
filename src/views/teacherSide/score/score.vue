@@ -46,7 +46,7 @@
 
 
 <!-- 学生信息列表 -->
-<div class="studentCard">
+<div class="studentCard" v-show="hasScores">
   
     
       <el-table
@@ -55,7 +55,6 @@
         height="600px"
         :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'63px','font-weight': 'bold','color':'black'}"
         :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
-        v-show="hasScores"
   >
     <el-table-column fixed prop="studentNumber" label="学号"  width="180px"/>
     <el-table-column fixed prop="studentName" label="姓名" width="180px"/>
@@ -125,7 +124,15 @@ export default {
     };
   },
   mounted() {
+    this.identity = this.$store.state.currentInfo.identity;
+    if(this.identity == '学院管理员'){
+      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+      console.log('identity:',this.identity);
+    }
+    else{
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    console.log('identity:',this.identity);
+    }
     this.getActivities();
     
     
