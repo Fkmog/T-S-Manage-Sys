@@ -392,7 +392,7 @@ async getActivities(){
           that.hasScores = true;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
-            let activityNumber = course.activities.item.length;
+            let activityNumber = course.activities[0]['item'].length;
             let studentNum = course.scores.length;
             that.currentNumberofActivities = activityNumber;
           //   that.db.items[0]={};
@@ -404,11 +404,11 @@ async getActivities(){
          for(let i=0;i<activityNumber;i++){
         //   itemDict[i.toString()] = course.activities.item[i];
         var columnDist = {};
-          that.db.items[0][course.activities.item[i]]= course.activities.item[i];
-          that.db.items[1][course.activities.item[i]]= course.activities.value[i];
-          that.db.items[2][course.activities.item[i]]= course.activities.remark[i];
+          that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
+          that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
+          that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
           columnDist={
-            data:course.activities.item[i],
+            data:course.activities[0]['item'][i],
           }
           that.columnList.push(columnDist);
           
@@ -423,10 +423,10 @@ async getActivities(){
             that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
             for(let j=0;j<activityNumber;j++){
               if(!course.scores[i]['grade'][j]){
-                that.db.items[3+i][course.activities.item[j]] = 0;
+                that.db.items[3+i][course.activities[0]['item'][j]] = 0;
               }
               else{
-                that.db.items[3+i][course.activities.item[j]] = course.scores[i]['grade'][j];
+                that.db.items[3+i][course.activities[0]['item'][j]] = course.scores[i]['grade'][j];
               }
                 
             }
@@ -445,7 +445,7 @@ async getActivities(){
           that.hasScores = false;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
-            let activityNumber = course.activities.item.length;
+            let activityNumber = course.activities[0]['item'].length;
             let studentNum = 0;
             that.currentNumberofActivities = activityNumber;
          
@@ -456,11 +456,11 @@ async getActivities(){
          for(let i=0;i<activityNumber;i++){
         //   itemDict[i.toString()] = course.activities.item[i];
         var columnDist = {};
-          that.db.items[0][course.activities.item[i]]= course.activities.item[i];
-          that.db.items[1][course.activities.item[i]]= course.activities.value[i];
-          that.db.items[2][course.activities.item[i]]= course.activities.remark[i];
+          that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
+          that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
+          that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
           columnDist={
-            data:course.activities.item[i],
+            data:course.activities[0]['item'][i],
           }
           that.columnList.push(columnDist);
           

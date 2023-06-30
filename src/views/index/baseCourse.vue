@@ -571,64 +571,12 @@
       routeCourseId:'',
   
       //select
-      currentVersion:'2016版',
+      currentVersion:'',
       currentVersionValue:1,
       loading:ref(false),
       options:[],
-      versions:[{
-        label:'2016版',
-        value:1
-      },
-      {
-        label:'2017版',
-        value:2
-      },
-      {
-        value:3,
-        label:'2018版'
-      },
-      {
-        value:4,
-        label:'2019版'
-      },
-      {
-        value:5,
-        label:'2020版'
-      },
-      {
-        value:6,
-        label:'2021版'
-      },
-      {
-        value:7,
-        label:'2022版'
-      },
-      {
-        value:8,
-        label:'2023版'
-      },
-      // {
-      //   value:9,
-      //   label:'2024版'
-      // },
-      // {
-      //   value:10,
-      //   label:'2025版'
-      // },
-      // {
-      //   value:11,
-      //   label:'2026版'
-      // },
-      // {
-      //   value:12,
-      //   label:'2027版'
-      // },
-      ],
-      versionLabel:[
-      '2016版','2017版','2018版',
-      '2019版','2020版','2021版','2022版','2023版',
-      // '2024版','2025版','2026版','2027版'
-      ],
+      versions:[],
+      versionLabel:[],
   
       // isRouterAlive:true,
       closeShow : ref(false),
@@ -701,13 +649,25 @@
     getDict(){
       let that = this;
       getDictionary().then((res)=>{
-        console.log(res);
+        console.log('Dict:',res);
+        let num =1;
         res.course_nature.forEach((nature)=>{
           that.courseNatureSource.push(nature.dictLabel);
         })
         res.course_type.forEach((type)=>{
           that.courseTypeSource.push(type.dictLabel);
         })
+        res.enroll_year.forEach((year)=>{
+          let dict={
+            label:year.dictLabel+'版',
+            value:num
+          }
+          num=num+1;
+          that.versions.push(dict);
+          that.versionLabel.push(year.dictLabel+'版')
+
+        })
+        that.currentVersion = that.versionLabel[that.currentVersionValue-1];
         // that.courseTypeSource = res.
       })
     },
@@ -1012,7 +972,7 @@
 
     getCourseByYear(label){
       this.currentVersionValue = label;
-      
+      this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
       this.getBaseCourse(this.pageSize,this.pageNum);
     },
     clearForm(){
@@ -1565,6 +1525,7 @@
               this.departmentId = this.$store.state.currentInfo.departmentId;
               this.schoolId = this.$store.state.currentInfo.schoolId;
               this.identity = this.$store.state.currentInfo.identity;
+              this.currentVersionValue = this.$store.state.course.baseCourseVersionId;
               if(this.identity == '课程负责人'){
                 this.userId = this.$store.state.userInfo.userId;
               }

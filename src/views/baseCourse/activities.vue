@@ -80,12 +80,28 @@
 
 
       
+  <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" addable @tab-add="this.handleTabsEdit('','add')"  @tab-click="editableTabsValueChange" >
+    <el-tab-pane
+      v-for="(item, index) in editableTabs"
+      :key="item.name"
+      :label="item.title"
+      :name="item.name"
+   
+    > 
+      
+    </el-tab-pane>
+  </el-tabs>
   
-     
+    <div class="hot-table-container" id="courseHot"></div>  
+ 
+  
 
-      <div  flex class="md-padding">
-          <div class="hot-table-container"  id="courseHot"></div>
-        </div>
+      
+
+
+
+
+
     </div>
   
     
@@ -120,6 +136,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     data(){
       let self = this;
       return{
+
+        editableTabsValue: '0',
+        currenteditableTabsValue:0,
+        editableTabs: [],
+        tabIndex: 0,
+
+
+
+
         colNum:1,
         over25:Boolean,
         activityList:[],
@@ -155,20 +180,119 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       ,CirclePlus,DocumentChecked
     },
     methods:{
+      editableTabsValueChange(pane){
+        
+        let that = this;
+        this.currenteditableTabsValue = Number(pane.props.name);
+        this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+                
+              });
+        return console.log('currenteditableTabsValue:',Number(pane.props.name));
+        
+        
+      },
+      handleTabsEdit(targetName, action) {
+        let that = this;
+        
+        if (action === 'add'&& !targetName) {
+          
+          let item = ['']
+          let value = ['']
+          let remark = ['']
+          let weight = ['']
+          let tempdata =[]
+          tempdata.push(item);
+          tempdata.push(value);
+          tempdata.push(remark);
+          tempdata.push(weight);
+          this.db.items.push(tempdata);
+          
+          let newTabName = ++this.tabIndex + '';
+          this.currenteditableTabsValue = this.tabIndex;
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+              });
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+        }
+        if (action === 'add' && targetName) {
+          this.currenteditableTabsValue = this.tabIndex;
+          let newTabName = ++this.tabIndex + '';
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+        }
+        if (action === 'remove') {
+      ElMessageBox.confirm(
+      '是否删除当前成绩项',
+      '注意',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(()=>{
+        let tabs = this.editableTabs;
+        this.currenteditableTabsValue = --this.tabIndex;
+        console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+          let activeName = this.editableTabsValue;
+          if (activeName === targetName) {
+            tabs.forEach((tab, index) => {
+              if (tab.name === targetName) {
+                let nextTab = tabs[index + 1] || tabs[index - 1];
+                if (nextTab) {
+                  activeName = nextTab.name;
+                }
+              }
+            });
+          }
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue],
+              });
+          this.editableTabsValue = activeName;
+          this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+      }).catch()
+          
+        }
+      },
       addActivities(){
         // this.iscolover25();
         if(this.colNum<25){
         this.firstActivities = false;
+       
+        if(!this.currenteditableTabsValue){
+        this.db.items[this.currenteditableTabsValue][0].push('');
+        this.db.items[this.currenteditableTabsValue][1].push(null);
+        this.db.items[this.currenteditableTabsValue][2].push('');
+        this.db.items[this.currenteditableTabsValue][3].push('');
+        this.hotInstance.updateSettings({
+                data:this.db.items[this.currenteditableTabsValue],
+              });
+        }
+        else{
+        this.db.items[this.currenteditableTabsValue-1][0].push('');
+        this.db.items[this.currenteditableTabsValue-1][1].push(null);
+        this.db.items[this.currenteditableTabsValue-1][2].push('');
+        this.db.items[this.currenteditableTabsValue-1][3].push('');
+        this.hotInstance.updateSettings({
+                data:this.db.items[this.currenteditableTabsValue-1],
+              });
         
+        }
         
-        this.db.items[0].push('');
-        this.db.items[1].push(null);
-        this.db.items[2].push('');
         this.colNum = this.colNum+1;
         // this.dictTolist(this.db.items);
-        this.hotInstance.updateSettings({
-                data:this.db.items,
-              });
+        
         }
         
        
@@ -185,12 +309,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       let that = this;
       this.getActivities().then(function(){
         let container = document.querySelector("#courseHot");
+        // let container = this.$refs.courseHot;
         let hotRegisterer = new Handsontable(container,{
-            data: self.db.items,
+            data: self.db.items[0],
             licenseKey: 'non-commercial-and-evaluation',
             colHeaders: false,
             dragToScroll: true,
-            rowHeaders: ['成绩项', '分值','设置'],
+            rowHeaders: ['成绩项', '分值','设置','权重'],
             copyPaste: true,
             colWidths: 70,
             allowRemoveColumn: true,
@@ -232,7 +357,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
 
         that.hotInstance = hotRegisterer;
         that.hotInstance.updateSettings({
-                data:that.db.items,
+                data:that.db.items[0],
                 cells: that.getHotCellsFunction(),
               });
       })
@@ -249,10 +374,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
                     cellProperties.className = 'ht-s-size';
                     //   cellProperties.validator = that.validScoreSetting();
                     }
+                  if(row === 3){
+                    cellProperties.allowEmpty = false;
+                  }
                     return cellProperties;
                 };
         },
-    getActivities(){
+  async getActivities(){
       let that = this;
       return request({
         url:'/detail/'+this.detailId,
@@ -261,23 +389,50 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         console.log('activities',res);
        
         let course = res.data;
-        if(course.activities){
-            
+        if(course.activities.length){
+          // that.tabIndex = course.activities.length;
+          
+          course.activities.forEach((activity)=>{
+            that.handleTabsEdit(1,'add');
+            let tempdata = []
+            tempdata.push(activity.item);
+            tempdata.push(activity.value);
+            tempdata.push(activity.remark);
+            if(!activity.weight){
+              let templist =[]
+              for(let i=0;i<activity.item.length;i++){
+                templist.push('');
+              }
+              tempdata.push(templist);
+            }
+            else{
+              tempdata.push(activity.weight);
+            }
+            that.db.items.push(tempdata);
+          })
          
            
-          that.db.items.push(course.activities.item);
-          that.db.items.push(course.activities.value);
-          that.db.items.push(course.activities.remark);
+          // that.db.items.push(course.activities.item);
+          // that.db.items.push(course.activities.value);
+          // that.db.items.push(course.activities.remark);
+          that.editableTabsValue = '1';
+          that.currenteditableTabsValue = 1;
           console.log('res has activities:',that.db.items);
         }
         else {
           console.log('res has no activities');
+          that.handleTabsEdit(1,'add');
           let item = ['']
           let value = ['']
           let remark = ['']
-          that.db.items.push(item);
-          that.db.items.push(value);
-          that.db.items.push(remark);
+          let weight = ['']
+          let tempdata =[]
+          tempdata.push(item);
+          tempdata.push(value);
+          tempdata.push(remark);
+          tempdata.push(weight);
+          that.db.items.push(tempdata);
+         
           }
       })
     },
@@ -309,21 +464,34 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
     
       
-      let item = [];
-      let value = [];
-      let remark = [];
-      let length = this.db.items[0].length;
+      let activities=[]
+      let length = Object.keys(this.db.items).length;
      
       for(let i=0;i<length;i++){
         // if(typeof(this.db.items[1][i]) == 'string'){
         //   this.db.items[1][i] = parseInt(this.db.items[1][i]);
         // }
-        item.push(this.db.items[0][i]);
-        value.push(this.db.items[1][i]);
-        remark.push(this.db.items[2][i])
+        let tempitem = [];
+        let tempvalue = [];
+        let tempremark = [];
+        let tempweight = [];
+        
+        for(let j=0;j<this.db.items[i][0].length;j++){
+          tempitem.push(this.db.items[i][0][j]);
+          tempvalue.push(this.db.items[i][1][j]);
+          tempremark.push(this.db.items[i][2][j]);
+          tempweight.push(this.db.items[i][3][j]);
+        }
+        let dict ={
+          item:tempitem,
+          value:tempvalue,
+          remark:tempremark,
+          weight:tempweight
+        }
+        activities.push(dict);
       }
     
-
+      console.log('activities data :',activities);
       return request({
         url:'/detail',
         method:'put',
@@ -332,16 +500,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         'departmentId': this.departmentId,
         'courseId':this.courseId,
         'detailId':this.detailId,
-        "activities": {
-        "item": item,
-        "value": value,
-        "remark":remark,
-  },}
+        "activities": activities,
+      }
       }).then(function(res){
         
         that.firstActivities = true;
-        
-        that.getActivities();
+        console.log('res:',res);
+        // that.getActivities();
         if(res.code == 'SUCCESS'){
           ElMessage({
                 type: 'success',
@@ -356,6 +521,29 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
                   duration:1000,
                 });
         }
+      }).catch((e)=>{
+        console.log('e:',e);
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '总评未设置'){
+          ElMessage({
+                  type: 'error',
+                  message: `总评未设置`,
+                  duration:1500,
+                });
+        }
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '有权重为空'){
+          ElMessage({
+                  type: 'error',
+                  message: `有权重为空`,
+                  duration:1500,
+                });
+        }
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '权重和不对'){
+          ElMessage({
+                  type: 'error',
+                  message: `权重和不对`,
+                  duration:1500,
+                });
+        }
       })
   },
     toPostData(){
@@ -364,8 +552,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
      
       var valid = true;
         
+        if(!this.currenteditableTabsValue){
+          let length =this.db.items[this.currenteditableTabsValue][0].length;
+        }
+        else{
+          let length =this.db.items[this.currenteditableTabsValue-1][0].length;
+        }
         
-        let length =this.db.items[0].length;
         // let count=0;
         // let hasremark=false;
         // for(let i=0;i<length;i++){
@@ -377,7 +570,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         //   hasremark=true;
         // }
           for(let i=0;i<length;i++){
-            if (!this.db.items[0][i] ||!this.db.items[1][i]) {
+            if (!this.db.items[this.currenteditableTabsValue-1][i][0] 
+            ||!this.db.items[this.currenteditableTabsValue-1][i][1]
+            ||!this.db.items[this.currenteditableTabsValue-1][i][3]) {
               
               valid = false;
               break;
@@ -441,8 +636,23 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   </script>
   
   <style  scoped>
+  .activity-tab{
+    margin-top: 10%;
+    width:80%;
+    margin-left: 10%;
+  }
+  .card{
+  display: flex;
+  flex-direction: column;
+  width: 750px;
+  background: white;
+  margin-bottom: 20px;
+  box-shadow: 0px 1px 3px rgb(164, 163, 163);
+  padding: 0 0 50px 20px;
+  }
   .hot-table-container{
     float: left;
+    height:100px;
     margin-left: 5%;
     
   }

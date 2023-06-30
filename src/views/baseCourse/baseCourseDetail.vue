@@ -23,7 +23,6 @@
         <div class="title">全部课程</div>
         <el-divider class="divider" direction="vertical" />
         <div class="title">{{ versionName }}</div>
-
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -39,6 +38,23 @@
             @click="toActivities()"
           >
             <Histogram />
+          </el-icon>
+        </el-tooltip>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="课程目标"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toObjectives()"
+          >
+            <Checked />
           </el-icon>
         </el-tooltip>
         <el-tooltip
@@ -61,7 +77,7 @@
         <el-tooltip
           class="box-item"
           effect="dark"
-          content="课程目标"
+          content="从其他大纲复制"
           placement="bottom"
           :hide-after="0"
         >
@@ -70,9 +86,9 @@
             size="22px"
             color="rgb(137, 137, 137)"
             style="margin-left: 20px"
-            @click="toObjectives()"
+            @click="openDrawer()"
           >
-            <Checked />
+            <CopyDocument />
           </el-icon>
         </el-tooltip>
       </el-row>
@@ -177,12 +193,63 @@
         </el-col>
       </div>
     </div>
+    <!-- 右侧复制抽屉 -->
+    <el-drawer v-model="drawer" :with-header="false">
+      <el-row>
+        <el-col :span="14">
+          <DrawerSearch
+            msg="搜索课程名称、课程号"
+            @SearchValue="getSearchValue"
+          />
+        </el-col>
+        <el-col :span="10">
+          <el-select
+            v-model="version"
+            placeholder="选择课程大纲版本"
+            clearable
+            @change="getEditDetail()"
+          >
+            <el-option
+              v-for="version in versionList"
+              :key="version.versionId"
+              :label="version.versionName"
+              :value="version.versionId"
+            >
+            </el-option>
+          </el-select>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 40px">
+        <el-table
+          :data="copyCourseList"
+          style="width: 100%"
+          @row-click="copyDetail"
+        >
+          <el-table-column prop="courseName" label="课程名" min-width="180px" />
+          <el-table-column prop="courseCode" label="课程号" min-width="180px" />
+          <el-table-column prop="versionName" label="版本" min-width="180px" />
+        </el-table>
+      </el-row>
+    </el-drawer>
+    <!-- 复制弹窗 -->
+    <el-dialog v-model="dialogVisible" title="从其他大纲复制" width="400px">
+      <el-row style="margin-bottom:20px;font-size:15px">从《{{currentRow.courseName}}》{{currentRow.versionName}}大纲复制以下内容：</el-row>
+      <el-checkbox-group v-model="checkList" >
+        <el-checkbox label="成绩项"></el-checkbox>
+        <el-checkbox label="课程目标"></el-checkbox>
+      </el-checkbox-group>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="copyInfo()">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import request from "@/utils/request/request";
-import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElTooltip, ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -191,14 +258,24 @@ import {
   List,
   Checked,
   CircleClose,
+  CopyDocument,
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
-import { getObjectives, downloadDetail, removeDetail } from "@/api/basecourse";
+import {
+  getObjectives,
+  downloadDetail,
+  removeDetail,
+  getEditDetail,
+  getVersion,
+  copyActAndObj,
+} from "@/api/basecourse";
+import DrawerSearch from "@/components/general/drawerSearch.vue";
 
 export default {
   name: "baseCourseDetail",
   components: {
-    HeaderSearch,
+    DrawerSearch,
+    CopyDocument,
     ElTooltip,
     ElMessage,
     ElMessageBox,
@@ -212,6 +289,14 @@ export default {
   },
   data() {
     return {
+      checkList: [],
+      currentRow: {},
+      copyCourseList: [],
+      keyword: "",
+      dialogVisible: false,
+      versionList: [],
+      version: "",
+      drawer: false,
       //上传文件
       fileList: [],
       headers: {
@@ -220,7 +305,6 @@ export default {
       action: "",
       //毕业要求
       indicators: [],
-
       departmentId: "",
       schoolId: "",
       majorId: [],
@@ -295,6 +379,7 @@ export default {
     } else {
       this.isVisiable = true;
       this.getDetail();
+      this.checkVersion();
     }
   },
   methods: {
@@ -353,6 +438,13 @@ export default {
       this.form.remark = this.$store.state.course.baseCourseRemark;
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
+    },
+    //查询版本信息
+    checkVersion() {
+      getVersion().then((res) => {
+        console.log("checkVersion", res);
+        this.versionList = res.data;
+      });
     },
     //上传成功
     uploadSuccess(response, file, fileList) {
@@ -448,6 +540,57 @@ export default {
         link.click();
         URL.revokeObjectURL(link.href);
         document.body.removeChild(link);
+      });
+    },
+    //唤起抽屉
+    openDrawer() {
+      this.drawer = true;
+    },
+    //选中被复制对象
+    copyDetail(row) {
+      console.log("copyDetail", row);
+      this.currentRow = row;
+      // 唤起弹窗
+      this.dialogVisible = true;
+    },
+    //查询可复制的课程
+    getEditDetail() {
+      getEditDetail(this.keyword, this.version).then((res) => {
+        console.log("getEditDetail", res);
+        this.copyCourseList = res.rows;
+      });
+    },
+    //搜索栏搜索
+    getSearchValue(data) {
+      this.keyword = data;
+      this.getEditDetail();
+    },
+    //复制
+    copyInfo() {
+      let obj = {};
+      obj.sourceDetailId = this.currentRow.detailId;
+      obj.targetDetailId = this.detailId;
+      // 确定需要复制的内容
+      if (this.checkList.indexOf("成绩项") !== -1) {
+        obj.isCopyActivities = 1;
+      } else {
+        obj.isCopyActivities = 0;
+      }
+      if (this.checkList.indexOf("课程目标") !== -1) {
+        obj.isCopyObjectives = 1;
+      } else {
+        obj.isCopyObjectives = 0;
+      }
+      copyActAndObj(obj).then((res) => {
+        console.log("copyActAndObj", res);
+        this.dialogVisible = false;
+        if (res.code == "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `复制成功`,
+            duration: 1000,
+          });
+        }
       });
     },
   },
