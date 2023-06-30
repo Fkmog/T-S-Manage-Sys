@@ -139,7 +139,15 @@ export default {
     };
   },
   mounted() {
+    this.identity = this.$store.state.currentInfo.identity;
+    if(this.identity == '学院管理员'){
+      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+      console.log('identity:',this.identity);
+    }
+    else{
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    console.log('identity:',this.identity);
+    }
     console.log("this.classinfo", this.classInfo);
     if (this.classInfo.isRespondent == 2) {
       this.isRespondent = true;

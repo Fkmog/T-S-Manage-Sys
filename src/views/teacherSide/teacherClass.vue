@@ -276,6 +276,7 @@ export default {
     },
     // 跳转成绩页面
     toScore() {
+      
       this.$router.push({
         name: "Score",
       });
