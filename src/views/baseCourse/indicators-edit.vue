@@ -54,9 +54,31 @@
           :label="major.programVersion"
         >
           <div class="card">
-            <span style="color: grey; font-size: 14px; margin-top: 20px"
-              >毕业要求指标点</span
-            >
+            <el-row style="margin-top: 30px">
+              <el-col :span="22">
+                <span style="color: grey; font-size: 14px; margin-top: 20px"
+                  >毕业要求指标点</span
+                >
+              </el-col>
+              <el-col :span="2">
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="从其他大纲复制"
+                  placement="bottom"
+                  :hide-after="0"
+                >
+                  <el-icon
+                    class="icon"
+                    size="22px"
+                    color="rgb(137, 137, 137)"
+                    @click="openDrawer()"
+                  >
+                    <CopyDocument />
+                  </el-icon>
+                </el-tooltip>
+              </el-col>
+            </el-row>
 
             <div
               class="attribute"
@@ -162,7 +184,7 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <!-- 弹出对话框 -->
+    <!-- 弹出设置支撑方式对话框 -->
     <div>
       <el-dialog
         v-model="dialogFormVisible"
@@ -254,17 +276,82 @@
         </template>
       </el-dialog>
     </div>
+    <!-- 弹出复制指标点drawer -->
+    <el-drawer v-model="drawer" :with-header="false">
+      <el-row>
+        <el-col :span="14">
+          <DrawerSearch msg="搜索专业名称" @SearchValue="getSearchValue" />
+        </el-col>
+        <el-col :span="10">
+          <el-select
+            v-model="year"
+            placeholder="选择培养方案版本"
+            clearable
+            @change="getCopyProgram()"
+          >
+            <el-option
+              v-for="year in enroll_year"
+              :key="year.dictValue"
+              :label="year.dictLabel"
+              :value="year.dictLabel"
+            >
+            </el-option>
+          </el-select>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 40px">
+        <el-table :data="programList" style="width: 100%">
+          <el-table-column type="expand">
+            <template #default="props">
+              <el-table
+                :data="props.row.baseCourseAndDetailVoList"
+                @row-click="copyCourse"
+              >
+                <el-table-column label="课程名" prop="courseName" />
+                <el-table-column label="课程号" prop="courseCode" />
+                <el-table-column label="版本" prop="bcDetails[0].versionName" />
+              </el-table>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="majorName"
+            label="专业名称"
+            min-width="180px"
+          />
+          <el-table-column prop="enrollyear" label="版本" min-width="180px" />
+        </el-table>
+      </el-row>
+    </el-drawer>
+    <!-- 复制弹窗 -->
+    <el-dialog v-model="dialogVisible" title="从其他大纲复制" width="400px">
+      <el-row style="margin-bottom: 20px; font-size: 15px"
+        >从《{{ currentRow.courseName }}》{{
+          currentRow.bcDetails[0].versionName
+        }}大纲复制毕业要求指标点</el-row
+      >
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="copyInfo()">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { getDictionary } from "@/api/dictionary";
+import DrawerSearch from "@/components/general/drawerSearch.vue";
 import {
   getIndicators,
   getMajorsProgram,
   getPullIndicator,
   getObjectives,
   saveIndicators,
+  getProgramCourseList,
+  copyIndicator,
 } from "@/api/basecourse";
+import { searchProgram } from "@/api/program";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getMajorInfo } from "@/api/major";
 import {
@@ -275,10 +362,12 @@ import {
   Close,
   EditPen,
   Edit,
+  CopyDocument,
 } from "@element-plus/icons-vue";
 export default {
   name: "baseCourseIndicatorsEdit",
   components: {
+    DrawerSearch,
     Back,
     DocumentChecked,
     Plus,
@@ -286,9 +375,18 @@ export default {
     Close,
     EditPen,
     Edit,
+    CopyDocument,
   },
   data() {
     return {
+      currentRow: [],
+      dialogVisible: false,
+      programCourse: [],
+      programList: [],
+      year: "",
+      keyword: "",
+      enroll_year: [],
+      drawer: false,
       searchValue: "",
       allIndicators: [],
       newIndicator: false,
@@ -336,6 +434,7 @@ export default {
     this.chosenMajor = this.$store.state.baseCourseDetailProgram.majorNum;
     this.checkMajors();
     this.checkObjectives();
+    this.getDictionary();
   },
   methods: {
     back() {
@@ -409,6 +508,13 @@ export default {
             });
           }
         });
+      });
+    },
+    //获取数据字典
+    getDictionary() {
+      getDictionary().then((res) => {
+        console.log("getDictionary", res);
+        this.enroll_year = res.enroll_year;
       });
     },
     //查询对应的专业以及bcdmId
@@ -751,6 +857,60 @@ export default {
         "chosen",
         this.chosenMajor
       );
+    },
+    //唤起抽屉
+    openDrawer() {
+      this.drawer = true;
+    },
+    // 查询对应的专业
+    getCopyProgram() {
+      searchProgram(
+        this.course.schoolId,
+        this.course.departmentId,
+        this.keyword,
+        this.year
+      ).then((res) => {
+        this.programList = res.rows;
+        console.log("查询对应的专业 ", this.programList);
+      });
+    },
+    //搜索栏搜索
+    getSearchValue(data) {
+      this.keyword = data;
+      this.getCopyProgram();
+    },
+    // 展开行
+    // expandChange(row) {
+    //   let programId = row.programId;
+    //   getProgramCourseList(programId).then((res) => {
+    //     console.log("@", res);
+    //     this.programCourse = res.rows;
+    //   });
+    // },
+    //选中被复制对象
+    copyCourse(row) {
+      console.log("copyCourse", row);
+      this.currentRow = row;
+      // 唤起弹窗
+      this.dialogVisible = true;
+    },
+    //复制
+    copyInfo() {
+      let obj = {};
+      obj.sourcebcdmId =
+        this.currentRow.bcDetails[0].bcDetailProgramVoList[0].bcdmId;
+      obj.targetbcdmId = this.majorList[this.chosenMajor].bcdmId;
+      copyIndicator(obj).then((res) => {
+        console.log("copyIndicator", res);
+        this.dialogVisible = false;
+        if (res.code == "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `复制成功`,
+            duration: 1000,
+          });
+        }
+      });
     },
   },
 };

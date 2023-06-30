@@ -52,3 +52,16 @@ export function checkCoreBaseCourseList(
     },
   });
 }
+//搜索查询培养方案 
+export function searchProgram(schoolId,departmentId,selectKeyWord,enrollYear) {
+  return request({
+    url: "/program/list",
+    method: "get",
+    params: {
+      schoolId:schoolId,
+      departmentId:departmentId,
+      selectKeyWord: selectKeyWord,
+      enrollyear:enrollYear
+    },
+  });
+}

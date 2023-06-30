@@ -32,12 +32,13 @@ export function getDetailMajor(bcdmId) {
   });
 }
 // 获取指标点列表
-export function getIndicatorList(bcdmId) {
+export function getIndicatorList(majorName,enrollYear) {
   return request({
     url: "/detailProgram/list ",
     method: "get",
     params: {
-      bcdmId: bcdmId,
+      majorName: majorName,
+      enrollYear:enrollYear
     },
   });
 }
@@ -105,5 +106,55 @@ export function removeDetail(detailId) {
   return request({
     url: "/detail/remove/syllabusFile/"+detailId,
     method: "DELETE",
+  });
+}
+
+//查询已有成绩项,课程目标的课程
+export function getEditDetail(selectKeyWord,versionId) {
+  return request({
+    url: "/detail/select",
+    method: "get",
+    params: {
+      selectKeyWord: selectKeyWord,
+      versionId:versionId
+    },
+  });
+}
+//查询版本信息
+export function getVersion() {
+  return request({
+    url: "/detail/versionList",
+    method: "get",
+  });
+}
+//复制成绩项,课程目标
+export function copyActAndObj(Array) {
+  return request({
+    url: "/detail/copy",
+    method: "PUT",
+    data: Array,
+  });
+}
+//查询培养方案课程列表
+export function getProgramCourseList(programId) {
+  return request({
+    url: "/baseCourse/program/"+programId,
+    method: "get",
+  });
+}
+//复制指标点
+export function copyIndicator(Array) {
+  return request({
+    url: "/detailProgram/copy",
+    method: "PUT",
+    data: Array,
+  });
+}
+//复制毕业要求，达成度，课程体系
+export function copyProgram(Array) {
+  return request({
+    url: "/program/copy",
+    method: "PUT",
+    data: Array,
   });
 }
