@@ -79,16 +79,20 @@
 
 
 
-      
-  <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" addable @tab-add="this.handleTabsEdit('','add')"  @tab-click="editableTabsValueChange" >
+  <!-- @tab-add="this.handleTabsEdit('','add')"   -->
+  <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" editable 
+
+  @tab-click="editableTabsValueChange"
+  @edit="handleTabsEdit"
+
+  >
     <el-tab-pane
       v-for="(item, index) in editableTabs"
       :key="item.name"
       :label="item.title"
       :name="item.name"
    
-    > 
-      
+    >
     </el-tab-pane>
   </el-tabs>
   
@@ -139,6 +143,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
 
         editableTabsValue: '0',
         currenteditableTabsValue:0,
+        maxeditableTabsValue:0,
         editableTabs: [],
         tabIndex: 0,
 
@@ -186,7 +191,6 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         this.currenteditableTabsValue = Number(pane.props.name);
         this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
-                
               });
         return console.log('currenteditableTabsValue:',Number(pane.props.name));
         
@@ -194,7 +198,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       },
       handleTabsEdit(targetName, action) {
         let that = this;
-        
+        console.log('action',action);
         if (action === 'add'&& !targetName) {
           
           let item = ['']
@@ -210,6 +214,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           
           let newTabName = ++this.tabIndex + '';
           this.currenteditableTabsValue = this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
           this.editableTabs.push({
             title: '成绩项'+' '+newTabName,
             name: newTabName.toString(),
@@ -219,10 +224,11 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
               });
-          console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
         }
         if (action === 'add' && targetName) {
           this.currenteditableTabsValue = this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
           let newTabName = ++this.tabIndex + '';
           this.editableTabs.push({
             title: '成绩项'+' '+newTabName,
@@ -243,8 +249,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       }
     ).then(()=>{
         let tabs = this.editableTabs;
-        this.currenteditableTabsValue = --this.tabIndex;
-        console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+        // this.currenteditableTabsValue = --this.tabIndex;
+        console.log('targetName:',targetName);
           let activeName = this.editableTabsValue;
           if (activeName === targetName) {
             tabs.forEach((tab, index) => {
@@ -257,11 +263,17 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             });
           }
           this.hotInstance.updateSettings({
-                data:that.db.items[that.currenteditableTabsValue],
+                data:that.db.items[Number(activeName-1)],
               });
+          
           this.editableTabsValue = activeName;
           this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-      }).catch()
+          console.log('editableTabs:',this.editableTabs);
+
+
+      }).catch(e=>{
+        console.log('e',e);
+      })
           
         }
       },
@@ -462,12 +474,17 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           this.saving = false;
           return;
         }
-    
+      let keyNum = [];
+      for(let i=0;i<Object.keys(this.editableTabs).length;i++){
+        keyNum.push(Number(this.editableTabs[i]['name'])-1);
+      }
+
+      let activities=[];
       
-      let activities=[]
-      let length = Object.keys(this.db.items).length;
+      
+      
      
-      for(let i=0;i<length;i++){
+      for(let i=0;i<keyNum.length;i++){
         // if(typeof(this.db.items[1][i]) == 'string'){
         //   this.db.items[1][i] = parseInt(this.db.items[1][i]);
         // }
@@ -475,12 +492,12 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         let tempvalue = [];
         let tempremark = [];
         let tempweight = [];
-        
-        for(let j=0;j<this.db.items[i][0].length;j++){
-          tempitem.push(this.db.items[i][0][j]);
-          tempvalue.push(this.db.items[i][1][j]);
-          tempremark.push(this.db.items[i][2][j]);
-          tempweight.push(this.db.items[i][3][j]);
+        console.log('keyNum[i]:',keyNum[i]);
+        for(let j=0;j<this.db.items[keyNum[i]][0].length;j++){
+          tempitem.push(this.db.items[keyNum[i]][0][j]);
+          tempvalue.push(this.db.items[keyNum[i]][1][j]);
+          tempremark.push(this.db.items[keyNum[i]][2][j]);
+          tempweight.push(this.db.items[keyNum[i]][3][j]);
         }
         let dict ={
           item:tempitem,
@@ -653,7 +670,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   .hot-table-container{
     float: left;
     height:100px;
-    margin-left: 5%;
+    margin-left: 10%;
     
   }
 .divider {

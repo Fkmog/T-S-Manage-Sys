@@ -69,6 +69,19 @@
 
           </el-row>
       </div>
+
+      <!-- editable @edit="handleTabsEdit"-->
+      <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" 
+        @tab-click="editableTabsValueChange"
+        
+        >
+          <el-tab-pane
+            v-for="(item, index) in editableTabs"
+            :key="item.name"
+            :label="item.title"
+            :name="item.name">
+          </el-tab-pane>
+        </el-tabs>
       <div layout="row" flex class="md-padding" v-show="hasActivities&&hasObjectives">
           <div class="hot-table-container" flex id="courseHot"></div>
       </div>
@@ -119,6 +132,14 @@
       data(){
         let self = this;
         return{
+          editableTabsValue: '0',
+          currenteditableTabsValue:0,
+          maxeditableTabsValue:0,
+          editableTabs: [],
+          tabIndex: 0,
+
+
+
           hasActivities:Boolean,
           hasScores:Boolean,
           hasObjectives:Boolean,
@@ -141,15 +162,7 @@
         //添加学生
         addNewStudentList:[],
         hotInstance: undefined,
-        columnList:[{
-                data:'studentNumber',
-            },
-            {
-                data:'studentName',
-            },
-            {
-                data:'pass',
-            },],
+        columnList:[],
         scoreSettingOptions:['总评','期末'],
           isRouterAlive:true,
           dirty:false,
@@ -172,6 +185,100 @@
         CirclePlus
       },
       methods:{
+        editableTabsValueChange(pane){
+        
+        let that = this;
+        this.currenteditableTabsValue = Number(pane.props.name);
+        this.hotInstance.updateSettings({
+                columns:that.columnList[that.currenteditableTabsValue-1],
+                data:that.db.items[that.currenteditableTabsValue-1],
+              });
+        return console.log('currenteditableTabsValue:',Number(pane.props.name));
+        
+        
+      },
+      handleTabsEdit(targetName, action) {
+        let that = this;
+        console.log('action',action);
+        if (action === 'add'&& !targetName) {
+          
+          let item = ['']
+          let value = ['']
+          let remark = ['']
+          let weight = ['']
+          let tempdata =[]
+          tempdata.push(item);
+          tempdata.push(value);
+          tempdata.push(remark);
+          tempdata.push(weight);
+          this.db.items.push(tempdata);
+          
+          let newTabName = ++this.tabIndex + '';
+          this.currenteditableTabsValue = this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+              });
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
+        }
+        if (action === 'add' && targetName) {
+          this.currenteditableTabsValue = ++this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
+          let newTabName = this.tabIndex + '';
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          this.currenteditableTabsValue=1;
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+        }
+        if (action === 'remove') {
+      ElMessageBox.confirm(
+      '是否删除当前成绩项',
+      '注意',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(()=>{
+        let tabs = this.editableTabs;
+        // this.currenteditableTabsValue = --this.tabIndex;
+        console.log('targetName:',targetName);
+          let activeName = this.editableTabsValue;
+          if (activeName === targetName) {
+            tabs.forEach((tab, index) => {
+              if (tab.name === targetName) {
+                let nextTab = tabs[index + 1] || tabs[index - 1];
+                if (nextTab) {
+                  activeName = nextTab.name;
+                }
+              }
+            });
+          }
+          this.hotInstance.updateSettings({
+                data:that.db.items[Number(activeName-1)],
+              });
+          
+          this.editableTabsValue = activeName;
+          this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+          console.log('editableTabs:',this.editableTabs);
+
+
+      }).catch(e=>{
+        console.log('e',e);
+      })
+          
+        }
+      },
 // addActivities(){
 //         this.firstActivities = false;
 //         let length = Object.keys(this.db.items[0]).length-2;
@@ -202,7 +309,7 @@ activateHotcolumn(){
         
         let container = document.querySelector("#courseHot");
         let hotRegisterer = new Handsontable(container,{
-             data: self.db.items,
+             data: self.db.items[0],
             licenseKey: 'non-commercial-and-evaluation',
             colHeaders: function(index) { // false
                 // return index === 0 ? '学号' : '成绩项';
@@ -236,7 +343,7 @@ activateHotcolumn(){
             
             fixedRowsTop: 3,
             fixedColumnsLeft: 2,
-            minSpareRows: 1,
+            minSpareRows: 0,
             minSpareCols: 0,
             preventOverflow: 'horizontal',
             manualColumnMove: false,
@@ -281,10 +388,9 @@ activateHotcolumn(){
         });
         that.hotInstance = hotRegisterer;
         that.hotInstance.updateSettings({
-                data:that.db.items,
-                columns:that.columnList,
-                cells: that.getHotCellsFunction(),
-                
+          columns:that.columnList[0],
+          data:that.db.items[0],
+          cells: that.getHotCellsFunction(),  
               });
         });
 },
@@ -382,7 +488,7 @@ async getActivities(){
         console.log('class Info',res);
         
         let course = res.data;
-        if(course.objectives){
+        if(course.objectives.length){
           that.hasObjectives = true;
         }
         else{
@@ -390,86 +496,142 @@ async getActivities(){
         }
         if(course.scores){
           that.hasScores = true;
+          let count = 0;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
-            let activityNumber = course.activities[0]['item'].length;
+            course.activities.forEach((activity)=>{
+            that.handleTabsEdit(1,'add');
+            let activityNumber = activity['item'].length;
+            console.log('activityNumber:',activityNumber);
             let studentNum = course.scores.length;
             that.currentNumberofActivities = activityNumber;
-          //   that.db.items[0]={};
-          //   that.db.items[1]={};
+          
+          let tempList = [];
           for(let i=0;i<studentNum+3;i++){
-            that.db.items[i]={};
+            // that.db.items[i]={};
+            tempList[i]={};
           }
-         
+          let tempcolumnList = [{
+                data:'studentNumber',
+            },
+            {
+                data:'studentName',
+            },
+            {
+                data:'pass',
+            },];
          for(let i=0;i<activityNumber;i++){
         //   itemDict[i.toString()] = course.activities.item[i];
         var columnDist = {};
-          that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
-          that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
-          that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
+          // that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
+          tempList[0][activity['item'][i]] = activity['item'][i];
+          // that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
+          tempList[1][activity['item'][i]] = activity['value'][i];
+          // that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
+          tempList[2][activity['item'][i]] = activity['remark'][i];
           columnDist={
-            data:course.activities[0]['item'][i],
+            data:activity['item'][i],
           }
-          that.columnList.push(columnDist);
-          
-         
+          tempcolumnList.push(columnDist);
         //   valueDict[i.toString()] = course.activities.value[i];
          }
-         
+         console.log('tempcolumnList:',tempcolumnList);
           for(let i=0;i<studentNum;i++){
-            console.log('number:',3+i);
-            that.db.items[3+i]['studentNumber']=course.scores[i]['info'][0];
-            that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
-            that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
+            // console.log('number:',3+i);
+            // that.db.items[3+i]['studentNumber']= course.scores[i]['info'][0];
+            tempList[3+i]['studentNumber'] = course.scores[i]['info'][0];
+            // that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
+            tempList[3+i]['studentName'] = course.scores[i]['info'][1];
+            // that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
+            tempList[3+i]['pass'] = (course.scores[i]['info'][2]=='')? '':'F';
+            if(count+1 >course.scores[i]['grade'].length){
+              // console.log('该成绩项下，并未添加学生成绩')
+              
+              for(let j=0;j<activityNumber;j++){
+                tempList[3+i][activity['item'][j]] = 0;
+              }
+              
+            }
+            else{
             for(let j=0;j<activityNumber;j++){
-              if(!course.scores[i]['grade'][j]){
-                that.db.items[3+i][course.activities[0]['item'][j]] = 0;
+              if(!course.scores[i]['grade'][count][j]){
+                //[count++]
+                // that.db.items[3+i][course.activities[0]['item'][j]] = 0;
+                tempList[3+i][activity['item'][j]] = 0;
               }
               else{
-                that.db.items[3+i][course.activities[0]['item'][j]] = course.scores[i]['grade'][j];
+                // that.db.items[3+i][course.activities[0]['item'][j]] = course.scores[i]['grade'][j];
+                // tempList[3+i][activity['item'][j]] =  course.scores[i]['grade'][count++][j];
+                tempList[3+i][activity['item'][j]] =  course.scores[i]['grade'][count][j];
               }
                 
             }
+
+            }
+            
           };
-          
+          that.columnList.push(tempcolumnList);
+          that.db.items.push(tempList);
+          count++;
+            });
+          that.editableTabsValue = '1';
+          that.currenteditableTabsValue = 1;
           console.log('db.items',that.db.items,'columnList:',that.columnList);
         }
         else {
           console.log('res has no activities');
+          that.handleTabsEdit(1,'add');
           that.hasActivities = false;
          
           }
         }
         else{
           console.log('res has no scores');
+          that.handleTabsEdit(1,'add');
           that.hasScores = false;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
-            let activityNumber = course.activities[0]['item'].length;
-            let studentNum = 0;
+            course.activities.forEach((activity)=>{
+            that.handleTabsEdit(1,'add');
+            let activityNumber = activity['item'].length;
+            let studentNum = course.scores.length;
             that.currentNumberofActivities = activityNumber;
-         
-          for(let i=0;i<studentNum+4;i++){
-            that.db.items[i]={};
+          
+          let tempList = [];
+          for(let i=0;i<studentNum+3;i++){
+            // that.db.items[i]={};
+            tempList[i]={};
           }
-         
+         let tempcolumnList = [{
+                data:'studentNumber',
+            },
+            {
+                data:'studentName',
+            },
+            {
+                data:'pass',
+            },];
          for(let i=0;i<activityNumber;i++){
         //   itemDict[i.toString()] = course.activities.item[i];
         var columnDist = {};
-          that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
-          that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
-          that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
+          // that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
+          tempList[0][activity['item'][i]] = activity['item'][i];
+          // that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
+          tempList[1][activity['item'][i]] = activity['value'][i];
+          // that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
+          tempList[2][activity['item'][i]] = activity['remark'][i];
           columnDist={
-            data:course.activities[0]['item'][i],
+            data:activity['item'][i],
           }
-          that.columnList.push(columnDist);
+          tempcolumnList.push(columnDist);
+          
           
          
-        
+        //   valueDict[i.toString()] = course.activities.value[i];
          }
-         
-        
-          
+          that.columnList.push(tempcolumnList);
+          that.db.items.push(tempList);
+            });
           console.log('db.items',that.db.items,'columnList:',that.columnList);
         }
         }
@@ -504,30 +666,58 @@ async getActivities(){
             return;
           }
             let that =this;
-            var studentList = JSON.parse(JSON.stringify(that.db.items));
-            let activityNumber = that.columnList.length;
+            
+            let allStudentsNumber = []
+            let studentList = JSON.parse(JSON.stringify(that.db.items[0]));
+            
             for(let m=0;m<3;m++){
-            studentList.shift();
-        }
+                studentList.shift();
+            }
             for(let i=0;i<studentList.length;i++){
-                console.log('studentInfo:',studentList[i]);
+                // console.log('studentInfo:',studentList[i]);
                 if(studentList[i]['studentNumber']!=undefined){
-                    var gradeList = [];
-                    for(let j=0;j<activityNumber-3;j++){
-                        var activityLabel = that.columnList[3+j];
-                        
-                        gradeList.push(studentList[i][activityLabel.data]);
-                    };
-                    studentList[i]['pass'] = studentList[i]['pass']==undefined ? "":studentList[i]['pass'];
-                    var scoreDist = {
-                        'info':[studentList[i]['studentNumber'],studentList[i]['studentName'],studentList[i]['pass']],
-                        'grade':gradeList,
-                    }
-                    
-                    that.postData.scores.push(scoreDist);
+                  allStudentsNumber.push(studentList[i]['studentNumber']);
                 }
             }
-           
+            let count=0;
+            allStudentsNumber.forEach((studentNumber)=>{
+              
+              let infoList = [];
+              let finalGrade = [];
+              that.db.items.forEach((activity)=>{
+                let gradList = [];
+                let student = JSON.parse(JSON.stringify(activity));
+                for(let m=0;m<3;m++){
+                  student.shift();
+                };
+                for(let i=0;i<studentList.length;i++){
+                  if(student[i]['studentNumber']==studentNumber){
+                    // console.log('socres:',student.values())
+                    for(var key in student[i]){
+                      // console.log('key',key,'student[key]',student[i][key])
+                      if(key == 'studentNumber'|| key == 'studentName'|| key == 'pass'){
+                        infoList.push(student[i][key]);
+                      }
+                      else{
+                        gradList.push(student[i][key]);
+                        
+                      }
+                    }
+                  }
+                  
+            }
+            finalGrade.push(gradList);
+              })
+              console.log('info:',infoList,'grade:',finalGrade);
+              var scoreDist = {
+                'info':[infoList[0],infoList[1],infoList[2]],
+                'grade':finalGrade,
+              }
+              
+              console.log('scoreDist',scoreDist,count++);
+              that.postData.scores.push(scoreDist);
+            });
+
             that.addScores(that.postData.scores);
          
             
@@ -542,36 +732,108 @@ async getActivities(){
         var res = this.postData.students;
         // var newstudent = this.postData.newStudents;
         // var scoreRes = this.postData.scores;
-        var studentList = JSON.parse( JSON.stringify(this.db.items));
+        
         var valid = true;
+        var OrFlag = Boolean;
+        var AndFlag = Boolean;
+        var trueFlagNum = 0;//为空的个数
+        var falseFlagNum = 0;//不为空的个数
+        // studentList.forEach(function(student){
+        //   that.columnList.forEach((column)=>{
+        //     let activityNumber = column.length;
+            
+        //     var trueFlagNum = 0;//为空的个数
+        //     var falseFlagNum = 0;//不为空的个数
+        //         // console.log('current student:',student);
+        //         for(let j=0;j<activityNumber-3;j++){
+        //             let activityLabel = column[3+j];//从columnList中获取成绩项名称
+                    
+        //             console.log('student[activityLabel.data]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
+        //             if(!student[activityLabel.data]){
+        //                 trueFlagNum++;
+        //             }
+        //             else{
+        //                 falseFlagNum++;
+        //             }
+        //       };
+        //      // true means null, false mens not null
+        //       if(trueFlagNum>0){
+        //         OrFlag = true;
+        //         if(trueFlagNum == activityNumber-3){
+        //             AndFlag = true;
+        //         }
+        //         else{
+        //             AndFlag = false;
+        //         }
+        //       }
+        //       else{
+        //         OrFlag = false;
+        //         AndFlag = false;
+        //       }
+        //       console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
+        //     if (!student.studentNumber || !student.studentName || OrFlag) {
+        //       if (!student.studentNumber && !student.studentName && AndFlag) {
+        //         // console.log('scoreRes:',scoreRes,'res: ',res);
+        //         console.log('----------全都为空------------');
+        //         return;
+        //       } else {  // either name OR teacherNo is empty, but not both
+        //         valid = false;
+        //         // console.log('scoreRes:',scoreRes,'res: ',res);
+        //         console.log('-----------部分为空-----------',student.studentNumber,student.studentName);
+        //         return;
+        //       }
+        //     } 
+        //     else {  // both are not empty: post 添加学生
+        //       // var distTeacher = {
+        //       //   'studentNumber':student.studentNumber,
+        //       //   'studentName':student.studentName,
+        //       //   // 'email':teacher.email,
+        //       //   'programId': that.programId,
+        //       //   // 'pass':student.pass,
+        //       //   'departmentId':that.departmentId,
+        //       //   'schoolId':that.schoolId
+        //       // };
+        //     // res.push(distTeacher);
+        //     // console.log('scoreRes:',scoreRes,'res: ',res);
+        //     // console.log('-----------都不空-----------');
+        //     };
+        //   })
+            
+        //   });
+      this.db.items.forEach((students)=>{
+        var studentList = JSON.parse( JSON.stringify(students));
+        
         for(let m=0;m<3;m++){
             studentList.shift();
         }
-        
-        var OrFlag = Boolean;
-        var AndFlag = Boolean;
-        
-        studentList.forEach(function(student){
-            let activityNumber = that.columnList.length;
-            
-            var trueFlagNum = 0;//为空的个数
-            var falseFlagNum = 0;//不为空的个数
-                console.log('current student:',student);
-                for(let j=0;j<activityNumber-3;j++){
-                    let activityLabel = that.columnList[3+j];//从columnList中获取成绩项名称
-                    
-                    console.log('activityLabel',activityLabel,'student[activityLabel]',activityLabel.data,'student[activityLabel]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
-                    if(!student[activityLabel.data]){
-                        trueFlagNum++;
+        for(let i=0;i<studentList.length;i++){
+                  if(studentList[i]['studentNumber']){
+                    // console.log('socres:',student.values())
+                    for(var key in studentList[i]){
+                      // console.log('key',key,'studentList[key]',studentList[i][key])
+                        if(key != 'pass'&&!studentList[i][key]){
+                          trueFlagNum++;
+                        }
+                        else{
+                          falseFlagNum++;
+                        }
+                      
                     }
-                    else{
-                        falseFlagNum++;
-                    }
-              };
-             // true means null, false mens not null
-              if(trueFlagNum>0){
+                  }
+                  else{
+                    // console.log("studentList[i]['studentNumber']:",studentList[i]['studentNumber'])
+                  }
+                  
+            }
+      });
+      let activityNumber = 0;
+      this.columnList.forEach((column)=>{
+        activityNumber = activityNumber+column.length-3;
+      })
+      console.log('trueFlagNum:',trueFlagNum);
+      if(trueFlagNum>0){
                 OrFlag = true;
-                if(trueFlagNum == activityNumber-3){
+                if(trueFlagNum == activityNumber){
                     AndFlag = true;
                 }
                 else{
@@ -582,78 +844,24 @@ async getActivities(){
                 OrFlag = false;
                 AndFlag = false;
               }
-              console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
-            if (!student.studentNumber || !student.studentName || OrFlag) {
-              if (!student.studentNumber && !student.studentName && AndFlag) {
-                // console.log('scoreRes:',scoreRes,'res: ',res);
-                console.log('----------全都为空------------');
-                return;
-              } else {  // either name OR teacherNo is empty, but not both
-                valid = false;
-                // console.log('scoreRes:',scoreRes,'res: ',res);
-                console.log('-----------部分为空-----------');
-                return;
-              }
-            } 
-            else {  // both are not empty: post
+      console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
+      if (OrFlag) {
+      if (AndFlag) {
+        // console.log('scoreRes:',scoreRes,'res: ',res);
+        console.log('----------全都为空------------');
+        return;
+      } else {  // either name OR teacherNo is empty, but not both
+        valid = false;
+        // console.log('scoreRes:',scoreRes,'res: ',res);
+        console.log('-----------部分为空-----------');
+        return;
+      }
+      
+    } else{
+        
+      }
 
-                
-               
-              var distTeacher = {
-                'studentNumber':student.studentNumber,
-                'studentName':student.studentName,
-                // 'email':teacher.email,
-                'programId': that.programId,
-                // 'pass':student.pass,
-                'departmentId':that.departmentId,
-                'schoolId':that.schoolId
-              };
-            //   console.log('that.searchStudent(student.studentNumber)',that.searchStudent(student.studentNumber));
-              // that.searchStudent(student.studentNumber).then(function(res){
-              //   console.log('search res:',res);
-              //   if(res){
-              //       var newStudent = {
-              //   'studentNumber':student.studentNumber,
-              //   'studentName':student.studentName,
-              //   // 'email':teacher.email,
-              //   'programId': that.programId,
-              //   // 'pass':student.pass,
-              //   'departmentId':that.departmentId,
-              //   'schoolId':that.schoolId
-              //       }
-              //       newstudent.push(newStudent);
-              //   };
-              // })
-              
-             
-            //   var scoreDist = {
-            //     'info':[student.studentNumber,student.studentName,pass],
-            //     'grade':gradeList,
-            //   };
-            
-                // if(scoreRes[0]==undefined){
-                //     // console.log('is going to push!!!!!!');
-                //     scoreRes.push(scoreDist);
-                // }
-                // else{
-                //     for(let i=0;i<scoreRes.length;i++){
-                //         if(scoreRes[i]['info'][0] == student.studentNumber){
-                //         // console.log('duplicated !!!!!!!!!');
-                //     }
-                //     else{
-                //         // console.log('is going to push!!!!!!');
-                //         scoreRes.push(scoreDist);
-                //     }
-                // }
-                // }
 
-            
-            res.push(distTeacher);
-            // console.log('scoreRes:',scoreRes,'res: ',res);
-            // console.log('-----------都不空-----------');
-            };
-          });
-    
           return valid;
       },
 // async searchForStudent(){
@@ -694,23 +902,24 @@ async getActivities(){
 
     goBackandClean(){
       let that = this;
-      this.db.items = [];
-      this.columnList = [{
-              data:'studentNumber',
-          },
-          {
-              data:'studentName',
-          },
-          {
-              data:'pass',
-          },];
-      this.postData.students = [];
+      // this.db.items = [];
+      // this.columnList = [{
+      //         data:'studentNumber',
+      //     },
+      //     {
+      //         data:'studentName',
+      //     },
+      //     {
+      //         data:'pass',
+      //     },];
+      // this.postData.students = [];
       this.postData.scores = [];
-      this.postData.newStudents = [];
+      // this.postData.newStudents = [];
       
       this.getActivities().then(function(res){
         that.hotInstance.updateSettings({
-                data:that.db.items,
+                data:that.db.items[that.currenteditableTabsValue-1],
+                column:that.columnList[that.currenteditableTabsValue-1]
               });
         that.dirty = false;
         console.log('datas:', that.db.items,that.postData.students);
@@ -752,36 +961,36 @@ async getActivities(){
       
       }
     },
- async searchStudent(postData){
+//  async searchStudent(postData){
     
-        return request({
-            url:'/student/number'+'/'+postData,
-            method:'get'
-        }).then(function(res){
-            console.log('searching for studentNumber:',postData,'student search res:',res);
-            if(res.data == undefined){
+//         return request({
+//             url:'/student/number'+'/'+postData,
+//             method:'get'
+//         }).then(function(res){
+//             console.log('searching for studentNumber:',postData,'student search res:',res);
+//             if(res.data == undefined){
                 
-                return true;
-            }
-            else{
-                return false;
-            }
+//                 return true;
+//             }
+//             else{
+//                 return false;
+//             }
             
-        })
-    },
- async addTeacher(postData){
-      var localres;
-      console.log('student postData:',postData);
-      return request({
-                url:'/student/addStudents',
-                method:'post',
-                data:postData
-            }).then(function(res){
-              localres = res;
+//         })
+//     },
+//  async addTeacher(postData){
+//       var localres;
+//       console.log('student postData:',postData);
+//       return request({
+//                 url:'/student/addStudents',
+//                 method:'post',
+//                 data:postData
+//             }).then(function(res){
+//               localres = res;
               
-              return localres;
-            });
-    },
+//               return localres;
+//             });
+//     },
     addScores(postData){
         let that = this;
         console.log('score postData:',postData);
@@ -808,6 +1017,7 @@ async getActivities(){
       
         }).catch(e=>{
           console.log('e:',e);
+          that.postData.scores = [];
         })
     }
     
@@ -822,6 +1032,9 @@ async getActivities(){
     </script>
     
     <style  scoped>
+    .activity-tab{
+      margin-top: 100px;
+    }
     .no-program {
   display: flex;
   flex-direction: column;
@@ -841,8 +1054,9 @@ async getActivities(){
   width: 100%;
 }
     .hot-table-container{
-    float: left;
-    margin-left: 5%;
+    width: 50%;
+    margin-left: 20%;
+    margin-right: 25%;
   }
     .hotTable{
       box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
