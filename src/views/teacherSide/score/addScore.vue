@@ -197,7 +197,7 @@
         
         
       },
-      handleTabsEdit(targetName, action) {
+      handleTabsEdit(targetName, action,activityName) {
         let that = this;
         console.log('action',action);
         if (action === 'add'&& !targetName) {
@@ -227,12 +227,12 @@
               });
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
         }
-        if (action === 'add' && targetName) {
+        if (action === 'add' && targetName && activityName) {
           this.currenteditableTabsValue = ++this.tabIndex;
           this.maxeditableTabsValue = this.tabIndex;
           let newTabName = this.tabIndex + '';
           this.editableTabs.push({
-            title: '成绩项'+' '+newTabName,
+            title: (activityName ? activityName:'成绩项'+' '+newTabName),
             name: newTabName.toString(),
             value: newTabName
           });
@@ -509,7 +509,7 @@ async getActivities(){
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
             course.activities.forEach((activity)=>{
-            that.handleTabsEdit(1,'add');
+            that.handleTabsEdit(1,'add',activity.name);
             let activityNumber = activity['item'].length;
             console.log('activityNumber:',activityNumber);
             let studentNum = course.scores.length;

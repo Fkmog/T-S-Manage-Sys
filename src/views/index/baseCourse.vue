@@ -4,12 +4,28 @@
       <template #rightTime>
 
         <div class="selectionBar">
-          <el-row >
-            <el-col :span="20">
+          <el-row>
+            <el-col :span="9">
+              <el-select
+                v-model="hasDetail"
+                class="m-3"
+                
+                @change="getSelectedBaseCourse(hasDetail)">
+        
+                <el-option
+                  v-for="item in hasDetailSeletion"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+          
+              </el-select>
+            </el-col>
+            <el-col :span="9">
               <el-select
                 v-model="currentVersion"
                 class="m-3"
-                placeholder="Please enter a keyword"
+                
                 @change="getCourseByYear(currentVersion)">
         
                 <el-option
@@ -464,8 +480,8 @@
 
     <el-dialog v-model="showEditVersionDailogFlag" title="课程大纲版本号维护">
 
-      <el-form :model="versionForm" :rules="editVersionRules" ref="editVersionRuleForm">
-        <el-form-item v-show="addFlag" label="课程大纲版本号" :label-width="formLabelWidth" prop="name">
+      <el-form :model="versionForm" :rules="editVersionRules" >
+        <el-form-item v-show="addFlag" label="课程大纲版本号" :label-width="formLabelWidth" prop="name" :error="C_ErrorMsg_editVersion_name">
           <el-input v-model="versionForm.name" autocomplete="off" />
         </el-form-item>
         <el-form-item v-show="editFlag||deleteFlag" label="选择课程大纲版本" :label-width="formLabelWidth" prop="name">
@@ -482,24 +498,24 @@
           
               </el-select>
         </el-form-item>
-        <el-form-item label="面向年级" :label-width="formLabelWidth" prop="enrollYear" >
+        <el-form-item label="面向年级" :label-width="formLabelWidth" prop="enrollYear" :error="C_ErrorMsg_editVersion_enrollYear">
           <el-input v-model="versionForm.enrollYear" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="修订年份" :label-width="formLabelWidth" prop="reviseYear">
+        <el-form-item label="修订年份" :label-width="formLabelWidth" prop="reviseYear" :error="C_ErrorMsg_editVersion_reviseYear">
           <el-input v-model="versionForm.reviseYear" autocomplete="off" />
         </el-form-item>
       </el-form>
 
       <template #footer>
             <span class="dialog-footer" >
-              <el-button @click="showEditVersionDailogFlag = false">取消</el-button>
-              <el-button v-show="addFlag" type="primary" @click="addVersion('editVersionRuleForm')">
+              <el-button @click="showEditVersionDailogFlag = false;this.cancelVersionForm()">取消</el-button>
+              <el-button v-show="addFlag" type="primary" :disabled="!submitFlag" @click="addVersion()">
                 添加课程大纲版本号
               </el-button>
-              <el-button v-show="editFlag" type="warning" @click="editVersion('editVersionRuleForm')">
+              <el-button v-show="editFlag" type="warning" :disabled="!submitFlag" @click="editVersion()">
                 修改课程大纲版本号
               </el-button>
-              <el-button v-show="this.deleteFlag" type="danger" @click="deleteVersion('editVersionRuleForm')">
+              <el-button v-show="deleteFlag" type="danger" :disabled="!submitFlag" @click="deleteVersion()">
                 删除课程大纲版本号
               </el-button>
             </span>
@@ -566,8 +582,85 @@
     Document,ElTag,Avatar,DocumentChecked,User,CircleClose
   },
   data(){
-    return{
+      var validateName = (rule,value,callback) =>{
+        if(value === ''){
+          this.C_ErrorMsg_editVersion_name = '请输入版本名称';
+        }
+        else{
+          let nameformat = /^\d{4}版$/;
+          if(!nameformat.test(value)){
+          this.C_ErrorMsg_editVersion_name = '请输入正确版本名称格式 例如：2020版';
+        }
+        else{
+          this.nameFlag = true;
+          if(this.enrollYearFlag&&this.nameFlag&&this.reviseYearFlag){
+              this.submitFlag = true;
+            }
+            else{
+              this.submitFlag = false;
+            }
+        }
+        }
+      };
+      var validateEnrollYear = (rule,value,callback) => {
+        if(value === ''){
+          this.C_ErrorMsg_editVersion_enrollYear = '请输入年份';
+        }
+        else{
+          let timeformat = /^[1-9]\d{3}$/;
+          let numberformat = /^\d+$/;
+          if(!numberformat.test(value)){
+          this.C_ErrorMsg_editVersion_enrollYear = '请输入数字'
+        }
+          else if(!timeformat.test(value)){
+            
+            this.C_ErrorMsg_editVersion_enrollYear = '请输入正确年份格式 例如：2020 '
+          }
+          else{
+            this.enrollYearFlag = true;
+            if(this.enrollYearFlag&&this.nameFlag&&this.reviseYearFlag){
+              this.submitFlag = true;
+            }
+            else{
+              this.submitFlag = false;
+            }
+         
+        }
+        }
+        
+      };
+      var validateReviseYear = (rule,value,callback) => {
+        if(value === ''){
+          this.C_ErrorMsg_editVersion_reviseYear = '请输入年份';
+        }
+        else{
+          let timeformat = /^[1-9]\d{3}$/;
+          let numberformat = /^\d+$/;
+          if(!numberformat.test(value)){
+          this.C_ErrorMsg_editVersion_reviseYear = '请输入数字'
+        }
+          else if(!timeformat.test(value)){
+            this.C_ErrorMsg_editVersion_reviseYear = '请输入正确年份格式 例如：2020 '
+          }
+          else{
+            this.reviseYearFlag = true;
+            if(this.enrollYearFlag&&this.nameFlag&&this.reviseYearFlag){
+              this.submitFlag = true;
+            }
+            else{
+              this.submitFlag = false;
+            }
+          }
+        }
+      }
 
+    return{
+      hasDetail:'全部',
+      hasDetailSeletion:['全部','有课程大纲','无课程大纲'],
+      submitFlag:false,
+      nameFlag:false,
+      enrollYearFlag:false,
+      reviseYearFlag:false,
       addFlag:false,
       editFlag:false,
       deleteFlag:false,
@@ -577,16 +670,22 @@
         reviseYear:'',
         versionId:'',
       },
+      C_ErrorMsg_editVersion_name:'',
+      C_ErrorMsg_editVersion_enrollYear:'',
+      C_ErrorMsg_editVersion_reviseYear:'',
+
       editVersionRules:{
           name: [
-              { required: true, message: '请输入课程大纲版本号名称', trigger: 'blur' },
+              
+              {validator:validateName,trigger: 'blur'}
             ],
           enrollYear: [
-            { required: true, message: '请输入面向年级', trigger: 'blur' },
             
+            {validator:validateEnrollYear,trigger: 'blur'}
           ],
           reviseYear: [
-            { required: true, message: '请输入修订年份', trigger: 'blur' },
+            
+            {validator:validateReviseYear,trigger: 'blur'}
             // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
           ],
          
@@ -597,6 +696,7 @@
 
       C_ErrorMsg:'',
       C_ErrorMsg_edit:'',
+
 
       showToolIcon:Boolean,
 
@@ -734,12 +834,25 @@
     versionId:'',
   }),
   
-  result:reactive({}),
+  result:{},
   
     }
   }, 
   methods: 
   {
+    getSelectedBaseCourse(){
+      this.getBaseCourse(this.pageSize,this.pageNum);
+    },
+    cancelVersionForm(){
+      this.versionForm={name:'',enrollYear:'',reviseYear:'',versionId:'',};
+      this.C_ErrorMsg_editVersion_name='';
+      this.C_ErrorMsg_editVersion_enrollYear='';
+      this.C_ErrorMsg_editVersion_reviseYear='';
+      this.nameFlag=false;
+      this.enrollYearFlag=false;
+      this.reviseYearFlag=false;
+
+    },
     selectVersion(versionId){
       
       this.versionForm.name = this.versions[versionId-1]['label'];
@@ -748,127 +861,95 @@
       this.versionForm.versionId = this.versions[versionId-1]['versionId'];
       // console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
     },
-    addVersion(formName){
-      this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let that = this;
-            return request({
-              url:'/detail/version',
-              method:'post',  
-              data:{
-                "enrollYear": that.versionForm.enrollYear,
-                "reviseYear": that.versionForm.reviseYear,
-                "versionName": that.versionForm.name
-              },
-            }).then((res)=>{
-              console.log('edit version res:',res);
-              if(res.code == 'SUCCESS'){
-                ElMessage({
-                    type: 'success',
-                    message: `添加版本大纲号成功`,
-                    duration:1000,
-                  });
-                  that.showEditVersionDailogFlag = false;
-                  that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
-                  that.getDict();
-              }
-            }).catch((e)=>{
-              console.log('edit version res error:',e);
-              ElMessage({
-                    type: 'error',
-                    message: `添加版本大纲号失败`,
-                    duration:1000,
-                  });
-            })
-          } else {
-            ElMessage({
-                    type: 'error',
-                    message: `添加版本大纲号失败`,
-                    duration:1000,
-                  });
-            return false;
-          }
-        });
+    addVersion(){
+      let that = this;
+      return request({
+        url:'/detail/version',
+        method:'post',  
+        data:{
+          "enrollYear": that.versionForm.enrollYear,
+          "reviseYear": that.versionForm.reviseYear,
+          "versionName": that.versionForm.name
+        },
+      }).then((res)=>{
+        console.log('edit version res:',res);
+        if(res.code == 'SUCCESS'){
+          ElMessage({
+              type: 'success',
+              message: `添加版本大纲号成功`,
+              duration:1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
+            that.getDict();
+        }
+      }).catch((e)=>{
+        console.log('edit version res error:',e);
+        ElMessage({
+              type: 'error',
+              message: `添加版本大纲号失败`,
+              duration:1000,
+            });
+      })
+
     },
-    editVersion(formName){
-      this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let that = this;
-            return request({
-              url:'/detail/version',
-              method:'put',  
-              data:{
-                "enrollYear": that.versionForm.enrollYear,
-                "reviseYear": that.versionForm.reviseYear,
-                "versionName": that.versionForm.name,
-                "versionId":that.versionForm.versionId,
-              },
-            }).then((res)=>{
-              console.log('edit version res:',res);
-              if(res.code == 'SUCCESS'){
-                ElMessage({
-                    type: 'success',
-                    message: `修改版本大纲号成功`,
-                    duration:1000,
-                  });
-                  that.showEditVersionDailogFlag = false;
-                  that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
-                  that.getDict();
-              }
-            }).catch((e)=>{
-              console.log('edit version res error:',e);
-              ElMessage({
-                    type: 'error',
-                    message: `修改版本大纲号失败`,
-                    duration:1000,
-                  });
-            })
-          } else {
-            ElMessage({
-                    type: 'error',
-                    message: `修改版本大纲号失败`,
-                    duration:1000,
-                  });
-            return false;
-          }
-        });
+    editVersion(){ 
+      let that = this;
+      return request({
+        url:'/detail/version',
+        method:'put',  
+        data:{
+          "enrollYear": that.versionForm.enrollYear,
+          "reviseYear": that.versionForm.reviseYear,
+          "versionName": that.versionForm.name,
+          "versionId":that.versionForm.versionId,
+        },
+      }).then((res)=>{
+        console.log('edit version res:',res);
+        if(res.code == 'SUCCESS'){
+          ElMessage({
+              type: 'success',
+              message: `修改版本大纲号成功`,
+              duration:1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
+            that.getDict();
+        }
+      }).catch((e)=>{
+        console.log('edit version res error:',e);
+        ElMessage({
+              type: 'error',
+              message: `修改版本大纲号失败`,
+              duration:1000,
+            });
+      })
     },
-    deleteVersion(formName){
-      this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let that = this;
-            return request({
-              url:'/detail/versionRemove/'+that.versionForm.versionId,
-              method:'delete',
-            }).then((res)=>{
-              console.log('delete version res:',res);
-              if(res === 204){
-                ElMessage({
-                    type: 'success',
-                    message: `删除版本大纲号成功`,
-                    duration:1000,
-                  });
-                  that.showEditVersionDailogFlag = false;
-                  that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
-                  that.getDict();
-              }
-            }).catch((e)=>{
-              console.log('edit version res error:',e);
-              ElMessage({
-                    type: 'error',
-                    message: `删除版本大纲号失败`,
-                    duration:1000,
-                  });
-            })
-          } else {
-            ElMessage({
-                    type: 'error',
-                    message: `删除版本大纲号失败`,
-                    duration:1000,
-                  });
-            return false;
-          }
-        });
+    deleteVersion(){
+      let that = this;
+      return request({
+        url:'/detail/versionRemove/'+that.versionForm.versionId,
+        method:'delete',
+      }).then((res)=>{
+        console.log('delete version res:',res);
+        if(res === 204){
+          ElMessage({
+              type: 'success',
+              message: `删除版本大纲号成功`,
+              duration:1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {name:'',enrollYear:'',reviseYear:'',versionId:''};
+            that.getDict();
+        }
+      }).catch((e)=>{
+        console.log('edit version res error:',e);
+        ElMessage({
+              type: 'error',
+              message: `删除版本大纲号失败`,
+              duration:1000,
+            });
+      })
     },
     showEditVersionDailog(){
       this.showEditVersionDailogFlag = true;
@@ -1124,7 +1205,7 @@
       this.pageSize +=20;
       this.getBaseCourse(this.pageSize,this.pageNum);
     }
-    else{
+    if(this.result.total-this.pageSize<20&&this.result.total>this.pageSize){
       this.pageSize +=(this.result.total-this.pageSize);
       this.getBaseCourse(this.pageSize,this.pageNum);
     }
@@ -1369,6 +1450,10 @@
       console.log('pageSize:',pageSize,' pageNum:',pageNum,'versionId',this.currentVersionValue);
       let that = this;
       let courses = [];
+      let courseshasVersion = [];
+      let numofcourseshasVersion = 0;
+      let courseshasNoVersion = [];
+      let numofcourseshasNoVersion = 0;
       this.isloading = true;
       this.loadmoreDisabled = true;
       return request({
@@ -1378,6 +1463,7 @@
               'pageSize':pageSize,
               'pageNum':pageNum,
               'versionId':that.currentVersionValue,
+              // 'hasDetail':that.hasDetail,
               'departmentId':that.departmentId,
               'schoolId':that.schoolId,
               'selectKeyWord':that.keyword
@@ -1424,17 +1510,36 @@
               // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
+              if(course.versionId){
+                numofcourseshasVersion++;
+                courseshasVersion.push(course);
+              }
+              if(!course.versionId){
+                numofcourseshasNoVersion++;
+                courseshasNoVersion.push(course);
+              }
             });
-            that.tableData = courses;
-            that.result = res;
+            if(that.hasDetail == '全部'){
+              that.tableData = courses;
+              that.result = res;
+            }
+            if(that.hasDetail == '有课程大纲'){
+              that.tableData = courseshasVersion;
+              that.result = {'total':numofcourseshasVersion};
+            }
+            if(that.hasDetail == '无课程大纲'){
+              that.tableData = courseshasNoVersion;
+              that.result = {'total':numofcourseshasNoVersion};
+            }
             
-            if(pageSize>=res.total){
+            
+            if(pageSize>=that.result.total){
               that.showLoadmore = false;
             }
             else{
               that.showLoadmore = true;
             }
-            console.log('pageSize:',pageSize,'res.total:',res.total,'showloadmore:',that.showLoadmore);
+            console.log('pageSize:',pageSize,'result.total:',that.result.total,'showloadmore:',that.showLoadmore);
             }
             else{
               that.hasBaseCourse = false;
@@ -1447,7 +1552,11 @@
       if(identity == '课程负责人'){
         console.log('pageSize:',pageSize,' pageNum:',pageNum,'versionId',this.currentVersionValue);
       let that = this;
-      let courses = []
+      let courses = [];
+      let courseshasVersion = [];
+      let numofcourseshasVersion = 0;
+      let courseshasNoVersion = [];
+      let numofcourseshasNoVersion = 0;
       return request({
               url:'/baseCourse/respondent',
               method:'get',
@@ -1497,10 +1606,28 @@
               // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
   
               courses.push(course);
+              if(course.versionId){
+                numofcourseshasVersion++;
+                courseshasVersion.push(course);
+              }
+              if(!course.versionId){
+                numofcourseshasNoVersion++;
+                courseshasNoVersion.push(course);
+              }
             });
-            that.tableData = courses;
-            that.result = res;
-            if(pageSize>=res.total){
+            if(that.hasDetail == '全部'){
+              that.tableData = courses;
+              that.result = res;
+            }
+            if(that.hasDetail == '有课程大纲'){
+              that.tableData = courseshasVersion;
+              that.result = {'total':numofcourseshasVersion};
+            }
+            if(that.hasDetail == '无课程大纲'){
+              that.tableData = courseshasNoVersion;
+              that.result = {'total':numofcourseshasNoVersion};
+            }
+            if(pageSize>=that.result.total){
               that.showLoadmore = false;
             }
           }).catch(e=>{
