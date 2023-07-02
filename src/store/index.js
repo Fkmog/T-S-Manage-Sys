@@ -69,6 +69,8 @@ export default createStore({
         identity: "",
         // 教师端变量
         teacherSideClassInfo: {},
+        //管理员变量
+        adminSideClassInfo:{},
       },
       getters: {
         changeIsTeacher(state) {
@@ -108,6 +110,9 @@ export default createStore({
         },
         setTeacherSideClassInfo(state, newVal) {
           state.teacherSideClassInfo = newVal;
+        },
+        setadminSideClassInfo(state, newVal) {
+          state.adminSideClassInfo = newVal;
         },
         setCurrentVersionValue(state, newVal){
           state.currentVersionValue = newVal;

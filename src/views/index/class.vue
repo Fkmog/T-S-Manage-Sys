@@ -341,6 +341,7 @@
     class="classesTable"
     :data="classTable"
     @selection-change="handleSelectionChange"
+    @row-dblclick="goCheck"
     style="width: 1400px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
@@ -627,6 +628,12 @@ export default {
     },
   },
   methods: {
+    //跳转到审核页面
+    goCheck(row){
+      console.log('row:',row);
+      this.$store.commit("currentInfo/setadminSideClassInfo", row);
+      this.$router.push({ name: "TeacherClass" });
+    },
     //跳转到批量添加
     goBatchAddClass() {
       this.$router.push({ path: "/batchClassAdd" });

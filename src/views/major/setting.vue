@@ -75,10 +75,10 @@
 
 <script>
 import DrawerSearch from "@/components/general/drawerSearch.vue";
-import { searchProgram,checkProgram } from "@/api/program";
+import { searchProgram, checkProgram } from "@/api/program";
 import { getDictionary } from "@/api/dictionary";
 import { copyProgram } from "@/api/basecourse";
-import {  ElMessage } from "element-plus";
+import { ElMessage } from "element-plus";
 
 export default {
   name: "Setting",
@@ -90,7 +90,7 @@ export default {
       programId: "",
       year: "",
       enroll_year: [],
-      checkList: [],
+      checkList: ["毕业要求和指标点", "课程体系", "达成度"],
       currentRow: [],
       programList: [],
       keyword: "",
@@ -113,7 +113,7 @@ export default {
       deep: true,
       handler(value) {
         this.currentYear = this.$store.state.currentInfo.year;
-         this.checkProgram();
+        this.checkProgram();
       },
     },
   },
@@ -124,7 +124,7 @@ export default {
     this.departmentId = this.$store.state.currentInfo.departmentId;
     this.schoolId = this.$store.state.currentInfo.schoolId;
     this.getDictionary();
-    this.checkProgram()
+    this.checkProgram();
   },
   methods: {
     //获取数据字典
@@ -200,6 +200,7 @@ export default {
             message: `复制成功`,
             duration: 1000,
           });
+          this.drawer=false
         }
       });
     },

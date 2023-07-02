@@ -31,10 +31,10 @@
               @change="changeYear()"
             >
               <el-option
-                v-for="item in yearOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="item in enroll_year"
+                :key="item.dictValue"
+                :label="item.dictLabel + '级'"
+                :value="item.dictLabel"
               />
             </el-select>
           </div>
@@ -96,7 +96,7 @@
 import HeaderNav from "./headerNav.vue";
 import HeaderIdentity from "./headerIdentity.vue";
 import { HomeFilled } from "@element-plus/icons-vue";
-// import PrincipalNav from "./principalNav";
+import { getDictionary } from "@/api/dictionary";
 
 export default {
   name: "MainHeader",
@@ -104,29 +104,27 @@ export default {
     HeaderNav,
     HeaderIdentity,
     HomeFilled,
-    // PrincipalNav,
   },
   data() {
     return {
       //现在直接给默认值，之后浏览器session拿 !todo
-      year: "2021",
-      yearOptions: [
-        {
-          value: "2021",
-          label: "2021级",
-        },
-        {
-          value: "2022",
-          label: "2022级",
-        },
-      ],
+      year: "2021级",
+      enroll_year: [],
     };
   },
   mounted() {
     this.$store.commit("currentInfo/setYear", this.year);
+    this.getDictionary();
   },
 
   methods: {
+    //获取数据字典
+    getDictionary() {
+      getDictionary().then((res) => {
+        console.log("getDictionary", res);
+        this.enroll_year = res.enroll_year;
+      });
+    },
     backIndex() {
       this.$router.replace({ path: "/major" });
     },
@@ -139,7 +137,6 @@ export default {
 </script>
 
 <style scoped>
-
 .headerBgd {
   display: flex;
   background-color: #5c6bc0;

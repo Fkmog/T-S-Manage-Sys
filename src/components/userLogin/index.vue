@@ -87,9 +87,14 @@ export default {
           this.errorMsg = "";
           login(this.loginForm.userName, this.loginForm.passWord).then(
             (res) => {
-              if (res.code == 'SUCCESS') {
+              if (res.code == "SUCCESS") {
                 //存储token -> cookie
                 Cookies.set("Admin-Token", res.token);
+                //登陆时保证Nav高亮正确
+                this.$store.commit("navInfo/setActiveDisplay1", 0);
+                this.$store.commit("navInfo/setActiveDisplay2", 0);
+                this.$store.commit("navInfo/setActiveDisplay3", 0);
+                this.$store.commit("navInfo/setActiveDisplay4", 0);
                 //存用户信息 ->vuex
                 getUserInfo().then((res) => {
                   console.log("userInfo", res);
@@ -132,8 +137,8 @@ export default {
                   }
                 });
               }
-              
-              if (res.code === 'ERROR') {
+
+              if (res.code === "ERROR") {
                 this.errorMsg = "账号/密码不正确，请重新输入";
                 this.loginForm.passWord = "";
                 return;

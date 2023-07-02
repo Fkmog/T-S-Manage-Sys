@@ -27,54 +27,68 @@
 
   <div layout="row" flex class="md-padding" >
     <addBtn @click="goAddScore"></addBtn>
+
+    <!-- editable @edit="handleTabsEdit"-->
+    <el-tabs v-model="editableTabsValue" type="card" class="activity-tab"  
+
+      @tab-click="editableTabsValueChange"
+      
+      >
+      <el-tab-pane
+        v-for="(item, index) in editableTabs"
+        :key="item.name"
+        :label="item.title"
+        :name="item.name"
+      >
+  </el-tab-pane>
+</el-tabs>
+
+
+
 <!-- 学生信息列表 -->
-    <el-table
-    class="studentsTable"
-    :data="studentsTable"
-    :style="{width: tableWidth}" 
-    :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
-    :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
-    v-show="hasScores"
+<div class="studentCard" v-show="hasScores">
+  
+    
+      <el-table
+        class="studentsTable"
+        :data="studentsTable[this.currenteditableTabsValue-1]"
+        height="600px"
+        :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'63px','font-weight': 'bold','color':'black'}"
+        :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
   >
-    <el-table-column prop="studentNumber" label="学号"  width="180px"/>
-    <el-table-column prop="studentName" label="姓名" width="100px"/>
-    <!-- <el-table-column>
-      <template #header="scope1">
-        <span>成绩</span>
-      </template>
-      <template #default="scope">
-        <el-row>
-          <el-col v-for="(item,i) in activityName" :key="item.name" :span="4">
-          {{ item }}
-          <el-row>{{ scope.row.scores[i]}}/{{ activityScores[i]  }}</el-row>
-        </el-col>
-        </el-row>
-      </template>
-    </el-table-column> -->
-    <el-table-column v-for="(item,i) in activityName"  :label="item" :key="item" width="180px">
+    <el-table-column fixed prop="studentNumber" label="学号"  width="180px"/>
+    <el-table-column fixed prop="studentName" label="姓名" width="180px"/>
+
+    <el-table-column v-for="(item,i) in currentactivityName"  :label="item" :key="item" width="180px">
       <template #header>
         <el-col>
           <el-row>
             <span>{{item}}</span>
           </el-row>
           <el-row>
-            <span class="subtabletitle">({{activityScores[i]}})</span>
+            <span class="subtabletitle">({{currentactivityScores[i]}})</span>
           </el-row>
         </el-col>
         
         
       </template>
       <template #default="scope">
-        <span class="scoreintable">
-          {{ scope.row.scores[i] }}
+        <span class="scoreintable" @click="showInfo(scope.row)">
+          {{ scope.row.scores[this.currenteditableTabsValue-1][i] }}
         </span>
       </template>
     </el-table-column>
+      </el-table>
     
-  </el-table>
+    
+
+  
+  
+</div>
+   
   <div v-show="!hasScores" class="no-program">
       <h2 style="display: flex; justify-content: center; margin-top: 100px">
-        未添加成绩项
+        未添加学生
       </h2>
       
   </div>
@@ -96,20 +110,132 @@ export default {
       hasActivities:Boolean,
       hasScores:Boolean,
 
+      editableTabs:[],
+      tabIndex: 0,
+      currenteditableTabsValue:0,
+
       classInfo: [],
       activityName:[],
+      currentactivityName:[],
       activityScores:[],
+      currentactivityScores:[],
       studentsTable:[],
       tableWidth:'',
     };
   },
   mounted() {
+    this.identity = this.$store.state.currentInfo.identity;
+    if(this.identity == '学院管理员'){
+      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+      console.log('identity:',this.identity);
+    }
+    else{
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    console.log('identity:',this.identity);
+    }
     this.getActivities();
     
     
   },
   methods: {
+    showInfo(row){
+      console.log('row',row);
+    },
+    editableTabsValueChange(pane){
+        
+      
+        let length = 0;
+        this.currenteditableTabsValue = Number(pane.props.name);
+        this.currentactivityName = this.activityName[this.currenteditableTabsValue-1];
+        this.currentactivityScores = this.activityScores[this.currenteditableTabsValue-1];
+        length = (this.currentactivityName.length+1)*180+100;
+        this.tableWidth = length.toString()+'px';
+        return console.log('currenteditableTabsValue:',Number(pane.props.name));
+        
+        
+      },
+      handleTabsEdit(targetName, action) {
+        let that = this;
+        console.log('action',action);
+        if (action === 'add'&& !targetName) {
+          
+          let item = ['']
+          let value = ['']
+          let remark = ['']
+          let weight = ['']
+          let tempdata =[]
+          tempdata.push(item);
+          tempdata.push(value);
+          tempdata.push(remark);
+          tempdata.push(weight);
+          this.db.items.push(tempdata);
+          
+          let newTabName = ++this.tabIndex + '';
+          this.currenteditableTabsValue = this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+              });
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
+        }
+        if (action === 'add' && targetName) {
+          this.currenteditableTabsValue = ++this.tabIndex;
+          this.maxeditableTabsValue = this.tabIndex;
+          let newTabName = this.tabIndex + '';
+          this.editableTabs.push({
+            title: '成绩项'+' '+newTabName,
+            name: newTabName.toString(),
+            value: newTabName
+          });
+          this.editableTabsValue = newTabName.toString();
+          
+          console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
+        }
+        if (action === 'remove') {
+      ElMessageBox.confirm(
+      '是否删除当前成绩项',
+      '注意',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(()=>{
+        let tabs = this.editableTabs;
+        // this.currenteditableTabsValue = --this.tabIndex;
+        console.log('targetName:',targetName);
+          let activeName = this.editableTabsValue;
+          if (activeName === targetName) {
+            tabs.forEach((tab, index) => {
+              if (tab.name === targetName) {
+                let nextTab = tabs[index + 1] || tabs[index - 1];
+                if (nextTab) {
+                  activeName = nextTab.name;
+                }
+              }
+            });
+          }
+          this.hotInstance.updateSettings({
+                data:that.db.items[Number(activeName-1)],
+              });
+          
+          this.editableTabsValue = activeName;
+          this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+          console.log('editableTabs:',this.editableTabs);
+
+
+      }).catch(e=>{
+        console.log('e',e);
+      })
+          
+        }
+      },
     goAddScore(){
       this.$router.push("/addScore");
     },
@@ -128,23 +254,48 @@ export default {
         let length = 0;
         if(course.scores){
           that.hasScores = true;
-          if(course.activities){
-            that.hasActivities = true;
-          let activityNumber = course.activities[0]['item'].length;
-          let studentNum = course.scores.length;
-         that.activityName = course.activities[0]['item'];
-         length = (that.activityName.length+1)*180+100;
-         that.tableWidth = length.toString()+'px';
-         that.activityScores = course.activities[0]['value'];
-        for(let i=0;i<studentNum;i++){
-          var student = {
-          studentNumber:course.scores[i]['info'][0],
-          studentName:course.scores[i]['info'][1],
-          scores:course.scores[i]['grade'],
-        };
-        that.studentsTable.push(student);
-        };
+          let count = 0;
+          if(course.activities.length){
+        that.hasActivities = true;
+        course.activities.forEach((activity)=>{
+          that.handleTabsEdit(1,'add');
+          let activityNumber = activity['item'].length;
+          that.activityName.push(activity['item']);
+          that.activityScores.push(activity['value']);
 
+          let studentNum = course.scores.length;
+          let tempStudents = [];
+          for(let i=0;i<studentNum;i++){
+          if(count+1 >course.scores[i]['grade'].length){
+            let tempscores=[];
+            for(let j=0;j<activityNumber;j++){
+              tempscores.push(0);
+              }
+              course.scores[i]['grade'].push(tempscores);
+          }
+            var student = {
+              studentNumber:course.scores[i]['info'][0],
+              studentName:course.scores[i]['info'][1],
+              scores:course.scores[i]['grade'],
+            }
+          
+          tempStudents.push(student);
+        
+          };
+          that.studentsTable.push(tempStudents);
+          count++;
+        })
+        that.currentactivityName = that.activityName[0];
+        that.currentactivityScores = that.activityScores[0];
+        let length = 0;
+        length = (that.currentactivityName.length+1)*180+100;
+        that.tableWidth = length.toString()+'px';
+        
+        
+        
+        that.editableTabsValue = '1';
+        that.currenteditableTabsValue = 1;
+        console.log('activityName',that.activityName,'activityScores:',that.activityScores);
         }
         else {
           console.log('res has no activities');
@@ -164,6 +315,13 @@ export default {
 </script>
 
 <style scoped>
+
+.studentCard{
+  margin-left: 5%;
+  margin-right: 5%;
+  width:80%;
+  height: 500px;
+}
 .scoreintable{
   margin-left: 19px;
 }
@@ -181,8 +339,7 @@ export default {
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding {
-  margin-top: 120px;
- 
+  margin-top: 90px;
 }
 .block {
   position: absolute;
