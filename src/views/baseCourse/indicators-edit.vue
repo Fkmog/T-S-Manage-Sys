@@ -909,6 +909,8 @@ export default {
             message: `复制成功`,
             duration: 1000,
           });
+          this.drawer=false
+
         }
       });
     },

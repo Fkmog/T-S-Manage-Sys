@@ -289,7 +289,7 @@ export default {
   },
   data() {
     return {
-      checkList: [],
+      checkList: ["成绩项","课程目标"],
       currentRow: {},
       copyCourseList: [],
       keyword: "",
@@ -590,6 +590,8 @@ export default {
             message: `复制成功`,
             duration: 1000,
           });
+          this.drawer=false
+
         }
       });
     },

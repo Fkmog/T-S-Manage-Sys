@@ -693,7 +693,6 @@
       },
 
       showEditVersionDailogFlag:false,
-
       C_ErrorMsg:'',
       C_ErrorMsg_edit:'',
 
