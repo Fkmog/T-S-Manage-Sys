@@ -211,7 +211,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     dragTab(){
     var tab = document.querySelector("#drag-tab .el-tabs__nav"); //获取需要拖拽的tab
     
-    this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
+    // this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
     let that = this;
     this.sortable = Sortable.create(tab, {
       //oldIIndex拖放前的位置， newIndex拖放后的位置 , editableTabs为遍历的tab签
@@ -219,7 +219,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       sort:true,
       onChoose({oldIndex}){
         let currTab = that.tempEditabel[oldIndex];
-        console.log('currTab:',currTab);
+        // that.currenteditableTabsValue = Number(currTab['name']);
+        // console.log('currenteditableTabsValue',that.currenteditableTabsValue);
+        console.log('OnChoose currTab:',currTab);
         if(currTab['name']== '1'){
           that.sortable.option('sort',false);
         }
@@ -231,17 +233,17 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       onEnd({ newIndex, oldIndex }) {
         let currTab = that.tempEditabel.splice(oldIndex, 1)[0]; //鼠标拖拽当前的el-tabs-pane
         // sortable.sort = true;
-        // console.log('this.currTab:',currTab['name']);
+        console.log('OnEnd this.currTab:',currTab);
         // console.log('this.tab:',tab);
         // console.log('this.tempEditabel:',tempEditabel);
           
         that.tempEditabel.splice(newIndex, 0, currTab); 
       
         that.editableTabs = that.tempEditabel;
-        
+        console.log('editableTabs:',that.editableTabs);
         that.editableTabsValue = that.editableTabs[newIndex]['name'];// 设置当前活动tab名称
         that.currenteditableTabsValue = Number(that.editableTabsValue);
-        console.log('currenteditableTabsValue',that.currenteditableTabsValue);
+        
         that.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
               });
@@ -309,6 +311,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             
           });
           this.editableTabsValue = newTabName.toString();
+          console.log('editableTabs after add ',this.editableTabs);
           this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
               });
@@ -326,6 +329,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             inputFlag:false,
             
           });
+          console.log('editableTabs after add ',this.editableTabs);
           this.editableTabsValue = newTabName.toString();
           this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue);

@@ -14,9 +14,9 @@
         
                 <el-option
                   v-for="item in hasDetailSeletion"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
                 />
           
               </el-select>
@@ -656,7 +656,7 @@
 
     return{
       hasDetail:'全部',
-      hasDetailSeletion:['全部','有课程大纲','无课程大纲'],
+      hasDetailSeletion:[{'label':'全部','value':null},{'label':'有课程大纲','value':'1'},{'label':'无课程大纲','value':'0'}],
       submitFlag:false,
       nameFlag:false,
       enrollYearFlag:false,
@@ -839,7 +839,9 @@
   }, 
   methods: 
   {
-    getSelectedBaseCourse(){
+    getSelectedBaseCourse(hasDeatil){
+      this.hasDeatil = hasDeatil;
+      console.log('hasDeatil:',this.hasDeatil);
       this.getBaseCourse(this.pageSize,this.pageNum);
     },
     cancelVersionForm(){
@@ -1462,7 +1464,7 @@
               'pageSize':pageSize,
               'pageNum':pageNum,
               'versionId':that.currentVersionValue,
-              // 'hasDetail':that.hasDetail,
+              'hasDetail':that.hasDeatil,
               'departmentId':that.departmentId,
               'schoolId':that.schoolId,
               'selectKeyWord':that.keyword
@@ -1518,20 +1520,8 @@
                 courseshasNoVersion.push(course);
               }
             });
-            if(that.hasDetail == '全部'){
               that.tableData = courses;
               that.result = res;
-            }
-            if(that.hasDetail == '有课程大纲'){
-              that.tableData = courseshasVersion;
-              that.result = {'total':numofcourseshasVersion};
-            }
-            if(that.hasDetail == '无课程大纲'){
-              that.tableData = courseshasNoVersion;
-              that.result = {'total':numofcourseshasNoVersion};
-            }
-            
-            
             if(pageSize>=that.result.total){
               that.showLoadmore = false;
             }
