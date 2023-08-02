@@ -1,21 +1,46 @@
 <template>
   <div class="content">
+    <!-- 顶部导航栏 -->
+    <div class="block">
+      <el-row class="block-row">
+        <div class="block_title">版本</div>
+        <el-divider class="divider" direction="vertical" />
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="工作手册模板"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toTemplate()"
+          >
+            <List />
+          </el-icon>
+        </el-tooltip>
+      </el-row>
+    </div>
+
     <div class="body-check">
       <div class="card">
         <el-row class="all_block">
-          <el-col class="block">
+          <el-col class="body_block">
             <el-col class="title">专业</el-col>
             <el-col class="detail">{{ currentMajorName }}</el-col>
           </el-col>
           <el-col>
             <el-col class="title">年级</el-col>
-            <el-col class="detail">{{ currentYear }} 级</el-col>
+            <el-col class="detail">{{ currentYear }} </el-col>
           </el-col>
           <el-col>
-            <el-col class="title">设置</el-col>
+            <!-- <el-col class="title">设置</el-col> -->
             <el-col>
               <el-button style="color: #6573c0" text @click="openDrawer"
-                >从其他课程大纲复制
+                >从其他培养方案复制
               </el-button>
             </el-col>
           </el-col>
@@ -57,7 +82,7 @@
   <el-dialog v-model="dialogVisible" title="从其他大纲复制" width="400px">
     <el-row style="margin-bottom: 20px; font-size: 15px"
       >从《{{ currentRow.majorName }}》{{ currentRow.enrollyear }} 级
-      大纲复制以下内容：</el-row
+      培养方案复制以下内容：</el-row
     >
     <el-checkbox-group v-model="checkList">
       <el-checkbox label="毕业要求和指标点"></el-checkbox>
@@ -79,11 +104,12 @@ import { searchProgram, checkProgram } from "@/api/program";
 import { getDictionary } from "@/api/dictionary";
 import { copyProgram } from "@/api/basecourse";
 import { ElMessage } from "element-plus";
-
+import { List } from "@element-plus/icons-vue";
 export default {
   name: "Setting",
   components: {
     DrawerSearch,
+    List,
   },
   data() {
     return {
@@ -127,6 +153,11 @@ export default {
     this.checkProgram();
   },
   methods: {
+    //跳转到模板编辑页面
+    toTemplate(){
+         this.$router.push({ name: "TemplateList" });
+      console.log("toTemplate");
+    },
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -200,7 +231,7 @@ export default {
             message: `复制成功`,
             duration: 1000,
           });
-          this.drawer=false
+          this.drawer = false;
         }
       });
     },
@@ -213,15 +244,39 @@ export default {
   height: 100vh;
   background-color: #f2f2f2;
 }
+/* 顶部导航栏 */
+.block {
+  position: absolute;
+  top: 110px;
+  left: 0px;
+  height: 55px;
+  border-bottom: 1px solid rgb(189, 189, 189);
+  width: 100%;
+}
+.icon {
+  cursor: pointer;
+}
+.block-row {
+  margin-top: 18px;
+}
+.block_title {
+  margin-left: 60px;
+  font-size: 16px;
+}
+.divider {
+  margin-left: 20px;
+  height: 24px;
+}
 .body-check {
   display: flex;
   justify-content: center;
   background-color: #f2f2f2;
 }
 .card {
+  display: flex;
   width: 800px;
   background: white;
-  margin-top: 30px;
+  margin-top: 100px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
@@ -229,7 +284,7 @@ export default {
 .all_block {
   margin-left: 30px;
 }
-.block {
+.body_block {
   margin-top: 20px;
 }
 .title {
