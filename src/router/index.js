@@ -17,6 +17,8 @@ import Index from "@/components/index/index.vue";
 import BaseCourse from "@/views/index/baseCourse.vue";
 import Class from "@/views/index/class.vue";
 import Major from "@/views/index/major.vue";
+import DepartmentSetting from "@/views/index/departmentSetting.vue";
+
 import Teacher from "@/views/index/teacher.vue";
 import AddTeacher from "@/views/teacher/addTeacher.vue";
 import BatchCourseAdd from "@/views/baseCourse/batchCourseAdd.vue";
@@ -28,7 +30,12 @@ import baseCourseIndicators from "@/views/baseCourse/indicators.vue";
 import baseCourseIndicatorsEdit from "@/views/baseCourse/indicators-edit.vue";
 import baseCourseObjectivesEdit from "@/views/baseCourse/objectives-edit.vue";
 
+//登录组件
 import userLogin from "@/components/userLogin/index.vue";
+
+//工作手册模板组件
+import TemplateList from "@/views/template/templateList.vue";
+import TemplateEdit from "@/views/template/templateEdit.vue";
 
 //教师端组件
 import TeacherIndex from "@/views/teacherSide/teacherIndex.vue";
@@ -89,6 +96,11 @@ const router = createRouter({
         {
           path: "/major",
           component: Major,
+          meta: { isMajor: false },
+        },
+        {
+          path: "/departmentSetting",
+          component: DepartmentSetting,
           meta: { isMajor: false },
         },
         {
@@ -187,6 +199,18 @@ const router = createRouter({
         {
           path: "/addTeacher",
           component: AddTeacher,
+        },
+        {
+          name: "TemplateList",
+          path: "/templateList",
+          component: TemplateList,
+          meta: { isMajor: false },
+        },
+        {
+          name: "TemplateEdit",
+          path: "/templateEdit",
+          component: TemplateEdit,
+          meta: { isMajor: false },
         },
       ],
     },

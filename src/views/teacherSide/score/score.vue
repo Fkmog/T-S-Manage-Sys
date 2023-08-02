@@ -154,7 +154,7 @@ export default {
         
         
       },
-      handleTabsEdit(targetName, action) {
+      handleTabsEdit(targetName, action,activityName) {
         let that = this;
         console.log('action',action);
         if (action === 'add'&& !targetName) {
@@ -189,7 +189,7 @@ export default {
           this.maxeditableTabsValue = this.tabIndex;
           let newTabName = this.tabIndex + '';
           this.editableTabs.push({
-            title: '成绩项'+' '+newTabName,
+            title: (activityName ? activityName:'成绩项'+' '+newTabName),
             name: newTabName.toString(),
             value: newTabName
           });
@@ -258,7 +258,7 @@ export default {
           if(course.activities.length){
         that.hasActivities = true;
         course.activities.forEach((activity)=>{
-          that.handleTabsEdit(1,'add');
+          that.handleTabsEdit(1,'add',activity.name);
           let activityNumber = activity['item'].length;
           that.activityName.push(activity['item']);
           that.activityScores.push(activity['value']);

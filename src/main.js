@@ -4,7 +4,10 @@ import ElementPlus from "element-plus";
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 import router from "./router";
 import store from "./store";
-// import 'default-passive-events'
+import formCreate from "@form-create/element-ui";
+import FcDesigner from "@form-create/designer";
+import 'element-plus/dist/index.css'
+import Codemirror from 'codemirror-editor-vue3'
 
 createApp(App)
   .use(store)
@@ -12,8 +15,10 @@ createApp(App)
   .use(ElementPlus, {
     locale: zhCn,
   })
+  .use(formCreate)
+  .use(FcDesigner)
+  .use(Codemirror)
   .mount("#app");
-
 //解决el-table  ResizeObserver loop limit exceeded问题
 const debounce = (fn, delay) => {
   let timer = null;
@@ -26,7 +31,6 @@ const debounce = (fn, delay) => {
     }, delay);
   };
 };
-
 const _ResizeObserver = window.ResizeObserver;
 window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
   constructor(callback) {

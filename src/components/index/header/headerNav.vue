@@ -81,6 +81,10 @@ export default {
           value: "教 师",
           path: "./teacher",
         },
+         {
+          value: "设 置",
+          path: "./departmentSetting",
+        },
       ],
       infos2: [
         {
