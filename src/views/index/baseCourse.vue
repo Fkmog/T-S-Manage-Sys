@@ -105,6 +105,10 @@
                 <el-icon><User /></el-icon>
                 &nbsp添加课程负责人
               </el-dropdown-item>
+              <el-dropdown-item @click="this.addWorkbook()">
+                <el-icon><Collection /></el-icon>
+                &nbsp分配手册模版
+              </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
                 &nbsp删除课程负责人
@@ -620,6 +624,35 @@
       </span>
     </template>
   </el-dialog>
+  
+  <el-dialog
+    v-model="showAddWorkbook"
+    title="设置手册模版"
+    width="330px"
+    :show-close="false"
+    :align-center="true"
+  >
+    <el-select
+      v-model="workBookId"
+      style="width: 250px; margin-left: 20px"
+      placeholder="选择手册模版"
+    >
+      <el-option
+        v-for="(datail) in workBookDetail"
+        :key="datail.workbookId"
+        :label="datail.name"
+        :value="datail.workbookId"
+      >
+      </el-option>
+    </el-select>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="showAddWorkbook = false">取消</el-button>
+        <el-button type="primary" @click="submitWorkbook()"> 确定 </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  
 
   <div class="pagination-container" flex>
     <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
@@ -670,9 +703,10 @@ import {
   DocumentChecked,
   User,
   CircleClose,
+  Collection
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
-import { setWorkbook } from "@/api/workbook";
+import { setWorkbook,checkWorkbook } from "@/api/workbook";
 
 export default {
   name: "BaseCourse",
@@ -710,6 +744,7 @@ export default {
     DocumentChecked,
     User,
     CircleClose,
+    Collection
   },
   data() {
     var validateName = (rule, value, callback) => {
@@ -805,6 +840,10 @@ export default {
           // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
         ],
       },
+
+      showAddWorkbook:false,
+      workBookId:'',
+      workBookDetail:[],
 
       showEditVersionDailogFlag: false,
       C_ErrorMsg: "",
@@ -1350,6 +1389,44 @@ export default {
         this.pageSize += this.result.total - this.pageSize;
         this.getBaseCourse(this.pageSize, this.pageNum);
       }
+    },
+    printworkbook(){
+      console.log('workBookId',this.workBookId);
+    },
+    addWorkbook(){
+      let that = this;
+      this.showAddWorkbook = true;
+      checkWorkbook(this.departmentId).then(function(res){
+        console.log(res);
+        if(res.code == "SUCCESS"){
+          res.rows.forEach((workbook)=>{
+            that.workBookDetail.push({'name':workbook.name,'workbookId':workbook.workbookId})
+          })
+        }
+      }).catch((e)=>{
+        console.log('e',e);
+      })
+    },
+    submitWorkbook(){
+      let that = this;
+      let tempList = [];
+      this.courseId.forEach((courseId)=>{
+        tempList.push({'courseId':courseId,'workbookId':that.workBookId});
+      })
+      console.log('tempList',tempList);
+      setWorkbook(tempList).then((res)=>{
+        console.log('setWorkbook res',res);
+        if(res.code == "SUCCESS"){
+          that.showAddWorkbook = false;
+          ElMessage({
+            type: "success",
+            message: `分配工作手册成功`,
+            duration: 1500,
+          });
+        }
+      }).catch((e)=>{
+        console.log('e',e);
+      })
     },
     //添加课程负责人
     addPrincipal() {

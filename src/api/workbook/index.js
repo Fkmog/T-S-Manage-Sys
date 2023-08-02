@@ -45,7 +45,7 @@ export function deleteWorkbook(workbookId) {
 // 为课程库课程分配工作手册模板
 export function setWorkbook(Array) {
     return request({
-      url: "/baseCourse/workbook/asssociate",
+      url: "/baseCourse/workbook/associate",
       method: "PUT",
       data: Array,
     });
