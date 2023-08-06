@@ -319,7 +319,7 @@ export default {
   background: white;
   margin-left: 5%;
   margin-right: 5%;
-  box-shadow: 0 15px 30px rgb(43 59 93 / 29%), 0 15px 30px rgb(43 59 93 / 29%);
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 
 .studentCard{
@@ -341,7 +341,7 @@ export default {
 }
 .studentsTable{
   margin: 0 auto;
-  box-shadow:0 15px 30px rgba(0,0,0,.3)
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding {
   margin-top: 90px;
