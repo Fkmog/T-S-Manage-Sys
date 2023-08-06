@@ -22,9 +22,26 @@
         </el-tooltip>
         <div class="block_title">{{ total.name }}</div>
         <el-divider class="divider" direction="vertical" />
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="保存"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            @click="changeWorkbookInfo()"
+            style="margin-left: 20px"
+          >
+            <DocumentChecked />
+          </el-icon>
+        </el-tooltip>
       </el-row>
 
-      <!--功能按钮-->
+      <!-- 功能按钮
       <div class="tool">
         <el-row>
           <el-button
@@ -36,11 +53,16 @@
             >保存
           </el-button>
         </el-row>
-      </div>
+      </div> -->
     </div>
     <!-- 表单构建器 -->
     <div class="form-designer">
-      <fc-designer ref="designer" class="designer" height="800px" />
+      <fc-designer
+        ref="designer"
+        class="designer"
+        height="800px"
+        :menu="menu"
+      />
     </div>
     <!-- 表单回显器 先放着看看效果 -->
     <!-- <form-create
@@ -53,7 +75,7 @@
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
+import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { checkWorkbookInfo, editWorkbookInfo } from "@/api/workbook";
 import { ElMessage } from "element-plus";
 
@@ -61,6 +83,7 @@ export default {
   name: "TemplateEdit",
   components: {
     Back,
+    DocumentChecked,
   },
   data() {
     return {
@@ -74,6 +97,117 @@ export default {
       fApi: {},
       //表单数据
       value: {},
+      menu: [
+        {
+          title: "表单组件",
+          name: "group1",
+          list: [
+            {
+              icon: "icon-input",
+              name: "input",
+              label: "输入框",
+            },
+            {
+              icon: "icon-number",
+              name: "inputNumber",
+              label: "计数器",
+            },
+            {
+              icon: "icon-radio",
+              name: "radio",
+              label: "单选框",
+            },
+            {
+              icon: "icon-checkbox",
+              name: "checkbox",
+              label: "多选框",
+            },
+            {
+              icon: "icon-cascader",
+              name: "cascader",
+              label: "级联选择器",
+            },
+            {
+              icon: "icon-select",
+              name: "select",
+              label: "选择器",
+            },
+
+            {
+              icon: "icon-editor",
+              name: "fc-editor",
+              label: "富文本框",
+            },
+            {
+              icon: "icon-rate",
+              name: "rate",
+              label: "评分",
+            },
+            {
+              icon: "icon-slider",
+              name: "slider",
+              label: "滑块",
+            },
+            {
+              icon: "icon-switch",
+              name: "switch",
+              label: "开关",
+            },
+            {
+              icon: "icon-time",
+              name: "timePicker",
+              label: "时间选择器",
+            },
+            {
+              icon: "icon-date",
+              name: "datePicker",
+              label: "日期选择器",
+            },
+          ],
+        },
+        {
+          title: "辅助组件",
+          name: "group2",
+          list: [
+            {
+              icon: "icon-alert",
+              name: "el-alert",
+              label: "提示",
+            },
+            {
+              icon: "icon-divider",
+              name: "el-divider",
+              label: "分割线",
+            },
+            {
+              icon: "icon-span",
+              name: "span",
+              label: "文字",
+            },
+          ],
+        },
+        {
+          title: "布局组件",
+          name: "group3",
+          list: [
+            {
+              icon: "icon-row",
+              name: "row",
+              label: "栅格布局",
+            },
+            {
+              icon: "icon-tab",
+              name: "tab",
+              label: "标签页",
+            },
+            {
+              icon: "icon-space",
+              name: "div",
+              label: "间距",
+            },
+          ],
+        },
+      ],
     };
   },
   mounted() {
@@ -85,17 +219,21 @@ export default {
     backList() {
       this.$router.push("/templateList");
     },
+    // 获取样式规则
     getOption() {
       this.option = this.$refs.designer.getOption();
       console.log("getOption", this.option);
     },
+    // 回显样式规则
     setOption() {
       this.$refs.designer.setOption(this.option);
     },
+    // 获取生成规则
     getJson() {
       this.json = this.$refs.designer.getJson();
       console.log("json", this.json);
     },
+    // 回显生成规则
     setJson() {
       this.$refs.designer.setRule(this.json);
     },
@@ -171,6 +309,6 @@ export default {
   display: flex;
   width: 90%;
   margin-left: 5%;
-  margin-top:100px;
+  margin-top: 70px;
 }
 </style>

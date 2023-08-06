@@ -41,7 +41,7 @@
         'padding-left': '20px',
         'font-size': '16px',
         height: '60px',
-        cursor:'pointer',
+        cursor: 'pointer',
       }"
       highlight-current-row
       @row-click="goEdit"
@@ -143,15 +143,22 @@ export default {
     },
     // 删除工作手册
     deleteBook(row) {
-      deleteWorkbook(row.workbookId).then((res) => {
-        if (res === 204) {
-          this.getWorkbookList()
-          ElMessage({
-            type: "success",
-            message: `删除成功`,
-            duration: 1500,
-          });
-        }
+      console.log(row);
+      ElMessageBox.confirm("是否确认删除：" + row.name + " ?", "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        deleteWorkbook(row.workbookId).then((res) => {
+          if (res === 204) {
+            this.getWorkbookList();
+            ElMessage({
+              type: "success",
+              message: `删除成功`,
+              duration: 1500,
+            });
+          }
+        });
       });
     },
   },
