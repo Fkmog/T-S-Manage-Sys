@@ -26,7 +26,7 @@
 
 
   <div layout="row" flex class="md-padding" >
-    <addBtn @click="goAddScore"></addBtn>
+    <addBtn @click="goAddScore" v-show="identity=='学院管理员'"></addBtn>
 
     <!-- editable @edit="handleTabsEdit"-->
     <el-tabs v-model="editableTabsValue" type="card" class="activity-tab"  
@@ -315,11 +315,16 @@ export default {
 </script>
 
 <style scoped>
+.activity-tab{
+  background: white;
+  margin-left: 5%;
+  margin-right: 5%;
+  box-shadow: 0 15px 30px rgb(43 59 93 / 29%), 0 15px 30px rgb(43 59 93 / 29%);
+}
 
 .studentCard{
   margin-left: 5%;
   margin-right: 5%;
-  width:80%;
   height: 500px;
 }
 .scoreintable{
@@ -336,7 +341,7 @@ export default {
 }
 .studentsTable{
   margin: 0 auto;
-  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+  box-shadow:0 15px 30px rgba(0,0,0,.3)
 }
 .md-padding {
   margin-top: 90px;
