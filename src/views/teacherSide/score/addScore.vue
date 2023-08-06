@@ -73,7 +73,6 @@
       <!-- editable @edit="handleTabsEdit"-->
       <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" 
         @tab-click="editableTabsValueChange"
-        
         >
           <el-tab-pane
             v-for="(item, index) in editableTabs"
@@ -199,9 +198,9 @@
       },
       handleTabsEdit(targetName, action,activityName) {
         let that = this;
-        console.log('action',action);
+        console.log('action',action,'targetName',targetName,'activityName',activityName);
         if (action === 'add'&& !targetName) {
-          
+          console.log('handleTabsEdit add processing');
           let item = ['']
           let value = ['']
           let remark = ['']
@@ -228,6 +227,7 @@
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
         }
         if (action === 'add' && targetName && activityName) {
+          console.log('handleTabsEdit 初始化 processing');
           this.currenteditableTabsValue = ++this.tabIndex;
           this.maxeditableTabsValue = this.tabIndex;
           let newTabName = this.tabIndex + '';

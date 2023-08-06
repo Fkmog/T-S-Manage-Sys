@@ -72,43 +72,60 @@
       
    
     >
-    <template v-slot="label">
-            
-            <span v-if="!item.inputFlag"
-                style="display: inline-block;width: 88px;text-align: center;padding: 10px;"
-                @dblclick="tabsContent(item,item.name)">
-                {{item.title}}
-            </span>
-            <input v-else-if="!!item.inputFlag" :ref="`myInput${item.name}`"
-                v-model="item.title" type="text" 
-                style="display: inline-block;width: 88px;text-align: center;padding: 10px;"
-                @blur="item.inputFlag=false" />
-            <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
-            <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="添加成绩项"
-        placement="bottom"
-        :hide-after="0"
-      >
-      <el-button 
-      @click="addActivities" 
-      link 
-      :disabled="!over21"
-      style="padding-left: 20px;"
-      >
-        <el-icon
-          size="22px"
-          color="rgb(137, 137, 137)"
-         
-        >
-          <CirclePlus />
-        </el-icon>
-      </el-button>
+      <template v-slot="label">
+          
+        <span v-if="!item.inputFlag"
+          style="display: inline-block;width: 200px;text-align: center;padding: 10px;">
+            <el-icon 
+              size="22px"
+              color="rgb(137, 137, 137)"
+              style="float: left;top: 4px;"
+              @click="tabsContent(item,item.name)" 
+              >
+              <EditPen />
+            </el-icon>
+            {{item.title}}
+        </span>
         
-      </el-tooltip>
-        </template>
-    </el-tab-pane>
+        <el-input v-else-if="!!item.inputFlag" :ref="`myInput${item.name}`"
+            v-model="item.title" type="text" 
+            style="display: inline-block;width: 200px;text-align: center;padding: 10px;font-size: large;"
+            clearable
+            @blur="item.inputFlag=false" />
+            
+        <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
+        <el-icon 
+              size="22px"
+              color="rgb(137, 137, 137)"
+              v-show="!!item.inputFlag"
+              style="padding-right: 30px;top: 6px;"
+              @click="item.inputFlag=false"
+              >
+              <Checked />
+        </el-icon>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="添加成绩项"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-button 
+            @click="addActivities" 
+            link 
+            :disabled="!over21"
+            style="padding: 10px;"
+          >
+            <el-icon
+              size="22px"
+              color="rgb(137, 137, 137)"
+            >
+              <CirclePlus />
+            </el-icon>
+          </el-button>
+          </el-tooltip>
+      </template>
+  </el-tab-pane>
     
   </el-tabs>
   
@@ -140,7 +157,7 @@
   
   import   Action  from 'element-plus'
   
-  import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus,DocumentChecked} from '@element-plus/icons-vue'
+  import { Back ,CloseBold,Checked, EditPen,FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus,DocumentChecked} from '@element-plus/icons-vue'
   import Handsontable from 'handsontable';
   import request from '@/utils/request/request'
  
@@ -158,17 +175,24 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   export default{
     name:'addTeacher',
     data(){
-      let self = this;
+      let that = this;
       return{
+
+        //角色信息
+        identity: "",
+
+        itemOrValueisEmpty:false,
 
         sortable:'',
         tempEditabel:'',
+        oldtempEditabel:'',
 
         editableTabsValue: '0',
         currenteditableTabsValue:0,
         maxeditableTabsValue:0,
         editableTabs: [],
         tabIndex: 0,
+        
 
 
 
@@ -205,22 +229,23 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
       ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
       Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
-      ,CirclePlus,DocumentChecked,Sortable
+      ,CirclePlus,DocumentChecked,Sortable,EditPen,Checked,CloseBold
     },
     methods:{
     dragTab(){
-    var tab = document.querySelector("#drag-tab .el-tabs__nav"); //获取需要拖拽的tab
-    
-    // this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
     let that = this;
+    var tab = document.querySelector("#drag-tab .el-tabs__nav"); //获取需要拖拽的tab
+    console.log('type of tab',typeof(tab),tab);
+    // this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
+    
     this.sortable = Sortable.create(tab, {
       //oldIIndex拖放前的位置， newIndex拖放后的位置 , editableTabs为遍历的tab签
       animation: 150,
       sort:true,
       onChoose({oldIndex}){
-        let currTab = that.tempEditabel[oldIndex];
-        // that.currenteditableTabsValue = Number(currTab['name']);
-        // console.log('currenteditableTabsValue',that.currenteditableTabsValue);
+        let templist = JSON.parse(JSON.stringify(that.tempEditabel));
+        that.oldtempEditabel = JSON.parse(JSON.stringify(that.tempEditabel));
+        let currTab = templist[oldIndex];
         console.log('OnChoose currTab:',currTab);
         if(currTab['name']== '1'){
           that.sortable.option('sort',false);
@@ -230,34 +255,38 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
 
       },
+      onMove:function (evt){
+        console.log('evt.related.className',evt.related.id);
+        if(evt.related.id == 'tab-1'){
+          return false;
+        }
+      },
       onEnd({ newIndex, oldIndex }) {
         let currTab = that.tempEditabel.splice(oldIndex, 1)[0]; //鼠标拖拽当前的el-tabs-pane
-        // sortable.sort = true;
-        console.log('OnEnd this.currTab:',currTab);
-        // console.log('this.tab:',tab);
-        // console.log('this.tempEditabel:',tempEditabel);
-          
-        that.tempEditabel.splice(newIndex, 0, currTab); 
-      
-        that.editableTabs = that.tempEditabel;
-        console.log('editableTabs:',that.editableTabs);
-        that.editableTabsValue = that.editableTabs[newIndex]['name'];// 设置当前活动tab名称
-        that.currenteditableTabsValue = Number(that.editableTabsValue);
-        
-        that.hotInstance.updateSettings({
-                data:that.db.items[that.currenteditableTabsValue-1],
-              });
-        
-        
-        // router.push({path:that.editableTabsValue});//main区页面和tab标签联动
+       
+          that.tempEditabel.splice(newIndex, 0, currTab); 
+          that.editableTabs = that.tempEditabel;
+          console.log('editableTabs:',that.editableTabs);
+         
+          that.currenteditableTabsValue = Number(that.editableTabsValue);
+          that.hotInstance.updateSettings({
+                  data:that.db.items[that.currenteditableTabsValue-1],
+                });
+         
       },
+     
     });
 },
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
-          // console.log(val, index, '双击编辑tabs');
-          if(index == '1'){
+          console.log(val, index, '双击编辑tabs');
+          if(index == '1' && this.identity == '教师'){
             val.inputFlag = false;
+            ElMessage({
+              type: "error",
+              message: "修改名称失败，没有权限",
+              duration: 1500,
+            });
           }
           else{
             val.inputFlag = true;
@@ -427,6 +456,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
               this.departmentId = this.$store.state.currentInfo.departmentId;
               this.schoolId = this.$store.state.currentInfo.schoolId;
               this.courseId = this.$store.state.course.baseCourseCourseId;
+              this.identity = this.$store.state.currentInfo.identity;
               this.detailId = this.$store.state.course.detailId;
               this.activateHotcolumn();
               
@@ -545,6 +575,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           that.editableTabsValue = '1';
           that.currenteditableTabsValue = 1;
           console.log('res has activities:',that.db.items);
+          
           that.dragTab();
         }
         else {
@@ -613,6 +644,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         let tempname = keyName[i];
         console.log('keyNum[i]:',keyNum[i]);
         for(let j=0;j<this.db.items[keyNum[i]][0].length;j++){
+          if(!this.db.items[keyNum[i]][0][j]){
+            this.itemOrValueisEmpty = true;
+          }
+          if(!this.db.items[keyNum[i]][1][j]){
+            this.itemOrValueisEmpty = true;
+          }
+          else{
+            this.itemOrValueisEmpty = false;
+          }
           tempitem.push(this.db.items[keyNum[i]][0][j]);
           tempvalue.push(this.db.items[keyNum[i]][1][j]);
           tempremark.push(this.db.items[keyNum[i]][2][j]);
@@ -627,9 +667,18 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
         activities.push(dict);
       }
-    
+      
+
       console.log('activities data :',activities);
-      return request({
+      if(this.itemOrValueisEmpty){
+        ElMessage({
+                type: 'error',
+                message: `成绩项或者分值为空`,
+                duration:1500,
+              });
+      }
+      else{
+        return request({
         url:'/detail',
         method:'put',
         data:{
@@ -682,6 +731,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
                 });
         }
       })
+      }
+      
   },
     toPostData(){
       
@@ -759,19 +810,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       this.activate();
       
     },
-   
-  
-    
-    
-  
-  
   }
-  
-  
-   
   </script>
   
   <style  scoped>
+  :deep().el-tabs__new-tab{
+    margin:10px;
+  }
   .card-container{
     margin-left: 10%;
     width: 80%;
@@ -781,6 +826,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   }
   .activity-tab{
     margin-top: 68px;
+    background: white;
+    box-shadow: 0px 1px 3px rgb(164, 163, 163);
     width:80%;
     margin-left: 10%;
   }
