@@ -116,7 +116,8 @@ export default createStore({
         },
         setCurrentVersionValue(state, newVal){
           state.currentVersionValue = newVal;
-        }
+        },
+      
       },
       actions: {},
       modules: {},

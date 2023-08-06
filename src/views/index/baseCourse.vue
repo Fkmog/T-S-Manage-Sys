@@ -105,6 +105,10 @@
                 <el-icon><Collection /></el-icon>
                 &nbsp分配手册模版
               </el-dropdown-item>
+              <el-dropdown-item @click="this.addWorkbook()">
+                <el-icon><Collection /></el-icon>
+                &nbsp分配手册模版
+              </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
                 &nbsp删除课程负责人

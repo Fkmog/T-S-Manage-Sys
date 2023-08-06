@@ -81,7 +81,7 @@ export default {
           value: "教 师",
           path: "./teacher",
         },
-         {
+        {
           value: "设 置",
           path: "./departmentSetting",
         },
@@ -134,6 +134,9 @@ export default {
     currentChange() {
       return this.$store.state.currentInfo;
     },
+    identityChange() {
+      return this.$store.state.currentInfo.identity;
+    },
   },
   watch: {
     $route: {
@@ -152,13 +155,23 @@ export default {
         // console.log("看我", this.$store.state.currentInfo.identity);
       },
     },
+    // 身份切换时，保证Nav高亮正确
+    identityChange: {
+      deep: true,
+      handler(value) {
+        this.$store.commit("navInfo/setActiveDisplay1", 0);
+        this.$store.commit("navInfo/setActiveDisplay2", 0);
+        this.$store.commit("navInfo/setActiveDisplay3", 0);
+        this.$store.commit("navInfo/setActiveDisplay4", 0);
+      },
+    },
   },
   mounted() {
     // console.log("看我", this.$store.state.currentInfo.identity);
-    this.activeDisplay1 = this.$store.state.navInfo.activeDisplay1
-    this.activeDisplay2 = this.$store.state.navInfo.activeDisplay2
-    this.activeDisplay3 = this.$store.state.navInfo.activeDisplay3
-    this.activeDisplay4 = this.$store.state.navInfo.activeDisplay4
+    this.activeDisplay1 = this.$store.state.navInfo.activeDisplay1;
+    this.activeDisplay2 = this.$store.state.navInfo.activeDisplay2;
+    this.activeDisplay3 = this.$store.state.navInfo.activeDisplay3;
+    this.activeDisplay4 = this.$store.state.navInfo.activeDisplay4;
   },
   methods: {
     show1(index) {

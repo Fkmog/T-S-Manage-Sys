@@ -1,5 +1,5 @@
 <template>
-  <div layout="column" flex class="ng-scope layout-column flex" >
+  <div layout="column" flex class="ng-scope layout-column flex">
     <!-- 顶部导航栏 -->
     <div class="block">
     <el-row class="block-row">
@@ -377,74 +377,64 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           ).then(()=>{
               let tabs = this.editableTabs;
               // this.currenteditableTabsValue = --this.tabIndex;
-              console.log('targetName:',targetName);
-                let activeName = this.editableTabsValue;
-                if (activeName === targetName) {
-                  tabs.forEach((tab, index) => {
-                    if (tab.name === targetName) {
-                      let nextTab = tabs[index + 1] || tabs[index - 1];
-                      if (nextTab) {
-                        activeName = nextTab.name;
-                      }
+              console.log("targetName:", targetName);
+              let activeName = this.editableTabsValue;
+              if (activeName === targetName) {
+                tabs.forEach((tab, index) => {
+                  if (tab.name === targetName) {
+                    let nextTab = tabs[index + 1] || tabs[index - 1];
+                    if (nextTab) {
+                      activeName = nextTab.name;
                     }
-                  });
-                }
-                this.hotInstance.updateSettings({
-                      data:that.db.items[Number(activeName-1)],
-                    });
-                
-                this.editableTabsValue = activeName;
-                this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-                this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
-                console.log('editableTabs:',this.editableTabs);
+                  }
+                });
+              }
+              this.hotInstance.updateSettings({
+                data: that.db.items[Number(activeName - 1)],
+              });
 
-
-            }).catch(e=>{
-              console.log('e',e);
+              this.editableTabsValue = activeName;
+              this.editableTabs = tabs.filter((tab) => tab.name !== targetName);
+              this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
+              console.log("editableTabs:", this.editableTabs);
             })
-          }
-          else{
-            ElMessageBox.confirm(
-            '此成绩项为不可删除的',
-            '注意',
-            {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning',
-            }
-          )
-          }
-      
-          
+            .catch((e) => {
+              console.log("e", e);
+            });
+        } else {
+          ElMessageBox.confirm("此成绩项为不可删除的", "注意", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          });
         }
-      },
-      addActivities(){
-        // this.iscolover21();
-        this.colNum = this.db.items[this.currenteditableTabsValue-1][0].length;
-        // console.log('colNum:',this.colNum);
-        if(this.colNum<21){
+      }
+    },
+    addActivities() {
+      // this.iscolover21();
+      this.colNum = this.db.items[this.currenteditableTabsValue - 1][0].length;
+      // console.log('colNum:',this.colNum);
+      if (this.colNum < 21) {
         this.firstActivities = false;
-       
-        if(!this.currenteditableTabsValue){
-        this.db.items[this.currenteditableTabsValue][0].push('');
-        this.db.items[this.currenteditableTabsValue][1].push(null);
-        this.db.items[this.currenteditableTabsValue][2].push('');
-        this.db.items[this.currenteditableTabsValue][3].push('');
-        this.hotInstance.updateSettings({
-                data:this.db.items[this.currenteditableTabsValue],
-              });
+
+        if (!this.currenteditableTabsValue) {
+          this.db.items[this.currenteditableTabsValue][0].push("");
+          this.db.items[this.currenteditableTabsValue][1].push(null);
+          this.db.items[this.currenteditableTabsValue][2].push("");
+          this.db.items[this.currenteditableTabsValue][3].push("");
+          this.hotInstance.updateSettings({
+            data: this.db.items[this.currenteditableTabsValue],
+          });
+        } else {
+          this.db.items[this.currenteditableTabsValue - 1][0].push("");
+          this.db.items[this.currenteditableTabsValue - 1][1].push(null);
+          this.db.items[this.currenteditableTabsValue - 1][2].push("");
+          this.db.items[this.currenteditableTabsValue - 1][3].push("");
+          this.hotInstance.updateSettings({
+            data: this.db.items[this.currenteditableTabsValue - 1],
+          });
         }
-        else{
-        this.db.items[this.currenteditableTabsValue-1][0].push('');
-        this.db.items[this.currenteditableTabsValue-1][1].push(null);
-        this.db.items[this.currenteditableTabsValue-1][2].push('');
-        this.db.items[this.currenteditableTabsValue-1][3].push('');
-        this.hotInstance.updateSettings({
-                data:this.db.items[this.currenteditableTabsValue-1],
-              });
-        
-        }
-        
+
         // this.colNum = this.colNum+1;
         // this.dictTolist(this.db.items);
         
@@ -464,176 +454,182 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     activateHotcolumn(){
       let self = this;
       let that = this;
-      this.getActivities().then(function(){
+      this.getActivities().then(function () {
         let container = document.querySelector("#courseHot");
         // let container = this.$refs.courseHot;
-        let hotRegisterer = new Handsontable(container,{
-            data: self.db.items[0],
-            licenseKey: 'non-commercial-and-evaluation',
-            colHeaders: false,
-            dragToScroll: true,
-            rowHeaders: ['成绩项', '分值','设置','权重'],
-            copyPaste: true,
-            colWidths: 70,
-            allowRemoveColumn: true,
-            
-            contextMenu: {
-              items: {
-                col_left: {
-                  name: "在左侧插入列",
-                },
-                col_right: {
-                  name: "在右侧插入列",
-                },
-                remove_col: {
-                  name: "删除列",
-                },
+        let hotRegisterer = new Handsontable(container, {
+          data: self.db.items[0],
+          licenseKey: "non-commercial-and-evaluation",
+          colHeaders: false,
+          dragToScroll: true,
+          rowHeaders: ["成绩项", "分值", "设置", "权重"],
+          copyPaste: true,
+          colWidths: 70,
+          allowRemoveColumn: true,
+
+          contextMenu: {
+            items: {
+              col_left: {
+                name: "在左侧插入列",
               },
-            },afterChange(changes, source) {
-          if (source === "loadData") {
-            console.log("same");
-            return;
-          } else {
-            self.isValid();
-            if (self.count == 0) {
-              self.dirty = false;
-              console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+              col_right: {
+                name: "在右侧插入列",
+              },
+              remove_col: {
+                name: "删除列",
+              },
+            },
+          },
+          afterChange(changes, source) {
+            if (source === "loadData") {
+              console.log("same");
+              return;
             } else {
-              self.dirty = true;
-              self.firstActivities = false;
-              console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items,'firstActivities',self.firstActivities);
+              self.isValid();
+              if (self.count == 0) {
+                self.dirty = false;
+                console.log(
+                  "console:",
+                  self.count,
+                  "dirty",
+                  self.dirty,
+                  "items:",
+                  self.db.items
+                );
+              } else {
+                self.dirty = true;
+                self.firstActivities = false;
+                console.log(
+                  "console:",
+                  self.count,
+                  "dirty",
+                  self.dirty,
+                  "items:",
+                  self.db.items,
+                  "firstActivities",
+                  self.firstActivities
+                );
+              }
+              self.count++;
+              console.log("console:", self.count);
             }
-            self.count++;
-            console.log("console:", self.count);
-          }
-        },
-        afterRemoveCol(changes, source){
-          self.firstActivities = false;
-        }
+          },
+          afterRemoveCol(changes, source) {
+            self.firstActivities = false;
+          },
         });
 
         that.hotInstance = hotRegisterer;
         that.hotInstance.updateSettings({
-                data:that.db.items[0],
-                cells: that.getHotCellsFunction(),
-              });
-      })
+          data: that.db.items[0],
+          cells: that.getHotCellsFunction(),
+        });
+      });
     },
     getHotCellsFunction() {
-                
-                return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
-                  var cellProperties = {};
-                  let that = this;
-                  if (row === 2) {
-                    cellProperties.type = 'dropdown';
-                    cellProperties.source = [' ','总评','期末'];
-                    cellProperties.allowEmpty = true;
-                    cellProperties.className = 'ht-s-size';
-                    //   cellProperties.validator = that.validScoreSetting();
-                    }
-                  if(row === 3){
-                    cellProperties.allowEmpty = false;
-                  }
-                    return cellProperties;
-                };
-        },
-  async getActivities(){
+      return function (row, col, prop) {
+        // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+        var cellProperties = {};
+        let that = this;
+        if (row === 2) {
+          cellProperties.type = "dropdown";
+          cellProperties.source = [" ", "总评", "期末"];
+          cellProperties.allowEmpty = true;
+          cellProperties.className = "ht-s-size";
+          //   cellProperties.validator = that.validScoreSetting();
+        }
+        if (row === 3) {
+          cellProperties.allowEmpty = false;
+        }
+        return cellProperties;
+      };
+    },
+    async getActivities() {
       let that = this;
       return request({
-        url:'/detail/'+this.detailId,
-        method:'get',
-      }).then(function(res){
-        console.log('activities',res);
-       
+        url: "/detail/" + this.detailId,
+        method: "get",
+      }).then(function (res) {
+        console.log("activities", res);
+
         let course = res.data;
-        if(course.activities.length){
+        if (course.activities.length) {
           // that.tabIndex = course.activities.length;
-          
-          course.activities.forEach((activity)=>{
-            that.handleTabsEdit(1,'add',activity.name);
-            let tempdata = []
+
+          course.activities.forEach((activity) => {
+            that.handleTabsEdit(1, "add", activity.name);
+            let tempdata = [];
             tempdata.push(activity.item);
             tempdata.push(activity.value);
             tempdata.push(activity.remark);
-            if(!activity.weight){
-              let templist =[]
-              for(let i=0;i<activity.item.length;i++){
-                templist.push('');
+            if (!activity.weight) {
+              let templist = [];
+              for (let i = 0; i < activity.item.length; i++) {
+                templist.push("");
               }
               tempdata.push(templist);
-            }
-            else{
+            } else {
               tempdata.push(activity.weight);
             }
             that.db.items.push(tempdata);
-          })
-         
-           
+          });
+
           // that.db.items.push(course.activities.item);
           // that.db.items.push(course.activities.value);
           // that.db.items.push(course.activities.remark);
-          that.editableTabsValue = '1';
+          that.editableTabsValue = "1";
           that.currenteditableTabsValue = 1;
           console.log('res has activities:',that.db.items);
           
           that.dragTab();
-        }
-        else {
-          console.log('res has no activities');
-          that.handleTabsEdit(1,'add');
-          let item = ['']
-          let value = ['']
-          let remark = ['']
-          let weight = ['']
-          let tempdata =[]
+        } else {
+          console.log("res has no activities");
+          that.handleTabsEdit(1, "add");
+          let item = [""];
+          let value = [""];
+          let remark = [""];
+          let weight = [""];
+          let tempdata = [];
           tempdata.push(item);
           tempdata.push(value);
           tempdata.push(remark);
           tempdata.push(weight);
           that.db.items.push(tempdata);
-         
-          }
-      })
+        }
+      });
     },
-    isValid(){
-        if(this.firstActivities){
-        console.log('isValid:this.firstActivities:',this.firstActivities)
+    isValid() {
+      if (this.firstActivities) {
+        console.log("isValid:this.firstActivities:", this.firstActivities);
         return false;
+      } else {
+        var result = this.toPostData();
+
+        return !!result;
       }
-        else{
-          var result = this.toPostData();
-          
-          return !(!result);
-      }
-      
-      
-      
     },
-    isNotDirty(){
-      this.dirty=false;
+    isNotDirty() {
+      this.dirty = false;
     },
     save() {
       let that = this;
       this.saving = true;
       this.dirty = false;
       var result = this.isValid();
-        if (!result) {
-          this.saving = false;
-          return;
-        }
+      if (!result) {
+        this.saving = false;
+        return;
+      }
       let keyNum = [];
       let keyName = [];
-      for(let i=0;i<Object.keys(this.editableTabs).length;i++){
-        keyNum.push(Number(this.editableTabs[i]['name'])-1);
-        keyName.push(this.editableTabs[i]['title'])
+      for (let i = 0; i < Object.keys(this.editableTabs).length; i++) {
+        keyNum.push(Number(this.editableTabs[i]["name"]) - 1);
+        keyName.push(this.editableTabs[i]["title"]);
       }
 
-      let activities=[];
-      
-      
-      
-     
-      for(let i=0;i<keyNum.length;i++){
+      let activities = [];
+
+      for (let i = 0; i < keyNum.length; i++) {
         // if(typeof(this.db.items[1][i]) == 'string'){
         //   this.db.items[1][i] = parseInt(this.db.items[1][i]);
         // }
@@ -658,13 +654,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           tempremark.push(this.db.items[keyNum[i]][2][j]);
           tempweight.push(this.db.items[keyNum[i]][3][j]);
         }
-        let dict ={
-          item:tempitem,
-          value:tempvalue,
-          remark:tempremark,
-          weight:tempweight,
-          name:tempname,
-        }
+        let dict = {
+          item: tempitem,
+          value: tempvalue,
+          remark: tempremark,
+          weight: tempweight,
+          name: tempname,
+        };
         activities.push(dict);
       }
       
@@ -737,38 +733,37 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     toPostData(){
       
       this.postData.activities.length = 0; // clean array
-     
-      var valid = true;
-        
-        if(!this.currenteditableTabsValue){
-          let length =this.db.items[this.currenteditableTabsValue][0].length;
-        }
-        else{
-          let length =this.db.items[this.currenteditableTabsValue-1][0].length;
-        }
-        
-        // let count=0;
-        // let hasremark=false;
-        // for(let i=0;i<length;i++){
-        //   if(this.db.item[2][i.toString()]){
-        //     count++;
-        //   }
-        // }
-        // if(count){
-        //   hasremark=true;
-        // }
-          for(let i=0;i<length;i++){
-            if (!this.db.items[this.currenteditableTabsValue-1][i][0] 
-            ||!this.db.items[this.currenteditableTabsValue-1][i][1]
-            ||!this.db.items[this.currenteditableTabsValue-1][i][3]) {
-              
-              valid = false;
-              break;
-          } 
-          }
 
-       
-        return valid;
+      var valid = true;
+
+      if (!this.currenteditableTabsValue) {
+        let length = this.db.items[this.currenteditableTabsValue][0].length;
+      } else {
+        let length = this.db.items[this.currenteditableTabsValue - 1][0].length;
+      }
+
+      // let count=0;
+      // let hasremark=false;
+      // for(let i=0;i<length;i++){
+      //   if(this.db.item[2][i.toString()]){
+      //     count++;
+      //   }
+      // }
+      // if(count){
+      //   hasremark=true;
+      // }
+      for (let i = 0; i < length; i++) {
+        if (
+          !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
+          !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
+          !this.db.items[this.currenteditableTabsValue - 1][i][3]
+        ) {
+          valid = false;
+          break;
+        }
+      }
+
+      return valid;
     },
   goBackandClean(){
     this.db.items = [];
@@ -839,13 +834,13 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   margin-bottom: 20px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   padding: 0 0 50px 20px;
-  }
-  .hot-table-container{
-    float: left;
-    height:100px;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
+}
+.hot-table-container {
+  float: left;
+  height: 100px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
 .divider {
   margin-left: 20px;
   height: 24px;
@@ -860,7 +855,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   margin-left: 20px;
   font-size: 16px;
 }
-  .block {
+.block {
   position: absolute;
   top: 110px;
   left: 0px;
@@ -868,22 +863,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   border-bottom: 1px solid rgb(189, 189, 189);
   width: 100%;
 }
-  .hotTable{
-    box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
-  }
-  .md-padding{
-    margin-top: 10%;
-    height: 80%;
-  }
-  .ng-scope layout-column flex{
+.hotTable {
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
+.md-padding {
+  margin-top: 10%;
+  height: 80%;
+}
+.ng-scope layout-column flex {
   display: flex;
   flex-direction: column;
-  }
-
- 
-  
- 
-  
-  
-  </style>
-  
+}
+</style>

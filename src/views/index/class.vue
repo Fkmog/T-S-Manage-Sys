@@ -341,7 +341,7 @@
     class="classesTable"
     :data="classTable"
     @selection-change="handleSelectionChange"
-    @row-dblclick="goCheck"
+    @row-click="goCheck"
     style="width: 1400px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{

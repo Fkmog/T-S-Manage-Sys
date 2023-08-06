@@ -36,6 +36,7 @@ import userLogin from "@/components/userLogin/index.vue";
 //工作手册模板组件
 import TemplateList from "@/views/template/templateList.vue";
 import TemplateEdit from "@/views/template/templateEdit.vue";
+import Workbook from "@/views/template/workbook.vue";
 
 //教师端组件
 import TeacherIndex from "@/views/teacherSide/teacherIndex.vue";
@@ -210,6 +211,12 @@ const router = createRouter({
           name: "TemplateEdit",
           path: "/templateEdit",
           component: TemplateEdit,
+          meta: { isMajor: false },
+        },
+        {
+          name: "Workbook",
+          path: "/workbook",
+          component: Workbook,
           meta: { isMajor: false },
         },
       ],
