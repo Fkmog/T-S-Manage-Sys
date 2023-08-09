@@ -22,6 +22,7 @@
         </el-tooltip>
         <div class="block_title">课程信息</div>
         <el-divider class="divider" direction="vertical" />
+        <el-switch v-model="openDrawer" class="switchstyle" />
       </el-row>
     </div>
     <!-- 表单回显器 -->
@@ -39,21 +40,27 @@
       </div>
     </div>
   </div>
+  <reviewDrawer  v-bind:visible="openDrawer"/>
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
-import { ElMessage } from "element-plus";
+import { ElMessage ,ElMessageBox, ElSwitch } from "element-plus";
+
+import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
 import { getClassInfo } from "@/api/class";
 
 export default {
   name: "Workbook",
   components: {
     Back,
+    reviewDrawer,
+    ElSwitch
   },
   data() {
     return {
+      openDrawer:false,
       classInfo: {},
       hasWorkbook: Boolean,
       workbook: [],
@@ -139,6 +146,9 @@ export default {
 </script>
 
 <style scoped>
+.switchstyle{
+  bottom: 4px;
+}
 .content {
   height: 100vh;
   background-color: #f2f2f2;

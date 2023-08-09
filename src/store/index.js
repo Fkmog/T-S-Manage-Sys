@@ -233,5 +233,23 @@ export default createStore({
       modules: {},
     },
     user,
+    reviewInfo:{
+      namespaced: true,
+      state:{
+        message:'',
+        checkState:''
+      },
+      getters: {},
+      mutations: {
+        setmessage(state, newVal) {
+          state.message = newVal;
+        },
+        setcheckState(state, newVal) {
+          state.checkState = newVal;
+        },
+      },
+      actions: {},
+      modules: {},
+    }
   },
 });

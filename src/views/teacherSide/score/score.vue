@@ -21,6 +21,7 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+      <el-switch v-model="openDrawer" class="switchstyle" />
     </el-row>
   </div>
 
@@ -93,20 +94,24 @@
       
   </div>
   </div>
-  
+  <reviewDrawer  v-bind:visible="openDrawer"/>
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
+import { ElMessageBox, ElSwitch,} from "element-plus";
+import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
+
 import request from "@/utils/request/request";
 export default {
   name: "Score",
   components: {
-    Back,addBtn,request
+    Back,addBtn,request,ElSwitch,reviewDrawer
   },
   data() {
     return {
+      openDrawer:false,
       hasActivities:Boolean,
       hasScores:Boolean,
 
@@ -315,6 +320,9 @@ export default {
 </script>
 
 <style scoped>
+.switchstyle{
+  bottom: 4px;
+}
 .activity-tab{
   background: white;
   margin-left: 5%;

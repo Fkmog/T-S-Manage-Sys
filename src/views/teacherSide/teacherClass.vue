@@ -94,19 +94,19 @@
           </el-tooltip>
         </div>
         <div
-          v-show="status == '未提交' && identity == '学院管理员'"
+          v-show="status == '未提交' && (identity == '学院管理员'||identity == '课程负责人')"
           class="status_desc"
         >
           未提交
         </div>
         <div
-          v-show="status == '已提交' && identity != '学院管理员'"
+          v-show="status == '已提交' && identity == '教师'"
           class="status_desc"
         >
           已提交
         </div>
         <div
-          v-show="status == '已提交' && identity == '学院管理员'"
+          v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')"
           class="status_desc"
         >
           <el-tooltip
@@ -127,8 +127,13 @@
             </el-icon>
           </el-tooltip>
         </div>
-        <div v-show="status == '已退回'">已退回</div>
+        <div v-show="status == '已退回' && identity == '教师'">已退回，请重新提交</div>
+        <div v-show="status == '已退回' && (identity == '学院管理员'||identity == '课程负责人')">已退回</div>
         <div v-show="status == '已审核'">已审核</div>
+        <el-divider class="divider" direction="vertical" />
+        <el-switch v-model="openDrawer" class="switchstyle" />
+        
+
       </el-row>
     </div>
     <div class="body">
@@ -183,17 +188,17 @@
     </div>
   </div>
 
-  <el-dialog v-model="showCheckDialogFlag">
+  <!-- <el-dialog v-model="showCheckDialogFlag"  >
     <span> 评审反馈： </span>
 
-    <el-form :model="checkFeedback">
+    <el-form :model="checkFeedback" :rules="checkFeedbackRules" ref="ruleForm">
       <el-form-item label="审核是否通过：" :label-width="140" prop="checkState">
         <el-select v-model="checkFeedback.checkState">
           <el-option
             v-for="state in checkStates"
-            :key="state"
-            :value="state"
-            :label="state"
+            :key="state.value"
+            :value="state.value"
+            :label="state.label"
           >
           </el-option>
         </el-select>
@@ -213,10 +218,67 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="showCheckDialogFlag = false">取消</el-button>
-        <el-button type="primary" @click="submitFeedback"> 提交反馈 </el-button>
+        <el-button type="primary"  @click="submitForm('ruleForm')"> 提交反馈 </el-button>
       </span>
     </template>
-  </el-dialog>
+  </el-dialog> -->
+
+  <!-- <div id="drawerbox">
+    <el-drawer v-model="openDrawer" >
+    <template #header>
+      <h2 style="color: black;">
+        审核记录
+      </h2>
+    </template>
+
+   <template #default>
+    <el-collapse v-model="activeNames" @change="collapseHandleChange">
+    <el-collapse-item 
+    v-for="(review,index) in reviewInfo" 
+    :title="'审核时间：'+review.createTime+'-----审核人：'+review.createBy"
+    >
+      <div>退回理由：{{ review.remark }}</div>
+    </el-collapse-item>
+   </el-collapse>
+
+   <div class="reviewBoxStyle" v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')">
+    <h2> 评审反馈： </h2>
+
+    <el-form :model="checkFeedback" :rules="checkFeedbackRules" ref="ruleForm">
+      <el-form-item label="审核是否通过：" :label-width="140" prop="checkState">
+        <el-select v-model="checkFeedback.checkState">
+          <el-option
+            v-for="state in checkStates"
+            :key="state.value"
+            :value="state.value"
+            :label="state.label"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="反馈内容：" :label-width="140" prop="message">
+        <el-input
+          v-model="checkFeedback.message"
+          autocomplete="off"
+          type="textarea"
+        />
+      </el-form-item>
+    </el-form>
+   </div>
+    </template>
+
+    <template #footer >
+      <span class="dialog-footer" v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')">
+        <el-button type="primary"  @click="submitForm('ruleForm')"> 提交反馈 </el-button>
+      </span>
+      <span class="dialog-footer" v-show="status == '已退回' && identity == '教师'">
+        <el-button type="primary"  @click="submit()"> 重新提交 </el-button>
+      </span>
+    </template>
+
+  </el-drawer>
+  </div> -->
+  <reviewDrawer v-bind:visible="openDrawer" @getData="getdata"/>
 </template>
 
 <script>
@@ -230,10 +292,11 @@ import {
   Finished,
   Management,
 } from "@element-plus/icons-vue";
-import { submit, getClassInfo } from "@/api/class";
+import { submit, getClassInfo, submitFeedback, createReview, getReview} from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
+import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
 import { getObjectives, downloadDetail } from "@/api/basecourse";
-import { ElMessageBox, ElMessage, ElDialog, ElForm } from "element-plus";
+import { ElMessageBox, ElMessage, ElDialog, ElForm, ElSwitch, ElDrawer, ElCollapse} from "element-plus";
 
 export default {
   name: "TeacherClass",
@@ -248,15 +311,26 @@ export default {
     ElDialog,
     ElForm,
     Management,
+    ElSwitch,
+    ElDrawer,
+    ElCollapse,
+    reviewDrawer
   },
   data() {
     return {
-      checkStates: ["审核通过", "退回"],
+      reviewInfo:[],
+      activeNames:'',
+      openDrawer:false,
+      hasNoReviewInfo:Boolean,
+      checkStates: [{label:"审核通过",value:'3'}, {label:"退回",value:'4'}],
       selectedCheckState: "",
       checkFeedback: {
         message: "",
         checkState: "",
         workNumber: "",
+      },
+      checkFeedbackRules:{ 
+        checkState:[{ required: true, trigger: "blur" }],
       },
       showCheckDialogFlag: false,
       identity: "",
@@ -278,19 +352,83 @@ export default {
       console.log("identity:", this.identity);
     }
     this.getClassInfo();
+    // this.getReviewInfo();
     console.log("classInfo", this.classInfo);
     this.getDictionary();
     this.getFile();
   },
-  methods: {
-    //提交反馈信息
-    submitFeedback() {
-      // return request({
-      //   url:,
-      //   method:,
-      //   data:,
-      // })
+  computed: {
+    classInfoChange(){
+      // console.log('teacherSideClassInfo changed');
+      return this.$store.state.currentInfo.teacherSideClassInfo;
     },
+  },
+  watch: {
+    classInfoChange: {
+      deep: true,
+      handler(value) {
+        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        this.classStatus();
+      },
+    },
+  },
+  methods: {
+    getdata(val){
+      this.openDrawer = val;
+    },
+    // collapseHandleChange(val){
+    //   console.log('collapseHandleChange',val);
+    // },
+    // submitForm(formName) {
+    //   this.$refs[formName].validate((valid) => {
+    //     if (valid) {
+    //     submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
+    //     console.log('feedback res',res);
+    //     if(res.code == 'SUCCESS'){
+    //       this.showCheckDialogFlag = false;
+    //       ElMessage({
+    //         type: "success",
+    //         message: `提交成功`,
+    //         duration: 1500,
+    //       });
+    //       this.getClassInfo();
+    //       this.getReviewInfo();
+    //     }
+    //   }).catch((e)=>{
+    //     this.showCheckDialogFlag = false;
+    //     console.log('e',e);
+    //     ElMessage({
+    //         type: "error",
+    //         message: `提交失败`,
+    //         duration: 1500,
+    //       });
+    //   });
+    //   if(this.checkFeedback.checkState == '4'){
+    //     console.log('creating review');
+    //     createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
+    //       console.log('creating review res',res);
+    //     if(res.code == 'SUCCESS'){
+    //       ElMessage({
+    //         type: "success",
+    //         message: `创建审核成功`,
+    //         duration: 1500,
+    //       });
+    //       this.getClassInfo();
+    //     }
+    //     }).catch((e)=>{
+    //       console.log('e',e);
+    //     })
+    //   }
+    //     } else {
+    //       ElMessage({
+    //         type: "error",
+    //         message: `提交失败`,
+    //         duration: 1000,
+    //       });
+    //       return false;
+    //     }
+    //   });
+    // },
     //返回教师端首页
     backHome() {
       if (this.identity == "学院管理员"||this.identity == "课程负责人") {
@@ -341,6 +479,22 @@ export default {
         });
       });
     },
+    //查询课程审核信息
+    // getReviewInfo(){
+    //   getReview(this.classInfo.classId).then((res)=>{
+    //     console.log('getReviewInfo',res);
+        
+    //     if(res.total != 0){
+    //       this.hasNoReviewInfo = false;
+    //       this.reviewInfo = res.rows;
+    //     }
+    //     else{
+    //       this.hasNoReviewInfo = true;
+
+    //     }
+        
+    //   })
+    // },
     //查看教学班信息
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
@@ -381,19 +535,20 @@ export default {
       });
     },
     //提交
-    submit() {
-      submit(this.classInfo.classId).then((res) => {
-        console.log("res", res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `提交成功`,
-            duration: 1000,
-          });
-        }
-        this.getClassInfo();
-      });
-    },
+    // submit() {
+    //   submit(this.classInfo.classId).then((res) => {
+    //     console.log("res", res);
+    //     if (res.code == "SUCCESS") {
+    //       ElMessage({
+    //         type: "success",
+    //         message: `提交成功`,
+    //         duration: 1000,
+    //       });
+    //     }
+    //     this.getClassInfo();
+
+    //   });
+    // },
     //确定提交状态
     classStatus() {
       switch (this.classInfo.status) {
@@ -410,12 +565,27 @@ export default {
           this.status = "已退回";
           break;
       }
+      console.log('this.status',this.status);
     },
   },
 };
 </script>
 
 <style scoped>
+#drawerbox .el-overlay{
+  position: satic;
+}
+.reviewBoxStyle{
+  padding-top: 100px;
+}
+
+:deep().el-overlay{
+  position: static;
+}
+
+.switchstyle{
+  bottom: 4px;
+}
 .content {
   height: 100vh;
   background-color: #f2f2f2;
