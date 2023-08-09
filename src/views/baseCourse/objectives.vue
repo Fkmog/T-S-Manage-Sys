@@ -45,10 +45,23 @@
         </el-row>
         <div v-for="objective in list.objectives" :key="objective.id">
           <el-row>
-            <el-col :span="2" class="objective-num">{{
+            <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
-            <el-col :span="20">
+            <el-col
+              :span="4"
+              class="objective-achieve"
+              v-show="objective.hasAchieve"
+            >
+              {{ objective.achievementTwo }}%
+            </el-col>
+            <el-col
+              :span="2"
+              class="objective-achieve"
+              v-show="!objective.hasAchieve"
+            >
+            </el-col>
+            <el-col :span="16">
               <div class="objective-name">
                 {{ objective.name }}
               </div>
@@ -70,12 +83,10 @@
                   <el-col :span="12">
                     <el-row>
                       <el-col
-                        :span="6"
                         v-for="(activity, index) in assessment.activities.item"
                         :key="index"
                       >
-                      {{ activity }}
-
+                        {{ activity }}
                       </el-col>
                     </el-row>
                   </el-col>
@@ -85,6 +96,17 @@
           </el-row>
           <div style="height: 30px"></div>
         </div>
+      </div>
+      <div v-show="!hasDetailId">
+        <div class="no-info">暂未设置课程大纲版本</div>
+      </div>
+      <div v-show="hasDetailId && !hasObjective">
+        <el-row class="no-info">
+          <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
+          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent"
+            >去设置</el-col
+          >
+        </el-row>
       </div>
     </div>
   </div>
@@ -104,18 +126,27 @@ export default {
   },
   data() {
     return {
+      hasDetailId: true,
+      hasObjective: true,
+      classInfo: [],
+      list: [],
+      objectives: [],
       course: {
         name: "",
         detailId: Number,
         departmentId: Number,
         schoolId: Number,
       },
-      list: [],
     };
   },
   mounted() {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
+     if (this.course.detailId === null) {
+      this.hasDetailId = false;
+    } else {
+      this.hasDetailId = true;
+    }
     this.checkObjectives();
   },
   methods: {
@@ -131,12 +162,19 @@ export default {
         this.list = res.data;
         //处理数据-serialNum
         if (this.list.objectives) {
+            this.hasObjective = true;
           this.list.objectives.forEach((value) => {
             if (value.id.charAt(0) == "0") {
               value.serialNum = value.id.charAt(1);
             } else {
               value.serialNum = value.id;
             }
+              if (value.hasOwnProperty("achievement")) {
+                value.achievementTwo=value.achievement.toFixed()
+                value.hasAchieve = true;
+              } else {
+                value.hasAchieve = false;
+              }
           });
         }
         console.log("getObjectives:", this.list);
@@ -201,6 +239,13 @@ export default {
   white-space: nowrap;
   margin-top: 33px;
 }
+.objective-achieve {
+  font-size: 1.6em;
+  color: #ff5722;
+  font-weight: bold;
+  margin-top: 30px;
+  padding-left: 16px;
+}
 .objective-description {
   margin-top: 30px;
 }
@@ -211,5 +256,13 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
+}
+.no-info {
+  padding-top: 120px;
+
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+  background-color: #f2f2f2;
 }
 </style>

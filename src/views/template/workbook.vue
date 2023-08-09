@@ -20,13 +20,13 @@
             <Back />
           </el-icon>
         </el-tooltip>
-        <div class="block_title">课程信息</div>
+        <div class="block_title">工作手册</div>
         <el-divider class="divider" direction="vertical" />
         <el-switch v-model="openDrawer" class="switchstyle" />
       </el-row>
     </div>
     <!-- 表单回显器 -->
-    <div class="form-card" v-show="hasWorkbook==true">
+    <div class="form-card" v-show="hasWorkbook == true">
       <form-create
         v-model="value"
         v-model:api="fApi"
@@ -34,8 +34,15 @@
         :option="option"
       ></form-create>
     </div>
-    <div class="noWorkbook" v-show="hasWorkbook==false">
-      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
+    <div class="noWorkbook" v-show="hasWorkbook == false">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          margin-top: 100px;
+          font-size: 22px;
+        "
+      >
         未分配工作手册模板
       </div>
     </div>
@@ -44,7 +51,7 @@
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
+import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
 import { ElMessage ,ElMessageBox, ElSwitch } from "element-plus";
 
@@ -72,22 +79,67 @@ export default {
       fApi: {},
       //表单数据
       value: {},
-      
     };
   },
+
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    // console.log("vuex中的classInfo", this.classInfo);
     this.getWorkbook();
     this.value = this.classInfo.workbookJson;
+  },
+  computed: {
+    classInfoChange() {
+      return this.$store.state.currentInfo.teacherSideClassInfo;
+    },
+  },
+  watch: {
+    classInfoChange: {
+      deep: true,
+      handler(value) {
+        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+      },
+    },
   },
   methods: {
     // 返回上级页面
     backClass() {
       this.$router.push({ name: "TeacherClass" });
     },
+    //当 status 为2，3时，无法编辑表单，注入disable属性
+    disabledForm() {
+      this.workbook.formJson.forEach((form) => {
+        form.props = {};
+        form.props.disabled = true;
+      });
+      console.log("disabled后", this.workbook);
+    },
+    abledForm() {
+      this.workbook.formJson.forEach((form) => {
+        form.props = {};
+        form.props.disabled = false;
+        console.log("abled后", this.workbook);
+      });
+    },
+    save() {
+      this.fApi.submit((formData, fApi) => {
+        console.log("save", formData);
+        editByTeacher(this.classInfo.classId, formData).then((res) => {
+          console.log("保存", res);
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `保存成功`,
+              duration: 1500,
+            });
+            this.getClassInfo();
+          }
+        });
+      });
+   
+    },
     // 查询对应的工作手册
     getWorkbook() {
-      let that = this;
       WorkbookByClass(this.classInfo.classId).then((res) => {
         if (res.code === "SUCCESS") {
           if (res.data.length == 0) {
@@ -100,26 +152,31 @@ export default {
             this.json = res.data.formJson;
             this.option = res.data.cssJson;
             // 保存提交
-            this.option.onSubmit = function (e) {
-              console.log("Submit", e);
-              editByTeacher(that.classInfo.classId, e).then((res) => {
-                console.log("保存", res);
-                if (res.code === "SUCCESS") {
-                  ElMessage({
-                    type: "success",
-                    message: `保存成功`,
-                    duration: 1500,
-                  });
-                  that.getClassInfo();
+            this.option.submitBtn = false;
+            // this.option.onSubmit = function (e) {
+            //   console.log("Submit", e);
+            //   editByTeacher(that.classInfo.classId, e).then((res) => {
+            //     console.log("保存", res);
+            //     if (res.code === "SUCCESS") {
+            //       ElMessage({
+            //         type: "success",
+            //         message: `保存成功`,
+            //         duration: 1500,
+            //       });
+            //       that.getClassInfo();
 
-                  console.log("!", that.value);
-                }
-              });
-            };
-            this.option.submitBtn.innerText = "保存";
-            console.log("option", this.option);
-            this.setJson();
-            this.setOption();
+            //       console.log("!", that.value);
+            //     }
+            //   });
+            // };
+            // this.setJson();
+            // this.setOption();
+            console.log(this.classInfo.status);
+            if (this.classInfo.status == 2 || this.classInfo.status == 3) {
+              this.disabledForm();
+            } else {
+              this.abledForm();
+            }
           }
         }
       });
@@ -129,18 +186,17 @@ export default {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res);
         this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
-        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-        this.value = this.classInfo.workbookJson;
+        this.value = res.data.workbookJson;
       });
     },
     // 回显生成规则
-    setJson() {
-      this.$refs.designer.setRule(this.json);
-    },
+    // setJson() {
+    //   this.$refs.designer.setRule(this.json);
+    // },
     // 回显样式规则
-    setOption() {
-      this.$refs.designer.setOption(this.option);
-    },
+    // setOption() {
+    //   this.$refs.designer.setOption(this.option);
+    // },
   },
 };
 </script>

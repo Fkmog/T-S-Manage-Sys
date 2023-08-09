@@ -158,7 +158,8 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="3" class="object-name">课程目标{{ dialogObject.serialNum }}：
+          <el-col :span="3" class="object-name"
+            >课程目标{{ dialogObject.serialNum }}：
           </el-col>
           <el-col :span="3" class="object-name">{{ dialogObject.name }}</el-col>
           <el-col :span="18" class="object-desc">{{
@@ -316,12 +317,10 @@ export default {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     this.checkObjectives();
+    console.log("123", this.$store.state.currentInfo.identity);
   },
   methods: {
     backObjectives() {
-      // console.log(
-      // this.listCopy,this.list,!(JSON.stringify(this.listCopy) === JSON.stringify(this.list))
-      // );
       if (!(JSON.stringify(this.listCopy) === JSON.stringify(this.list))) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
           confirmButtonText: "确定",
@@ -329,11 +328,23 @@ export default {
           type: "warning",
         })
           .then(() => {
-            this.$router.push("/baseCourseObjectives");
+            if (this.$store.state.currentInfo.identity == "学院管理员") {
+              this.$router.push("/baseCourseObjectives");
+            } else {
+              this.$router.push({
+                name: "Objectives",
+              });
+            }
           })
           .catch(() => {});
       } else {
-        this.$router.push("/baseCourseObjectives");
+        if (this.$store.state.currentInfo.identity == "学院管理员") {
+          this.$router.push("/baseCourseObjectives");
+        } else {
+          this.$router.push({
+            name: "Objectives",
+          });
+        }
       }
     },
     judgeBeforeSave() {
@@ -390,13 +401,15 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
-        console.log("getObjectives",res);
+        console.log("getObjectives", res);
         this.allActivities = this.list.activities;
         // console.log("初始list", this.list);
         console.log("初始allActivities", this.list.activities);
-        this.allActivities.itemObject = this.allActivities[0].item.map((item) => ({
-          value: item,
-        }));
+        this.allActivities.itemObject = this.allActivities[0].item.map(
+          (item) => ({
+            value: item,
+          })
+        );
         // console.log("格式化后的allActivities", this.allActivities);
         // console.log("格式化后的list", this.list);
         //处理数据-serialNum
@@ -512,13 +525,11 @@ export default {
             let index = this.allActivities.item.indexOf(array[0].value);
             // console.log("index", index);
             if (index > -1) {
-                if (
-                  !(assessmentMethod.activities.item.length == array.length)
-                ) {
-                  assessmentMethod.activities.item.push(
-                    this.allActivities.item[index]
-                  );
-                }
+              if (!(assessmentMethod.activities.item.length == array.length)) {
+                assessmentMethod.activities.item.push(
+                  this.allActivities.item[index]
+                );
+              }
               if (
                 assessmentMethod.activities.value === null ||
                 !assessmentMethod.activities.hasOwnProperty("value")

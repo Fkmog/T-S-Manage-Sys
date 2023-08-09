@@ -21,7 +21,7 @@
               <Back />
             </el-icon>
           </el-tooltip>
-          <div class="title">{{ classInfo.className }}</div>
+          <div class="title">课程目标</div>
           <el-divider class="divider" direction="vertical" />
           <el-switch v-model="openDrawer" class="switchstyle" />
         </el-row>
@@ -87,7 +87,6 @@
                   <el-col :span="12">
                     <el-row>
                       <el-col
-                        :span="6"
                         v-for="(activity, index) in assessment.activities.item"
                         :key="index"
                       >
@@ -139,7 +138,6 @@ export default {
       openDrawer:false,
       hasDetailId: true,
       hasObjective: true,
-      // hasAchieve:false,
       isRespondent: false,
       classInfo: [],
       list: [],
@@ -157,6 +155,8 @@ export default {
     console.log('identity:',this.identity);
     }
     console.log("this.classinfo", this.classInfo);
+    this.$store.commit("course/setDetailId",  this.classInfo.detailId);
+
     if (this.classInfo.isRespondent == 2) {
       this.isRespondent = true;
     } else {
@@ -176,7 +176,7 @@ export default {
   },
   methods: {
     goEdit() {
-      this.$router.push("/objectivesEdit");
+      this.$router.push("/baseCourseObjectivesEdit");
     },
     backClass() {
       this.$router.push("/teacherClass");

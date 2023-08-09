@@ -1,9 +1,8 @@
 <template>
   <div class="content">
     <addBtn @click="addTemplate()"></addBtn>
-
     <!-- 顶部导航栏 -->
-    <div class="block">
+    <!-- <div class="block">
       <el-row class="block-row">
         <el-tooltip
           class="box-item"
@@ -25,7 +24,7 @@
         <div class="block_title">工作手册模板</div>
         <el-divider class="divider" direction="vertical" />
       </el-row>
-    </div>
+    </div> -->
     <el-table
       class="ListTable"
       :data="workbookList"
@@ -144,7 +143,7 @@ export default {
     // 删除工作手册
     deleteBook(row) {
       console.log(row);
-      ElMessageBox.confirm("是否确认删除：" + row.name + " ?", "", {
+      ElMessageBox.confirm("是否确认删除该模板"  + "?", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
