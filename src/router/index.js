@@ -58,6 +58,9 @@ import PrincipalClass from "@/views/principalSide/class/class.vue";
 import WebAdminIndex from "@/views/webAdmin/webIndex.vue";
 import Schools from "@/views/webAdmin/schools/schools.vue";
 
+//版本页面
+import Version from "@/views/version/version.vue";
+
 const router = createRouter({
   //history配置暂未定
   history: createWebHistory(),
@@ -91,18 +94,35 @@ const router = createRouter({
         },
         {
           path: "/teacher",
+          name:"Teacher",
           component: Teacher,
           meta: { isMajor: false },
         },
         {
           path: "/major",
+          name:"Major",
           component: Major,
           meta: { isMajor: false },
         },
         {
           path: "/departmentSetting",
           component: DepartmentSetting,
+          name:"DepartmentSetting",
           meta: { isMajor: false },
+          children: [
+            {
+              name: "TemplateList",
+              path: "/templateList",
+              component: TemplateList,
+              meta: { isMajor: false },
+            },
+            {
+              name: "Version",
+              path: "/version",
+              component: Version,
+              meta: { isMajor: false },
+            },
+          ],
         },
         {
           path: "/addTeacher",
@@ -201,12 +221,12 @@ const router = createRouter({
           path: "/addTeacher",
           component: AddTeacher,
         },
-        {
-          name: "TemplateList",
-          path: "/templateList",
-          component: TemplateList,
-          meta: { isMajor: false },
-        },
+        // {
+        //   name: "TemplateList",
+        //   path: "/templateList",
+        //   component: TemplateList,
+        //   meta: { isMajor: false },
+        // },
         {
           name: "TemplateEdit",
           path: "/templateEdit",

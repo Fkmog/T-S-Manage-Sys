@@ -91,12 +91,17 @@
                         {{ assessment.name }}
                       </el-col>
                       <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                      <el-col
-                        :span="2"
-                        v-for="(activity, index) in assessment.activities.item"
-                        :key="index"
-                      >
-                        {{ activity }}
+                     <el-col :span="12">
+                        <el-row>
+                          <el-col
+                            :span="6"
+                            v-for="(activity, index) in assessment.activities
+                              .item"
+                            :key="index"
+                          >
+                            {{ activity }}
+                          </el-col>
+                        </el-row>
                       </el-col>
                     </el-row>
                   </el-col>
@@ -376,12 +381,15 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
-        this.allActivities = this.list.activities.item;
-        // console.log("@", this.allActivities)
-        this.allActivities = this.allActivities.map((item) => ({
+        console.log("getObjectives",res);
+        this.allActivities = this.list.activities;
+        // console.log("初始list", this.list);
+        console.log("初始allActivities", this.list.activities);
+        this.allActivities.itemObject = this.allActivities[0].item.map((item) => ({
           value: item,
         }));
-
+        // console.log("格式化后的allActivities", this.allActivities);
+        // console.log("格式化后的list", this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
           this.list.objectives.forEach((value) => {
@@ -403,7 +411,6 @@ export default {
             assessment.isEditWeight = false;
           });
         });
-
         console.log("objectives:", this.objectives);
         //保存成绩项
         if (this.objectives.length > 0) {

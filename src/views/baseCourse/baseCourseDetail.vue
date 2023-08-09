@@ -194,7 +194,7 @@
       </div>
     </div>
     <!-- 右侧复制抽屉 -->
-    <el-drawer v-model="drawer" :with-header="false">
+    <el-drawer v-model="drawer" :modal="true">
       <el-row>
         <el-col :span="14">
           <DrawerSearch
@@ -667,4 +667,5 @@ export default {
 .fileName:hover .fileCloseIcon {
   opacity: 1;
 }
+
 </style>

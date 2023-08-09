@@ -137,7 +137,7 @@
         <el-col>
           <el-col style="margin-top: 15px">
             <div class="detail-title">课程名</div>
-            <div class="detail-info">{{ classInfo.courseName }}</div>
+            <div class="detail-info">{{ classInfo.className }}</div>
           </el-col>
           <el-row style="margin-top: 15px">
             <el-col :span="12" style="margin-top: 10px">

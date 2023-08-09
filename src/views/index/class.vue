@@ -398,7 +398,7 @@
                   <el-button
                     link
                     style="color: #3f51b5"
-                    @click="editClass(scope.$index, scope.row)"
+                    @click.stop="editClass(scope.$index, scope.row)"
                     ><el-icon><Edit /></el-icon
                   ></el-button>
                 </el-tooltip>
@@ -408,7 +408,7 @@
                   <el-button
                     link
                     style="color: #3f51b5"
-                    @click="deleteClass(scope.$index, scope.row)"
+                    @click.stop="deleteClass(scope.$index, scope.row)"
                     ><el-icon><Delete /></el-icon
                   ></el-button>
                 </el-tooltip>
@@ -831,7 +831,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: "还没写完",
+            message: "请输入完整信息",
             duration: 1500,
           });
           return;

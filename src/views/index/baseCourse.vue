@@ -32,7 +32,7 @@
                 />
               </el-select>
             </el-col>
-            <el-col :span="2" style="position: relative; top: 8px">
+            <el-col :span="2" style="position: relative; top: 8px" v-show="identity == '学院管理员'">
               <el-dropdown class="dropdownstyle">
                 <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
                 <template #dropdown>
@@ -46,7 +46,7 @@
                       "
                     >
                       <el-icon><User /></el-icon>
-                      &nbsp;添加课程版本大纲号
+                      &nbsp;添加课程大纲版本号
                     </el-dropdown-item>
                     <el-dropdown-item
                       @click="
@@ -57,7 +57,7 @@
                       "
                     >
                       <el-icon><CircleClose /></el-icon>
-                      &nbsp;修改课程版本大纲号
+                      &nbsp;修改课程大纲版本号
                     </el-dropdown-item>
                     <el-dropdown-item
                       @click="
@@ -68,11 +68,7 @@
                       "
                     >
                       <el-icon><Delete /></el-icon>
-                      &nbsp;删除课程版本大纲号
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="setModel()">
-                      <el-icon><Delete /></el-icon>
-                      &nbsp;设置模板
+                      &nbsp;删除课程大纲版本号
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -104,6 +100,10 @@
               <el-dropdown-item @click="this.addPrincipal()">
                 <el-icon><User /></el-icon>
                 &nbsp添加课程负责人
+              </el-dropdown-item>
+              <el-dropdown-item @click="this.addWorkbook()">
+                <el-icon><Collection /></el-icon>
+                &nbsp分配手册模版
               </el-dropdown-item>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
@@ -380,7 +380,7 @@
 
   <div v-show="!hasBaseCourse" class="no-class">没有课程</div>
 
-  <el-dialog v-model="dialogFormVisible" title="添加基础课程">
+  <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -452,7 +452,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
+  <el-dialog v-model="dialogFormVisible1"  title="修改基础课程">
     <el-form :model="preform">
       <el-form-item label="课程名称" :label-width="formLabelWidth">
         <el-input
@@ -510,7 +510,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showPrinciple" title="添加负责人">
+  <el-dialog v-model="showPrinciple"  title="添加负责人">
     <span> 请选择负责人姓名： </span>
 
     <el-select
@@ -540,7 +540,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showEditVersionDailogFlag" title="课程大纲版本号维护">
+  <el-dialog v-model="showEditVersionDailogFlag"  title="课程大纲版本号维护">
     <el-form :model="versionForm" :rules="editVersionRules">
       <el-form-item
         v-show="addFlag"
@@ -627,6 +627,7 @@
   
   <el-dialog
     v-model="showAddWorkbook"
+    
     title="设置手册模版"
     width="330px"
     :show-close="false"
@@ -2156,12 +2157,12 @@ export default {
   cursor: pointer;
 }
 .dropdownIcon {
+  margin-left: 10px;
   margin-top: 18px;
   cursor: pointer;
 }
 .dropdownstyle {
-  float: right;
-  margin-right: 70px;
+  margin-right: 10px;
 }
 
 .no-class {

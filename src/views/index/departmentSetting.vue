@@ -3,7 +3,23 @@
     <!-- 顶部导航栏 -->
     <div class="block">
       <el-row class="block-row">
-        <div class="block_title">版本</div>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="版本"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 50px"
+            @click="toVersion()"
+          >
+            <List />
+          </el-icon>
+        </el-tooltip>
         <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
@@ -16,35 +32,45 @@
             class="icon"
             size="22px"
             color="rgb(137, 137, 137)"
-            style="margin-left: 20px"
+            style="margin-left: 15px"
             @click="toTemplate()"
           >
-            <List />
+            <Management />
           </el-icon>
         </el-tooltip>
       </el-row>
     </div>
+    <router-view />
   </div>
 </template>
 
 <script>
-import { List } from "@element-plus/icons-vue";
+import { List, Management } from "@element-plus/icons-vue";
 export default {
   name: "DepartmentSetting",
   components: {
     List,
+    Management,
   },
   data() {
     return {};
   },
   computed: {},
   watch: {},
-  mounted() {},
+  mounted() {
+    // 点击"设置"后，默认进入版本页面，后期可能会出现bug
+    if (this.$route.matched.length == 2) {
+      this.toVersion();
+    }
+  },
   methods: {
+    toVersion() {
+      console.log(this.$route);
+      this.$router.push({ name: "Version" });
+    },
     //跳转到模板编辑页面
     toTemplate() {
       this.$router.push({ name: "TemplateList" });
-      console.log("toTemplate");
     },
   },
 };

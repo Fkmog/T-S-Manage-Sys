@@ -222,7 +222,7 @@ export default {
     // 获取样式规则
     getOption() {
       this.option = this.$refs.designer.getOption();
-      console.log("getOption", this.option);
+      // console.log("getOption", this.option);
     },
     // 回显样式规则
     setOption() {
@@ -231,7 +231,7 @@ export default {
     // 获取生成规则
     getJson() {
       this.json = this.$refs.designer.getJson();
-      console.log("json", this.json);
+      // console.log("json", this.json);
     },
     // 回显生成规则
     setJson() {
@@ -247,7 +247,7 @@ export default {
         this.option.onSubmit = function (e) {
           console.log("Submit", e);
         };
-        console.log("option", this.option);
+        // console.log("option", this.option);
         this.setJson();
         this.setOption();
       });

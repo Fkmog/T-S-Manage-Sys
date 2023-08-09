@@ -6,10 +6,13 @@ import router from "./router";
 import store from "./store";
 import formCreate from "@form-create/element-ui";
 import FcDesigner from "@form-create/designer";
-import 'element-plus/dist/index.css'
-import Codemirror from 'codemirror-editor-vue3'
+import 'element-plus/dist/index.css';
+import Codemirror from 'codemirror-editor-vue3';
 
-createApp(App)
+
+
+
+const app = createApp(App)
   .use(store)
   .use(router)
   .use(ElementPlus, {
@@ -38,6 +41,8 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
     super(callback);
   }
 };
+//dialog对话框点击遮罩层不消失
+app.$.appContext.components.ElDialog.props.closeOnClickModal.default = false;
 
 // 判断配置文件是否开启日志调试 是否输出日志 True 输出 False 不输出
 // var logDebug = true;
