@@ -115,23 +115,6 @@
           "
           class="status_desc"
         >
-          <!-- <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="审核"
-            placement="bottom"
-            :hide-after="0"
-          >
-            <el-icon
-              class="icon"
-              size="24px"
-              color="rgb(137, 137, 137)"
-              style="margin-left: 20px"
-              @click="this.showCheckDialogFlag = true"
-            >
-              <Finished />
-            </el-icon>
-          </el-tooltip> -->
           待审核
         </div>
         <div v-show="status == '已退回' && identity == '教师'">
@@ -348,59 +331,7 @@ export default {
     getdata(val){
       this.openDrawer = val;
     },
-    // collapseHandleChange(val){
-    //   console.log('collapseHandleChange',val);
-    // },
-    // submitForm(formName) {
-    //   this.$refs[formName].validate((valid) => {
-    //     if (valid) {
-    //     submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
-    //     console.log('feedback res',res);
-    //     if(res.code == 'SUCCESS'){
-    //       this.showCheckDialogFlag = false;
-    //       ElMessage({
-    //         type: "success",
-    //         message: `提交成功`,
-    //         duration: 1500,
-    //       });
-    //       this.getClassInfo();
-    //       this.getReviewInfo();
-    //     }
-    //   }).catch((e)=>{
-    //     this.showCheckDialogFlag = false;
-    //     console.log('e',e);
-    //     ElMessage({
-    //         type: "error",
-    //         message: `提交失败`,
-    //         duration: 1500,
-    //       });
-    //   });
-    //   if(this.checkFeedback.checkState == '4'){
-    //     console.log('creating review');
-    //     createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
-    //       console.log('creating review res',res);
-    //     if(res.code == 'SUCCESS'){
-    //       ElMessage({
-    //         type: "success",
-    //         message: `创建审核成功`,
-    //         duration: 1500,
-    //       });
-    //       this.getClassInfo();
-    //     }
-    //     }).catch((e)=>{
-    //       console.log('e',e);
-    //     })
-    //   }
-    //     } else {
-    //       ElMessage({
-    //         type: "error",
-    //         message: `提交失败`,
-    //         duration: 1000,
-    //       });
-    //       return false;
-    //     }
-    //   });
-    // },
+   
     //返回教师端首页
     backHome() {
       if (this.identity == "学院管理员" || this.identity == "课程负责人") {

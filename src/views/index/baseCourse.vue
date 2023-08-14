@@ -939,14 +939,11 @@ export default {
 
       //select
       currentVersion: "",
-      currentVersion: "",
       currentVersionValue: 1,
       loading: ref(false),
       options: [],
-      versions: [],
       versionLabel: [],
       versions: [],
-      versionLabel: [],
 
       // isRouterAlive:true,
       closeShow: ref(false),

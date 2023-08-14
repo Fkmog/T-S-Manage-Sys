@@ -40,7 +40,7 @@
           </el-icon>
         </el-tooltip>
         <el-divider class="divider" direction="vertical" />
-        <el-switch v-model="openDrawer" class="switchstyle" />
+        <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
       </el-row>
     </div>
     <!-- 表单回显器 -->
@@ -103,6 +103,7 @@ export default {
 
   mounted() {
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     // console.log("vuex中的classInfo", this.classInfo);
     this.getWorkbook();
     this.value = this.classInfo.workbookJson;
@@ -121,6 +122,9 @@ export default {
     },
   },
   methods: {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     // 返回上级页面
     backClass() {
       this.$router.push({ name: "TeacherClass" });

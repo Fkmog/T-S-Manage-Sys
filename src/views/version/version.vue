@@ -1,16 +1,541 @@
 <template>
-  <div class="content">版本页面（还没做</div>
+  <div class="content">
+    <div class="tools">
+      <el-row class="rowstyle">
+        <el-col :span="4" class="colstyle">
+          <el-tooltip content="添加课程大纲版本号">
+            <el-icon 
+            style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
+            @click="this.addFlag = true;
+                    this.deleteFlag = false;
+                    this.editFlag = false;
+                    this.showEditVersionDailogFlag = true;">
+                    <User />
+                  </el-icon>
+            </el-tooltip>
+          </el-col>
+        <el-col :span="4" class="colstyle">
+          <el-tooltip content="修改课程大纲版本号">
+           
+              <el-icon 
+              style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
+              @click="this.editFlag = true;
+                    this.deleteFlag = false;
+                    this.addFlag = false;
+                    this.showEditVersionDailogFlag = true;">
+                    <Document />
+              </el-icon>
+          </el-tooltip>
+        </el-col>
+        <el-col :span="4" class="colstyle">
+          <el-tooltip content="删除课程大纲版本号">
+            <el-icon  
+            style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
+            @click="this.deleteFlag = true;
+                    this.addFlag = false;
+                    this.editFlag = false;
+                    this.showEditVersionDailogFlag = true;">
+                    <Delete />
+            </el-icon>
+          </el-tooltip>
+        </el-col>
+      </el-row>
+          
+    </div>
+    <el-table :data="versions" class="el-table-container" :header-cell-style="{
+        'padding-left': '20px',
+        'font-size': '14.4px',
+        height: '48px',
+        'font-weight': 'bold',
+        color: 'black',
+      }"
+      :cell-style="{
+        'padding-left': '20px',
+        'font-size': '16px',
+        height: '60px',
+      }"
+      style="width: 750px"
+      >
+       <el-table-column label="版本大纲名称" width="250">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span>{{ scope.row.label}}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="面向年级" width="250">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span>{{ scope.row.enrollYear }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="修订年份" width="250">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span>{{ scope.row.reviseYear }}</span>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    
+  </div>
+  
+
+
+
+  <el-dialog v-model="showEditVersionDailogFlag"  title="课程大纲版本号维护">
+    <el-form :model="versionForm" :rules="editVersionRules">
+      <el-form-item
+        v-show="addFlag"
+        label="课程大纲版本号"
+        :label-width="formLabelWidth"
+        prop="name"
+        :error="C_ErrorMsg_editVersion_name"
+      >
+        <el-input v-model="versionForm.name" autocomplete="off" />
+      </el-form-item>
+      <el-form-item
+        v-show="editFlag || deleteFlag"
+        label="选择课程大纲版本"
+        :label-width="formLabelWidth"
+        prop="name"
+      >
+        <el-select
+          v-model="currentVersion"
+          
+          @change="selectVersion(currentVersion)"
+        >
+          <el-option
+            v-for="item in versions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item
+        label="面向年级"
+        :label-width="formLabelWidth"
+        prop="enrollYear"
+        :error="C_ErrorMsg_editVersion_enrollYear"
+      >
+        <el-input v-model="versionForm.enrollYear" autocomplete="off" />
+      </el-form-item>
+      <el-form-item
+        label="修订年份"
+        :label-width="formLabelWidth"
+        prop="reviseYear"
+        :error="C_ErrorMsg_editVersion_reviseYear"
+      >
+        <el-input v-model="versionForm.reviseYear" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button
+          @click="
+            showEditVersionDailogFlag = false;
+            this.cancelVersionForm();
+          "
+          >取消</el-button
+        >
+        <el-button
+          v-show="addFlag"
+          type="primary"
+          :disabled="!submitFlag"
+          @click="addVersion()"
+        >
+          添加课程大纲版本号
+        </el-button>
+        <el-button
+          v-show="editFlag"
+          type="warning"
+          :disabled="!submitFlag"
+          @click="editVersion()"
+        >
+          修改课程大纲版本号
+        </el-button>
+        <el-button
+          v-show="deleteFlag"
+          type="danger"
+          :disabled="!submitFlag"
+          @click="deleteVersion()"
+        >
+          删除课程大纲版本号
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
+import request from "@/utils/request/request";
+import HeaderSearch from "@/components/general/headerSearch.vue";
+import addBtn from "@/components/general/addBtn.vue";
+import { ref, reactive, version } from "vue";
+import {
+  ElTooltip,
+  ElIcon,
+  ElInput,
+  ElForm,
+  ElButton,
+  ElTable,
+  ElMessage,
+  ElMessageBox,
+  ElDialog,
+  ElDropdown,
+  ElTag,
+} from "element-plus";
+import {
+  Back,
+  FolderChecked,
+  InfoFilled,
+  Loading,
+  Search,
+  Close,
+  Plus,
+  Delete,
+  Edit,
+  MoreFilled,
+  ArrowDown,
+  Document,
+  Avatar,
+  DocumentChecked,
+  User,
+  CircleClose,
+  Collection
+} from "@element-plus/icons-vue";
+import { getDictionary } from "@/api/dictionary";
+import { setWorkbook,checkWorkbook } from "@/api/workbook";
 export default {
   name: "Version",
+   components: {
+    request,
+    ElTooltip,
+    ElIcon,
+    ElInput,
+    ElForm,
+    ElButton,
+    ElTable,
+    ElMessage,
+    ElMessageBox,
+    Back,
+    FolderChecked,
+    InfoFilled,
+    Loading,
+    Search,
+    Close,
+    Plus,
+    Delete,
+    ElDialog,
+    ref,
+    reactive,
+    Delete,
+    Edit,
+    HeaderSearch,
+    addBtn,
+    MoreFilled,
+    ElDropdown,
+    ArrowDown,
+    Document,
+    ElTag,
+    Avatar,
+    DocumentChecked,
+    User,
+    CircleClose,
+    Collection
+  },
+  data(){
+    var validateName = (rule, value, callback) => {
+      if (value === "") {
+        this.C_ErrorMsg_editVersion_name = "请输入版本名称";
+      } else {
+        let nameformat = /^\d{4}版$/;
+        if (!nameformat.test(value)) {
+          this.C_ErrorMsg_editVersion_name =
+            "请输入正确版本名称格式 例如：2020版";
+        } else {
+          this.nameFlag = true;
+          if (this.enrollYearFlag && this.nameFlag && this.reviseYearFlag) {
+            this.submitFlag = true;
+          } else {
+            this.submitFlag = false;
+          }
+        }
+      }
+    };
+    var validateEnrollYear = (rule, value, callback) => {
+      if (value === "") {
+        this.C_ErrorMsg_editVersion_enrollYear = "请输入年份";
+      } else {
+        let timeformat = /^[1-9]\d{3}$/;
+        let numberformat = /^\d+$/;
+        if (!numberformat.test(value)) {
+          this.C_ErrorMsg_editVersion_enrollYear = "请输入数字";
+        } else if (!timeformat.test(value)) {
+          this.C_ErrorMsg_editVersion_enrollYear =
+            "请输入正确年份格式 例如：2020 ";
+        } else {
+          this.enrollYearFlag = true;
+          if (this.enrollYearFlag && this.nameFlag && this.reviseYearFlag) {
+            this.submitFlag = true;
+          } else {
+            this.submitFlag = false;
+          }
+        }
+      }
+    };
+     var validateReviseYear = (rule, value, callback) => {
+      if (value === "") {
+        this.C_ErrorMsg_editVersion_reviseYear = "请输入年份";
+      } else {
+        let timeformat = /^[1-9]\d{3}$/;
+        let numberformat = /^\d+$/;
+        if (!numberformat.test(value)) {
+          this.C_ErrorMsg_editVersion_reviseYear = "请输入数字";
+        } else if (!timeformat.test(value)) {
+          this.C_ErrorMsg_editVersion_reviseYear =
+            "请输入正确年份格式 例如：2020 ";
+        } else {
+          this.reviseYearFlag = true;
+          if (this.enrollYearFlag && this.nameFlag && this.reviseYearFlag) {
+            this.submitFlag = true;
+          } else {
+            this.submitFlag = false;
+          }
+        }
+      }
+    };
+    return{
+      formLabelWidth: "140px",
+
+      submitFlag: false,
+      nameFlag: false,
+      enrollYearFlag: false,
+      reviseYearFlag: false,
+      addFlag: false,
+      editFlag: false,
+      deleteFlag: false,
+      versions: [],
+      versionLabel:[],
+      currentVersion:'',
+      versionForm: {
+        name: "",
+        enrollYear: "",
+        reviseYear: "",
+        versionId: "",
+      },
+      C_ErrorMsg_editVersion_name: "",
+      C_ErrorMsg_editVersion_enrollYear: "",
+      C_ErrorMsg_editVersion_reviseYear: "",
+
+      editVersionRules: {
+        name: [{ validator: validateName, trigger: "blur" }],
+        enrollYear: [{ validator: validateEnrollYear, trigger: "blur" }],
+        reviseYear: [
+          { validator: validateReviseYear, trigger: "blur" },
+          // { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+        ],
+      },
+
+      showEditVersionDailogFlag:false,
+
+    }
+  },
+  mounted(){
+    this.getDictionary();
+  },
+  methods:{
+    addVersion() {
+      let that = this;
+      return request({
+        url: "/detail/version",
+        method: "post",
+        data: {
+          enrollYear: that.versionForm.enrollYear,
+          reviseYear: that.versionForm.reviseYear,
+          versionName: that.versionForm.name,
+        },
+      })
+        .then((res) => {
+          console.log("edit version res:", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `添加版本大纲号成功`,
+              duration: 1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {
+              name: "",
+              enrollYear: "",
+              reviseYear: "",
+              versionId: "",
+            };
+            that.getDict();
+          }
+        })
+        .catch((e) => {
+          console.log("edit version res error:", e);
+          ElMessage({
+            type: "error",
+            message: `添加版本大纲号失败`,
+            duration: 1000,
+          });
+        });
+    },
+    editVersion() {
+      let that = this;
+      return request({
+        url: "/detail/version",
+        method: "put",
+        data: {
+          enrollYear: that.versionForm.enrollYear,
+          reviseYear: that.versionForm.reviseYear,
+          versionName: that.versionForm.name,
+          versionId: that.versionForm.versionId,
+        },
+      })
+        .then((res) => {
+          console.log("edit version res:", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `修改版本大纲号成功`,
+              duration: 1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {
+              name: "",
+              enrollYear: "",
+              reviseYear: "",
+              versionId: "",
+            };
+            that.getDict();
+          }
+        })
+        .catch((e) => {
+          console.log("edit version res error:", e);
+          ElMessage({
+            type: "error",
+            message: `修改版本大纲号失败`,
+            duration: 1000,
+          });
+        });
+    },
+    deleteVersion() {
+      let that = this;
+      return request({
+        url: "/detail/versionRemove/" + that.versionForm.versionId,
+        method: "delete",
+      })
+        .then((res) => {
+          console.log("delete version res:", res);
+          if (res === 204) {
+            ElMessage({
+              type: "success",
+              message: `删除版本大纲号成功`,
+              duration: 1000,
+            });
+            that.showEditVersionDailogFlag = false;
+            that.versionForm = {
+              name: "",
+              enrollYear: "",
+              reviseYear: "",
+              versionId: "",
+            };
+            that.getDict();
+          }
+        })
+        .catch((e) => {
+          console.log("edit version res error:", e);
+          ElMessage({
+            type: "error",
+            message: `删除版本大纲号失败`,
+            duration: 1000,
+          });
+        });
+    },
+     cancelVersionForm() {
+      this.versionForm = {
+        name: "",
+        enrollYear: "",
+        reviseYear: "",
+        versionId: "",
+      };
+      this.C_ErrorMsg_editVersion_name = "";
+      this.C_ErrorMsg_editVersion_enrollYear = "";
+      this.C_ErrorMsg_editVersion_reviseYear = "";
+      this.nameFlag = false;
+      this.enrollYearFlag = false;
+      this.reviseYearFlag = false;
+    },
+    selectVersion(versionId) {
+      this.versionForm.name = this.versions[versionId - 1]["label"];
+      this.versionForm.enrollYear = this.versions[versionId - 1]["enrollYear"];
+      this.versionForm.reviseYear = this.versions[versionId - 1]["reviseYear"];
+      this.versionForm.versionId = this.versions[versionId - 1]["versionId"];
+      // console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
+    },
+    getDictionary() {
+      let that = this;
+      this.versions = [];
+      this.versionLabel = [];
+      return request({
+        url: "detail/versionList",
+        method: "get",
+      }).then((res) => {
+        console.log("versionList", res);
+        if (res.code == "SUCCESS") {
+            let num = 1;
+            res.data.forEach((year) => {
+              let dict = {
+                label: year.versionName,
+                value: num,
+                enrollYear: year.enrollYear,
+                reviseYear: year.reviseYear,
+                versionId: year.versionId,
+              };
+              num = num + 1;
+              that.versions.push(dict);
+              that.versionLabel.push(year.versionName);
+            });
+            that.currentVersion =
+              that.versionLabel[that.currentVersionValue - 1];
+          }
+      
+       
+      }).catch((e)=>{
+        console.log("error:", e);
+      })
+    },
+  }
 };
 </script>
 
 <style scoped>
+.colstyle{
+  margin-top: 10px;
+}
+.rowstyle{
+  justify-content: center;
+}
+.tools{
+  position: relative;
+  background-color: white;
+  width: 400px;
+  height: 50px;
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
 .content {
   margin-top: 85px;
-  margin-left: 50px;
+  margin-left: 5%;
+  
+}
+.el-table-container {
+  margin: 0 auto;
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 </style>

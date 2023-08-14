@@ -649,6 +649,9 @@ export default {
     //跳转到审核页面
     goCheck(row) {
       console.log("row:", row);
+      this.$store.commit("currentInfo/setOpenDrawer", false);
+      this.$store.commit("reviewInfo/setmessage", '');
+          this.$store.commit("reviewInfo/setcheckState", '');
       if (this.identity == "学院管理员") {
         this.$store.commit("currentInfo/setadminSideClassInfo", row);
       } else if (this.identity == "课程负责人") {

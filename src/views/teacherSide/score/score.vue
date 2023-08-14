@@ -21,7 +21,7 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
-      <el-switch v-model="openDrawer" class="switchstyle" />
+      <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
     </el-row>
   </div>
 
@@ -130,6 +130,7 @@ export default {
   },
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if(this.identity == '学院管理员'){
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log('identity:',this.identity);
@@ -143,6 +144,9 @@ export default {
     
   },
   methods: {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     showInfo(row){
       console.log('row',row);
     },
@@ -326,13 +330,13 @@ export default {
 .activity-tab{
   background: white;
   margin-left: 5%;
-  margin-right: 5%;
+  width: 1200px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 
 .studentCard{
   margin-left: 5%;
-  margin-right: 5%;
+  width: 1200px;
   height: 500px;
 }
 .scoreintable{
