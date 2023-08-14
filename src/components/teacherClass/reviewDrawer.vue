@@ -1,6 +1,6 @@
 <template>
     <div id="drawerbox">
-    <el-drawer v-model="openDrawer" :show-close="false">
+    <el-drawer v-model="openDrawer" :show-close="false" >
     <template #header>
       <h2 style="color: black;">
         审核记录
@@ -11,9 +11,28 @@
     <el-collapse v-model="activeNames" @change="collapseHandleChange">
     <el-collapse-item 
     v-for="(review,index) in reviewInfo" 
-    :title="'审核时间：'+review.createTime+'-----审核人：'+review.createBy"
+    :title="'审核时间：'+review.createTime+'-----审核人：'+review.reviewerName"
     >
-      <div>退回理由：{{ review.remark }}</div>
+      <div style="padding-left: 30px;">审核意见：{{ review.remark }}</div>
+      <el-tooltip
+        class="box-item"
+        
+        effect="dark"
+        content="删除该审核意见"
+        placement="bottom"
+        :hide-after="0"
+      >
+      <el-icon
+        class="icon"
+        size="24px"
+        v-show="identity != '教师'"
+        color="rgb(137, 137, 137)"
+        style="float:right"
+        @click="deleteReview(review.reviewId)"
+      >
+          <Delete />
+        </el-icon>  
+      </el-tooltip>
     </el-collapse-item>
    </el-collapse>
 
@@ -32,10 +51,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="反馈内容：" :label-width="140" prop="message">
+      <el-form-item label="审核意见：" :label-width="140" prop="message">
         <el-input
           v-model="checkFeedback.message"
           autocomplete="off"
+          :rows="10"
           type="textarea"
         />
       </el-form-item>
@@ -65,8 +85,9 @@ import {
   Download,
   UploadFilled,
   Finished,
-  Management,} from "@element-plus/icons-vue";
-import { submit, getClassInfo, submitFeedback, createReview, getReview} from "@/api/class";
+  Management,
+  Delete} from "@element-plus/icons-vue";
+import { submit, getClassInfo, submitFeedback, createReview, getReview, deleteReview} from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import { ElMessageBox, ElMessage, ElDialog, ElForm, ElSwitch, ElDrawer, ElCollapse} from "element-plus";
 
@@ -87,7 +108,7 @@ export default{
     Management,
     ElSwitch,
     ElDrawer,
-    ElCollapse
+    ElCollapse,Delete
   },
   data(){
     return{
@@ -101,6 +122,7 @@ export default{
         message: "",
         checkState: "",
         workNumber: "",
+        reviewerName:""
       },
       checkFeedbackRules:{ 
         checkState:[{ required: true, trigger: "blur" }],
@@ -117,6 +139,7 @@ export default{
   },
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -126,9 +149,11 @@ export default{
     }
     this.checkFeedback.message = this.$store.state.reviewInfo.message;
     this.checkFeedback.checkState = this.$store.state.reviewInfo.checkState;
+   
     this.getClassInfo();
     this.getReviewInfo();
     console.log("classInfo", this.classInfo);
+    console.log('checkFeedback',this.checkFeedback)
     this.getDictionary();
   },
   computed: {
@@ -160,12 +185,42 @@ export default{
     checkStateChange:{
         deep:true,
         handler(value){
-            this.checkFeedback.message = this.$store.state.reviewInfo.message;
-            this.checkFeedback.checkState = this.$store.state.reviewInfo.checkState;
+          this.$store.commit("reviewInfo/setmessage", this.checkFeedback.message);
+          this.$store.commit("reviewInfo/setcheckState", this.checkFeedback.checkState);
+          this.checkFeedback.message = this.$store.state.reviewInfo.message;
+          this.checkFeedback.checkState = this.$store.state.reviewInfo.checkState;
         }
     }
   },
   methods: {
+    //删除评审意见
+    deleteReview(reviewId){
+      ElMessageBox.confirm("是否删除该评审意见？","注意",{
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(()=>{
+        deleteReview(reviewId).then((res)=>{
+        console.log('deleteReview res',res);
+        if(res == 204){
+          ElMessage({
+            type: "success",
+            message: `删除评审意见成功`,
+            duration: 1500,
+          });
+        }
+        this.getReviewInfo();
+      }).catch((e)=>{
+        ElMessage({
+            type: "error",
+            message: `删除评审意见失败`,
+            duration: 1500,
+          });
+        console.log('e',e)
+      })
+      }).catch(()=>{})
+      
+    },
     //向父组件船值
     sendopenDrawer(){
         console.log('sending false to father')
@@ -199,7 +254,7 @@ export default{
           });
       });
       if(this.checkFeedback.checkState == '4'){
-        console.log('creating review');
+        console.log('creating review',this.checkFeedback);
         createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
           console.log('creating review res',res);
         if(res.code == 'SUCCESS'){
@@ -268,7 +323,37 @@ export default{
     },
     //提交
     submit() {
-      submit(this.classInfo.classId).then((res) => {
+      console.log('submit',this.status,this.identity);
+      if(this.status == '已退回' && this.identity == '教师'){
+        ElMessageBox.confirm("是否已按照审核意见进行修改?","注意",{
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(()=>{
+          submit(this.classInfo.classId).then((res) => {
+          console.log("res", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `提交成功`,
+              duration: 1000,
+            });
+          }
+          this.getClassInfo();
+        }).catch((e)=>{
+          ElMessage({
+              type: "error",
+              message: `提交失败`,
+              duration: 1000,
+            });
+          console.log('e',e);
+        })
+        }).catch(()=>{
+
+        })
+      }
+      else{
+        submit(this.classInfo.classId).then((res) => {
         console.log("res", res);
         if (res.code == "SUCCESS") {
           ElMessage({
@@ -278,8 +363,9 @@ export default{
           });
         }
         this.getClassInfo();
-
       });
+      }
+      
     },
     //确定提交状态
     classStatus() {

@@ -115,7 +115,7 @@
           "
           class="status_desc"
         >
-          <el-tooltip
+          <!-- <el-tooltip
             class="box-item"
             effect="dark"
             content="审核"
@@ -131,7 +131,8 @@
             >
               <Finished />
             </el-icon>
-          </el-tooltip>
+          </el-tooltip> -->
+          待审核
         </div>
         <div v-show="status == '已退回' && identity == '教师'">
           已退回，请重新提交
@@ -146,7 +147,18 @@
         </div>
         <div v-show="status == '已审核'">已审核</div>
         <el-divider class="divider" direction="vertical" />
-        <el-switch v-model="openDrawer" class="switchstyle" />
+        <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="审核意见"
+            placement="bottom"
+            :hide-after="0"
+          >
+          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange" />
+          </el-tooltip>
+        
+        
+
       </el-row>
     </div>
     <div class="body">
@@ -283,6 +295,7 @@ export default {
   },
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -329,9 +342,65 @@ export default {
     },
   },
   methods: {
-    getdata(val) {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
+    getdata(val){
       this.openDrawer = val;
     },
+    // collapseHandleChange(val){
+    //   console.log('collapseHandleChange',val);
+    // },
+    // submitForm(formName) {
+    //   this.$refs[formName].validate((valid) => {
+    //     if (valid) {
+    //     submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
+    //     console.log('feedback res',res);
+    //     if(res.code == 'SUCCESS'){
+    //       this.showCheckDialogFlag = false;
+    //       ElMessage({
+    //         type: "success",
+    //         message: `提交成功`,
+    //         duration: 1500,
+    //       });
+    //       this.getClassInfo();
+    //       this.getReviewInfo();
+    //     }
+    //   }).catch((e)=>{
+    //     this.showCheckDialogFlag = false;
+    //     console.log('e',e);
+    //     ElMessage({
+    //         type: "error",
+    //         message: `提交失败`,
+    //         duration: 1500,
+    //       });
+    //   });
+    //   if(this.checkFeedback.checkState == '4'){
+    //     console.log('creating review');
+    //     createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
+    //       console.log('creating review res',res);
+    //     if(res.code == 'SUCCESS'){
+    //       ElMessage({
+    //         type: "success",
+    //         message: `创建审核成功`,
+    //         duration: 1500,
+    //       });
+    //       this.getClassInfo();
+    //     }
+    //     }).catch((e)=>{
+    //       console.log('e',e);
+    //     })
+    //   }
+    //     } else {
+    //       ElMessage({
+    //         type: "error",
+    //         message: `提交失败`,
+    //         duration: 1000,
+    //       });
+    //       return false;
+    //     }
+    //   });
+    // },
     //返回教师端首页
     backHome() {
       if (this.identity == "学院管理员" || this.identity == "课程负责人") {
@@ -382,6 +451,22 @@ export default {
         });
       });
     },
+    //查询课程审核信息
+    // getReviewInfo(){
+    //   getReview(this.classInfo.classId).then((res)=>{
+    //     console.log('getReviewInfo',res);
+        
+    //     if(res.total != 0){
+    //       this.hasNoReviewInfo = false;
+    //       this.reviewInfo = res.rows;
+    //     }
+    //     else{
+    //       this.hasNoReviewInfo = true;
+
+    //     }
+        
+    //   })
+    // },
     //查看教学班信息
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {

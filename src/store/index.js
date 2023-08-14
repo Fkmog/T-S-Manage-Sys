@@ -62,7 +62,8 @@ export default createStore({
         schoolName: "",
         schoolId: "",
         year: "",
-        currentVersionValue: 1,
+        opendrawer:Boolean,
+        currentVersionValue:1,
         role: {},
         isTeacher: false,
         //当前角色身份
@@ -103,6 +104,9 @@ export default createStore({
         },
         setYear(state, newVal) {
           state.year = newVal;
+        },
+        setOpenDrawer(state, newVal){
+          state.opendrawer = newVal;
         },
         setRole(state, newVal) {
           state.role = newVal;
@@ -241,11 +245,11 @@ export default createStore({
       modules: {},
     },
     user,
-    reviewInfo: {
+    reviewInfo:{
       namespaced: true,
-      state: {
-        message: "",
-        checkState: "",
+      state:{
+        message:'',
+        checkState:''
       },
       getters: {},
       mutations: {
@@ -258,6 +262,6 @@ export default createStore({
       },
       actions: {},
       modules: {},
-    },
+    }
   },
 });

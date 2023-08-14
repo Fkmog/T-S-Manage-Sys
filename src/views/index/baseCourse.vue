@@ -105,10 +105,6 @@
                 <el-icon><Collection /></el-icon>
                 &nbsp分配手册模版
               </el-dropdown-item>
-              <el-dropdown-item @click="this.addWorkbook()">
-                <el-icon><Collection /></el-icon>
-                &nbsp分配手册模版
-              </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
                 &nbsp删除课程负责人
@@ -125,26 +121,26 @@
       </el-col>
 
       <el-col :span="6" v-show="identity == '课程负责人'">
-        <el-dropdown class="columnstyle">
+        <!-- <el-dropdown class="columnstyle">
           <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
 
           <template #dropdown>
             <el-dropdown-menu>
-              <!-- <el-dropdown-item @click="this.addPrincipal()">
+              <el-dropdown-item @click="this.addPrincipal()">
             <el-icon><User /></el-icon>
               &nbsp添加课程负责人
            </el-dropdown-item>
            <el-dropdown-item @click="this.deleteRespondent()" >
               <el-icon><CircleClose /></el-icon>
               &nbsp删除课程负责人
-            </el-dropdown-item> -->
+            </el-dropdown-item>
 
-              <!-- <el-dropdown-item>Action 3</el-dropdown-item>
+              <el-dropdown-item>Action 3</el-dropdown-item>
            <el-dropdown-item disabled>Action 4</el-dropdown-item>
-           <el-dropdown-item divided>Action 5</el-dropdown-item> -->
+           <el-dropdown-item divided>Action 5</el-dropdown-item>
             </el-dropdown-menu>
           </template>
-        </el-dropdown>
+        </el-dropdown> -->
       </el-col>
     </el-row>
   </div>
@@ -160,7 +156,7 @@
       @selection-change="handleSelectionChange"
       @row-dblclick="editTrigger"
       class="el-table-container"
-      style="width: 1375px"
+      style="width: 1525px"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -219,8 +215,16 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="工作手册" width="200">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
+            <span v-show="!scope.row.workbookName">未分配工作手册</span>
+          </div>
+        </template>
+      </el-table-column>
 
-      <el-table-column label="操作" width="300">
+      <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row v-show="showToolIcon">
             <el-col :span="4">
@@ -278,7 +282,7 @@
       class="el-table-container"
       @selection-change="handleSelectionChange"
       @row-dblclick="editTrigger"
-      style="width: 1400px"
+      style="width: 1550px"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -337,8 +341,16 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="工作手册" width="200">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
+            <span v-show="!scope.row.workbookName">未分配工作手册</span>
+          </div>
+        </template>
+      </el-table-column>
 
-      <el-table-column label="操作" width="300">
+      <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row v-show="showToolIcon">
             <el-col :span="4">
@@ -627,7 +639,6 @@
   
   <el-dialog
     v-model="showAddWorkbook"
-    
     title="设置手册模版"
     width="330px"
     :show-close="false"
@@ -1402,8 +1413,10 @@ export default {
         if(res.code == "SUCCESS"){
           res.rows.forEach((workbook)=>{
             that.workBookDetail.push({'name':workbook.name,'workbookId':workbook.workbookId})
-          })
+          });
+          
         }
+      
       }).catch((e)=>{
         console.log('e',e);
       })
@@ -1424,6 +1437,7 @@ export default {
             message: `分配工作手册成功`,
             duration: 1500,
           });
+          that.getBaseCourse(that.pageSize, that.pageNum);
         }
       }).catch((e)=>{
         console.log('e',e);

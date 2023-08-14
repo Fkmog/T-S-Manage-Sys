@@ -759,7 +759,8 @@ export default {
           this.chosenYear,
           this.chosenSemester,
           this.pageSize,
-          this.pageNum
+          this.pageNum,
+          this.chosenStatus
         ).then((res) => {
           console.log("getClassList", res);
           if (res.code === "SUCCESS") {
