@@ -40,20 +40,6 @@
           </el-icon>
         </el-tooltip>
       </el-row>
-
-      <!-- 功能按钮
-      <div class="tool">
-        <el-row>
-          <el-button
-            class="getJsonButton"
-            type="primary"
-            size="small"
-            @click="changeWorkbookInfo()"
-            round
-            >保存
-          </el-button>
-        </el-row>
-      </div> -->
     </div>
     <!-- 表单构建器 -->
     <div class="form-designer">
@@ -77,7 +63,8 @@
 <script>
 import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { checkWorkbookInfo, editWorkbookInfo } from "@/api/workbook";
-import { ElMessage } from "element-plus";
+import { ElMessage,ElMessageBox } from "element-plus";
+import _ from "lodash";
 
 export default {
   name: "TemplateEdit",
@@ -217,11 +204,30 @@ export default {
   },
   methods: {
     backList() {
-      this.$router.push("/templateList");
+      this.json = JSON.parse(this.$refs.designer.getJson());
+      this.getOption();
+      if (
+        _.isEqual(this.total.formJson, this.json) &&
+        _.isEqual(this.total.cssJson, this.option)
+      ) {
+        this.$router.push("/templateList");
+      } else {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push("/templateList");
+          })
+          .catch(() => {});
+      }
     },
     // 获取样式规则
     getOption() {
       this.option = this.$refs.designer.getOption();
+      this.option.form.formCreateResetBtn = false;
+      this.option.form.formCreateSubmitBtn = true;
       // console.log("getOption", this.option);
     },
     // 回显样式规则
@@ -242,11 +248,14 @@ export default {
       checkWorkbookInfo(this.workbookId).then((res) => {
         console.log("getWorkbookInfo", res);
         this.total = res.data;
+
         this.json = res.data.formJson;
         this.option = res.data.cssJson;
         this.option.onSubmit = function (e) {
           console.log("Submit", e);
         };
+        this.option.form.formCreateResetBtn = false;
+        this.option.form.formCreateSubmitBtn = true;
         // console.log("option", this.option);
         this.setJson();
         this.setOption();

@@ -104,10 +104,6 @@ export default {
           path: "./student",
         },
         {
-          value: "管 理",
-          path: "./manage",
-        },
-        {
           value: "设 置",
           path: "./setting",
         },

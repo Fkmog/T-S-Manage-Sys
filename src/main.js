@@ -10,7 +10,7 @@ import 'element-plus/dist/index.css';
 import Codemirror from 'codemirror-editor-vue3';
 
 
-
+import _ from 'lodash'
 
 const app = createApp(App)
   .use(store)

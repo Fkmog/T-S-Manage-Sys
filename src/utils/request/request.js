@@ -71,22 +71,6 @@ service.interceptors.request.use(
             : config.data,
         time: new Date().getTime(),
       };
-      // const sessionObj = cache.session.getJSON('sessionObj')
-      // if (sessionObj === undefined || sessionObj === null || sessionObj === '') {
-      //   cache.session.setJSON('sessionObj', requestObj)
-      // } else {
-      //   const s_url = sessionObj.url;                  // 请求地址
-      //   const s_data = sessionObj.data;                // 请求数据
-      //   const s_time = sessionObj.time;                // 请求时间
-      //   const interval = 1000;                         // 间隔时间(ms)，小于此时间视为重复提交
-      //   if (s_data === requestObj.data && requestObj.time - s_time < interval && s_url === requestObj.url) {
-      //     const message = '数据正在处理，请勿重复提交';
-      //     console.warn(`[${s_url}]: ` + message)
-      //     return Promise.reject(new Error(message))
-      //   } else {
-      //     cache.session.setJSON('sessionObj', requestObj)
-      //   }
-      // }
     }
     return config;
   },
@@ -99,18 +83,12 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (res) => {
-    // console.log("http res",res);
     // 未设置状态码则默认成功状态
     // const code = res.data.code || 200;
-    // console.log("res", res);
-    if (
-      res.headers["content-type"] === "application/octet-stream"
-    ) {
-      // console.log("res.data", res.data);
+    if (res.headers["content-type"] === "application/octet-stream") {
       return res.data;
     }
     const code = res.status || 200;
-    // console.log("code",code);
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode["default"];
     // 二进制数据则直接返回
@@ -121,7 +99,6 @@ service.interceptors.response.use(
       return res.data;
     }
     if (code === 401) {
-      console.log("401啦！");
       if (!isRelogin.show) {
         isRelogin.show = true;
         ElMessageBox.confirm(
@@ -147,6 +124,8 @@ service.interceptors.response.use(
       return Promise.reject(new Error(msg));
     } else if (code === 204) {
       return res.status;
+    } else if (code === 404) {
+      return Promise.reject(new Error(msg));
     } else {
       return res.data;
     }
@@ -155,39 +134,49 @@ service.interceptors.response.use(
     console.log("error", error);
     //认证错误
     if (error.response.status === 401) {
-      console.log("401啦！");
-      if (!isRelogin.show) {
-        isRelogin.show = true;
-        ElMessageBox.confirm(
-          "登录状态已过期，您可以继续留在该页面，或者重新登录",
-          "系统提示",
-          {
-            confirmButtonText: "重新登录",
-            cancelButtonText: "取消",
-            type: "warning",
-          }
-        )
-          .then(() => {
-            isRelogin.show = false;
-            Cookies.remove("Admin-Token");
-            router.replace({ path: "/login" });
-          })
-          .catch(() => {
-            isRelogin.show = false;
-          });
+      if (error.response.data.msg == "用户不存在/密码错误") {
+        ElMessage({
+          type: "error",
+          message: "密码错误",
+          duration: 1500,
+        });
+        return Promise.reject(error.response.data);
+      } else if (error.response.data.code == "UNAUTHORIZED") {
+        console.log("401啦！");
+        if (!isRelogin.show) {
+          isRelogin.show = true;
+          ElMessageBox.confirm(
+            "登录状态已过期，您可以继续留在该页面，或者重新登录",
+            "系统提示",
+            {
+              confirmButtonText: "重新登录",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+          )
+            .then(() => {
+              isRelogin.show = false;
+              Cookies.remove("Admin-Token");
+              router.replace({ path: "/login" });
+            })
+            .catch(() => {
+              isRelogin.show = false;
+            });
+        }
+        // return Promise.reject("无效的会话，或者会话已过期，请重新登录。");
+        else {
+          return Promise.reject(error.response.data);
+        }
+      } else {
+        ElMessage({
+          type: "error",
+          message: "账号错误",
+          duration: 1500,
+        });
       }
-      return Promise.reject("无效的会话，或者会话已过期，请重新登录。");
-    } else {
+    } else if (error.response.status === 404) {
       return Promise.reject(error.response.data);
     }
-    // let { message } = error;
-    // if (message == "Network Error") {
-    //   message = "后端接口连接异常";
-    // } else if (message.includes("timeout")) {
-    //   message = "系统接口请求超时";
-    // } else if (message.includes("Request failed with status code")) {
-    //   message = "系统接口" + message.substr(message.length - 3) + "异常";
-    // }
   }
 );
 

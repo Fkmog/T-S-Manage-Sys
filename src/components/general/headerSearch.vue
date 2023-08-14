@@ -17,12 +17,16 @@
             @blur="inputBlur()"
             clearable
             @clear="clearInput()"
+            @keyup.enter="sendMessage"
           />
         </div>
       </div>
       <!-- 右侧时间选择插槽 -->
       <slot name="rightTime" class="rightSlot"></slot>
+      <!-- 右侧分配插槽 -->
       <slot name="assignBtn" class="assignBtn"></slot>
+      <!-- 右侧状态选择插槽 -->
+      <slot name="status" class="status"></slot>
     </div>
   </div>
 </template>

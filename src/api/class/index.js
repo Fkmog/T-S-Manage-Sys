@@ -1,6 +1,6 @@
 import request from '@/utils/request/request'
 //查询教学班列表
-export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pageNum,KeyWord) {
+export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pageNum,KeyWord,status) {
     return request({
       url: '/classes/list',
       method: 'get',
@@ -12,6 +12,7 @@ export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pa
         pageSize:pageSize,
         pageNum:pageNum,
         selectKeyWord:KeyWord,
+        status:status
       }
     })
   }

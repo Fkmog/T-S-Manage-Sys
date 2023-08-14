@@ -1413,8 +1413,10 @@ export default {
         if(res.code == "SUCCESS"){
           res.rows.forEach((workbook)=>{
             that.workBookDetail.push({'name':workbook.name,'workbookId':workbook.workbookId})
-          })
+          });
+          
         }
+      
       }).catch((e)=>{
         console.log('e',e);
       })
@@ -1435,6 +1437,7 @@ export default {
             message: `分配工作手册成功`,
             duration: 1500,
           });
+          that.getBaseCourse(that.pageSize, that.pageNum);
         }
       }).catch((e)=>{
         console.log('e',e);

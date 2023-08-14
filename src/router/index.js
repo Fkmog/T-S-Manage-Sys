@@ -29,6 +29,8 @@ import baseCourseActivities from "@/views/baseCourse/activities.vue";
 import baseCourseIndicators from "@/views/baseCourse/indicators.vue";
 import baseCourseIndicatorsEdit from "@/views/baseCourse/indicators-edit.vue";
 import baseCourseObjectivesEdit from "@/views/baseCourse/objectives-edit.vue";
+import templateManage from "@/views/baseCourse/templateManage.vue";
+
 
 //登录组件
 import userLogin from "@/components/userLogin/index.vue";
@@ -162,6 +164,11 @@ const router = createRouter({
         {
           path: "/baseCourseObjectivesEdit",
           component: baseCourseObjectivesEdit,
+          meta: { isMajor: false },
+        },
+        {
+          path: "/templateManage",
+          component: templateManage,
           meta: { isMajor: false },
         },
         {

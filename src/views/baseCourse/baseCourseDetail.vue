@@ -74,6 +74,23 @@
             <List />
           </el-icon>
         </el-tooltip>
+         <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="工作手册"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 15px"
+            @click="toTemplate()"
+          >
+            <Management />
+          </el-icon>
+        </el-tooltip>
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -259,6 +276,7 @@ import {
   Checked,
   CircleClose,
   CopyDocument,
+  Management
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import {
@@ -286,6 +304,7 @@ export default {
     List,
     Checked,
     CircleClose,
+    Management
   },
   data() {
     return {
@@ -336,6 +355,7 @@ export default {
   mounted() {
     this.getRouter();
     this.$store.commit("course/setCourseName", this.form.courseName);
+    this.$store.commit("course/setCourseId", this.courseId);
     let that = this;
     //如果没有版本信息，提示添加
     if (!this.versionFlag) {
@@ -422,6 +442,9 @@ export default {
     },
     toObjectives() {
       this.$router.push("/baseCourseObjectives");
+    },
+    toTemplate(){
+      this.$router.push("/templateManage");
     },
     //获取路由参数信息
     getRouter() {
@@ -600,10 +623,10 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 /* 顶部导航栏 */
 .block {
   position: absolute;

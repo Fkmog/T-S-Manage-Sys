@@ -50,10 +50,10 @@
     </div>
   </div>
   <div v-show="!hasProgram" class="no-program">
-    <h2 style="display: flex; justify-content: center; margin-top: 100px">
+    <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
       未创建培养方案
-    </h2>
-    <div style="display: flex; justify-content: center; color: grey">
+    </div>
+    <div style="display: flex; justify-content: center; color: grey;margin-top: 30px;font-size:13px;">
         请先创建培养方案
       </div>
   </div>

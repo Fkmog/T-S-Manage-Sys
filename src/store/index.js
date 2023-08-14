@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import user from './modules/user'
+import user from "./modules/user";
 
 export default createStore({
   state: {},
@@ -71,7 +71,9 @@ export default createStore({
         // 教师端变量
         teacherSideClassInfo: {},
         //管理员变量
-        adminSideClassInfo:{},
+        adminSideClassInfo: {},
+        // 课程负责人变量
+        respondClassInfo: {},
       },
       getters: {
         changeIsTeacher(state) {
@@ -118,10 +120,12 @@ export default createStore({
         setadminSideClassInfo(state, newVal) {
           state.adminSideClassInfo = newVal;
         },
-        setCurrentVersionValue(state, newVal){
+        setRespondClassInfo(state, newVal) {
+          state.respondClassInfo = newVal;
+        },
+        setCurrentVersionValue(state, newVal) {
           state.currentVersionValue = newVal;
         },
-      
       },
       actions: {},
       modules: {},
@@ -130,6 +134,7 @@ export default createStore({
       namespaced: true,
       state: {
         courseName: "",
+        courseId: "",
         detailId: Number,
         baseCourseVersionName: "",
         baseCourseVersionFlag: "",
@@ -151,6 +156,9 @@ export default createStore({
         },
         setCourseName(state, newVal) {
           state.courseName = newVal;
+        },
+        setCourseId(state, newVal) {
+          state.courseId = newVal;
         },
         setDetailId(state, newVal) {
           state.detailId = newVal;
@@ -223,13 +231,13 @@ export default createStore({
         setActiveDisplay1(state, newVal) {
           state.activeDisplay1 = newVal;
         },
-         setActiveDisplay2(state, newVal) {
+        setActiveDisplay2(state, newVal) {
           state.activeDisplay2 = newVal;
         },
-         setActiveDisplay3(state, newVal) {
+        setActiveDisplay3(state, newVal) {
           state.activeDisplay3 = newVal;
         },
-         setActiveDisplay4(state, newVal) {
+        setActiveDisplay4(state, newVal) {
           state.activeDisplay4 = newVal;
         },
       },
