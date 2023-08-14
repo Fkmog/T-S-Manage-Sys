@@ -287,7 +287,6 @@ export default {
   text-align: center;
   font-size: 22px;
 }
-
 .major-tab {
   margin-top: 100px;
 }

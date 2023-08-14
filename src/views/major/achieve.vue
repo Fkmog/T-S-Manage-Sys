@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <!-- 头部栏 -->
-    <div class="Block"></div>
+    <!-- <div class="Block"></div> -->
     <div v-show="hasProgram" class="body-check">
       <div class="card">
         <div class="noAttribute" v-if="!hasAttribute">
@@ -72,19 +72,19 @@
                     <el-col :span="8" class="method-weight"
                       >{{ coreBaseCourse.courseName }}
                     </el-col>
-                       <el-tooltip
+                    <el-tooltip
                       effect="dark"
                       content="权重"
                       placement="bottom"
                       :hide-after="0"
                     >
-                    <el-col
-                      :span="5"
-                      class="method-desc"
-                      style="margin-left: 80px"
-                      >（ {{ coreBaseCourse.weight }}% ）</el-col
-                    >
-                       </el-tooltip>
+                      <el-col
+                        :span="5"
+                        class="method-desc"
+                        style="margin-left: 80px"
+                        >（ {{ coreBaseCourse.weight }}% ）</el-col
+                      >
+                    </el-tooltip>
                   </el-row>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default {
       this.dialogFormVisible = true;
       this.index1 = index1;
       this.index2 = index2;
-      console.log('attribute',attribute);
+      console.log("attribute", attribute);
       this.dialogDetail = JSON.parse(JSON.stringify(attribute));
       let temporary = this.dialogDetail.programIndicators[index2];
       this.dialogDetail.programIndicators = [];
@@ -360,49 +360,56 @@ export default {
       }
       this.getCoreBaseCourseList();
       console.log("dialogDetail", this.dialogDetail);
-      this.temp = JSON.parse(JSON.stringify(this.dialogDetail.programIndicators[index2]));
-      console.log("temp",this.temp);
+      this.temp = JSON.parse(
+        JSON.stringify(this.dialogDetail.programIndicators[index2])
+      );
+      console.log("temp", this.temp);
     },
     //查询有无培养计划
     checkProgram() {
-      checkProgram(
-        this.currentMajorId,
-        this.$store.state.currentInfo.year
-      ).then((res) => {
-        // console.log("checkProgram", res);
-        if (res.msg == "未查到" && res.code == "SUCCESS") {
-          this.hasProgram = false;
-          this.noProgram = true;
-          this.$store.commit("major/setProgramId", "");
-        }
-        if (res.msg == "操作成功" && res.code == "SUCCESS") {
-          this.noProgram = false;
-          this.hasProgram = true;
-          this.programId = res.data.programId;
-          this.$store.commit("major/setProgramId", this.programId);
-          this.requirements = res.data.graduateAttributes;
-          // 将为null的coreBaseCourses处理为空数组
-          this.requirements.forEach((requirement) => {
-            requirement.programIndicators.forEach((programIndicator) => {
-              if (programIndicator.coreBaseCourses === null) {
-                programIndicator.coreBaseCourses = [];
-              }
+      checkProgram(this.currentMajorId, this.$store.state.currentInfo.year)
+        .then((res) => {
+          console.log("checkProgram", res);
+          if (res.msg == "未查到" && res.code == "SUCCESS") {
+            this.hasProgram = false;
+            this.noProgram = true;
+            this.$store.commit("major/setProgramId", "");
+          }
+          if (res.msg == "操作成功" && res.code == "SUCCESS") {
+            this.noProgram = false;
+            this.hasProgram = true;
+            this.programId = res.data.programId;
+            this.$store.commit("major/setProgramId", this.programId);
+            this.requirements = res.data.graduateAttributes;
+            // 将为null的coreBaseCourses处理为空数组
+            this.requirements.forEach((requirement) => {
+              requirement.programIndicators.forEach((programIndicator) => {
+                if (programIndicator.coreBaseCourses === null) {
+                  programIndicator.coreBaseCourses = [];
+                }
+              });
             });
-          });
-          if (this.requirements == null) {
-            this.hasAttribute = false;
+            if (this.requirements == null) {
+              this.hasAttribute = false;
+            }
+            this.totalInfo = res.data;
+            // console.log("this.totalInfo", this.totalInfo);
+            console.log("requirements", this.requirements);
+            if (this.requirements !== null && this.requirements.length == 0) {
+              this.hasAttribute = false;
+            }
+            if (this.requirements !== null) {
+              this.hasAttribute = true;
+            }
           }
-          this.totalInfo = res.data;
-          // console.log("this.totalInfo", this.totalInfo);
-          console.log("requirements", this.requirements);
-          if (this.requirements !== null && this.requirements.length == 0) {
-            this.hasAttribute = false;
+        })
+        .catch((e) => {
+          if (e.msg == "资源不存在" && e.code == "PROGRAM_NOT_FIND") {
+            this.hasProgram = false;
+            this.noProgram = true;
+            this.$store.commit("major/setProgramId", "");
           }
-          if (this.requirements !== null) {
-            this.hasAttribute = true;
-          }
-        }
-      });
+        });
     },
     //查询可支撑某个毕业要求二级指标点的支撑课程列表
     getCoreBaseCourseList() {
@@ -596,14 +603,14 @@ export default {
   border-bottom: 1px solid rgb(189, 189, 189);
   width: 100%;
 }
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .body-check {
   display: flex;
   justify-content: center;
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
 }
 .no-program {
   display: flex;

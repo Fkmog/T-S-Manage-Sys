@@ -185,7 +185,6 @@ export default {
         if (res.msg == "未查到" && res.code === 'SUCCESS') {
           this.hasProgram = false;
           this.noProgram = true;
-
           this.$store.commit("major/setProgramId", "");
         }
         if (res.msg == "操作成功" && res.code === 'SUCCESS') {
@@ -205,7 +204,14 @@ export default {
             this.hasAttribute = true;
           }
         }
-      });
+      })
+      .catch((e)=>{
+        console.log("e",e);
+        if(e.msg=="资源不存在"){
+          this.noProgram = true
+          this.hasProgram = false
+        }
+      })
     },
     //新增培养计划
     addProgram() {
@@ -238,14 +244,14 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .body-check {
   display: flex;
   justify-content: center;
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
 }
 .no-program {
   display: flex;
@@ -261,7 +267,7 @@ export default {
 .card {
   width: 800px;
   background: white;
-  margin-top: 30px;
+  margin-top: 50px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);

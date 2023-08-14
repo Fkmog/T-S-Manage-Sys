@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch msg="搜索课程名称"></HeaderSearch>
+  <HeaderSearch msg="搜索课程名称" @SearchValue="getSearchValue"></HeaderSearch>
   <div class="classes-list">
     <div
       class="card"
@@ -37,6 +37,7 @@ export default {
   data() {
     return {
       classesList: {},
+      keyword:"",
     };
   },
   mounted() {
@@ -47,7 +48,8 @@ export default {
     getClassesList() {
       checkClasses(
         this.$store.state.currentInfo.schoolId,
-        this.$store.state.currentInfo.departmentId
+        this.$store.state.currentInfo.departmentId,
+        this.keyword
       ).then((res) => {
         this.classesList = res.rows;
         console.log("getClassesList", this.classesList);
@@ -57,6 +59,12 @@ export default {
     toClass(Class) {
       this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
       this.$router.push({ name: "TeacherClass" });
+    },
+    // 搜索栏查询
+     getSearchValue(data) {
+      this.keyword = data;
+      console.log("keyword", this.keyword, );
+      this.getClassesList();
     },
   },
 };

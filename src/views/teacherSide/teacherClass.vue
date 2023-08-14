@@ -94,19 +94,25 @@
           </el-tooltip>
         </div>
         <div
-          v-show="status == '未提交' && identity == '学院管理员'"
+          v-show="
+            status == '未提交' &&
+            (identity == '学院管理员' || identity == '课程负责人')
+          "
           class="status_desc"
         >
           未提交
         </div>
         <div
-          v-show="status == '已提交' && identity != '学院管理员'"
+          v-show="status == '已提交' && identity == '教师'"
           class="status_desc"
         >
           已提交
         </div>
         <div
-          v-show="status == '已提交' && identity == '学院管理员'"
+          v-show="
+            status == '已提交' &&
+            (identity == '学院管理员' || identity == '课程负责人')
+          "
           class="status_desc"
         >
           <el-tooltip
@@ -127,8 +133,20 @@
             </el-icon>
           </el-tooltip>
         </div>
-        <div v-show="status == '已退回'">已退回</div>
+        <div v-show="status == '已退回' && identity == '教师'">
+          已退回，请重新提交
+        </div>
+        <div
+          v-show="
+            status == '已退回' &&
+            (identity == '学院管理员' || identity == '课程负责人')
+          "
+        >
+          已退回
+        </div>
         <div v-show="status == '已审核'">已审核</div>
+        <el-divider class="divider" direction="vertical" />
+        <el-switch v-model="openDrawer" class="switchstyle" />
       </el-row>
     </div>
     <div class="body">
@@ -182,41 +200,7 @@
       </div>
     </div>
   </div>
-
-  <el-dialog v-model="showCheckDialogFlag">
-    <span> 评审反馈： </span>
-
-    <el-form :model="checkFeedback">
-      <el-form-item label="审核是否通过：" :label-width="140" prop="checkState">
-        <el-select v-model="checkFeedback.checkState">
-          <el-option
-            v-for="state in checkStates"
-            :key="state"
-            :value="state"
-            :label="state"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="反馈内容：" :label-width="140" prop="message">
-        <el-input
-          v-model="checkFeedback.message"
-          autocomplete="off"
-          type="textarea"
-        />
-      </el-form-item>
-      <el-form-item label="反馈人：" :label-width="140" prop="workNumber">
-        {{ checkFeedback.workNumber }}
-      </el-form-item>
-    </el-form>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="showCheckDialogFlag = false">取消</el-button>
-        <el-button type="primary" @click="submitFeedback"> 提交反馈 </el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <reviewDrawer v-bind:visible="openDrawer" @getData="getdata" />
 </template>
 
 <script>
@@ -230,10 +214,25 @@ import {
   Finished,
   Management,
 } from "@element-plus/icons-vue";
-import { submit, getClassInfo } from "@/api/class";
+import {
+  submit,
+  getClassInfo,
+  submitFeedback,
+  createReview,
+  getReview,
+} from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
+import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getObjectives, downloadDetail } from "@/api/basecourse";
-import { ElMessageBox, ElMessage, ElDialog, ElForm } from "element-plus";
+import {
+  ElMessageBox,
+  ElMessage,
+  ElDialog,
+  ElForm,
+  ElSwitch,
+  ElDrawer,
+  ElCollapse,
+} from "element-plus";
 
 export default {
   name: "TeacherClass",
@@ -248,15 +247,29 @@ export default {
     ElDialog,
     ElForm,
     Management,
+    ElSwitch,
+    ElDrawer,
+    ElCollapse,
+    reviewDrawer,
   },
   data() {
     return {
-      checkStates: ["审核通过", "退回"],
+      reviewInfo: [],
+      activeNames: "",
+      openDrawer: false,
+      hasNoReviewInfo: Boolean,
+      checkStates: [
+        { label: "审核通过", value: "3" },
+        { label: "退回", value: "4" },
+      ],
       selectedCheckState: "",
       checkFeedback: {
         message: "",
         checkState: "",
         workNumber: "",
+      },
+      checkFeedbackRules: {
+        checkState: [{ required: true, trigger: "blur" }],
       },
       showCheckDialogFlag: false,
       identity: "",
@@ -273,29 +286,57 @@ export default {
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
+    } else if (this.identity == "课程负责人") {
+      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
     } else {
       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
       console.log("identity:", this.identity);
     }
     this.getClassInfo();
+    // this.getReviewInfo();
     console.log("classInfo", this.classInfo);
     this.getDictionary();
     this.getFile();
   },
+  computed: {
+    teacherInfoChange() {
+      // console.log('teacherSideClassInfo changed');
+      return this.$store.state.currentInfo.teacherSideClassInfo;
+    },
+    respondInfoChange() {
+      // console.log('teacherSideClassInfo changed');
+      return this.$store.state.currentInfo.respondClassInfo;
+    },
+  },
+  watch: {
+    teacherInfoChange: {
+      deep: true,
+      handler(value) {
+        if (this.identity == "教师") {
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+          this.classStatus();
+        }
+      },
+    },
+    respondInfoChange: {
+      deep: true,
+      handler(value) {
+        if (this.identity == "课程负责人") {
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+          this.classStatus();
+        }
+      },
+    },
+  },
   methods: {
-    //提交反馈信息
-    submitFeedback() {
-      // return request({
-      //   url:,
-      //   method:,
-      //   data:,
-      // })
+    getdata(val) {
+      this.openDrawer = val;
     },
     //返回教师端首页
     backHome() {
-      if (this.identity == "学院管理员"||this.identity == "课程负责人") {
+      if (this.identity == "学院管理员" || this.identity == "课程负责人") {
         this.$router.push("/class");
-      } else{
+      } else {
         this.$router.push("/teacherClasses");
       }
     },
@@ -380,20 +421,6 @@ export default {
         document.body.removeChild(link);
       });
     },
-    //提交
-    submit() {
-      submit(this.classInfo.classId).then((res) => {
-        console.log("res", res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `提交成功`,
-            duration: 1000,
-          });
-        }
-        this.getClassInfo();
-      });
-    },
     //确定提交状态
     classStatus() {
       switch (this.classInfo.status) {
@@ -410,12 +437,27 @@ export default {
           this.status = "已退回";
           break;
       }
+      console.log("this.status", this.status);
     },
   },
 };
 </script>
 
 <style scoped>
+#drawerbox .el-overlay {
+  position: satic;
+}
+.reviewBoxStyle {
+  padding-top: 100px;
+}
+
+:deep().el-overlay {
+  position: static;
+}
+
+.switchstyle {
+  bottom: 4px;
+}
 .content {
   height: 100vh;
   background-color: #f2f2f2;

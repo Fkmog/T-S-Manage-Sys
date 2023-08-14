@@ -23,6 +23,7 @@
           </el-tooltip>
           <div class="title">课程目标</div>
           <el-divider class="divider" direction="vertical" />
+          <el-switch v-model="openDrawer" class="switchstyle" />
         </el-row>
       </div>
       <div v-show="hasDetailId && hasObjective" class="card">
@@ -113,11 +114,15 @@
       </div>
     </div>
   </div>
+
+  <reviewDrawer  v-bind:visible="openDrawer"/>
 </template>
 
 <script>
 import { Back, EditPen } from "@element-plus/icons-vue";
 import { getObjectives } from "@/api/basecourse";
+import { ElMessageBox, ElSwitch,} from "element-plus";
+import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue';
 import { getClassInfo } from "@/api/class";
 
 export default {
@@ -125,9 +130,12 @@ export default {
   components: {
     Back,
     EditPen,
+    reviewDrawer,
+    ElSwitch
   },
   data() {
     return {
+      openDrawer:false,
       hasDetailId: true,
       hasObjective: true,
       isRespondent: false,
@@ -206,6 +214,9 @@ export default {
 </script>
 
 <style scoped>
+.switchstyle{
+  bottom: 4px;
+}
 .content {
   height: 100vh;
   background-color: #f2f2f2;

@@ -19,7 +19,7 @@
           </el-select>
           <el-select
             v-model="chosenSemester"
-            placeholder="学期"
+            placeholder="全部学期"
             class="selecter"
             @change="getClassList()"
           >
@@ -30,25 +30,21 @@
               :value="item.dictValue"
             />
           </el-select>
+          <el-select
+            v-model="chosenStatus"
+            placeholder="提交状态"
+            class="status"
+            @change="getClassList()"
+          >
+            <el-option
+              v-for="item in status"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </div>
       </div>
-       <div class="assignBtn" v-show="showAdd">
-        <el-dropdown style="margin-top: 10px; cursor: pointer">
-          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="assignDetail()">
-                设置课程大纲
-              </el-dropdown-item>
-              <el-dropdown-item @click="associateCourse()">
-                关联课程库课程
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
-    </template>
-    <!-- <template #assignBtn>
       <div class="assignBtn" v-show="showAdd">
         <el-dropdown style="margin-top: 10px; cursor: pointer">
           <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
@@ -64,7 +60,7 @@
           </template>
         </el-dropdown>
       </div>
-    </template> -->
+    </template>
   </HeaderSearch>
   <!-- 添加教学班按钮 -->
   <addBtn
@@ -504,10 +500,33 @@ export default {
       classTable: [],
       academicYear: [],
       semester: [],
+      status: [
+        {
+          value: null,
+          label: "全部",
+        },
+        {
+          value: 1,
+          label: "未提交",
+        },
+        {
+          value: 2,
+          label: "已提交",
+        },
+        {
+          value: 3,
+          label: "已审核",
+        },
+        {
+          value: 4,
+          label: "已退回",
+        },
+      ],
       onlyAcademicYear: [],
       onlySemester: [],
       chosenYear: "",
       chosenSemester: "",
+      chosenStatus: "",
       currentInfo: {
         departmentId: Number,
         schoolId: Number,
@@ -556,7 +575,6 @@ export default {
       pageNum: 1,
       pageSize: 20,
       total: 0,
-      // errorMsg
       E_ErrorMsg: "",
       T_ErrorMsg: "",
     };
@@ -589,7 +607,7 @@ export default {
       handler(value) {
         this.currentInfo.departmentId =
           this.$store.state.currentInfo.departmentId;
-           this.identity = this.$store.state.currentInfo.identity;
+        this.identity = this.$store.state.currentInfo.identity;
         this.getClassList();
       },
     },
@@ -629,15 +647,22 @@ export default {
   },
   methods: {
     //跳转到审核页面
-    goCheck(row){
-      console.log('row:',row);
-      this.$store.commit("currentInfo/setadminSideClassInfo", row);
+    goCheck(row) {
+      console.log("row:", row);
+      if (this.identity == "学院管理员") {
+        this.$store.commit("currentInfo/setadminSideClassInfo", row);
+      } else if (this.identity == "课程负责人") {
+        this.$store.commit("currentInfo/setRespondClassInfo", row);
+      } else {
+        this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
+      }
       this.$router.push({ name: "TeacherClass" });
     },
     //跳转到批量添加
     goBatchAddClass() {
       this.$router.push({ path: "/batchClassAdd" });
     },
+    // 搜索栏查询
     getSearchValue(data) {
       this.keyword = data;
       console.log("keyword", this.keyword, this.currentInfo.schoolId);
@@ -679,7 +704,8 @@ export default {
           this.currentInfo.schoolId,
           this.pageSize,
           this.pageNum,
-          this.keyword
+          this.keyword,
+          this.chosenStatus
         ).then((res) => {
           console.log("getClassList", res);
           if (res.code === "SUCCESS") {
@@ -1066,31 +1092,31 @@ export default {
     //关联课程库课程
     associateCourse() {
       console.log(" this.multipleSelection", this.multipleSelection);
-      associateCourses(this.multipleSelection).then((res) => {
-        console.log("associateCourses", res);
-        if (res.code === "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: "关联成功",
-            duration: 1500,
-          });
-          this.multipleSelection.forEach((item)=>{
-            item.courseIsDeleted="0"
-          })
-          // this.getClassList()
-        }
-      })
-     .catch((e)=>{
-      console.log("e",e);
-       if(e.code==="CODE_NOT_EXIST"){
-          ElMessage({
-            type: "error",
-            message: "请先添加课程库课程",
-            duration: 1500,
-          });
-        }
-     })
-
+      associateCourses(this.multipleSelection)
+        .then((res) => {
+          console.log("associateCourses", res);
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: "关联成功",
+              duration: 1500,
+            });
+            this.multipleSelection.forEach((item) => {
+              item.courseIsDeleted = "0";
+            });
+            // this.getClassList()
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+          if (e.code === "CODE_NOT_EXIST") {
+            ElMessage({
+              type: "error",
+              message: "请先添加课程库课程",
+              duration: 1500,
+            });
+          }
+        });
     },
     //加载更多
     loadMore() {
@@ -1131,7 +1157,7 @@ export default {
 .rightSlot {
   position: absolute;
   right: 10%;
-  width: 300px;
+  width: 440px;
   margin-top: 10px;
 }
 .assignBtn {
@@ -1145,6 +1171,10 @@ export default {
   flex-direction: row;
 }
 .selecter {
+  margin-left: 15px;
+  width: 120px;
+}
+.status {
   margin-left: 15px;
   width: 120px;
 }

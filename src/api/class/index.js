@@ -1,6 +1,6 @@
 import request from '@/utils/request/request'
 //查询教学班列表
-export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pageNum,KeyWord) {
+export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pageNum,KeyWord,status) {
     return request({
       url: '/classes/list',
       method: 'get',
@@ -12,6 +12,7 @@ export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pa
         pageSize:pageSize,
         pageNum:pageNum,
         selectKeyWord:KeyWord,
+        status:status
       }
     })
   }
@@ -82,5 +83,33 @@ export function submit(classId) {
     url: '/classes/submit/'+classId,
     method: 'POST',
  
+  })
+}
+//管理员or课程负责人审核反馈
+export function submitFeedback(classId,status){
+  return request({
+    url:'classes/review/'+classId+'/'+status,
+    method:'POST',
+  })
+}
+//新增课程审核内容
+export function createReview(classId,checkFeedback){
+  return request({
+    url:'/review',
+    method:'POST',
+    data:{
+      'classId':classId,
+      'remark':checkFeedback.message
+    },
+  })
+}
+//查询该课程是否有审核记录
+export function getReview(classId){
+  return request({
+    url:'/review/list',
+    method:'GET',
+    params:{
+      'classId':classId,
+    },
   })
 }

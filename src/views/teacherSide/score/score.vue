@@ -21,12 +21,13 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+      <el-switch v-model="openDrawer" class="switchstyle" />
     </el-row>
   </div>
 
 
   <div layout="row" flex class="md-padding" >
-    <addBtn @click="goAddScore"></addBtn>
+    <addBtn @click="goAddScore" v-show="identity=='学院管理员'"></addBtn>
 
     <!-- editable @edit="handleTabsEdit"-->
     <el-tabs v-model="editableTabsValue" type="card" class="activity-tab"  
@@ -93,20 +94,24 @@
       
   </div>
   </div>
-  
+  <reviewDrawer  v-bind:visible="openDrawer"/>
 </template>
 
 <script>
 import { Back } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
+import { ElMessageBox, ElSwitch,} from "element-plus";
+import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
+
 import request from "@/utils/request/request";
 export default {
   name: "Score",
   components: {
-    Back,addBtn,request
+    Back,addBtn,request,ElSwitch,reviewDrawer
   },
   data() {
     return {
+      openDrawer:false,
       hasActivities:Boolean,
       hasScores:Boolean,
 
@@ -315,11 +320,19 @@ export default {
 </script>
 
 <style scoped>
+.switchstyle{
+  bottom: 4px;
+}
+.activity-tab{
+  background: white;
+  margin-left: 5%;
+  margin-right: 5%;
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
 
 .studentCard{
   margin-left: 5%;
   margin-right: 5%;
-  width:80%;
   height: 500px;
 }
 .scoreintable{

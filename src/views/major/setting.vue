@@ -1,14 +1,12 @@
 <template>
   <div class="content">
     <!-- 顶部导航栏 -->
-    <div class="block">
+   <div class="block">
       <el-row class="block-row">
-        <div class="block_title">版本</div>
-        <el-divider class="divider" direction="vertical" />
-        <el-tooltip
+         <el-tooltip
           class="box-item"
           effect="dark"
-          content="工作手册模板"
+          content="从其他培养方案复制"
           placement="bottom"
           :hide-after="0"
         >
@@ -16,14 +14,14 @@
             class="icon"
             size="22px"
             color="rgb(137, 137, 137)"
-            style="margin-left: 20px"
-            @click="toTemplate()"
+            style="margin-left: 70px"
+            @click="openDrawer()"
           >
-            <List />
+            <CopyDocument />
           </el-icon>
         </el-tooltip>
       </el-row>
-    </div>
+    </div> 
 
     <div class="body-check">
       <div class="card">
@@ -37,11 +35,11 @@
             <el-col class="detail">{{ currentYear }} </el-col>
           </el-col>
           <el-col>
-            <!-- <el-col class="title">设置</el-col> -->
+
             <el-col>
-              <el-button style="color: #6573c0" text @click="openDrawer"
+              <!-- <el-button style="color: #6573c0" text @click="openDrawer"
                 >从其他培养方案复制
-              </el-button>
+              </el-button> -->
             </el-col>
           </el-col>
         </el-row>
@@ -49,7 +47,7 @@
     </div>
   </div>
   <!-- 右侧复制抽屉 -->
-  <el-drawer v-model="drawer" :with-header="false">
+  <el-drawer v-model="drawer" >
     <el-row>
       <el-col :span="14">
         <DrawerSearch msg="搜索专业名称" @SearchValue="getSearchValue" />
@@ -104,11 +102,11 @@ import { searchProgram, checkProgram } from "@/api/program";
 import { getDictionary } from "@/api/dictionary";
 import { copyProgram } from "@/api/basecourse";
 import { ElMessage } from "element-plus";
-import { List } from "@element-plus/icons-vue";
+import { List,CopyDocument } from "@element-plus/icons-vue";
 export default {
   name: "Setting",
   components: {
-    DrawerSearch,
+    DrawerSearch,CopyDocument,
     List,
   },
   data() {
@@ -153,11 +151,7 @@ export default {
     this.checkProgram();
   },
   methods: {
-    //跳转到模板编辑页面
-    toTemplate(){
-         this.$router.push({ name: "TemplateList" });
-      console.log("toTemplate");
-    },
+
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -169,7 +163,6 @@ export default {
     checkProgram() {
       checkProgram(this.currentMajorId, this.currentYear).then((res) => {
         console.log("checkProgram", res);
-
         this.programId = res.data.programId;
       });
     },
@@ -240,10 +233,10 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 /* 顶部导航栏 */
 .block {
   position: absolute;
@@ -270,7 +263,7 @@ export default {
 .body-check {
   display: flex;
   justify-content: center;
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
 }
 .card {
   display: flex;
