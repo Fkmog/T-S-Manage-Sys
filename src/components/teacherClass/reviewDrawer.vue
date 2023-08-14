@@ -12,7 +12,6 @@
     <el-collapse-item 
     v-for="(review,index) in reviewInfo" 
     :title="'审核时间：'+review.createTime+'-----审核人：'+review.reviewerName"
-    :title="'审核时间：'+review.createTime+'-----审核人：'+review.reviewerName"
     >
       <div style="padding-left: 30px;">审核意见：{{ review.remark }}</div>
       <el-tooltip
