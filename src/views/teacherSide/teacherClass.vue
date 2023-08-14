@@ -109,7 +109,7 @@
           v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')"
           class="status_desc"
         >
-          <el-tooltip
+          <!-- <el-tooltip
             class="box-item"
             effect="dark"
             content="审核"
@@ -125,13 +125,23 @@
             >
               <Finished />
             </el-icon>
-          </el-tooltip>
+          </el-tooltip> -->
+          待审核
         </div>
         <div v-show="status == '已退回' && identity == '教师'">已退回，请重新提交</div>
         <div v-show="status == '已退回' && (identity == '学院管理员'||identity == '课程负责人')">已退回</div>
         <div v-show="status == '已审核'">已审核</div>
         <el-divider class="divider" direction="vertical" />
-        <el-switch v-model="openDrawer" class="switchstyle" />
+        <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="审核意见"
+            placement="bottom"
+            :hide-after="0"
+          >
+          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange" />
+          </el-tooltip>
+        
         
 
       </el-row>
@@ -344,6 +354,7 @@ export default {
   },
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -362,6 +373,9 @@ export default {
       // console.log('teacherSideClassInfo changed');
       return this.$store.state.currentInfo.teacherSideClassInfo;
     },
+    openDrawerChange(){
+      return this.$store.state.currentInfo.opendrawer;
+    }
   },
   watch: {
     classInfoChange: {
@@ -371,8 +385,17 @@ export default {
         this.classStatus();
       },
     },
+    openDrawerChange:{
+      deep: true,
+      handler(value) {
+        this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+      },
+    }
   },
   methods: {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     getdata(val){
       this.openDrawer = val;
     },

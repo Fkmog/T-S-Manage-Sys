@@ -98,7 +98,8 @@ export function createReview(classId,checkFeedback){
     method:'POST',
     data:{
       'classId':classId,
-      'remark':checkFeedback.message
+      'remark':checkFeedback.message,
+      // 'reviewerName':checkFeedback.reviewerName
     },
   })
 }
@@ -110,5 +111,12 @@ export function getReview(classId){
     params:{
       'classId':classId,
     },
+  })
+}
+//删除审核记录
+export function deleteReview(reviewId){
+  return request({
+    url:'/review/'+reviewId,
+    method:'DELETE'
   })
 }

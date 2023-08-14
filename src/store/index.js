@@ -62,6 +62,7 @@ export default createStore({
         schoolName: "",
         schoolId: "",
         year: "",
+        opendrawer:Boolean,
         currentVersionValue:1,
         role: {},
         isTeacher: false,
@@ -101,6 +102,9 @@ export default createStore({
         },
         setYear(state, newVal) {
           state.year = newVal;
+        },
+        setOpenDrawer(state, newVal){
+          state.opendrawer = newVal;
         },
         setRole(state, newVal) {
           state.role = newVal;
