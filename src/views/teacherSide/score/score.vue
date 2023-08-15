@@ -21,13 +21,21 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+      <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="审核意见"
+            placement="bottom"
+            :hide-after="0"
+          >
       <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
+      </el-tooltip>
     </el-row>
   </div>
 
 
   <div layout="row" flex class="md-padding" >
-    <addBtn @click="goAddScore" v-show="identity=='学院管理员'"></addBtn>
+    <addBtn @click="goAddScore" v-show="identity=='教师'"></addBtn>
 
     <!-- editable @edit="handleTabsEdit"-->
     <el-tabs v-model="editableTabsValue" type="card" class="activity-tab"  

@@ -290,7 +290,7 @@ export default {
     }
     this.getClassInfo();
     // this.getReviewInfo();
-    console.log("classInfo", this.classInfo);
+    // console.log("classInfo", this.classInfo);
     this.getDictionary();
     this.getFile();
   },
@@ -402,7 +402,18 @@ export default {
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res.data);
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        if(this.identity =='教师'){
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        }
+        else if(this.identity =='课程负责人'){
+          this.$store.commit("currentInfo/setRespondClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        }
+        else {
+          this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+        }
         this.classStatus();
       });
     },

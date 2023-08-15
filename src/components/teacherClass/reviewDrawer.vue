@@ -154,15 +154,8 @@ export default{
    
     this.getClassInfo();
     this.getReviewInfo();
-    console.log("classInfo", this.classInfo);
-    console.log('checkFeedback',this.checkFeedback)
-    this.getDictionary();
   },
   computed: {
-    classInfoChange(){
-      // console.log('teacherSideClassInfo changed');
-      return this.$store.state.currentInfo.teacherSideClassInfo;
-    },
     openDrawerChange(){
         return this.$props.visible;
     },
@@ -171,16 +164,36 @@ export default{
     },
     checkMessageChange(){
         return this.checkFeedback.message;
-    }
+    },
+    // teacherInfoChange() {
+    //   // console.log('teacherSideClassInfo changed');
+    //   return this.$store.state.currentInfo.teacherSideClassInfo;
+    // },
+    // respondInfoChange() {
+    //   // console.log('teacherSideClassInfo changed');
+    //   return this.$store.state.currentInfo.respondClassInfo;
+    // },
   },
   watch: {
-    classInfoChange: {
-      deep: true,
-      handler(value) {
-        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-        this.classStatus();
-      },
-    },
+   
+    // teacherInfoChange: {
+    //   deep: true,
+    //   handler(value) {
+    //     if (this.identity == "教师") {
+    //       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    //       this.classStatus();
+    //     }
+    //   },
+    // },
+    // respondInfoChange: {
+    //   deep: true,
+    //   handler(value) {
+    //     if (this.identity == "课程负责人") {
+    //       this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+    //       this.classStatus();
+    //     }
+    //   },
+    // },
     openDrawerChange:{
         deep:true,
         handler(value){
@@ -246,6 +259,7 @@ export default{
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+        console.log('this.checkFeedback.checkState',this.checkFeedback.checkState);
         submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
         console.log('feedback res',res);
         if(res.code == 'SUCCESS'){
@@ -277,7 +291,6 @@ export default{
             message: `创建审核成功`,
             duration: 1500,
           });
-          this.status = "已退回"
           this.getClassInfo();
           this.getReviewInfo();
         }
@@ -333,7 +346,18 @@ export default{
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res.data);
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        if(this.identity =='教师'){
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        }
+        else if(this.identity =='课程负责人'){
+          this.$store.commit("currentInfo/setRespondClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        }
+        else {
+          this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+        }
         this.classStatus();
       });
     },
@@ -412,6 +436,7 @@ export default{
 }
 #drawerbox .el-drawer{
   position: fixed;
+  z-index:1;
 }
 #drawerfixed{
   position: fixed;
@@ -425,6 +450,7 @@ export default{
 }
 :deep().el-drawer{
   position: fixed;
+  z-index:1;
 }
 
 .switchstyle{

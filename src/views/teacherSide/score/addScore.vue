@@ -925,14 +925,14 @@ async getActivities(){
       this.postData.scores = [];
       // this.postData.newStudents = [];
       
-      this.getActivities().then(function(res){
-        that.hotInstance.updateSettings({
-                data:that.db.items[that.currenteditableTabsValue-1],
-                column:that.columnList[that.currenteditableTabsValue-1]
-              });
-        that.dirty = false;
-        console.log('datas:', that.db.items,that.postData.students);
-      })
+      // this.getActivities().then(function(res){
+      //   that.hotInstance.updateSettings({
+      //           data:that.db.items[that.currenteditableTabsValue-1],
+      //           column:that.columnList[that.currenteditableTabsValue-1]
+      //         });
+      //   that.dirty = false;
+      //   console.log('datas:', that.db.items,that.postData.students);
+      // })
       
       
     },

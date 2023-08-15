@@ -1,47 +1,10 @@
 <template>
   <div class="content">
-    <div class="tools">
-      <el-row class="rowstyle">
-        <el-col :span="4" class="colstyle">
-          <el-tooltip content="添加课程大纲版本号">
-            <el-icon 
-            style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
-            @click="this.addFlag = true;
+    <addBtn @click="this.addFlag = true;
                     this.deleteFlag = false;
                     this.editFlag = false;
-                    this.showEditVersionDailogFlag = true;">
-                    <User />
-                  </el-icon>
-            </el-tooltip>
-          </el-col>
-        <el-col :span="4" class="colstyle">
-          <el-tooltip content="修改课程大纲版本号">
-           
-              <el-icon 
-              style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
-              @click="this.editFlag = true;
-                    this.deleteFlag = false;
-                    this.addFlag = false;
-                    this.showEditVersionDailogFlag = true;">
-                    <Document />
-              </el-icon>
-          </el-tooltip>
-        </el-col>
-        <el-col :span="4" class="colstyle">
-          <el-tooltip content="删除课程大纲版本号">
-            <el-icon  
-            style="line-height: 1em;color:rgb(137,137,137);height: 1em;width: 1em;cursor: pointer;"
-            @click="this.deleteFlag = true;
-                    this.addFlag = false;
-                    this.editFlag = false;
-                    this.showEditVersionDailogFlag = true;">
-                    <Delete />
-            </el-icon>
-          </el-tooltip>
-        </el-col>
-      </el-row>
-          
-    </div>
+                    this.showEditVersionDailogFlag = true;"></addBtn>
+   
     <el-table :data="versions" class="el-table-container" :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -54,8 +17,9 @@
         'font-size': '16px',
         height: '60px',
       }"
-      style="width: 750px"
+      style="width: 1000px"
       >
+      
        <el-table-column label="版本大纲名称" width="250">
         <template #default="scope">
           <div style="display: flex; align-items: center">
@@ -75,6 +39,48 @@
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.reviseYear }}</span>
           </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="250">
+        <template #default="scope">
+          <el-row >
+        <el-col :span="4">
+          <el-tooltip content="修改课程大纲版本号">
+           <el-button 
+            class="deleteButton"
+            link
+            style="color: #3f51b5"
+           @click="this.editFlag = true;
+                    this.deleteFlag = false;
+                    this.addFlag = false;
+                    this.nameFlag = true;
+                    this.selectVersion(scope.row.versionId);
+                    this.showEditVersionDailogFlag = true;">
+            <el-icon><Edit /></el-icon>
+           </el-button>
+              
+          </el-tooltip>
+        </el-col>
+        <el-col :span="4">
+          <el-tooltip content="删除课程大纲版本号">
+            <el-button 
+            class="deleteButton"
+            link
+            style="color: #3f51b5"
+            @click="this.deleteFlag = true;
+                    this.addFlag = false;
+                    this.editFlag = false;
+                    this.nameFlag = true;
+                    this.selectVersion(scope.row.versionId);
+                    this.showEditVersionDailogFlag = true;">
+              <el-icon>
+                  <Delete />
+            </el-icon>
+            </el-button>
+            
+          </el-tooltip>
+        </el-col>
+      </el-row>
         </template>
       </el-table-column>
     </el-table>
@@ -97,22 +103,12 @@
       </el-form-item>
       <el-form-item
         v-show="editFlag || deleteFlag"
-        label="选择课程大纲版本"
+        label="课程大纲版本号"
         :label-width="formLabelWidth"
+        :error="C_ErrorMsg_editVersion_name"
         prop="name"
       >
-        <el-select
-          v-model="currentVersion"
-          
-          @change="selectVersion(currentVersion)"
-        >
-          <el-option
-            v-for="item in versions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
+     <el-input v-model="versionForm.name" disabled autocomplete="off"/>
       </el-form-item>
       <el-form-item
         label="面向年级"
@@ -251,7 +247,8 @@ export default {
     var validateName = (rule, value, callback) => {
       if (value === "") {
         this.C_ErrorMsg_editVersion_name = "请输入版本名称";
-      } else {
+      }
+       else {
         let nameformat = /^\d{4}版$/;
         if (!nameformat.test(value)) {
           this.C_ErrorMsg_editVersion_name =
@@ -265,6 +262,7 @@ export default {
           }
         }
       }
+      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
     };
     var validateEnrollYear = (rule, value, callback) => {
       if (value === "") {
@@ -286,6 +284,7 @@ export default {
           }
         }
       }
+      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
     };
      var validateReviseYear = (rule, value, callback) => {
       if (value === "") {
@@ -307,6 +306,7 @@ export default {
           }
         }
       }
+      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
     };
     return{
       formLabelWidth: "140px",
@@ -374,7 +374,7 @@ export default {
               reviseYear: "",
               versionId: "",
             };
-            that.getDict();
+            this.getDictionary();
           }
         })
         .catch((e) => {
@@ -413,7 +413,7 @@ export default {
               reviseYear: "",
               versionId: "",
             };
-            that.getDict();
+            this.getDictionary();
           }
         })
         .catch((e) => {
@@ -446,7 +446,7 @@ export default {
               reviseYear: "",
               versionId: "",
             };
-            that.getDict();
+            this.getDictionary();
           }
         })
         .catch((e) => {
@@ -477,7 +477,7 @@ export default {
       this.versionForm.enrollYear = this.versions[versionId - 1]["enrollYear"];
       this.versionForm.reviseYear = this.versions[versionId - 1]["reviseYear"];
       this.versionForm.versionId = this.versions[versionId - 1]["versionId"];
-      // console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
+      console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
     },
     getDictionary() {
       let that = this;
@@ -516,23 +516,25 @@ export default {
 </script>
 
 <style scoped>
+.deleteButton {
+  margin-right: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+:deep().el-icon {
+    font-size: large;
+}
 .colstyle{
   margin-top: 10px;
 }
 .rowstyle{
   justify-content: center;
 }
-.tools{
-  position: relative;
-  background-color: white;
-  width: 400px;
-  height: 50px;
-  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
-}
+
 .content {
   margin-top: 85px;
   margin-left: 5%;
-  
+  margin-right: 5%;
 }
 .el-table-container {
   margin: 0 auto;

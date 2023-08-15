@@ -42,8 +42,15 @@
           </el-tooltip>
           <el-divider class="divider" direction="vertical" />
         </div>
-
+        <el-tooltip
+            class="box-item"
+            effect="dark"
+          content="审核意见"
+            placement="bottom"
+            :hide-after="0"
+          >
         <el-switch v-model="openDrawer" class="switchstyle" />
+        </el-tooltip>
       </el-row>
     </div>
     <!-- 表单回显器 -->

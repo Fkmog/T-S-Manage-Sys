@@ -146,7 +146,7 @@
         请先点击右上角圆形按钮添加课程
       </div>
     </div>
-    <el-drawer v-model="drawer" :direction="direction" size="50%" :with-header="false">
+    <el-drawer v-model="drawer" :direction="direction" size="42%"  :show-close="true">
     
       <el-col :span="24">
         <el-row>
