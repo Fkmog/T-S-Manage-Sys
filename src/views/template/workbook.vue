@@ -126,7 +126,15 @@ export default {
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
     // console.log("identity",this.identity);
-    this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    if (this.identity == "学院管理员") {
+      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+      console.log("identity:", this.identity);
+    } else if (this.identity == "课程负责人") {
+      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+    } else {
+      this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+      console.log("identity:", this.identity);
+    }
     if (this.classInfo.status == 2 || this.classInfo.status == 3) {
       // 状态为已提交或者已审核时，无法编辑
       this.noEdit = true;
@@ -139,17 +147,33 @@ export default {
     this.value = this.classInfo.workbookJson;
   },
   computed: {
-    classInfoChange() {
+   
+    teacherInfoChange() {
+      // console.log('teacherSideClassInfo changed');
       return this.$store.state.currentInfo.teacherSideClassInfo;
+    },
+    respondInfoChange() {
+      // console.log('teacherSideClassInfo changed');
+      return this.$store.state.currentInfo.respondClassInfo;
     },
   },
   watch: {
-    classInfoChange: {
-      deep: true,
-      handler(value) {
-        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    teacherInfoChange: {
+        deep: true,
+        handler(value) {
+          if (this.identity == "教师") {
+            this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+          }
+        },
       },
-    },
+      respondInfoChange: {
+        deep: true,
+        handler(value) {
+          if (this.identity == "课程负责人") {
+            this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+          }
+        },
+      },
   },
   methods: {
     openDrawerChange() {
@@ -245,7 +269,13 @@ export default {
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res);
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        if (this.identity == "学院管理员") {
+          this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
+        } else if (this.identity == "课程负责人") {
+          this.$store.commit("currentInfo/setRespondClassInfo", res.data);
+        } else {
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        }
         this.value = res.data.workbookJson;
       });
     },
