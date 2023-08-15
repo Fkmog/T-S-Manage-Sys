@@ -57,6 +57,8 @@ import Cookies from "js-cookie";
 import { login } from "@/api/login/login";
 import { getUserInfo } from "@/api/userInfo/getUserInfo";
 import { User, Lock } from "@element-plus/icons-vue";
+import { getToken } from "@/utils/request/auth";
+
 export default {
   name: "userLogin",
   components: {
@@ -89,7 +91,14 @@ export default {
             (res) => {
               if (res.code == "SUCCESS") {
                 //存储token -> cookie
+                if(getToken()===undefined){
                 Cookies.set("Admin-Token", res.token);
+                Cookies.set("first-Login", true);
+                }else{
+                Cookies.set("Admin-Token", res.token);
+                Cookies.set("first-Login", false);
+                }
+
                 //登陆时保证Nav高亮正确
                 this.$store.commit("navInfo/setActiveDisplay1", 0);
                 this.$store.commit("navInfo/setActiveDisplay2", 0);

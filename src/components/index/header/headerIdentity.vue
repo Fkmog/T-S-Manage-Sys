@@ -76,6 +76,7 @@ export default {
             duration: 1500,
           });
           Cookies.remove("Admin-Token");
+          Cookies.remove("first-Login");
           this.$router.push("/login");
         })
         .catch(() => {});

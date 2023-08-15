@@ -1,9 +1,9 @@
 <template>
   <div class="content">
     <!-- 顶部导航栏 -->
-   <div class="block">
+    <div class="block">
       <el-row class="block-row">
-         <el-tooltip
+        <el-tooltip
           class="box-item"
           effect="dark"
           content="从其他培养方案复制"
@@ -21,7 +21,7 @@
           </el-icon>
         </el-tooltip>
       </el-row>
-    </div> 
+    </div>
 
     <div class="body-check">
       <div class="card">
@@ -34,20 +34,13 @@
             <el-col class="title">年级</el-col>
             <el-col class="detail">{{ currentYear }} </el-col>
           </el-col>
-          <el-col>
-
-            <el-col>
-              <!-- <el-button style="color: #6573c0" text @click="openDrawer"
-                >从其他培养方案复制
-              </el-button> -->
-            </el-col>
-          </el-col>
+          <el-col> </el-col>
         </el-row>
       </div>
     </div>
   </div>
   <!-- 右侧复制抽屉 -->
-  <el-drawer v-model="drawer" >
+  <el-drawer v-model="drawer">
     <el-row>
       <el-col :span="14">
         <DrawerSearch msg="搜索专业名称" @SearchValue="getSearchValue" />
@@ -90,7 +83,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="copyInfo()">确定</el-button>
+        <el-button type="primary" @click="confirm()">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -101,12 +94,14 @@ import DrawerSearch from "@/components/general/drawerSearch.vue";
 import { searchProgram, checkProgram } from "@/api/program";
 import { getDictionary } from "@/api/dictionary";
 import { copyProgram } from "@/api/basecourse";
-import { ElMessage } from "element-plus";
-import { List,CopyDocument } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { addProgram } from "@/api/program";
+import { List, CopyDocument } from "@element-plus/icons-vue";
 export default {
   name: "Setting",
   components: {
-    DrawerSearch,CopyDocument,
+    DrawerSearch,
+    CopyDocument,
     List,
   },
   data() {
@@ -125,6 +120,7 @@ export default {
       departmentId: "",
       schoolId: "",
       currentYear: "",
+      noProgram: Boolean,
     };
   },
   computed: {
@@ -151,7 +147,6 @@ export default {
     this.checkProgram();
   },
   methods: {
-
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
@@ -161,14 +156,24 @@ export default {
     },
     //查询培养计划
     checkProgram() {
-      checkProgram(this.currentMajorId, this.currentYear).then((res) => {
-        console.log("checkProgram", res);
-        this.programId = res.data.programId;
-      });
+      checkProgram(this.currentMajorId, this.currentYear)
+        .then((res) => {
+          console.log("checkProgram", res);
+          this.programId = res.data.programId;
+          console.log("@", this.programId);
+          this.noProgram = false;
+        })
+        .catch((e) => {
+          if (e.code === "PROGRAM_NOT_FIND" && e.msg === "资源不存在") {
+            this.noProgram = true;
+          }
+        });
     },
     // 唤起抽屉
     openDrawer() {
       this.drawer = true;
+      // 打开时默认进行一次搜索
+      this.getCopyProgram();
     },
     //搜索栏搜索
     getSearchValue(data) {
@@ -193,6 +198,46 @@ export default {
       this.currentRow = row;
       // 唤起弹窗
       this.dialogVisible = true;
+    },
+    // 确定有无培养计划，没有则创建
+    confirm() {
+      if (this.noProgram === false) {
+        this.copyInfo();
+      } else {
+        ElMessageBox.confirm("暂未创建培养方案，是否需要创建？", "注意", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.addProgram();
+          })
+          .catch(() => {});
+      }
+    },
+    //新增培养计划
+    addProgram() {
+      addProgram(
+        this.currentMajorId,
+        this.departmentId,
+        this.schoolId,
+        this.currentYear
+      ).then((res) => {
+        console.log("addProgram", res);
+        checkProgram(this.currentMajorId, this.currentYear)
+        .then((r) => {
+          console.log("checkProgram", r);
+          this.programId = r.data.programId;
+          console.log("@", this.programId);
+          this.noProgram = false;
+          this.copyInfo()
+        })
+        .catch((e) => {
+          if (e.code === "PROGRAM_NOT_FIND" && e.msg === "资源不存在") {
+            this.noProgram = true;
+          }
+        });
+      });
     },
     //复制
     copyInfo() {

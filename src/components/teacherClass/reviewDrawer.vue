@@ -164,15 +164,7 @@ export default{
     },
     checkMessageChange(){
         return this.checkFeedback.message;
-    },
-    // teacherInfoChange() {
-    //   // console.log('teacherSideClassInfo changed');
-    //   return this.$store.state.currentInfo.teacherSideClassInfo;
-    // },
-    // respondInfoChange() {
-    //   // console.log('teacherSideClassInfo changed');
-    //   return this.$store.state.currentInfo.respondClassInfo;
-    // },
+    }
   },
   watch: {
    
@@ -291,6 +283,7 @@ export default{
             message: `创建审核成功`,
             duration: 1500,
           });
+          this.status = "已退回"
           this.getClassInfo();
           this.getReviewInfo();
         }

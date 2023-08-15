@@ -22,7 +22,7 @@
         </el-tooltip>
         <div class="block_title">工作手册</div>
         <el-divider class="divider" direction="vertical" />
-        <div v-show="hasWorkbook && identity == '教师'">
+        <div v-show="(hasWorkbook && identity == '教师') && !noEdit">
           <el-tooltip
             class="box-item"
             effect="dark"
@@ -109,6 +109,7 @@ export default {
     return {
       openDrawer: false,
       classInfo: {},
+      noEdit: false,
       hasWorkbook: Boolean,
       workbook: [],
       //表单生成规则
@@ -126,6 +127,13 @@ export default {
     this.identity = this.$store.state.currentInfo.identity;
     // console.log("identity",this.identity);
     this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    if (this.classInfo.status == 2 || this.classInfo.status == 3) {
+      // 状态为已提交或者已审核时，无法编辑
+      this.noEdit = true;
+      console.log("@@",this.classInfo);
+    } else {
+      this.noEdit = false;
+    }
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     this.getWorkbook();
     this.value = this.classInfo.workbookJson;
@@ -144,23 +152,27 @@ export default {
     },
   },
   methods: {
-    openDrawerChange(){
+    openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
     // 返回上级页面
     backClass() {
-      if (_.isEqual(this.classInfo.workbookJson, this.value)) {
-        this.$router.push({ name: "TeacherClass" });
-      } else {
-        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        })
-          .then(() => {
-            this.$router.push({ name: "TeacherClass" });
+      if (this.identity == "教师") {
+        if (_.isEqual(this.classInfo.workbookJson, this.value)) {
+          this.$router.push({ name: "TeacherClass" });
+        } else {
+          ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
           })
-          .catch(() => {});
+            .then(() => {
+              this.$router.push({ name: "TeacherClass" });
+            })
+            .catch(() => {});
+        }
+      } else {
+        this.$router.push({ name: "TeacherClass" });
       }
     },
     //当 status 为2，3时，无法编辑表单，注入disable属性

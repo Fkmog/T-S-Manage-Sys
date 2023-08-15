@@ -74,7 +74,7 @@
             <List />
           </el-icon>
         </el-tooltip>
-         <el-tooltip
+        <el-tooltip
           class="box-item"
           effect="dark"
           content="工作手册"
@@ -247,11 +247,28 @@
           <el-table-column prop="versionName" label="版本" min-width="180px" />
         </el-table>
       </el-row>
+      <!-- 分页 -->
+      <div class="pagination-container" flex>
+        <div class="loadMore">
+          <el-button
+            link
+            plain
+            v-show=" showLoadmore"
+            @click="loadMore()"
+            >加载更多</el-button
+          >
+        </div>
+      </div>
     </el-drawer>
+
     <!-- 复制弹窗 -->
     <el-dialog v-model="dialogVisible" title="从其他大纲复制" width="400px">
-      <el-row style="margin-bottom:20px;font-size:15px">从《{{currentRow.courseName}}》{{currentRow.versionName}}大纲复制以下内容：</el-row>
-      <el-checkbox-group v-model="checkList" >
+      <el-row style="margin-bottom: 20px; font-size: 15px"
+        >从《{{ currentRow.courseName }}》{{
+          currentRow.versionName
+        }}大纲复制以下内容：</el-row
+      >
+      <el-checkbox-group v-model="checkList">
         <el-checkbox label="成绩项"></el-checkbox>
         <el-checkbox label="课程目标"></el-checkbox>
       </el-checkbox-group>
@@ -276,7 +293,7 @@ import {
   Checked,
   CircleClose,
   CopyDocument,
-  Management
+  Management,
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import {
@@ -304,11 +321,11 @@ export default {
     List,
     Checked,
     CircleClose,
-    Management
+    Management,
   },
   data() {
     return {
-      checkList: ["成绩项","课程目标"],
+      checkList: ["成绩项", "课程目标"],
       currentRow: {},
       copyCourseList: [],
       keyword: "",
@@ -350,6 +367,10 @@ export default {
       },
       //majorinformation
       majorForm: [],
+      pageSize: 20,
+      pageNum: 1,
+      total: 0,
+      showLoadmore: false,
     };
   },
   mounted() {
@@ -443,7 +464,7 @@ export default {
     toObjectives() {
       this.$router.push("/baseCourseObjectives");
     },
-    toTemplate(){
+    toTemplate() {
       this.$router.push("/templateManage");
     },
     //获取路由参数信息
@@ -568,6 +589,7 @@ export default {
     //唤起抽屉
     openDrawer() {
       this.drawer = true;
+      this.getEditDetail();
     },
     //选中被复制对象
     copyDetail(row) {
@@ -578,10 +600,31 @@ export default {
     },
     //查询可复制的课程
     getEditDetail() {
-      getEditDetail(this.keyword, this.version).then((res) => {
+      getEditDetail(
+        this.keyword,
+        this.version,
+        this.pageSize,
+        this.pageNum
+      ).then((res) => {
         console.log("getEditDetail", res);
         this.copyCourseList = res.rows;
+        this.total = res.total;
+        if (this.pageSize >= res.total) {
+          this.showLoadmore = false;
+        } else {
+          this.showLoadmore = true;
+        }
       });
+    },
+    //加载更多
+    loadMore() {
+      if (this.total - this.pageSize >= 20) {
+        this.pageSize += 20;
+        this.getEditDetail();
+      } else {
+        this.pageSize += this.total - this.pageSize;
+        this.getEditDetail();
+      }
     },
     //搜索栏搜索
     getSearchValue(data) {
@@ -613,8 +656,7 @@ export default {
             message: `复制成功`,
             duration: 1000,
           });
-          this.drawer=false
-
+          this.drawer = false;
         }
       });
     },
@@ -690,5 +732,10 @@ export default {
 .fileName:hover .fileCloseIcon {
   opacity: 1;
 }
-
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
 </style>

@@ -31,7 +31,6 @@ import baseCourseIndicatorsEdit from "@/views/baseCourse/indicators-edit.vue";
 import baseCourseObjectivesEdit from "@/views/baseCourse/objectives-edit.vue";
 import templateManage from "@/views/baseCourse/templateManage.vue";
 
-
 //登录组件
 import userLogin from "@/components/userLogin/index.vue";
 
@@ -96,20 +95,20 @@ const router = createRouter({
         },
         {
           path: "/teacher",
-          name:"Teacher",
+          name: "Teacher",
           component: Teacher,
           meta: { isMajor: false },
         },
         {
           path: "/major",
-          name:"Major",
+          name: "Major",
           component: Major,
           meta: { isMajor: false },
         },
         {
           path: "/departmentSetting",
           component: DepartmentSetting,
-          name:"DepartmentSetting",
+          name: "DepartmentSetting",
           meta: { isMajor: false },
           children: [
             {
@@ -320,33 +319,33 @@ const router = createRouter({
     },
   ],
 });
-router.beforeEach((to, from, next) => {
-  const tokenStr = Cookies.get("Admin-Token");
-  if (to.path == "/login") {
-    // console.log("from", from, to);
-    if (!tokenStr) {
-      return next();
-    }
-    if (tokenStr) {
-      if (store.state.currentInfo.identity == "学院管理员") {
-        next("/major");
-      }
-      if (store.state.currentInfo.identity == "教师") {
-        next("/teacherClasses");
-      }
-      if (store.state.currentInfo.identity == "课程负责人") {
-        next("/principalBaseCourse");
-      }
-    }
-  }
-  // console.log(tokenStr);
-  else {
-    if (!tokenStr) {
-      next("/login");
-    } else {
-      next();
-    }
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const tokenStr = Cookies.get("Admin-Token");
+//   if (to.path == "/login") {
+//     if (!tokenStr) {
+//       return next();
+//     }
+//     if (tokenStr) {
+//       if (store.state.currentInfo.identity == "学院管理员") {
+//         next("/major");
+//       }
+//       if (store.state.currentInfo.identity == "教师") {
+//         next("/teacherClasses");
+//       }
+//       if (store.state.currentInfo.identity == "课程负责人") {
+//         next("/principalBaseCourse");
+//       }
+//     }
+//   }
+//   // console.log(tokenStr);
+//   else {
+//     if (!tokenStr) {
+//       next("/login");
+//     } else {
+//       next();
+//     }
+//   }
+
+// });
 
 export default router;
