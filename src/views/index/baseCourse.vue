@@ -33,7 +33,7 @@
               </el-select>
             </el-col>
             <el-col :span="2" style="position: relative; top: 8px" v-show="identity == '学院管理员'">
-              <el-dropdown class="dropdownstyle">
+              <!-- <el-dropdown class="dropdownstyle">
                 <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -72,7 +72,7 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-              </el-dropdown>
+              </el-dropdown> -->
             </el-col>
           </el-row>
         </div>
@@ -939,14 +939,11 @@ export default {
 
       //select
       currentVersion: "",
-      currentVersion: "",
       currentVersionValue: 1,
       loading: ref(false),
       options: [],
-      versions: [],
       versionLabel: [],
       versions: [],
-      versionLabel: [],
 
       // isRouterAlive:true,
       closeShow: ref(false),

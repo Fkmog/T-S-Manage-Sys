@@ -62,7 +62,7 @@ export default createStore({
         schoolName: "",
         schoolId: "",
         year: "",
-        opendrawer:Boolean,
+        opendrawer:false,
         currentVersionValue:1,
         role: {},
         isTeacher: false,

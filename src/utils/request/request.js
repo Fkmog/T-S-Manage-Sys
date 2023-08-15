@@ -38,7 +38,6 @@ axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API,
   baseURL: "http://81.68.103.96:8080/",
-
   timeout: 20 * 1000, //超时请求时间：20s
 });
 
@@ -49,6 +48,13 @@ service.interceptors.request.use(
     const isToken = (config.headers || {}).isToken === false;
     // 是否需要防止数据重复提交
     const isRepeatSubmit = (config.headers || {}).repeatSubmit === false;
+    const hasToken = getToken() === undefined ? false : true;
+    // console.log("^^^",Cookies.get("first-Login"));
+    const firstLogin=(Cookies.get("first-Login")===undefined||Cookies.get("first-Login")===false)?true:false
+    // 非首次登陆时，login请求不携带header
+    if (config.url === "/login" && !firstLogin) {
+      return config;
+    }
     if (getToken() && !isToken) {
       config.headers["Authorization"] = "Bearer " + getToken(); // 设置token
     }
@@ -142,7 +148,6 @@ service.interceptors.response.use(
         });
         return Promise.reject(error.response.data);
       } else if (error.response.data.code == "UNAUTHORIZED") {
-        console.log("401啦！");
         if (!isRelogin.show) {
           isRelogin.show = true;
           ElMessageBox.confirm(

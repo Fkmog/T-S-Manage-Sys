@@ -110,13 +110,15 @@ export function removeDetail(detailId) {
 }
 
 //查询已有成绩项,课程目标的课程
-export function getEditDetail(selectKeyWord,versionId) {
+export function getEditDetail(selectKeyWord,versionId,pageSize,pageNum) {
   return request({
     url: "/detail/select",
     method: "get",
     params: {
       selectKeyWord: selectKeyWord,
-      versionId:versionId
+      versionId:versionId,
+      pageSize:pageSize,
+      pageNum:pageNum,
     },
   });
 }

@@ -1,6 +1,6 @@
 <template>
     <div id="drawerbox">
-    <el-drawer v-model="openDrawer" :show-close="false" >
+    <el-drawer v-model="openDrawer" :show-close="false" :lock-scroll="false" >
     <template #header>
       <h2 style="color: black;">
         审核记录
@@ -143,6 +143,8 @@ export default{
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
+    } else if (this.identity == "课程负责人") {
+      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
     } else {
       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
       console.log("identity:", this.identity);
@@ -165,7 +167,10 @@ export default{
         return this.$props.visible;
     },
     checkStateChange(){
-        return this.$store.state.reviewInfo.checkState;
+        return this.checkFeedback.checkState;
+    },
+    checkMessageChange(){
+        return this.checkFeedback.message;
     }
   },
   watch: {
@@ -185,10 +190,19 @@ export default{
     checkStateChange:{
         deep:true,
         handler(value){
+          console.log('checkFeedback state changes');
           this.$store.commit("reviewInfo/setmessage", this.checkFeedback.message);
           this.$store.commit("reviewInfo/setcheckState", this.checkFeedback.checkState);
-          this.checkFeedback.message = this.$store.state.reviewInfo.message;
-          this.checkFeedback.checkState = this.$store.state.reviewInfo.checkState;
+          
+        }
+    },
+    checkMessageChange:{
+        deep:true,
+        handler(value){
+          console.log('checkFeedback message changes');
+          this.$store.commit("reviewInfo/setmessage", this.checkFeedback.message);
+          this.$store.commit("reviewInfo/setcheckState", this.checkFeedback.checkState);
+          
         }
     }
   },
@@ -263,7 +277,9 @@ export default{
             message: `创建审核成功`,
             duration: 1500,
           });
+          this.status = "已退回"
           this.getClassInfo();
+          this.getReviewInfo();
         }
         }).catch((e)=>{
           console.log('e',e);
@@ -394,12 +410,21 @@ export default{
 #drawerbox .el-overlay{
   position: satic;
 }
+#drawerbox .el-drawer{
+  position: fixed;
+}
+#drawerfixed{
+  position: fixed;
+}
 .reviewBoxStyle{
   padding-top: 100px;
 }
 
 :deep().el-overlay{
   position: static;
+}
+:deep().el-drawer{
+  position: fixed;
 }
 
 .switchstyle{

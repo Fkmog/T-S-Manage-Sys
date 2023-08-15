@@ -23,7 +23,7 @@
           </el-tooltip>
           <div class="title">课程目标</div>
           <el-divider class="divider" direction="vertical" />
-          <el-switch v-model="openDrawer" class="switchstyle" />
+          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
         </el-row>
       </div>
       <div v-show="hasDetailId && hasObjective" class="card">
@@ -146,6 +146,7 @@ export default {
   },
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if(this.identity == '学院管理员'){
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log('identity:',this.identity);
@@ -175,6 +176,9 @@ export default {
     }
   },
   methods: {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     goEdit() {
       this.$router.push("/baseCourseObjectivesEdit");
     },

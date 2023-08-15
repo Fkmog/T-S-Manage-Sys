@@ -276,10 +276,18 @@
           :label-width="formLabelWidth"
           prop="isRespondent"
         >
-          <el-radio-group v-model="classEditForm.isRespondent" class="ml-4">
-            <el-radio label="2">允许任课教师修改考核方式</el-radio>
+          <!-- <el-radio-group v-model="classEditForm.isRespondent" class="ml-4">
+            <el-radio label="2">是否允许任课教师修改考核方式</el-radio>
             <el-radio label="0">不允许任课教师修改考核方式</el-radio>
-          </el-radio-group>
+          </el-radio-group> -->
+          允许任课教师修改考核方式&nbsp;<el-switch
+            v-model="classEditForm.isRespondent"
+            inline-prompt
+            active-text="是"
+            inactive-text="否"
+            active-value="2"
+            inactive-value="0"
+          />
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input
@@ -649,6 +657,9 @@ export default {
     //跳转到审核页面
     goCheck(row) {
       console.log("row:", row);
+      this.$store.commit("currentInfo/setOpenDrawer", false);
+      this.$store.commit("reviewInfo/setmessage", "");
+      this.$store.commit("reviewInfo/setcheckState", "");
       if (this.identity == "学院管理员") {
         this.$store.commit("currentInfo/setadminSideClassInfo", row);
       } else if (this.identity == "课程负责人") {
@@ -922,7 +933,6 @@ export default {
       classEditForm.semester = classEditForm.chosenSemester;
       classEditForm.departmentId = this.currentInfo.departmentId;
       classEditForm.schoolId = this.currentInfo.schoolId;
-      // this.classEditForm.isRespondent = this.isRespondent
       this.giveRespondentPermission(classEditForm);
       // console.log("修改后", classEditForm);
       editClass(classEditForm)
