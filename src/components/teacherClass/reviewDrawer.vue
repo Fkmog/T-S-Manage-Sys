@@ -33,26 +33,6 @@
           <Delete />
         </el-icon>  
       </el-tooltip>
-      <div style="padding-left: 30px;">审核意见：{{ review.remark }}</div>
-      <el-tooltip
-        class="box-item"
-        
-        effect="dark"
-        content="删除该审核意见"
-        placement="bottom"
-        :hide-after="0"
-      >
-      <el-icon
-        class="icon"
-        size="24px"
-        v-show="identity != '教师'"
-        color="rgb(137, 137, 137)"
-        style="float:right"
-        @click="deleteReview(review.reviewId)"
-      >
-          <Delete />
-        </el-icon>  
-      </el-tooltip>
     </el-collapse-item>
    </el-collapse>
 
