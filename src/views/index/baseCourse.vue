@@ -1117,7 +1117,7 @@ export default {
               that.versions.push(dict);
               that.versionLabel.push(year.versionName);
             });
-            that.currentVersionId = (this.$store.state.course.baseCourseVersionId)?this.$store.state.course.baseCourseVersionId:versions[0].versionId;
+            that.currentVersionId = (this.$store.state.course.baseCourseVersionId)?this.$store.state.course.baseCourseVersionId:that.versions[0].versionId;
             for(const element of that.versions){
               if(element['versionId']==that.currentVersionId){
                 that.currentVersion = element["label"];
