@@ -211,8 +211,8 @@ export default{
   methods: {
     //删除评审意见
     deleteReview(reviewId){
-      ElMessageBox.confirm("是否删除该评审意见？","注意",{
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否删除该评审意见？","",{
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(()=>{
@@ -221,7 +221,7 @@ export default{
         if(res == 204){
           ElMessage({
             type: "success",
-            message: `删除评审意见成功`,
+            message: `删除成功`,
             duration: 1500,
           });
         }
@@ -229,7 +229,7 @@ export default{
       }).catch((e)=>{
         ElMessage({
             type: "error",
-            message: `删除评审意见失败`,
+            message: `删除失败`,
             duration: 1500,
           });
         console.log('e',e)
@@ -255,7 +255,7 @@ export default{
           this.showCheckDialogFlag = false;
           ElMessage({
             type: "success",
-            message: `提交成功`,
+            message: `新建成功`,
             duration: 1500,
           });
           this.getClassInfo();
@@ -266,7 +266,7 @@ export default{
         console.log('e',e);
         ElMessage({
             type: "error",
-            message: `提交失败`,
+            message: `新建失败`,
             duration: 1500,
           });
       });
@@ -277,7 +277,7 @@ export default{
         if(res.code == 'SUCCESS'){
           ElMessage({
             type: "success",
-            message: `创建审核成功`,
+            message: `新建成功`,
             duration: 1500,
           });
           this.status = "已退回"
@@ -291,7 +291,7 @@ export default{
         } else {
           ElMessage({
             type: "error",
-            message: `提交失败`,
+            message: `新建失败`,
             duration: 1000,
           });
           return false;
@@ -355,8 +355,8 @@ export default{
     submit() {
       console.log('submit',this.status,this.identity);
       if(this.status == '已退回' && this.identity == '教师'){
-        ElMessageBox.confirm("是否已按照审核意见进行修改?","注意",{
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         }).then(()=>{
@@ -365,7 +365,7 @@ export default{
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `提交成功`,
+              message: `新建成功`,
               duration: 1000,
             });
           }
@@ -373,7 +373,7 @@ export default{
         }).catch((e)=>{
           ElMessage({
               type: "error",
-              message: `提交失败`,
+              message: `新建失败`,
               duration: 1000,
             });
           console.log('e',e);
@@ -388,7 +388,7 @@ export default{
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `提交成功`,
+            message: `新建成功`,
             duration: 1000,
           });
         }

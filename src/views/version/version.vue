@@ -149,7 +149,7 @@
           :disabled="!submitFlag"
           @click="addVersion()"
         >
-          确定
+          确认
         </el-button>
         <el-button
           v-show="editFlag"
@@ -441,8 +441,8 @@ export default {
     },
     deleteVersion() {
       let that = this;
-      ElMessageBox.confirm("将要删除课程大纲版本，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程大纲版本？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(()=>{

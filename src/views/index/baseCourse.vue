@@ -371,7 +371,7 @@
         <el-button @click="goAddBaseCourses">批量添加</el-button>
 
         <el-button type="primary" @click="submitForm('ruleForm')">
-          提交
+          确认
         </el-button>
         <el-button @click="resetForm('ruleForm')"> 重置 </el-button>
         <el-button
@@ -438,7 +438,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible1 = false">取消</el-button>
-        <el-button type="primary" @click="editBaseCourse"> 修改 </el-button>
+        <el-button type="primary" @click="editBaseCourse"> 确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -467,7 +467,7 @@
       <span class="dialog-footer">
         <el-button @click="showPrinciple = false">取消</el-button>
         <el-button type="primary" @click="addRespondent">
-          添加负责人
+          确认
         </el-button>
       </span>
     </template>
@@ -581,7 +581,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="showAddWorkbook = false">取消</el-button>
-        <el-button type="primary" @click="submitWorkbook()"> 确定 </el-button>
+        <el-button type="primary" @click="submitWorkbook()"> 确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -975,7 +975,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `添加版本大纲号成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -992,7 +992,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `添加版本大纲号失败`,
+            message: `新建失败`,
             duration: 1000,
           });
         });
@@ -1014,7 +1014,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `修改版本大纲号成功`,
+              message: `更新成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -1031,7 +1031,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `修改版本大纲号失败`,
+            message: `更新失败`,
             duration: 1000,
           });
         });
@@ -1047,7 +1047,7 @@ export default {
           if (res === 204) {
             ElMessage({
               type: "success",
-              message: `删除版本大纲号成功`,
+              message: `删除成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -1064,7 +1064,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `删除版本大纲号失败`,
+            message: `删除失败`,
             duration: 1000,
           });
         });
@@ -1174,8 +1174,8 @@ export default {
         that.editRespondentPostdata.push(courseRespondentDict);
       });
 
-      ElMessageBox.confirm("即将删除课程负责人", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程负责人", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1192,13 +1192,13 @@ export default {
             if (res.code == "SUCCESS") {
               ElMessage({
                 type: "success",
-                message: `删除负责人成功`,
+                message: `删除成功`,
                 duration: 1000,
               });
             } else {
               ElMessage({
                 type: "error",
-                message: `删除负责人失败`,
+                message: `删除失败`,
                 duration: 1000,
               });
             }
@@ -1230,13 +1230,13 @@ export default {
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `添加负责人成功`,
+            message: `新建成功`,
             duration: 1000,
           });
         } else {
           ElMessage({
             type: "error",
-            message: `添加负责人失败`,
+            message: `新建失败`,
             duration: 1000,
           });
         }
@@ -1315,7 +1315,7 @@ export default {
           that.showAddWorkbook = false;
           ElMessage({
             type: "success",
-            message: `分配工作手册成功`,
+            message: `分配成功`,
             duration: 1500,
           });
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1346,7 +1346,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: `添加失败`,
+            message: `新建失败`,
             duration: 1000,
           });
           return false;
@@ -1372,9 +1372,9 @@ export default {
         }
       });
       let versionMessage =
-        "是否添加课程大纲（版本：" + this.currentVersion + " ）?";
-      ElMessageBox.confirm(versionMessage, "注意", {
-        confirmButtonText: "确定",
+        "是否确认添加课程大纲（版本：" + this.currentVersion + " ）?";
+      ElMessageBox.confirm(versionMessage, "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
@@ -1400,7 +1400,7 @@ export default {
             if (res.code == "SUCCESS") {
               ElMessage({
                 type: "success",
-                message: `新增成功`,
+                message: `新建成功`,
                 duration: 1000,
               });
               //成功后根据vesionId和basecouseId获取详细信息
@@ -1411,7 +1411,7 @@ export default {
             console.log("e", e);
             ElMessage({
               type: "error",
-              message: `新增失败`,
+              message: `新建失败`,
               duration: 1000,
             });
             //失败后退回basecouse页面
@@ -1514,7 +1514,7 @@ export default {
             that.dialogFormVisible = false;
             ElMessage({
               type: "success",
-              message: `添加成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             that.clearForm();
@@ -1527,21 +1527,21 @@ export default {
           if (e.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
-              message: "添加失败，课程已存在",
+              message: "新建失败，课程已存在",
               duration: 2000,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else if (e.code == "DATA_DUPLICATED") {
             ElMessage({
               type: "error",
-              message: "添加失败，数据重复",
+              message: "新建失败，数据重复",
               duration: 2000,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else {
             ElMessage({
               type: "error",
-              message: "添加失败",
+              message: "新建失败",
 
               duration: 1000,
             });
@@ -1671,8 +1671,8 @@ export default {
     },
     multideleteBaseCourse(row) {
       let that = this;
-      ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1735,8 +1735,8 @@ export default {
       console.log("deleteCourse", row);
       let that = this;
 
-      ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1839,7 +1839,7 @@ export default {
             that.dialogFormVisible1 = false;
             ElMessage({
               type: "success",
-              message: `修改成功`,
+              message: `更新成功`,
               duration: 1000,
             });
 
@@ -1854,20 +1854,20 @@ export default {
           if (e.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
-              message: "修改失败，课程已存在",
-              duration: 2000,
+              message: "更新失败，课程已存在",
+              duration: 1000,
             });
             that.C_ErrorMsg_edit = "课程已存在，请重新输入";
           } else if (e.code == "UNAUTHENTICATED") {
             ElMessage({
               type: "error",
-              message: "修改失败，无权限",
-              duration: 2000,
+              message: "更新失败，无权限",
+              duration: 1000,
             });
           } else {
             ElMessage({
               type: "error",
-              message: "修改失败",
+              message: "更新失败",
 
               duration: 1000,
             });

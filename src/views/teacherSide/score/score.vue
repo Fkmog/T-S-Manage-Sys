@@ -216,10 +216,10 @@ export default {
         }
         if (action === 'remove') {
       ElMessageBox.confirm(
-      '是否删除当前成绩项',
-      '注意',
+      '是否确认删除当前成绩项',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }

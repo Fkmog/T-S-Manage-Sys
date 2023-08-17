@@ -248,7 +248,7 @@
               type="primary"
               @click="confirmAddAssessment(dialogObject)"
             >
-              确定
+              确认
             </el-button>
           </span>
         </template>
@@ -323,7 +323,7 @@ export default {
     backObjectives() {
       if (!(JSON.stringify(this.listCopy) === JSON.stringify(this.list))) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-          confirmButtonText: "确定",
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         })
@@ -381,7 +381,7 @@ export default {
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `保存成功`,
+            message: `更新成功`,
             duration: 1500,
           });
           // 更新副本
@@ -390,7 +390,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: `保存失败`,
+            message: `更新失败`,
             duration: 1500,
           });
         }
@@ -621,7 +621,7 @@ export default {
     // 删除课程目标
     deleteObject() {
       ElMessageBox.confirm(
-        "是否确定删除课程目标" + this.deleteSerialNum + "?",
+        "是否确认删除课程目标" + this.deleteSerialNum + "?",
         "",
         {
           confirmButtonText: "确认",

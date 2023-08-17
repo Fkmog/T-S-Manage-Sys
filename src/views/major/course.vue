@@ -126,7 +126,7 @@
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible1 = false">取消</el-button>
         <el-button type="primary" @click="editBaseCourse">
-          修改
+          确认
         </el-button>
       </span>
     </template>
@@ -500,12 +500,12 @@ methods:{
           that.currentVersion = version['label']
         }
       });
-      let versionMessage = '是否添加课程大纲（版本：'+this.currentVersion+' ）?'
+      let versionMessage = '是否确认添加课程大纲（版本：'+this.currentVersion+' ）?'
       ElMessageBox.confirm(
       versionMessage,
-      '注意',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }
@@ -526,7 +526,7 @@ methods:{
         if(res.code == 'SUCCESS'){
           ElMessage({
                   type: 'success',
-                  message: `新增成功`,
+                  message: `新建成功`,
                   duration:1000,
                 });
               //成功后根据vesionId和basecouseId获取详细信息
@@ -537,7 +537,7 @@ methods:{
         console.log('e',e);
               ElMessage({
                     type: 'error',
-                    message: `新增失败`,
+                    message: `新建失败`,
                     duration:1000,
                   });
               //失败后退回basecouse页面
@@ -888,15 +888,7 @@ methods:{
       
   //   });
   // },
-  confirmClick() {
-  ElMessageBox.confirm(`Are you confirm to chose ${this.drawernumSelected} ?`)
-    .then(() => {
-      this.drawer = false;
-    })
-    .catch(() => {
-      // catch error
-    })
-},
+
   cancelClick() {
   this.drawer = false;
 },
@@ -928,7 +920,7 @@ methods:{
           if(res.code == 'SUCCESS'){
             ElMessage({
                 type: 'success',
-                message: `添加成功`,
+                message: `新建成功`,
                 duration:1000,
               });
             that.clearForm();
@@ -940,7 +932,7 @@ methods:{
           
             ElMessage({
                   type: 'error',
-                  message: `添加失败`,
+                  message: `新建失败`,
                   duration:1000,
                 });
             that.clearForm();
@@ -1003,10 +995,10 @@ methods:{
   deleteBaseCourse(){
     let that = this;
 ElMessageBox.confirm(
-    '是否将所选课程从培养方案中移除？',
-    '注意',
+    '是否确认将所选课程从培养方案中移除？',
+    '',
     {
-      confirmButtonText: '确定',
+      confirmButtonText: '确认',
       cancelButtonText: '取消',
       type: 'warning',
     }
@@ -1109,12 +1101,12 @@ ElMessageBox.confirm(
           that.currentVersion = version['label']
         }
       });
-    let message = '是否将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中 ？'
+    let message = '是否确认将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中 ？'
     ElMessageBox.confirm(
       message,
-    '注意',
+    '',
     {
-      confirmButtonText: '确定',
+      confirmButtonText: '确认',
       cancelButtonText: '取消',
       type: 'warning',
     }
@@ -1134,7 +1126,7 @@ ElMessageBox.confirm(
       if(res.code == 'SUCCESS'){
         ElMessage({
                 type: 'success',
-                message: `添加成功`,
+                message: `新建成功`,
                 duration:1000,
               });
             that.drawercourseId=[];
@@ -1154,7 +1146,7 @@ ElMessageBox.confirm(
       console.log('e',e);
             ElMessage({
                   type: 'error',
-                  message: `添加失败`,
+                  message: `新建失败`,
                   duration:1000,
                 });
             that.drawercourseId=[];
@@ -1191,7 +1183,7 @@ ElMessageBox.confirm(
       if(res.code == 'SUCCESS'){
         ElMessage({
                 type: 'success',
-                message: `修改成功`,
+                message: `更新成功`,
                 duration:1000,
               });
             
@@ -1203,7 +1195,7 @@ ElMessageBox.confirm(
       
             ElMessage({
                   type: 'error',
-                  message: `修改失败`,
+                  message: `更新失败`,
                   duration:1000,
                 });
             that.getBaseCourse(that.pageSize,that.pageNum);

@@ -189,8 +189,8 @@
         let that = this;
         //如果没有版本信息，提示添加
         if (!this.versionFlag) {
-          ElMessageBox.confirm("尚未添加版本信息是否添加？", "注意", {
-            confirmButtonText: "确定",
+          ElMessageBox.confirm("尚未添加版本信息是否添加？", "", {
+            confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
           }).then(() => {
@@ -209,7 +209,7 @@
               if (res.code == "200") {
                 ElMessage({
                       type: "success",
-                      message: `新增成功`,
+                      message: `新建成功`,
                       duration:1000,
                     });
                 //成功后根据vesionId和basecouseId获取详细信息
@@ -218,7 +218,7 @@
               } else {
                 ElMessage({
                       type: "error",
-                      message: `新增失败`,
+                      message: `新建失败`,
                       duration:1000,
                     });
                 //失败后退回basecouse页面

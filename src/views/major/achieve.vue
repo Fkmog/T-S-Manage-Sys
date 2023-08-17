@@ -245,7 +245,7 @@
               type="primary"
               @click="confirmAddCoreBaseCourse(dialogDetail)"
             >
-              确定
+              确认
             </el-button>
           </span>
         </template>
@@ -552,7 +552,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `新增成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             this.dialogFormVisible = false;

@@ -251,8 +251,8 @@ export default {
     deleteTeacher() {
       let that = this;
       let teacherId = this.teacherId;
-      ElMessageBox.confirm("即将删除教师数据", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除教师", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })

@@ -167,7 +167,7 @@
         <span class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmEditClass(classEditForm)">
-            确定
+            确认
           </el-button>
         </span>
       </template>

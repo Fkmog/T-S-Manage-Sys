@@ -22,7 +22,7 @@
         </el-tooltip>
         <div class="block_title">工作手册</div>
         <el-divider class="divider" direction="vertical" />
-        <div v-show="(hasWorkbook && identity == '教师') && !noEdit">
+        <div v-show="hasWorkbook && identity == '教师' && !noEdit">
           <el-tooltip
             class="box-item"
             effect="dark"
@@ -43,13 +43,13 @@
           <el-divider class="divider" direction="vertical" />
         </div>
         <el-tooltip
-            class="box-item"
-            effect="dark"
+          class="box-item"
+          effect="dark"
           content="审核意见"
-            placement="bottom"
-            :hide-after="0"
-          >
-        <el-switch v-model="openDrawer" class="switchstyle" />
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-switch v-model="openDrawer" class="switchstyle" />
         </el-tooltip>
       </el-row>
     </div>
@@ -124,30 +124,10 @@ export default {
   },
 
   mounted() {
-    this.identity = this.$store.state.currentInfo.identity;
-    // console.log("identity",this.identity);
-    if (this.identity == "学院管理员") {
-      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-      console.log("identity:", this.identity);
-    } else if (this.identity == "课程负责人") {
-      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
-    } else {
-      this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-      console.log("identity:", this.identity);
-    }
-    if (this.classInfo.status == 2 || this.classInfo.status == 3) {
-      // 状态为已提交或者已审核时，无法编辑
-      this.noEdit = true;
-      console.log("@@",this.classInfo);
-    } else {
-      this.noEdit = false;
-    }
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
-    this.getWorkbook();
-    this.value = this.classInfo.workbookJson;
+    this.create();
   },
   computed: {
-   
     teacherInfoChange() {
       // console.log('teacherSideClassInfo changed');
       return this.$store.state.currentInfo.teacherSideClassInfo;
@@ -159,34 +139,68 @@ export default {
   },
   watch: {
     teacherInfoChange: {
-        deep: true,
-        handler(value) {
-          if (this.identity == "教师") {
-            this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-          }
-        },
+      deep: true,
+      handler(value) {
+        if (this.identity == "教师") {
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        }
       },
-      respondInfoChange: {
-        deep: true,
-        handler(value) {
-          if (this.identity == "课程负责人") {
-            this.classInfo = this.$store.state.currentInfo.respondClassInfo;
-          }
-        },
+    },
+    respondInfoChange: {
+      deep: true,
+      handler(value) {
+        if (this.identity == "课程负责人") {
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        }
       },
+    },
   },
   methods: {
+    async create() {
+      await this.createValue();
+      this.getWorkbook();
+      editByTeacher(this.classInfo.classId, this.value).then((res) => {
+        if (res.code === "SUCCESS") {
+          this.getClassInfo();
+        }
+      });
+    },
+    createValue() {
+      return new Promise((resolve, reject) => {
+        this.identity = this.$store.state.currentInfo.identity;
+        // console.log("identity",this.identity);
+        if (this.identity == "学院管理员") {
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+          console.log("identity:", this.identity);
+        } else if (this.identity == "课程负责人") {
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        } else {
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+          console.log("identity:", this.identity);
+        }
+        if (this.classInfo.status == 2 || this.classInfo.status == 3) {
+          // 状态为已提交或者已审核时，无法编辑
+          this.noEdit = true;
+        } else {
+          this.noEdit = false;
+        }
+        this.value = this.classInfo.workbookJson;
+        resolve("suc");
+        reject(err);
+      });
+    },
     openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
     // 返回上级页面
     backClass() {
       if (this.identity == "教师") {
+        console.log("save", this.value);
         if (_.isEqual(this.classInfo.workbookJson, this.value)) {
           this.$router.push({ name: "TeacherClass" });
         } else {
-          ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-            confirmButtonText: "确定",
+          ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+            confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
           })
@@ -211,18 +225,18 @@ export default {
       this.workbook.formJson.forEach((form) => {
         form.props = {};
         form.props.disabled = false;
-        console.log("abled后", this.workbook);
       });
+      console.log("abled后", this.workbook);
     },
     save() {
       this.fApi.submit((formData, fApi) => {
-        console.log("save", formData);
+        console.log("save", formData, fApi, this.value);
         editByTeacher(this.classInfo.classId, formData).then((res) => {
           console.log("保存", res);
           if (res.code === "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `保存成功`,
+              message: `更新成功`,
               duration: 1500,
             });
             this.getClassInfo();
@@ -315,9 +329,8 @@ export default {
   height: 24px;
 }
 .form-card {
-  margin-top: 100px;
-  width: 90%;
-  margin-left: 5%;
+  width: 784px;
+  margin: 100px auto;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   background: white;
   padding: 25px;

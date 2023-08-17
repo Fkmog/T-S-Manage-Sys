@@ -64,8 +64,8 @@ export default {
     },
     //用户退出
     exit() {
-      ElMessageBox.confirm("是否确定退出登录？", "", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认退出登录？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })

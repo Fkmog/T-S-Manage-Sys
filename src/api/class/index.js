@@ -17,7 +17,7 @@ export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pa
     })
   }
  //添加教学班列表
- export function addClass(academicYear,semester,departmentId,className,identifier,teacherName,teacherNumber,courseCode,remark,schoolId) {
+ export function addClass(academicYear,semester,departmentId,className,identifier,teacherNumber,courseCode,remark,schoolId) {
   return request({
     url: '/classes/add',
     method: 'POST',
@@ -30,7 +30,6 @@ export function getClass(academicYear,semester,departmentId,schoolId,pageSize,pa
       // 开课号
       identifier:identifier,
       // 任课教师
-      teacherName:teacherName,
       teacherNumber:teacherNumber,
       // 课程号
       courseCode:courseCode,

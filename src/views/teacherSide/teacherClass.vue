@@ -347,8 +347,8 @@ export default {
     submit() {
       console.log('submit',this.status,this.identity);
       if(this.status == '已退回' && this.identity == '教师'){
-        ElMessageBox.confirm("是否已按照审核意见进行修改?","注意",{
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         }).then(()=>{

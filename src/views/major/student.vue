@@ -95,8 +95,8 @@ export default {
     //删除学生
     deleteStudent(){
 console.log('delete student');
-ElMessageBox.confirm("即将删除学神信息", "注意", {
-        confirmButtonText: "确定",
+ElMessageBox.confirm("是否确认删除学生信息", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(()=>{

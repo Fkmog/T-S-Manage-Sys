@@ -161,7 +161,7 @@
         <span class="dialog-footer">
           <el-button @click="dialogFormVisible1 = false">取消</el-button>
           <el-button type="primary" @click="editBaseCourse">
-            修改
+            确认
           </el-button>
         </span>
       </template>
@@ -403,10 +403,10 @@ export default {
     addBaseCourseDetail(row){
       let that = this;
       ElMessageBox.confirm(
-      '尚未添加版本信息是否添加？',
-      '注意',
+      '尚未添加版本信息是否确认添加？',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }
@@ -427,7 +427,7 @@ export default {
         if(res.code == '200'){
           ElMessage({
                   type: 'success',
-                  message: `新增成功`,
+                  message: `新建成功`,
                   duration:1000,
                 });
               //成功后根据vesionId和basecouseId获取详细信息
@@ -436,7 +436,7 @@ export default {
             else{
               ElMessage({
                     type: 'error',
-                    message: `新增失败`,
+                    message: `新建失败`,
                     duration:1000,
                   });
               //失败后退回basecouse页面
@@ -531,7 +531,7 @@ export default {
             if(res.code == '200'){
               ElMessage({
                   type: 'success',
-                  message: `添加成功`,
+                  message: `新建成功`,
                   duration:1000,
                 });
               that.clearForm();
@@ -540,7 +540,7 @@ export default {
             else{
               ElMessage({
                     type: 'error',
-                    message: `添加失败`,
+                    message: `新建失败`,
                     duration:1000,
                   });
               that.clearForm();
@@ -601,10 +601,10 @@ export default {
       let that = this;
   
       ElMessageBox.confirm(
-      '将要删除基础课程，是否确定删除？',
-      '注意',
+      '是否确认删除课程？',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }
@@ -682,7 +682,7 @@ export default {
         if(res.code == '200'){
           ElMessage({
                   type: 'success',
-                  message: `修改成功`,
+                  message: `更新成功`,
                   duration:1000,
                 });
               
@@ -691,7 +691,7 @@ export default {
             else{
               ElMessage({
                     type: 'error',
-                    message: `修改失败`,
+                    message: `更新失败`,
                     duration:1000,
                   });
               that.getBaseCourse(that.pageSize,that.pageNum);

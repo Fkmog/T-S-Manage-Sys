@@ -83,7 +83,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirm()">确定</el-button>
+        <el-button type="primary" @click="confirm()">确认</el-button>
       </span>
     </template>
   </el-dialog>
@@ -204,8 +204,8 @@ export default {
       if (this.noProgram === false) {
         this.copyInfo();
       } else {
-        ElMessageBox.confirm("暂未创建培养方案，是否需要创建？", "注意", {
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("暂未创建培养方案，是否需要创建？", "", {
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         })

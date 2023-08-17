@@ -212,8 +212,8 @@ export default {
       ) {
         this.$router.push("/templateList");
       } else {
-        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         })
@@ -272,7 +272,7 @@ export default {
         if (res.code === "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `保存成功`,
+            message: `更新成功`,
             duration: 1500,
           });
         }

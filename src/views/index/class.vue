@@ -89,17 +89,30 @@
         >
           <el-input v-model="classAddForm.className" autocomplete="off" />
         </el-form-item>
+
         <el-form-item
           label="任课教师"
           :label-width="formLabelWidth"
           prop="instructor"
           :error="T_ErrorMsg"
         >
-          <el-autocomplete
-            style="width: 540px"
+          <el-select
             v-model="classAddForm.instructor"
-            :fetch-suggestions="querySearch"
-          ></el-autocomplete>
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            style="width: 540px"
+            :remote-method="goSearch"
+            :loading="loading"
+          >
+            <el-option
+              v-for="(item, idx) in result"
+              :key="idx"
+              :label="item.value"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -198,12 +211,29 @@
           prop="instructor"
           :error="T_ErrorMsg"
         >
-          <el-autocomplete
+          <el-select
+            v-model="classEditForm.teachers"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            style="width: 540px"
+            :remote-method="goSearch"
+            :loading="loading"
+          >
+            <el-option
+              v-for="(item, idx) in result"
+              :key="idx"
+              :label="item.value"
+              :value="item.value"
+            />
+          </el-select>
+          <!-- <el-autocomplete
             style="width: 540px"
             v-model="classEditForm.instructor"
             hide-loading
             :fetch-suggestions="querySearch"
-          ></el-autocomplete>
+          ></el-autocomplete> -->
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -302,7 +332,7 @@
         <span class="dialog-footer">
           <el-button @click="editVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmEditClass(classEditForm)">
-            确定
+            确认
           </el-button>
         </span>
       </template>
@@ -333,7 +363,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="isAssign = false">取消</el-button>
-          <el-button type="primary" @click="confirmAssign()"> 确定 </el-button>
+          <el-button type="primary" @click="confirmAssign()"> 确认 </el-button>
         </span>
       </template>
     </el-dialog>
@@ -346,7 +376,7 @@
     :data="classTable"
     @selection-change="handleSelectionChange"
     @row-click="goCheck"
-    style="width: 1400px"
+    style="width: 1500px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
@@ -359,6 +389,8 @@
       'padding-left': '20px',
       'font-size': '16px',
       height: '60px',
+      'text-overflow': ' ellipsis',
+      'white-space': ' nowrap',
     }"
     highlight-current-row
     :row-key="rowKey"
@@ -378,6 +410,23 @@
     <el-table-column prop="identifier" label="开课号" width="270" />
     <el-table-column prop="academicYear" label="学年" width="140" />
     <el-table-column prop="semester" label="学期" width="120" />
+    <el-table-column prop="status" label="状态" width="100">
+      <template #default="scope">
+        <div v-if="scope.row.status == 1">
+          <el-tag type="info">未提交</el-tag>
+        </div>
+        <div v-else-if="scope.row.status == 2">
+          <el-tag type="warning">已提交</el-tag>
+        </div>
+        <div v-else-if="scope.row.status == 3">
+          <el-tag type="success">已审核</el-tag>
+        </div>
+        <div v-else-if="scope.row.status == 4">
+          <el-tag type="danger">已退回</el-tag>
+        </div>
+        <div v-else></div>
+      </template>
+    </el-table-column>
     <el-table-column prop="isRespondent" label="" width="50">
       <template #default="scope">
         <div v-if="scope.row.isRespondent == 2">
@@ -585,6 +634,7 @@ export default {
       total: 0,
       E_ErrorMsg: "",
       T_ErrorMsg: "",
+      result: [],
     };
   },
   mounted() {
@@ -748,7 +798,22 @@ export default {
                     }
                   );
                 }
-
+                this.classTable[i].teachers = [];
+                let temp =
+                  this.classTable[i].teacherName +
+                  "(" +
+                  this.classTable[i].teacherNumber +
+                  ")";
+                this.classTable[i].teachers.push(temp);
+                if (this.classTable[i].additionalTeacherList !== null) {
+                  this.classTable[i].additionalTeacherList.forEach(
+                    (teacher) => {
+                      let temp =
+                        teacher.teacherName + "(" + teacher.teacherNumber + ")";
+                      this.classTable[i].teachers.push(temp);
+                    }
+                  );
+                }
                 this.academicYear.forEach((year) => {
                   if (year.dictValue == this.classTable[i].academicYear) {
                     this.classTable[i].academicYear = year.dictLabel;
@@ -771,7 +836,8 @@ export default {
           this.chosenSemester,
           this.pageSize,
           this.pageNum,
-          this.chosenStatus
+          this.chosenStatus,
+          this.keyword
         ).then((res) => {
           console.log("getClassList", res);
           if (res.code === "SUCCESS") {
@@ -803,7 +869,22 @@ export default {
                     }
                   );
                 }
-
+                this.classTable[i].teachers = [];
+                let temp =
+                  this.classTable[i].teacherName +
+                  "(" +
+                  this.classTable[i].teacherNumber +
+                  ")";
+                this.classTable[i].teachers.push(temp);
+                if (this.classTable[i].additionalTeacherList !== null) {
+                  this.classTable[i].additionalTeacherList.forEach(
+                    (teacher) => {
+                      let temp =
+                        teacher.teacherName + "(" + teacher.teacherNumber + ")";
+                      this.classTable[i].teachers.push(temp);
+                    }
+                  );
+                }
                 this.academicYear.forEach((year) => {
                   if (year.dictValue == this.classTable[i].academicYear) {
                     this.classTable[i].academicYear = year.dictLabel;
@@ -829,16 +910,20 @@ export default {
           this.T_ErrorMsg = "";
           this.E_ErrorMsg = "";
           console.log("classAddForm", classAddForm);
-          let array = classAddForm.instructor.split("(");
-          let teacherName = array[0];
-          let teacherNumber = array[1].substr(0, array[1].length - 1);
+          let teacherNumber = "";
+          classAddForm.instructor.forEach((teacher) => {
+            let array = teacher.split("(");
+            teacherNumber =
+              teacherNumber + "," + array[1].substr(0, array[1].length - 1);
+          });
+          teacherNumber = teacherNumber.substr(1, teacherNumber.length);
+          // console.log(teacherNumber);
           addClass(
             this.classAddForm.chosenYear,
             this.classAddForm.chosenSemester,
             this.currentInfo.departmentId,
             this.classAddForm.className,
             this.classAddForm.identifier,
-            teacherName,
             teacherNumber,
             this.classAddForm.courseCode,
             this.classAddForm.remark,
@@ -908,10 +993,11 @@ export default {
       this.classEditForm.chosenSemester = row.semester;
       this.classEditForm.remark = row.remark;
       this.classEditForm.classId = row.classId;
-      this.classEditForm.teacherName = row.teacherName;
       this.classEditForm.teacherNumber = row.teacherNumber;
       this.classEditForm.versionName = row.versionName;
       this.classEditForm.isRespondent = row.isRespondent;
+      this.classEditForm.teachers = row.teachers;
+
       this.editVisible = true;
       this.onlyAcademicYear.forEach((year) => {
         if (year.dictValue == row.academicYear) {
@@ -933,8 +1019,21 @@ export default {
       classEditForm.semester = classEditForm.chosenSemester;
       classEditForm.departmentId = this.currentInfo.departmentId;
       classEditForm.schoolId = this.currentInfo.schoolId;
+      classEditForm.teacherNumber = "";
+      classEditForm.teachers.forEach((teacher) => {
+        let temp = [];
+        temp = teacher.split("(");
+        classEditForm.teacherNumber =
+          classEditForm.teacherNumber +
+          "," +
+          temp[1].substr(0, temp[1].length - 1);
+      });
+      classEditForm.teacherNumber = classEditForm.teacherNumber.substr(
+        1,
+        classEditForm.teacherNumber.length
+      );
       this.giveRespondentPermission(classEditForm);
-      // console.log("修改后", classEditForm);
+      console.log("修改后", classEditForm);
       editClass(classEditForm)
         .then((res) => {
           console.log("confirmEditClass", res);
@@ -969,7 +1068,7 @@ export default {
     //删除教学班
     deleteClass(index, row) {
       console.log("index", index, "row", row);
-      ElMessageBox.confirm("是否确定删除该教学班?", "", {
+      ElMessageBox.confirm("是否确认删除教学班?", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
@@ -996,6 +1095,7 @@ export default {
       ).then((res) => {
         // console.log("!!", res);
         this.allTeachers = res.data;
+        this.querySearch();
       });
     },
     querySearch(queryString, cb) {
@@ -1005,10 +1105,11 @@ export default {
           ? allTeachers.filter(this.createStateFilter(queryString))
           : allTeachers;
         results = allTeachers.map((item) => ({ value: item }));
-        cb(results);
+        // cb(results);
+        this.result = results;
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
-          cb(results);
+          // cb(results);
         }, 3000 * Math.random());
       }
     },
@@ -1085,7 +1186,7 @@ export default {
           this.isAssign = false;
           ElMessage({
             type: "success",
-            message: "设置成功",
+            message: "分配成功",
             duration: 1500,
           });
           this.multipleSelection = [];
@@ -1094,7 +1195,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: "设置失败",
+            message: "分配失败",
             duration: 1500,
           });
         }

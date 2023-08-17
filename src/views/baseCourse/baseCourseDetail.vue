@@ -163,12 +163,13 @@
                 <el-upload
                   class="upload-demo"
                   :action="action"
+                  :data='data'
                   :headers="headers"
                   accept=".doc,.docx,.pdf,.rar,.zip"
                   :file-list="fileList"
                   :limit="1"
                   show-file-list
-                  name="syllabusFile"
+                  name="file"
                   :on-success="uploadSuccess"
                   :on-exceed="uploadExceed"
                   :before-remove="uploadBeforeRemove"
@@ -250,11 +251,7 @@
       <!-- 分页 -->
       <div class="pagination-container" flex>
         <div class="loadMore">
-          <el-button
-            link
-            plain
-            v-show=" showLoadmore"
-            @click="loadMore()"
+          <el-button link plain v-show="showLoadmore" @click="loadMore()"
             >加载更多</el-button
           >
         </div>
@@ -275,7 +272,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="copyInfo()">确定</el-button>
+          <el-button type="primary" @click="copyInfo()">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -302,6 +299,7 @@ import {
   removeDetail,
   getEditDetail,
   getVersion,
+  upload,
   copyActAndObj,
 } from "@/api/basecourse";
 import DrawerSearch from "@/components/general/drawerSearch.vue";
@@ -339,6 +337,7 @@ export default {
         Authorization: "Bearer " + Cookies.get("Admin-Token"),
       },
       action: "",
+      data:[],
       //毕业要求
       indicators: [],
       departmentId: "",
@@ -380,8 +379,8 @@ export default {
     let that = this;
     //如果没有版本信息，提示添加
     if (!this.versionFlag) {
-      ElMessageBox.confirm("尚未添加版本信息是否添加？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("尚未添加版本信息是否添加？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
@@ -400,7 +399,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `新增成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             //成功后根据vesionId和basecouseId获取详细信息
@@ -409,7 +408,7 @@ export default {
           } else {
             ElMessage({
               type: "error",
-              message: `新增失败`,
+              message: `新建失败`,
               duration: 1000,
             });
             //失败后退回basecouse页面
@@ -444,9 +443,14 @@ export default {
           }
         });
         console.log("detailId", that.detailId);
-        that.action =
-          "http://81.68.103.96:8080/detail/upload/syllabusFile/" +
-          that.detailId;
+        let array = [];
+        let obj = {};
+        obj.param = that.detailId;
+        obj.type = "syllabusFile";
+        array.push(obj);
+        console.log("@@",array);
+        that.action = "http://81.68.103.96:8099/common/upload/file";
+        that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
         that.getFile();
       });
@@ -514,13 +518,13 @@ export default {
     uploadBeforeRemove(file, fileList) {
       console.log("fileList", fileList);
 
-      return this.$confirm(`确定移除 ${file.name}？`);
+      return this.$confirm(`确认移除 ${file.name}？`);
     },
     //移除文件前
     beforeRemove() {
       console.log("fileList", this.fileList);
-      ElMessageBox.confirm(`确定移除${this.object.fileName}？`, "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm(`确认移除${this.object.fileName}？`, "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -538,7 +542,7 @@ export default {
         if (res.code === "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `移除成功`,
+            message: `删除成功`,
             duration: 1500,
           });
           this.getFile();

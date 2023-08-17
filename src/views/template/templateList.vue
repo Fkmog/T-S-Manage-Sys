@@ -118,7 +118,7 @@ export default {
               this.getWorkbookList();
               ElMessage({
                 type: "success",
-                message: `成功新建模板:${value}`,
+                message: `新建成功`,
                 duration: 1500,
               });
             }
@@ -143,7 +143,7 @@ export default {
     // 删除工作手册
     deleteBook(row) {
       console.log(row);
-      ElMessageBox.confirm("是否确认删除该模板"  + "?", "", {
+      ElMessageBox.confirm("是否确认删除模板?", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",

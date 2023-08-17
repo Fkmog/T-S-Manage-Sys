@@ -242,10 +242,10 @@
         }
         if (action === 'remove') {
       ElMessageBox.confirm(
-      '是否删除当前成绩项',
-      '注意',
+      '是否确认删除成绩项',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }
@@ -950,9 +950,9 @@ async getActivities(){
       if(this.dirty == true || this.saving== false&&this.dirty == true ){
         ElMessageBox.confirm(
         '数据还未保存，是否仍然关闭？',
-        '注意',
+        '',
         {
-          confirmButtonText: '确定',
+          confirmButtonText: '确认',
           cancelButtonText: '取消',
           type: 'warning',
         }
@@ -1016,7 +1016,7 @@ async getActivities(){
             if(res.code == 'SUCCESS'){
                 ElMessage({
                     type: 'success',
-                    message: `成绩保存成功`,
+                    message: `更新成功`,
                     duration:1500,
                   });
                  that.goBackandClean();
