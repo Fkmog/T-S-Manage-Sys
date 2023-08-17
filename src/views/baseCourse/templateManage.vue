@@ -136,7 +136,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="changeWorkbook = false">取消</el-button>
-          <el-button type="primary" @click="submit()"> 确定 </el-button>
+          <el-button type="primary" @click="submit()"> 确认 </el-button>
         </span>
       </template>
     </el-dialog>
@@ -164,7 +164,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="addWorkbook = false">取消</el-button>
-          <el-button type="primary" @click="submit()"> 确定 </el-button>
+          <el-button type="primary" @click="submit()"> 确认 </el-button>
         </span>
       </template>
     </el-dialog>
@@ -233,8 +233,8 @@ export default {
     //提交修改
     submit() {
       if (this.changeWorkbook == true) {
-        ElMessageBox.confirm("是否修改关联的工作手册模板？", "注意", {
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("是否确认修改关联的工作手册模板？", "", {
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
@@ -255,7 +255,7 @@ export default {
         if (res.code == "SUCCESS" && this.changeWorkbook == true) {
           ElMessage({
             type: "success",
-            message: `修改成功`,
+            message: `更新成功`,
             duration: 1500,
           });
           this.changeWorkbook = false;
@@ -274,8 +274,8 @@ export default {
     },
     // 删除关联模板
     Delete() {
-      ElMessageBox.confirm("是否删除关联的工作手册模板？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除关联的工作手册模板？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {

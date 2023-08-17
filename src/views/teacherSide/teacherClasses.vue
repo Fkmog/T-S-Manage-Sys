@@ -58,6 +58,7 @@ export default {
     //跳转班级视图
     toClass(Class) {
       this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
+      this.$store.commit("currentInfo/setOpenDrawer", false);
       this.$router.push({ name: "TeacherClass" });
     },
     // 搜索栏查询

@@ -23,7 +23,15 @@
           </el-tooltip>
           <div class="title">课程目标</div>
           <el-divider class="divider" direction="vertical" />
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="审核意见"
+            placement="bottom"
+            :hide-after="0"
+          >
           <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
+          </el-tooltip>
         </el-row>
       </div>
       <div v-show="hasDetailId && hasObjective" class="card">

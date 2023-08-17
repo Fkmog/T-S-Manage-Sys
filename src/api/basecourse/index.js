@@ -92,6 +92,14 @@ export function assign(Array) {
     data: Array,
   });
 }
+// 上传课程大纲
+export function upload(Array) {
+  return request({
+    url: "/common/upload/file",
+    method: "POST",
+    data: Array,
+  });
+}
 //下载课程大纲
 export function downloadDetail(detailId) {
   return request({

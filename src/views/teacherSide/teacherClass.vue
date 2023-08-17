@@ -74,7 +74,7 @@
           </el-icon>
         </el-tooltip>
         <el-divider class="divider" direction="vertical" />
-        <div v-show="status == '未提交' && identity != '学院管理员'">
+        <div v-show="status == '未提交' && identity == '教师'">
           <el-tooltip
             class="box-item"
             effect="dark"
@@ -118,7 +118,26 @@
           待审核
         </div>
         <div v-show="status == '已退回' && identity == '教师'">
-          已退回，请重新提交
+          已退回
+        </div>
+        <div v-show="status == '已退回' && identity == '教师'">
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="重新提交"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              style="margin-left: 10px"
+              @click="submit()"
+            >
+              <UploadFilled />
+            </el-icon>
+          </el-tooltip>
         </div>
         <div
           v-show="
@@ -290,7 +309,7 @@ export default {
     }
     this.getClassInfo();
     // this.getReviewInfo();
-    console.log("classInfo", this.classInfo);
+    // console.log("classInfo", this.classInfo);
     this.getDictionary();
     this.getFile();
   },
@@ -325,6 +344,51 @@ export default {
     },
   },
   methods: {
+    submit() {
+      console.log('submit',this.status,this.identity);
+      if(this.status == '已退回' && this.identity == '教师'){
+        ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(()=>{
+          submit(this.classInfo.classId).then((res) => {
+          console.log("res", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `提交成功`,
+              duration: 1000,
+            });
+          }
+          this.getClassInfo();
+        }).catch((e)=>{
+          ElMessage({
+              type: "error",
+              message: `提交失败`,
+              duration: 1000,
+            });
+          console.log('e',e);
+        })
+        }).catch(()=>{
+
+        })
+      }
+      else{
+        submit(this.classInfo.classId).then((res) => {
+        console.log("res", res);
+        if (res.code == "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `提交成功`,
+            duration: 1000,
+          });
+        }
+        this.getClassInfo();
+      });
+      }
+      
+    },
     openDrawerChange(){
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
@@ -402,7 +466,18 @@ export default {
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res.data);
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        if(this.identity =='教师'){
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        }
+        else if(this.identity =='课程负责人'){
+          this.$store.commit("currentInfo/setRespondClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        }
+        else {
+          this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+        }
         this.classStatus();
       });
     },

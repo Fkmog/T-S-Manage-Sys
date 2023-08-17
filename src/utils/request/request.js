@@ -37,7 +37,7 @@ axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
 // 创建axios实例
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API,
-  baseURL: "http://81.68.103.96:8080/",
+  baseURL: "http://81.68.103.96:8099/",
   timeout: 20 * 1000, //超时请求时间：20s
 });
 
@@ -109,7 +109,7 @@ service.interceptors.response.use(
         isRelogin.show = true;
         ElMessageBox.confirm(
           "登录状态已过期，您可以继续留在该页面，或者重新登录",
-          "系统提示",
+          "",
           {
             confirmButtonText: "重新登录",
             cancelButtonText: "取消",
@@ -152,7 +152,7 @@ service.interceptors.response.use(
           isRelogin.show = true;
           ElMessageBox.confirm(
             "登录状态已过期，您可以继续留在该页面，或者重新登录",
-            "系统提示",
+            "",
             {
               confirmButtonText: "重新登录",
               cancelButtonText: "取消",

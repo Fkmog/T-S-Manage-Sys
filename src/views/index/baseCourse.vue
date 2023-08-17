@@ -26,53 +26,13 @@
               >
                 <el-option
                   v-for="item in versions"
-                  :key="item.value"
+                  :key="item.versionId"
                   :label="item.label"
-                  :value="item.value"
+                  :value="item.versionId"
                 />
               </el-select>
             </el-col>
             <el-col :span="2" style="position: relative; top: 8px" v-show="identity == '学院管理员'">
-              <!-- <el-dropdown class="dropdownstyle">
-                <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item
-                      @click="
-                        this.addFlag = true;
-                        this.deleteFlag = false;
-                        this.editFlag = false;
-                        this.showEditVersionDailogFlag = true;
-                      "
-                    >
-                      <el-icon><User /></el-icon>
-                      &nbsp;添加课程大纲版本号
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      @click="
-                        this.editFlag = true;
-                        this.deleteFlag = false;
-                        this.addFlag = false;
-                        this.showEditVersionDailogFlag = true;
-                      "
-                    >
-                      <el-icon><CircleClose /></el-icon>
-                      &nbsp;修改课程大纲版本号
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      @click="
-                        this.deleteFlag = true;
-                        this.addFlag = false;
-                        this.editFlag = false;
-                        this.showEditVersionDailogFlag = true;
-                      "
-                    >
-                      <el-icon><Delete /></el-icon>
-                      &nbsp;删除课程大纲版本号
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown> -->
             </el-col>
           </el-row>
         </div>
@@ -121,26 +81,6 @@
       </el-col>
 
       <el-col :span="6" v-show="identity == '课程负责人'">
-        <!-- <el-dropdown class="columnstyle">
-          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
-
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="this.addPrincipal()">
-            <el-icon><User /></el-icon>
-              &nbsp添加课程负责人
-           </el-dropdown-item>
-           <el-dropdown-item @click="this.deleteRespondent()" >
-              <el-icon><CircleClose /></el-icon>
-              &nbsp删除课程负责人
-            </el-dropdown-item>
-
-              <el-dropdown-item>Action 3</el-dropdown-item>
-           <el-dropdown-item disabled>Action 4</el-dropdown-item>
-           <el-dropdown-item divided>Action 5</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown> -->
       </el-col>
     </el-row>
   </div>
@@ -151,12 +91,12 @@
     <el-table
       :data="tableData"
       v-loading="isloading"
-      v-show="hasBaseCourse"
+      v-show="hasBaseCourse && hasVersion"
       ref="multipleTable1"
       @selection-change="handleSelectionChange"
-      @row-dblclick="editTrigger"
+      @row-click="editTrigger"
       class="el-table-container"
-      style="width: 1525px"
+      style="width: 1375px;text-overflow: ellipsis; white-space: nowrap;"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -180,21 +120,21 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程号" width="180">
+      <el-table-column label="课程号" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseCode }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程类型" width="180">
+      <el-table-column label="课程类型" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseType }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程性质" width="180">
+      <el-table-column label="课程性质" width="120">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseNature }}</span>
@@ -208,7 +148,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="负责人" width="150">
+      <el-table-column label="负责人" width="120">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
@@ -219,7 +159,7 @@
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
-            <span v-show="!scope.row.workbookName">未分配工作手册</span>
+            <span v-show="!scope.row.workbookName"></span>
           </div>
         </template>
       </el-table-column>
@@ -230,7 +170,7 @@
             <el-col :span="4">
               <el-tooltip content="删除课程">
                 <el-button
-                  @click="deleteBaseCourse(scope.$index, scope.row.courseId)"
+                  @click.stop="deleteBaseCourse(scope.$index, scope.row.courseId)"
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -238,21 +178,10 @@
                 ></el-button>
               </el-tooltip>
             </el-col>
-            <el-col :span="4">
-              <el-tooltip content="修改课程">
-                <el-button
-                  @click="editTrigger(scope.row)"
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Edit /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
             <el-col :span="4" v-show="scope.row.versionId">
               <el-tooltip content="查看信息">
                 <el-button
-                  @click="goBaseCourseDetail(scope.$index, scope.row)"
+                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -265,9 +194,8 @@
                 <el-tag
                   class="noBaseCourseDetail"
                   type="danger"
-                  @click="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag
-                >
+                  @click.stop="addBaseCourseDetail(scope.row)"
+                  >无课程大纲</el-tag>
               </el-tooltip>
             </el-col>
           </el-row>
@@ -278,11 +206,13 @@
   <div class="md-padding" layout="row" flex v-show="identity == '课程负责人'">
     <el-table
       :data="tableData"
+      v-show="hasBaseCourse && hasVersion"
+      v-loading="isloading"
       ref="multipleTable2"
       class="el-table-container"
       @selection-change="handleSelectionChange"
-      @row-dblclick="editTrigger"
-      style="width: 1550px"
+      @row-click="editTrigger"
+      style="width: 1375px;text-overflow: ellipsis; white-space: nowrap;"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -297,7 +227,7 @@
       }"
       :row-key="rowKey"
     >
-      <el-table-column width="80" type="selection" :reserve-selection="true">
+      <el-table-column width="55" type="selection" :reserve-selection="true">
       </el-table-column>
       <el-table-column label="课程名" width="250">
         <template #default="scope">
@@ -306,21 +236,21 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程号" width="180">
+      <el-table-column label="课程号" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseCode }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程类型" width="180">
+      <el-table-column label="课程类型" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseType }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="课程性质" width="180">
+      <el-table-column label="课程性质" width="120">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.courseNature }}</span>
@@ -334,7 +264,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="负责人" width="150">
+      <el-table-column label="负责人" width="120">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
@@ -353,20 +283,10 @@
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row v-show="showToolIcon">
-            <el-col :span="4">
-              <el-tooltip content="修改">
-                <el-button
-                  @click="editTrigger(scope.row)"
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Edit /></el-icon
-                ></el-button> </el-tooltip
-            ></el-col>
             <el-col :span="4" v-show="scope.row.versionId">
               <el-tooltip content="查看信息">
                 <el-button
-                  @click="goBaseCourseDetail(scope.$index, scope.row)"
+                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -379,7 +299,7 @@
                 <el-tag
                   class="noBaseCourseDetail"
                   type="danger"
-                  @click="addBaseCourseDetail(scope.row)"
+                  @click.stop="addBaseCourseDetail(scope.row)"
                   >无课程大纲</el-tag
                 >
               </el-tooltip>
@@ -390,8 +310,9 @@
     </el-table>
   </div>
 
-  <div v-show="!hasBaseCourse" class="no-class">没有课程</div>
+  <div v-show="(!hasBaseCourse && hasVersion)||(!hasBaseCourse && !hasVersion)" class="no-class">没有课程</div>
 
+  <div v-show="!hasVersion && hasBaseCourse" class="no-class">没有版本信息，请去设置，设置版本信息</div>
   <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
@@ -450,7 +371,7 @@
         <el-button @click="goAddBaseCourses">批量添加</el-button>
 
         <el-button type="primary" @click="submitForm('ruleForm')">
-          提交
+          确认
         </el-button>
         <el-button @click="resetForm('ruleForm')"> 重置 </el-button>
         <el-button
@@ -517,7 +438,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogFormVisible1 = false">取消</el-button>
-        <el-button type="primary" @click="editBaseCourse"> 修改 </el-button>
+        <el-button type="primary" @click="editBaseCourse"> 确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -546,7 +467,7 @@
       <span class="dialog-footer">
         <el-button @click="showPrinciple = false">取消</el-button>
         <el-button type="primary" @click="addRespondent">
-          添加负责人
+          确认
         </el-button>
       </span>
     </template>
@@ -576,9 +497,9 @@
         >
           <el-option
             v-for="item in versions"
-            :key="item.value"
+            :key="item.versionId"
             :label="item.label"
-            :value="item.value"
+            :value="item.versionId"
           />
         </el-select>
       </el-form-item>
@@ -660,7 +581,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="showAddWorkbook = false">取消</el-button>
-        <el-button type="primary" @click="submitWorkbook()"> 确定 </el-button>
+        <el-button type="primary" @click="submitWorkbook()"> 确认 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -821,6 +742,9 @@ export default {
     };
 
     return {
+
+      hasVersion:Boolean,
+
       hasDetail: "全部",
       hasDetailSeletion: [
         { label: "全部", value: null },
@@ -939,7 +863,7 @@ export default {
 
       //select
       currentVersion: "",
-      currentVersionValue: 1,
+      currentVersionId: Number,
       loading: ref(false),
       options: [],
       versionLabel: [],
@@ -1024,11 +948,16 @@ export default {
       this.reviseYearFlag = false;
     },
     selectVersion(versionId) {
-      this.versionForm.name = this.versions[versionId - 1]["label"];
-      this.versionForm.enrollYear = this.versions[versionId - 1]["enrollYear"];
-      this.versionForm.reviseYear = this.versions[versionId - 1]["reviseYear"];
-      this.versionForm.versionId = this.versions[versionId - 1]["versionId"];
-      // console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
+      console.log('versionId',versionId);
+      for(const element of this.versions){
+        if(element['versionId']==versionId){
+          this.versionForm.name = element["label"];
+          this.versionForm.enrollYear = element["enrollYear"];
+          this.versionForm.reviseYear = element["reviseYear"];
+          this.versionForm.versionId = element["versionId"];
+        }
+      }
+      console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
     },
     addVersion() {
       let that = this;
@@ -1046,7 +975,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `添加版本大纲号成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -1063,7 +992,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `添加版本大纲号失败`,
+            message: `新建失败`,
             duration: 1000,
           });
         });
@@ -1085,7 +1014,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `修改版本大纲号成功`,
+              message: `更新成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -1102,7 +1031,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `修改版本大纲号失败`,
+            message: `更新失败`,
             duration: 1000,
           });
         });
@@ -1118,7 +1047,7 @@ export default {
           if (res === 204) {
             ElMessage({
               type: "success",
-              message: `删除版本大纲号成功`,
+              message: `删除成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -1135,7 +1064,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `删除版本大纲号失败`,
+            message: `删除失败`,
             duration: 1000,
           });
         });
@@ -1151,7 +1080,7 @@ export default {
       this.keyword = data;
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
-    getDict() {
+    async getDict() {
       let that = this;
       this.courseNatureSource = [];
       this.courseTypeSource = [];
@@ -1174,26 +1103,40 @@ export default {
       })
         .then((res) => {
           console.log("versionList:", res);
-          if (res.code == "SUCCESS") {
-            let num = 1;
+          
+          if (res.code == "SUCCESS" && res.data.length) {
+            
+            that.hasVersion = true;
             res.data.forEach((year) => {
               let dict = {
                 label: year.versionName,
-                value: num,
                 enrollYear: year.enrollYear,
                 reviseYear: year.reviseYear,
                 versionId: year.versionId,
               };
-              num = num + 1;
               that.versions.push(dict);
               that.versionLabel.push(year.versionName);
             });
-            that.currentVersion =
-              that.versionLabel[that.currentVersionValue - 1];
+            that.currentVersionId = (this.$store.state.course.baseCourseVersionId)?this.$store.state.course.baseCourseVersionId:that.versions[0].versionId;
+            for(const element of that.versions){
+              if(element['versionId']==that.currentVersionId){
+                that.currentVersion = element["label"];
+              }
           }
+          }
+          else{
+            that.hasVersion = false;
+            ElMessage({
+            type: "error",
+            message: `没有版本信息，请先添加版本！`,
+            duration: 1000,
+          });
+          }
+
         })
         .catch((e) => {
           console.log("error:", e);
+          
         });
     },
 
@@ -1218,65 +1161,6 @@ export default {
         this.principleForm = [];
       }
     },
-    // remoteMethodinEdit(query){
-    //   if (query !== '') {
-    //       this.loading = true;
-    //       setTimeout(() => {
-    //         this.loading = false;
-
-    //         this.principleForm = this.remoteteacher.filter(item => {
-    //           return item.respondentName
-    //             .indexOf(query) > -1;
-    //         });
-    //       }, 200);
-    //     } else {
-    //       this.principleForm = [];
-    //     }
-    // },
-
-    //showEditRespondent
-    // showEditRespondent(row){
-    //   this.editPrinciple = true;
-    //   this.currentEditRow = row;
-    // },
-    //修改课程负责人
-    // editRespondent(){
-    //   let that = this;
-    //   let row = this.currentEditRow;
-    //   console.log('修改课程负责人：',row);
-    //   this.respondentInfos = row.respondentInfos;
-    //   var courseRespondentDict={
-    //     "courseId": row.courseId,
-    //     "departmentId": this.departmentId,
-    //     "schoolId": this.schoolId,
-    //     "userId": this.editRespondentInfo
-    //   }
-    // this.editRespondentPostdata.push(courseRespondentDict);
-    // return request({
-    // url:'/system/role/editRespondent',
-    // method:'post',
-    // data:this.editRespondentPostdata
-    // }).then(function(res){
-    //   console.log('edit respondent res:',res);
-    //   that.getBaseCourse(that.pageSize,that.pageNum);
-    //   that.editPrinciple = false;
-    //   that.editRespondentPostdata = [];
-    //   if(res.code == 'SUCCESS'){
-    //       ElMessage({
-    //                 type: 'success',
-    //                 message: `修改负责人成功`,
-    //                 duration:1000,
-    //               });
-    //     }
-    //     else{
-    //       ElMessage({
-    //                 type: 'error',
-    //                 message: `修改负责人失败`,
-    //                 duration:1000,
-    //               });
-    //     }
-    // })
-    // },
     //删除课程负责人
     deleteRespondent() {
       let that = this;
@@ -1290,8 +1174,8 @@ export default {
         that.editRespondentPostdata.push(courseRespondentDict);
       });
 
-      ElMessageBox.confirm("即将删除课程负责人", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程负责人", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1308,13 +1192,13 @@ export default {
             if (res.code == "SUCCESS") {
               ElMessage({
                 type: "success",
-                message: `删除负责人成功`,
+                message: `删除成功`,
                 duration: 1000,
               });
             } else {
               ElMessage({
                 type: "error",
-                message: `删除负责人失败`,
+                message: `删除失败`,
                 duration: 1000,
               });
             }
@@ -1346,13 +1230,13 @@ export default {
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `添加负责人成功`,
+            message: `新建成功`,
             duration: 1000,
           });
         } else {
           ElMessage({
             type: "error",
-            message: `添加负责人失败`,
+            message: `新建失败`,
             duration: 1000,
           });
         }
@@ -1431,7 +1315,7 @@ export default {
           that.showAddWorkbook = false;
           ElMessage({
             type: "success",
-            message: `分配工作手册成功`,
+            message: `分配成功`,
             duration: 1500,
           });
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1462,7 +1346,7 @@ export default {
         } else {
           ElMessage({
             type: "error",
-            message: `添加失败`,
+            message: `新建失败`,
             duration: 1000,
           });
           return false;
@@ -1483,20 +1367,20 @@ export default {
     addBaseCourseDetail(row) {
       let that = this;
       this.versions.forEach((version) => {
-        if (version["value"] == that.currentVersionValue) {
+        if (version["value"] == that.currentVersionId) {
           that.currentVersion = version["label"];
         }
       });
       let versionMessage =
-        "是否添加课程大纲（版本：" + this.currentVersion + " ）?";
-      ElMessageBox.confirm(versionMessage, "注意", {
-        confirmButtonText: "确定",
+        "是否确认添加课程大纲（版本：" + this.currentVersion + " ）?";
+      ElMessageBox.confirm(versionMessage, "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
         console.log(
           "versionId",
-          that.currentVersionValue,
+          that.currentVersionId,
           "CourseId",
           that.courseId
         );
@@ -1505,7 +1389,7 @@ export default {
           url: "/detail",
           method: "post",
           data: {
-            versionId: that.currentVersionValue,
+            versionId: that.currentVersionId,
             courseId: row.courseId,
             departmentId: that.departmentId,
             schoolId: that.schoolId,
@@ -1516,7 +1400,7 @@ export default {
             if (res.code == "SUCCESS") {
               ElMessage({
                 type: "success",
-                message: `新增成功`,
+                message: `新建成功`,
                 duration: 1000,
               });
               //成功后根据vesionId和basecouseId获取详细信息
@@ -1527,7 +1411,7 @@ export default {
             console.log("e", e);
             ElMessage({
               type: "error",
-              message: `新增失败`,
+              message: `新建失败`,
               duration: 1000,
             });
             //失败后退回basecouse页面
@@ -1536,11 +1420,11 @@ export default {
       });
     },
 
-    getCourseByYear(label) {
-      this.currentVersionValue = label;
+    getCourseByYear(value) {
+      this.currentVersionId = value;
       this.$store.commit(
         "course/setbaseCourseVersionId",
-        this.currentVersionValue
+        this.currentVersionId
       );
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
@@ -1630,7 +1514,7 @@ export default {
             that.dialogFormVisible = false;
             ElMessage({
               type: "success",
-              message: `添加成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             that.clearForm();
@@ -1643,21 +1527,21 @@ export default {
           if (e.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
-              message: "添加失败，课程已存在",
+              message: "新建失败，课程已存在",
               duration: 2000,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else if (e.code == "DATA_DUPLICATED") {
             ElMessage({
               type: "error",
-              message: "添加失败，数据重复",
+              message: "新建失败，数据重复",
               duration: 2000,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else {
             ElMessage({
               type: "error",
-              message: "添加失败",
+              message: "新建失败",
 
               duration: 1000,
             });
@@ -1666,15 +1550,38 @@ export default {
     },
     getBaseCourse(pageSize, pageNum) {
       let identity = this.identity;
+      let tempurl = '';
+      let tempparams = {};
 
       if (identity == "学院管理员") {
-        console.log(
+        tempurl= "/baseCourse/list";
+        tempparams={pageSize: pageSize,
+            pageNum: pageNum,
+            versionId: this.currentVersionId,
+            hasDetail: this.hasDeatil,
+            departmentId: this.departmentId,
+            schoolId: this.schoolId,
+            selectKeyWord: this.keyword,}
+      }
+      if (identity == "课程负责人") {
+        tempurl= "/baseCourse/respondent";
+        tempparams={
+            pageSize: pageSize,
+            pageNum: pageNum,
+            versionId: this.currentVersionId,
+            userId: this.userId,
+            hasDetail: this.hasDeatil,
+            departmentId: this.departmentId,
+            schoolId: this.schoolId,
+            selectKeyWord: this.keyword,}
+      }
+      console.log(
           "pageSize:",
           pageSize,
           " pageNum:",
           pageNum,
           "versionId",
-          this.currentVersionValue
+          this.currentVersionId
         );
         let that = this;
         let courses = [];
@@ -1685,17 +1592,9 @@ export default {
         this.isloading = true;
         this.loadmoreDisabled = true;
         return request({
-          url: "/baseCourse/list",
+          url: tempurl,
           method: "get",
-          params: {
-            pageSize: pageSize,
-            pageNum: pageNum,
-            versionId: that.currentVersionValue,
-            hasDetail: that.hasDeatil,
-            departmentId: that.departmentId,
-            schoolId: that.schoolId,
-            selectKeyWord: that.keyword,
-          },
+          params: tempparams,
         })
           .then(function (res) {
             that.isloading = false;
@@ -1717,9 +1616,9 @@ export default {
                   that.courseNatureSource[course.courseNature];
                 course.credit = course.credit;
                 if (course.bcDetails.length) {
-                  for (let i = 0; i < course.bcDetails.length; i++) {
+                  for (const element of course.bcDetails) {
                     if (
-                      course.bcDetails[i].versionId == that.currentVersionValue
+                      element.versionId == that.currentVersionId
                     ) {
                       course.versionId = true;
                       break;
@@ -1730,18 +1629,13 @@ export default {
                 }
 
                 if (course.respondentInfos) {
-                  // let teacherName =[];
+                 
                   course.respondentInfos.forEach(function (respondent) {
                     course.respondentName = respondent.respondentName;
-                    // teacherName.push(respondent.respondentName);
+                    
                   });
-                  // course.respondentName = teacherName;
+                  
                 }
-                // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
-                // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-                course.semester = course.semester == "0" ? "上学期" : "下学期";
-                // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
-
                 courses.push(course);
                 if (course.versionId) {
                   numofcourseshasVersion++;
@@ -1774,113 +1668,11 @@ export default {
           .catch((e) => {
             console.log("e", e);
           });
-      }
-      if (identity == "课程负责人") {
-        console.log(
-          "pageSize:",
-          pageSize,
-          " pageNum:",
-          pageNum,
-          "versionId",
-          this.currentVersionValue
-        );
-        let that = this;
-        let courses = [];
-        let courseshasVersion = [];
-        let numofcourseshasVersion = 0;
-        let courseshasNoVersion = [];
-        let numofcourseshasNoVersion = 0;
-        return request({
-          url: "/baseCourse/respondent",
-          method: "get",
-          params: {
-            pageSize: pageSize,
-            pageNum: pageNum,
-            userId: that.userId,
-            departmentId: that.departmentId,
-            schoolId: that.schoolId,
-          },
-        })
-          .then(function (res) {
-            console.log("courseDetails:", res);
-            console.log(
-              "department:",
-              that.departmentId,
-              "schoolId:",
-              that.schoolId,
-              "currentVersionValue",
-              that.currentVersionValue
-            );
-            res.rows.forEach(function (course) {
-              course.courseName = course.courseName;
-              course.courseCode = course.courseCode;
-              course.courseType = that.courseTypeSource[course.courseType];
-              course.courseNature =
-                that.courseNatureSource[course.courseNature];
-              course.credit = course.credit;
-
-              // course.remark = (_.isEmpty(course.remark)) ? '' : course.remark.trim();
-              // course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
-
-              if (course.bcDetails.length) {
-                for (let i = 0; i < course.bcDetails.length; i++) {
-                  if (
-                    course.bcDetails[i].versionId == that.currentVersionValue
-                  ) {
-                    course.versionId = true;
-                    break;
-                  } else {
-                    course.versionId = false;
-                  }
-                }
-              }
-              if (course.respondentInfos) {
-                // let teacherName =[];
-                course.respondentInfos.forEach(function (respondent) {
-                  course.respondentName = respondent.respondentName;
-                  // teacherName.push(respondent.respondentName);
-                });
-                // course.respondentName = teacherName;
-              }
-              // course.versionId = (course.versionId== that.currentVersionValue) ? true : false;
-
-              courses.push(course);
-              if (course.versionId) {
-                numofcourseshasVersion++;
-                courseshasVersion.push(course);
-              }
-              if (!course.versionId) {
-                numofcourseshasNoVersion++;
-                courseshasNoVersion.push(course);
-              }
-            });
-            if (that.hasDetail == "全部") {
-              that.tableData = courses;
-              that.result = res;
-            }
-            if (that.hasDetail == "有课程大纲") {
-              that.tableData = courseshasVersion;
-              that.result = { total: numofcourseshasVersion };
-            }
-            if (that.hasDetail == "无课程大纲") {
-              that.tableData = courseshasNoVersion;
-              that.result = { total: numofcourseshasNoVersion };
-            }
-            if (pageSize >= that.result.total) {
-              that.showLoadmore = false;
-            }
-          })
-          .catch((e) => {
-            console.log("e", e);
-          });
-      }
-      if (identity == "教师") {
-      }
     },
     multideleteBaseCourse(row) {
       let that = this;
-      ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1943,8 +1735,8 @@ export default {
       console.log("deleteCourse", row);
       let that = this;
 
-      ElMessageBox.confirm("将要删除基础课程，是否确定删除？", "注意", {
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否确认删除课程？", "", {
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
@@ -1996,12 +1788,18 @@ export default {
     },
     goBaseCourseDetail(index, row) {
       console.log("goBaseCourseDetail", row);
-      let versionName = this.versions[this.currentVersionValue - 1].label;
+      let versionName = '';
+      for(const element of this.versions){
+        if(element['versionId']==this.currentVersionId){
+          versionName = element["label"];
+        }
+      }
+     
       this.$store.commit("course/setbaseCourseVersionName", versionName);
       this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
       this.$store.commit(
         "course/setbaseCourseVersionId",
-        this.currentVersionValue
+        this.currentVersionId
       );
       this.$store.commit("course/setbaseCourseCourseId", row.courseId);
       this.$store.commit("course/setbaseCourseCourseName", row.courseName);
@@ -2041,7 +1839,7 @@ export default {
             that.dialogFormVisible1 = false;
             ElMessage({
               type: "success",
-              message: `修改成功`,
+              message: `更新成功`,
               duration: 1000,
             });
 
@@ -2056,20 +1854,20 @@ export default {
           if (e.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
-              message: "修改失败，课程已存在",
-              duration: 2000,
+              message: "更新失败，课程已存在",
+              duration: 1000,
             });
             that.C_ErrorMsg_edit = "课程已存在，请重新输入";
           } else if (e.code == "UNAUTHENTICATED") {
             ElMessage({
               type: "error",
-              message: "修改失败，无权限",
-              duration: 2000,
+              message: "更新失败，无权限",
+              duration: 1000,
             });
           } else {
             ElMessage({
               type: "error",
-              message: "修改失败",
+              message: "更新失败",
 
               duration: 1000,
             });
@@ -2131,7 +1929,7 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
-      this.currentVersionValue = this.$store.state.course.baseCourseVersionId;
+      
       if (this.identity == "课程负责人") {
         this.userId = this.$store.state.userInfo.userId;
       }
@@ -2139,16 +1937,18 @@ export default {
   },
   created() {
     this.activate();
-    this.getDict();
+    this.getDict().then(()=>{
     let identity = this.identity;
     if (identity == "学院管理员") {
       this.getRouter();
       // this.getPrincipleInfo();
       if (this.routeVersionId) {
-        this.currentVersionValue = this.routeVersionId;
+        this.currentVersionId = this.routeVersionId;
       }
     }
     this.getBaseCourse(this.pageSize, this.pageNum);
+    })
+    
   },
 };
 </script>
@@ -2305,6 +2105,7 @@ export default {
 }
 
 .el-table-container {
+  cursor: pointer;
   margin: 0 auto;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }

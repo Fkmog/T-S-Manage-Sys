@@ -314,7 +314,7 @@ getDict(){
           if (res.code == "SUCCESS") {
             ElMessage({
                   type: "success",
-                  message: `添加成功`,
+                  message: `新建成功`,
                   duration: 1000,
                 });
   
@@ -340,7 +340,7 @@ getDict(){
             that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
-                  message: "添加失败，标红教学班已存在",
+                  message: "新建失败，标红教学班已存在",
                   duration: 2000,
                 });
               
@@ -370,7 +370,7 @@ getDict(){
             that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
-                  message: "添加失败，标红教师不存在",
+                  message: "新建失败，标红教师不存在",
                   duration: 2000,
                 });
                 that.hotInstance.validateCells((valid) =>{
@@ -398,7 +398,7 @@ getDict(){
             that.hotInstance.setCellMetaObject(that.postData.courses.length,6,{validator:undefined});
               ElMessage({
                   type: "error",
-                  message: "添加失败，标红课程号不存在",
+                  message: "新建失败，标红课程号不存在",
                   duration: 2000,
                 });
               that.hotInstance.validateCells((valid) =>{
@@ -410,7 +410,7 @@ getDict(){
             else{
               ElMessage({
                   type: "error",
-                  message: "添加失败",
+                  message: "新建失败",
                   
                   duration: 1000,
                 });
@@ -524,8 +524,8 @@ getDict(){
         //如果dirty是true 或者saving是false并且dirty是true需要询问
         console.log("gobasecourse:" + this.saving + this.dirty);
         if (this.dirty == true || (this.saving == false && this.dirty == true)) {
-          ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-            confirmButtonText: "确定",
+          ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+            confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
           })

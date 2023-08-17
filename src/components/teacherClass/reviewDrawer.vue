@@ -18,7 +18,7 @@
         class="box-item"
         
         effect="dark"
-        content="删除该审核意见"
+        content="删除"
         placement="bottom"
         :hide-after="0"
       >
@@ -66,9 +66,6 @@
     <template #footer >
       <span class="dialog-footer" v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')">
         <el-button type="primary"  @click="submitForm('ruleForm')"> 提交反馈 </el-button>
-      </span>
-      <span class="dialog-footer" v-show="status == '已退回' && identity == '教师'">
-        <el-button type="primary"  @click="submit()"> 重新提交 </el-button>
       </span>
     </template>
 
@@ -154,15 +151,8 @@ export default{
    
     this.getClassInfo();
     this.getReviewInfo();
-    console.log("classInfo", this.classInfo);
-    console.log('checkFeedback',this.checkFeedback)
-    this.getDictionary();
   },
   computed: {
-    classInfoChange(){
-      // console.log('teacherSideClassInfo changed');
-      return this.$store.state.currentInfo.teacherSideClassInfo;
-    },
     openDrawerChange(){
         return this.$props.visible;
     },
@@ -174,13 +164,25 @@ export default{
     }
   },
   watch: {
-    classInfoChange: {
-      deep: true,
-      handler(value) {
-        this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-        this.classStatus();
-      },
-    },
+   
+    // teacherInfoChange: {
+    //   deep: true,
+    //   handler(value) {
+    //     if (this.identity == "教师") {
+    //       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+    //       this.classStatus();
+    //     }
+    //   },
+    // },
+    // respondInfoChange: {
+    //   deep: true,
+    //   handler(value) {
+    //     if (this.identity == "课程负责人") {
+    //       this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+    //       this.classStatus();
+    //     }
+    //   },
+    // },
     openDrawerChange:{
         deep:true,
         handler(value){
@@ -209,8 +211,8 @@ export default{
   methods: {
     //删除评审意见
     deleteReview(reviewId){
-      ElMessageBox.confirm("是否删除该评审意见？","注意",{
-        confirmButtonText: "确定",
+      ElMessageBox.confirm("是否删除该评审意见？","",{
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       }).then(()=>{
@@ -219,7 +221,7 @@ export default{
         if(res == 204){
           ElMessage({
             type: "success",
-            message: `删除评审意见成功`,
+            message: `删除成功`,
             duration: 1500,
           });
         }
@@ -227,7 +229,7 @@ export default{
       }).catch((e)=>{
         ElMessage({
             type: "error",
-            message: `删除评审意见失败`,
+            message: `删除失败`,
             duration: 1500,
           });
         console.log('e',e)
@@ -246,13 +248,14 @@ export default{
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+        console.log('this.checkFeedback.checkState',this.checkFeedback.checkState);
         submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
         console.log('feedback res',res);
         if(res.code == 'SUCCESS'){
           this.showCheckDialogFlag = false;
           ElMessage({
             type: "success",
-            message: `提交成功`,
+            message: `新建成功`,
             duration: 1500,
           });
           this.getClassInfo();
@@ -263,7 +266,7 @@ export default{
         console.log('e',e);
         ElMessage({
             type: "error",
-            message: `提交失败`,
+            message: `新建失败`,
             duration: 1500,
           });
       });
@@ -274,7 +277,7 @@ export default{
         if(res.code == 'SUCCESS'){
           ElMessage({
             type: "success",
-            message: `创建审核成功`,
+            message: `新建成功`,
             duration: 1500,
           });
           this.status = "已退回"
@@ -288,7 +291,7 @@ export default{
         } else {
           ElMessage({
             type: "error",
-            message: `提交失败`,
+            message: `新建失败`,
             duration: 1000,
           });
           return false;
@@ -333,7 +336,18 @@ export default{
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res.data);
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+        if(this.identity =='教师'){
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        }
+        else if(this.identity =='课程负责人'){
+          this.$store.commit("currentInfo/setRespondClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        }
+        else {
+          this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+        }
         this.classStatus();
       });
     },
@@ -341,8 +355,8 @@ export default{
     submit() {
       console.log('submit',this.status,this.identity);
       if(this.status == '已退回' && this.identity == '教师'){
-        ElMessageBox.confirm("是否已按照审核意见进行修改?","注意",{
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         }).then(()=>{
@@ -351,7 +365,7 @@ export default{
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `提交成功`,
+              message: `新建成功`,
               duration: 1000,
             });
           }
@@ -359,7 +373,7 @@ export default{
         }).catch((e)=>{
           ElMessage({
               type: "error",
-              message: `提交失败`,
+              message: `新建失败`,
               duration: 1000,
             });
           console.log('e',e);
@@ -374,7 +388,7 @@ export default{
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `提交成功`,
+            message: `新建成功`,
             duration: 1000,
           });
         }
@@ -412,6 +426,7 @@ export default{
 }
 #drawerbox .el-drawer{
   position: fixed;
+  z-index:10;
 }
 #drawerfixed{
   position: fixed;
@@ -425,6 +440,7 @@ export default{
 }
 :deep().el-drawer{
   position: fixed;
+  z-index:10;
 }
 
 .switchstyle{

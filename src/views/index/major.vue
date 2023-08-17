@@ -142,7 +142,7 @@ export default {
             console.log("addMajor", res);
             ElMessage({
               type: "success",
-              message: `成功新建专业:${value}`,
+              message: `新建成功`,
               duration: 1500,
             });
             this.getMajorList();
@@ -152,7 +152,7 @@ export default {
     },
     //删除专业
     deleteMajor(majorId, majorName) {
-      ElMessageBox.confirm("是否确定删除" + majorName + "专业？", "", {
+      ElMessageBox.confirm("是否确认删除" + majorName + "专业？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
@@ -187,7 +187,7 @@ export default {
             (res) => {
               ElMessage({
                 type: "success",
-                message: `成功修改专业名称:${value}`,
+                message: `更新成功`,
                 duration: 1500,
               });
               console.log("changeMajor", res);

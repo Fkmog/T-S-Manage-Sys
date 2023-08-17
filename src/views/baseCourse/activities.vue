@@ -284,7 +284,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             val.inputFlag = false;
             ElMessage({
               type: "error",
-              message: "修改名称失败，没有权限",
+              message: "更新失败，没有权限",
               duration: 1500,
             });
           }
@@ -367,10 +367,10 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           console.log('removing targetName:',targetName);
           if(targetName!='1'){
                   ElMessageBox.confirm(
-            '是否删除当前成绩项',
-            '注意',
+            '是否确认删除当前成绩项？',
+            '',
             {
-              confirmButtonText: '确定',
+              confirmButtonText: '确认',
               cancelButtonText: '取消',
               type: 'warning',
             }
@@ -403,7 +403,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             });
         } else {
           ElMessageBox.confirm("此成绩项为不可删除的", "注意", {
-            confirmButtonText: "确定",
+            confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
           });
@@ -692,14 +692,14 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         if(res.code == 'SUCCESS'){
           ElMessage({
                 type: 'success',
-                message: `添加成功`,
+                message: `新建成功`,
                 duration:1000,
               });
         }
         else{
           ElMessage({
                   type: 'error',
-                  message: `添加失败`,
+                  message: `新建失败`,
                   duration:1000,
                 });
         }
@@ -708,21 +708,21 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '总评未设置'){
           ElMessage({
                   type: 'error',
-                  message: `总评未设置`,
+                  message: `新建失败，总评未设置`,
                   duration:1500,
                 });
         }
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '有权重为空'){
           ElMessage({
                   type: 'error',
-                  message: `有权重为空`,
+                  message: `新建失败，有权重为空`,
                   duration:1500,
                 });
         }
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '权重和不对'){
           ElMessage({
                   type: 'error',
-                  message: `权重和不对`,
+                  message: `新建失败，权重和不对`,
                   duration:1500,
                 });
         }
@@ -780,9 +780,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     if(this.dirty == true || this.saving== false&&this.dirty == true ){
       ElMessageBox.confirm(
       '数据还未保存，是否仍然关闭？',
-      '注意',
+      '',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning',
       }

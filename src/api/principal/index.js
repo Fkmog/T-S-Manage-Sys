@@ -1,7 +1,7 @@
 import request from "@/utils/request/request";
 
 //查询课程负责人的教学班列表
-export function getPrincipalClassList(academicYear, semester,pageSize,pageNum,status) {
+export function getPrincipalClassList(academicYear, semester,pageSize,pageNum,status,keyword) {
   return request({
     url: "/classes/respondent",
     method: "get",
@@ -10,7 +10,8 @@ export function getPrincipalClassList(academicYear, semester,pageSize,pageNum,st
       semester: semester,
       pageSize:pageSize,
       pageNum:pageNum,
-      status:status
+      status:status,
+      selectKeyWord:keyword
     },
   });
 }

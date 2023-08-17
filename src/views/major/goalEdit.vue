@@ -297,7 +297,7 @@ export default {
     // 删除指标点
     deleteDetail(attribute) {
       ElMessageBox.confirm(
-        "是否确定删除指标点" + this.deleteDetailId(attribute) + "?",
+        "是否确认删除指标点" + this.deleteDetailId(attribute) + "?",
         "",
         {
           confirmButtonText: "确认",
@@ -353,7 +353,7 @@ export default {
       console.log("@", this.requirements);
       if (this.requirements.length > 0) {
         ElMessageBox.confirm(
-          "是否确定删除毕业要求" + this.attributeIdDelete + "?",
+          "是否确认删除毕业要求" + this.attributeIdDelete + "?",
           "",
           {
             confirmButtonText: "确认",
@@ -404,14 +404,14 @@ export default {
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
-            message: `保存成功`,
+            message: `更新成功`,
             duration: 1500,
           });
           this.backGoal();
         } else {
           ElMessage({
             type: "error",
-            message: `保存失败`,
+            message: `更新失败`,
             duration: 1500,
           });
         }

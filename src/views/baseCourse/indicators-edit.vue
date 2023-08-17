@@ -270,7 +270,7 @@
               type="primary"
               @click="confirmAddSupport(dialogIndicator)"
             >
-              确定
+              确认
             </el-button>
           </span>
         </template>
@@ -332,7 +332,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="copyInfo()">确定</el-button>
+          <el-button type="primary" @click="copyInfo()">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -446,8 +446,8 @@ export default {
       if (
         !(JSON.stringify(this.majorListCopy) === JSON.stringify(this.majorList))
       ) {
-        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "注意", {
-          confirmButtonText: "确定",
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+          confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
         })
@@ -494,7 +494,7 @@ export default {
             this.successNum = this.successNum + 1;
             ElMessage({
               type: "success",
-              message: `保存成功`,
+              message: `更新成功`,
               duration: 1500,
             });
             //更新副本
@@ -503,7 +503,7 @@ export default {
           } else {
             ElMessage({
               type: "error",
-              message: `保存失败`,
+              message: `更新失败`,
               duration: 1500,
             });
           }
@@ -615,7 +615,7 @@ export default {
     deleteIndicator(indicator, index1) {
       this.index1 = index1;
       ElMessageBox.confirm(
-        "是否确定删除指标点" + indicator.serialNum + "?",
+        "是否确认删除指标点" + indicator.serialNum + "?",
         "",
         {
           confirmButtonText: "确认",

@@ -253,7 +253,7 @@
               type="primary"
               @click="confirmAddAssessment(dialogObject)"
             >
-              确定
+              确认
             </el-button>
           </span>
         </template>
@@ -363,14 +363,14 @@ export default {
         if (res.code == 'SUCCESS') {
           ElMessage({
             type: "success",
-            message: `保存成功`,
+            message: `更新成功`,
             duration: 1500,
           });
           this.backObjectives();
         } else {
           ElMessage({
             type: "error",
-            message: `保存失败`,
+            message: `更新失败`,
             duration: 1500,
           });
         }
@@ -517,7 +517,7 @@ export default {
     // 删除课程目标
     deleteObject() {
       ElMessageBox.confirm(
-        "是否确定删除课程目标" + this.deleteSerialNum + "?",
+        "是否确认删除课程目标" + this.deleteSerialNum + "?",
         "",
         {
           confirmButtonText: "确认",

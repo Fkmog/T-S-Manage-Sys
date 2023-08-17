@@ -138,7 +138,7 @@ export default createStore({
         detailId: Number,
         baseCourseVersionName: "",
         baseCourseVersionFlag: "",
-        baseCourseVersionId: 1,
+        baseCourseVersionId: "",
         baseCourseCourseId: "",
         baseCourseCourseName: "",
         baseCourseCourseCode: "",
