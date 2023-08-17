@@ -18,6 +18,7 @@
         height: '60px',
       }"
       style="width: 1000px"
+      @row-click="goEdit"
       >
       
        <el-table-column label="版本大纲名称" width="250">
@@ -44,8 +45,8 @@
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row >
-        <el-col :span="4">
-          <el-tooltip content="修改课程大纲版本号">
+        <!-- <el-col :span="4">
+          <el-tooltip content="更新">
            <el-button 
             class="deleteButton"
             link
@@ -54,24 +55,24 @@
                     this.deleteFlag = false;
                     this.addFlag = false;
                     this.nameFlag = true;
-                    this.selectVersion(scope.row.versionId);
+                    this.selectVersion(scope.row);
                     this.showEditVersionDailogFlag = true;">
             <el-icon><Edit /></el-icon>
            </el-button>
               
           </el-tooltip>
-        </el-col>
+        </el-col> -->
         <el-col :span="4">
-          <el-tooltip content="删除课程大纲版本号">
+          <el-tooltip content="删除">
             <el-button 
             class="deleteButton"
             link
             style="color: #3f51b5"
-            @click="this.deleteFlag = true;
+            @click.stop="this.deleteFlag = true;
                     this.addFlag = false;
                     this.editFlag = false;
                     this.nameFlag = true;
-                    this.selectVersion(scope.row.versionId);
+                    this.selectVersion(scope.row);
                     this.showEditVersionDailogFlag = true;">
               <el-icon>
                   <Delete />
@@ -90,7 +91,12 @@
 
 
 
-  <el-dialog v-model="showEditVersionDailogFlag"  title="课程大纲版本号维护">
+  <el-dialog v-model="showEditVersionDailogFlag">
+    <template #header>
+        <h4 v-show="addFlag">课程大纲版本号新建</h4>
+        <h4 v-show="editFlag">课程大纲版本号更新</h4>
+        <h4 v-show="deleteFlag">课程大纲版本号删除</h4>
+    </template>
     <el-form :model="versionForm" :rules="editVersionRules">
       <el-form-item
         v-show="addFlag"
@@ -143,23 +149,23 @@
           :disabled="!submitFlag"
           @click="addVersion()"
         >
-          添加课程大纲版本号
+          确定
         </el-button>
         <el-button
           v-show="editFlag"
-          type="warning"
+          type="primary"
           :disabled="!submitFlag"
           @click="editVersion()"
         >
-          修改课程大纲版本号
+          确定
         </el-button>
         <el-button
           v-show="deleteFlag"
-          type="danger"
+          type="primary"
           :disabled="!submitFlag"
           @click="deleteVersion()"
         >
-          删除课程大纲版本号
+          确定
         </el-button>
       </span>
     </template>
@@ -348,6 +354,14 @@ export default {
     this.getDictionary();
   },
   methods:{
+    goEdit(row){
+      this.editFlag = true;
+      this.deleteFlag = false;
+      this.addFlag = false;
+      this.nameFlag = true;
+      this.selectVersion(row);
+      this.showEditVersionDailogFlag = true;
+    },
     addVersion() {
       let that = this;
       return request({
@@ -364,7 +378,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `添加版本大纲号成功`,
+              message: `新建成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -381,7 +395,7 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `添加版本大纲号失败`,
+            message: `新建失败`,
             duration: 1000,
           });
         });
@@ -403,7 +417,7 @@ export default {
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
-              message: `修改版本大纲号成功`,
+              message: `更新成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -420,14 +434,19 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `修改版本大纲号失败`,
+            message: `更新失败`,
             duration: 1000,
           });
         });
     },
     deleteVersion() {
       let that = this;
-      return request({
+      ElMessageBox.confirm("将要删除课程大纲版本，是否确定删除？", "注意", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(()=>{
+        return request({
         url: "/detail/versionRemove/" + that.versionForm.versionId,
         method: "delete",
       })
@@ -436,7 +455,7 @@ export default {
           if (res === 204) {
             ElMessage({
               type: "success",
-              message: `删除版本大纲号成功`,
+              message: `删除成功`,
               duration: 1000,
             });
             that.showEditVersionDailogFlag = false;
@@ -453,12 +472,19 @@ export default {
           console.log("edit version res error:", e);
           ElMessage({
             type: "error",
-            message: `删除版本大纲号失败`,
+            message: `删除失败`,
             duration: 1000,
           });
         });
+      }).catch((e)=>{
+        console.log('e',e);
+      })
+      
     },
      cancelVersionForm() {
+      this.addFlag = false;
+      this.deleteFlag = false;
+      this.editFlag = false;
       this.versionForm = {
         name: "",
         enrollYear: "",
@@ -472,11 +498,16 @@ export default {
       this.enrollYearFlag = false;
       this.reviseYearFlag = false;
     },
-    selectVersion(versionId) {
-      this.versionForm.name = this.versions[versionId - 1]["label"];
-      this.versionForm.enrollYear = this.versions[versionId - 1]["enrollYear"];
-      this.versionForm.reviseYear = this.versions[versionId - 1]["reviseYear"];
-      this.versionForm.versionId = this.versions[versionId - 1]["versionId"];
+    selectVersion(row) {
+      console.log('row',row);
+      for(const element of this.versions){
+        if(element['versionId']==row.versionId){
+          this.versionForm.name = element["label"];
+          this.versionForm.enrollYear = element["enrollYear"];
+          this.versionForm.reviseYear = element["reviseYear"];
+          this.versionForm.versionId = element["versionId"];
+        }
+      }
       console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
     },
     getDictionary() {
@@ -489,16 +520,13 @@ export default {
       }).then((res) => {
         console.log("versionList", res);
         if (res.code == "SUCCESS") {
-            let num = 1;
             res.data.forEach((year) => {
               let dict = {
                 label: year.versionName,
-                value: num,
                 enrollYear: year.enrollYear,
                 reviseYear: year.reviseYear,
                 versionId: year.versionId,
               };
-              num = num + 1;
               that.versions.push(dict);
               that.versionLabel.push(year.versionName);
             });
@@ -537,6 +565,7 @@ export default {
   margin-right: 5%;
 }
 .el-table-container {
+  cursor: pointer;
   margin: 0 auto;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }

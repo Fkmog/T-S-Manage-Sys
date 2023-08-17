@@ -18,7 +18,7 @@
         class="box-item"
         
         effect="dark"
-        content="删除该审核意见"
+        content="删除"
         placement="bottom"
         :hide-after="0"
       >
@@ -66,9 +66,6 @@
     <template #footer >
       <span class="dialog-footer" v-show="status == '已提交' && (identity == '学院管理员'||identity == '课程负责人')">
         <el-button type="primary"  @click="submitForm('ruleForm')"> 提交反馈 </el-button>
-      </span>
-      <span class="dialog-footer" v-show="status == '已退回' && identity == '教师'">
-        <el-button type="primary"  @click="submit()"> 重新提交 </el-button>
       </span>
     </template>
 
@@ -429,7 +426,7 @@ export default{
 }
 #drawerbox .el-drawer{
   position: fixed;
-  z-index:1;
+  z-index:10;
 }
 #drawerfixed{
   position: fixed;
@@ -443,7 +440,7 @@ export default{
 }
 :deep().el-drawer{
   position: fixed;
-  z-index:1;
+  z-index:10;
 }
 
 .switchstyle{

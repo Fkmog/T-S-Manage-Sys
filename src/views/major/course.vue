@@ -133,19 +133,19 @@
   </el-dialog>
     </div>
     <div v-show="!hasCourse" class="no-program">
-    <HeaderSearch v-show="!closeShow">
-  </HeaderSearch>
+        <HeaderSearch v-show="!closeShow"></HeaderSearch>
 
-<div layout="row" flex class="md-padding" >
-  <addBtn @click="this.drawerShow()"></addBtn>
-</div>
-      <h2 style="display: flex; justify-content: center; margin-top: 100px">
-      没有课程
-    </h2>
-    <div style="display: flex; justify-content: center; color: grey">
-        请先点击右上角圆形按钮添加课程
-      </div>
+        <div layout="row" flex class="md-padding" >
+          <addBtn @click="this.drawerShow()"></addBtn>
+        </div>
+        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+          没有课程
+        </h2>
+        <div style="display: flex; justify-content: center; color: grey">
+            请先点击右上角圆形按钮添加课程
+        </div>
     </div>
+
     <el-drawer v-model="drawer" :direction="direction" size="42%"  :show-close="true">
     
       <el-col :span="24">
@@ -187,19 +187,10 @@
             </div>
           </div>
         </el-col>
-        
       </el-row>
-
       </el-col>
       
-     
-      
-    
-
    <!-- 具体basecourse页面，分页 可搜索-->
-      
-  
-      
       <div class="drawerBlock" flex>
         
         <div >
