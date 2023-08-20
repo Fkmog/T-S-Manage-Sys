@@ -157,7 +157,7 @@
           :disabled="!submitFlag"
           @click="editVersion()"
         >
-          确定
+          确认
         </el-button>
         <el-button
           v-show="deleteFlag"
@@ -165,7 +165,7 @@
           :disabled="!submitFlag"
           @click="deleteVersion()"
         >
-          确定
+          确认
         </el-button>
       </span>
     </template>

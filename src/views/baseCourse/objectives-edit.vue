@@ -410,7 +410,6 @@ export default {
             value: item,
           })
         );
-        // console.log("格式化后的allActivities", this.allActivities);
         // console.log("格式化后的list", this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
@@ -520,14 +519,17 @@ export default {
               assessmentMethod.activities.item.map((item) => ({ value: item }));
           }
           let array = assessmentMethod.activities.itemObject;
-          // console.log("arrat", array, array[0]);
+          console.log("array", array, array[0]);
           if (array.length === 1) {
-            let index = this.allActivities.item.indexOf(array[0].value);
-            // console.log("index", index);
+            console.log("this.allActivities",this.allActivities,this.allActivities.item);
+            let index = this.allActivities.itemObject.findIndex(itemObject => itemObject.value === array[0].value);
+            console.log("index", index);
             if (index > -1) {
+
+            console.log( !assessmentMethod.activities.hasOwnProperty("value"));
               if (!(assessmentMethod.activities.item.length == array.length)) {
                 assessmentMethod.activities.item.push(
-                  this.allActivities.item[index]
+                  this.allActivities[0].item[index]
                 );
               }
               if (
@@ -535,10 +537,13 @@ export default {
                 !assessmentMethod.activities.hasOwnProperty("value")
               ) {
                 assessmentMethod.activities.value = [];
+              console.log('you value?');
+
               }
               assessmentMethod.activities.value.push(
-                this.allActivities.value[index]
+                this.allActivities[0].value[index]
               );
+              console.log('给value?');
               if (
                 assessmentMethod.activities.remark === null ||
                 !assessmentMethod.activities.hasOwnProperty("remark")
@@ -546,21 +551,21 @@ export default {
                 assessmentMethod.activities.remark = [];
               }
               assessmentMethod.activities.remark.push(
-                this.allActivities.remark[index]
+                this.allActivities[0].remark[index]
               );
             }
           }
           if (array.length > 1) {
             array.forEach((singleActivity) => {
-              let index = this.allActivities.item.indexOf(singleActivity.value);
+              let index = this.allActivities.itemObject.findIndex(itemObject => itemObject.value === singleActivity.value);
               // console.log("多于1项的时候，",singleActivity,"index",index);
               if (index > -1) {
-                console.log("zheli执行了几次", array);
+                // console.log("zheli执行了几次", array);
                 if (
                   !(assessmentMethod.activities.item.length == array.length)
                 ) {
                   assessmentMethod.activities.item.push(
-                    this.allActivities.item[index]
+                    this.allActivities[0].item[index]
                   );
                 }
                 if (
@@ -570,7 +575,7 @@ export default {
                   assessmentMethod.activities.value = [];
                 }
                 assessmentMethod.activities.value.push(
-                  this.allActivities.value[index]
+                  this.allActivities[0].value[index]
                 );
                 if (
                   assessmentMethod.activities.remark === null ||
@@ -579,7 +584,7 @@ export default {
                   assessmentMethod.activities.remark = [];
                 }
                 assessmentMethod.activities.remark.push(
-                  this.allActivities.remark[index]
+                  this.allActivities[0].remark[index]
                 );
               }
             });

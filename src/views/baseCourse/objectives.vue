@@ -82,7 +82,7 @@
                   <el-col :span="5">( {{ assessment.weight }}% )</el-col>
                   <el-col :span="12">
                     <el-row>
-                      <el-col
+                      <el-col :span="8"
                         v-for="(activity, index) in assessment.activities.item"
                         :key="index"
                       >
@@ -160,6 +160,7 @@ export default {
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         this.list = res.data;
+        console.log(this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
             this.hasObjective = true;
@@ -169,7 +170,7 @@ export default {
             } else {
               value.serialNum = value.id;
             }
-              if (value.hasOwnProperty("achievement")) {
+              if (value.hasOwnProperty("achievement")&&value.achievement!==null) {
                 value.achievementTwo=value.achievement.toFixed()
                 value.hasAchieve = true;
               } else {

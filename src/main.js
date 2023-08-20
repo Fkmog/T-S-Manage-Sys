@@ -8,7 +8,8 @@ import formCreate from "@form-create/element-ui";
 import FcDesigner from "@form-create/designer";
 import 'element-plus/dist/index.css';
 import Codemirror from 'codemirror-editor-vue3';
-
+// import NewUp from "./components/form-designer/up.vue";
+// formCreate.component("NewUp", NewUp);
 
 import _ from 'lodash'
 

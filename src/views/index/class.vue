@@ -177,7 +177,7 @@
           <el-button @click="goBatchAddClass">批量添加</el-button>
           <el-button @click="addVisible = false">取消</el-button>
           <el-button link plain @click="addClass(classAddForm)">
-            确定
+            确认
           </el-button>
         </span>
       </template>
