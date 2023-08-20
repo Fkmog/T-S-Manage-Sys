@@ -458,6 +458,9 @@ export default {
               message: `删除成功`,
               duration: 1000,
             });
+            if(this.$store.state.course.baseCourseVersionId == that.versionForm.versionId){
+              this.$store.commit("course/setbaseCourseVersionId",'');
+            }
             that.showEditVersionDailogFlag = false;
             that.versionForm = {
               name: "",
@@ -465,6 +468,7 @@ export default {
               reviseYear: "",
               versionId: "",
             };
+            
             this.getDictionary();
           }
         })

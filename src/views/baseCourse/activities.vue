@@ -411,8 +411,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       }
     },
     addActivities() {
+      console.log('currenteditableTabsValue',this.currenteditableTabsValue);
       // this.iscolover21();
-      this.colNum = this.db.items[this.currenteditableTabsValue - 1][0].length;
+      if(this.currenteditableTabsValue == 0){
+        this.colNum = this.db.items[this.currenteditableTabsValue][0].length;
+      }
+      else{
+        this.colNum = this.db.items[this.currenteditableTabsValue - 1][0].length;
+      }
+      
       // console.log('colNum:',this.colNum);
       if (this.colNum < 21) {
         this.firstActivities = false;

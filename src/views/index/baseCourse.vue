@@ -593,7 +593,7 @@
         :disabled="loadmoreDisabled"
         link
         plain
-        v-show="showLoadmore && hasBaseCourse && !isloading"
+        v-show="showLoadmore && hasBaseCourse && !isloading && hasVersion"
         @click="loadmoreCourse()"
         >加载更多</el-button
       >
@@ -1117,7 +1117,9 @@ export default {
               that.versions.push(dict);
               that.versionLabel.push(year.versionName);
             });
+
             that.currentVersionId = (this.$store.state.course.baseCourseVersionId)?this.$store.state.course.baseCourseVersionId:that.versions[0].versionId;
+            console.log('baseCourseVersionId',this.$store.state.course.baseCourseVersionId,'that.versions[0].versionId',that.versions[0].versionId)
             for(const element of that.versions){
               if(element['versionId']==that.currentVersionId){
                 that.currentVersion = element["label"];
@@ -1365,7 +1367,9 @@ export default {
       console.log("routeCourse:", this.routeCourseId);
     },
     addBaseCourseDetail(row) {
-      let that = this;
+      console.log('currentVersionId',this.currentVersionId);
+      if(this.currentVersionId){
+        let that = this;
       this.versions.forEach((version) => {
         if (version["value"] == that.currentVersionId) {
           that.currentVersion = version["label"];
@@ -1406,6 +1410,16 @@ export default {
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize, that.pageNum);
             }
+            if (res.code == "UNPROCESSABLE ENTITY" && res.msg == "UNPROCESSABLE ENTIT") {
+              ElMessage({
+                type: "error",
+                message: `没有选择课程大纲版本`,
+                duration: 1000,
+              });
+              //成功后根据vesionId和basecouseId获取详细信息
+              that.getBaseCourse(that.pageSize, that.pageNum);
+            }
+
           })
           .catch((e) => {
             console.log("e", e);
@@ -1418,15 +1432,30 @@ export default {
             that.getBaseCourse(that.pageSize, that.pageNum);
           });
       });
+      }
+      else{
+        ElMessage({
+            type: "error",
+            message: `请选择课程大纲！`,
+            duration: 1000,
+          });
+      }
     },
 
     getCourseByYear(value) {
-      this.currentVersionId = value;
-      this.$store.commit(
+      if(value){
+        this.currentVersionId = value;
+        this.$store.commit(
         "course/setbaseCourseVersionId",
         this.currentVersionId
       );
-      this.getBaseCourse(this.pageSize, this.pageNum);
+      
+        this.getBaseCourse(this.pageSize, this.pageNum);
+      }
+      else{
+        console.log('没有选择版本大纲',value);
+      }
+     
     },
     clearForm() {
       this.form.courseId = "";
@@ -1648,6 +1677,7 @@ export default {
               });
               that.tableData = courses;
               that.result = res;
+
               if (pageSize >= that.result.total) {
                 that.showLoadmore = false;
               } else {
@@ -1935,7 +1965,7 @@ export default {
       }
     },
   },
-  created() {
+  mounted() {
     this.activate();
     this.getDict().then(()=>{
     let identity = this.identity;
