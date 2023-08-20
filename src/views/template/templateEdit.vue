@@ -65,12 +65,12 @@ import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { checkWorkbookInfo, editWorkbookInfo } from "@/api/workbook";
 import { ElMessage,ElMessageBox } from "element-plus";
 import _ from "lodash";
-
+import newUp from "@/components/form-designer/upload.js"
 export default {
   name: "TemplateEdit",
   components: {
     Back,
-    DocumentChecked,
+    DocumentChecked,newUp
   },
   data() {
     return {
@@ -197,7 +197,18 @@ export default {
       ],
     };
   },
+   created(){
+    
+    },
   mounted() {
+      //插入组件规则
+      // this.$refs.designer.addComponent(newUp);
+      //插入拖拽按钮到`main`分类下
+      this.$refs.designer.appendMenuItem('group1', {
+        icon: Back,
+        name: 'upload.name',
+        label: 'upload.label'
+      })
     this.workbookId = this.$route.query.workbookId;
     // console.log(this.workbookId);
     this.getWorkbookInfo();

@@ -29,6 +29,7 @@
       <div v-show="hasMajor">
         <el-tabs
           class="major-tab"
+          style="width:750px"
           @tab-change="tabChange()"
           v-model="chosenMajor"
         >

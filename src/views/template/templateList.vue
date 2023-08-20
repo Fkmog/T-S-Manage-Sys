@@ -1,30 +1,6 @@
 <template>
   <div class="content">
     <addBtn @click="addTemplate()"></addBtn>
-    <!-- 顶部导航栏 -->
-    <!-- <div class="block">
-      <el-row class="block-row">
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="返回"
-          placement="bottom"
-          :hide-after="0"
-        >
-          <el-icon
-            class="icon"
-            size="22px"
-            color="rgb(137, 137, 137)"
-            style="margin-left: 50px"
-            @click="backSetting()"
-          >
-            <Back />
-          </el-icon>
-        </el-tooltip>
-        <div class="block_title">工作手册模板</div>
-        <el-divider class="divider" direction="vertical" />
-      </el-row>
-    </div> -->
     <el-table
       class="ListTable"
       :data="workbookList"
