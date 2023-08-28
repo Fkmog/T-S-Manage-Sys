@@ -6,12 +6,12 @@ import router from "./router";
 import store from "./store";
 import formCreate from "@form-create/element-ui";
 import FcDesigner from "@form-create/designer";
-import 'element-plus/dist/index.css';
-import Codemirror from 'codemirror-editor-vue3';
-// import NewUp from "./components/form-designer/up.vue";
-// formCreate.component("NewUp", NewUp);
+import "element-plus/dist/index.css";
+import Codemirror from "codemirror-editor-vue3";
+import upload from "./components/form-designer/upload.vue";
+formCreate.component("upload", upload);
 
-import _ from 'lodash'
+import _ from "lodash";
 
 const app = createApp(App)
   .use(store)
@@ -22,6 +22,7 @@ const app = createApp(App)
   .use(formCreate)
   .use(FcDesigner)
   .use(Codemirror)
+  .component("upload", upload)
   .mount("#app");
 //解决el-table  ResizeObserver loop limit exceeded问题
 const debounce = (fn, delay) => {

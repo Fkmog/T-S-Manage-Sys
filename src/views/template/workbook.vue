@@ -96,6 +96,7 @@ import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
 import _ from "lodash";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getClassInfo } from "@/api/class";
+import Cookies from "js-cookie";
 
 export default {
   name: "Workbook",
@@ -107,6 +108,7 @@ export default {
   },
   data() {
     return {
+      identity: "",
       openDrawer: false,
       classInfo: {},
       noEdit: false,
@@ -158,7 +160,6 @@ export default {
   methods: {
     async create() {
       await this.createValue();
-      this.getWorkbook();
       editByTeacher(this.classInfo.classId, this.value).then((res) => {
         if (res.code === "SUCCESS") {
           this.getClassInfo();
@@ -184,7 +185,11 @@ export default {
         } else {
           this.noEdit = false;
         }
-        this.value = this.classInfo.workbookJson;
+        console.log("this.classInfo", this.classInfo);
+        if (!(this.classInfo.workbookJson === null)) {
+          this.value = this.classInfo.workbookJson;
+        }
+        this.getWorkbook();
         resolve("suc");
         reject(err);
       });
@@ -216,14 +221,12 @@ export default {
     //当 status 为2，3时，无法编辑表单，注入disable属性
     disabledForm() {
       this.workbook.formJson.forEach((form) => {
-        form.props = {};
         form.props.disabled = true;
       });
       console.log("disabled后", this.workbook);
     },
     abledForm() {
       this.workbook.formJson.forEach((form) => {
-        form.props = {};
         form.props.disabled = false;
       });
       console.log("abled后", this.workbook);
@@ -253,8 +256,29 @@ export default {
               this.hasWorkbook = false;
             } else {
               this.hasWorkbook = true;
+              // 找到上传组件，注入props
+              res.data.formJson.forEach((form) => {
+                if (form.type === "upload") {
+                  form.props.action =
+                    "http://81.68.103.96:8080/common/upload/file";
+                  form.props.headers = {
+                    Authorization: "Bearer " + Cookies.get("Admin-Token"),
+                  };
+                  form.props.data = {
+                    param: this.classInfo.classId,
+                    type: "workbookFile",
+                  };
+                  form.props.onSuccess = function (res,file,fileList) {
+                    console.log("nanshou",res,file,fileList);
+                    // fileList.url=url.name
+                  };
+                }
+              });
               this.workbook = res.data;
               this.workbookId = this.workbook.workbookId;
+              if (this.classInfo.workbookJson === null) {
+                this.value = this.workbook.formJson;
+              }
               console.log("workbook", this.workbook);
               this.json = res.data.formJson;
               this.option = res.data.cssJson;

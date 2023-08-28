@@ -30,7 +30,11 @@
             placement="bottom"
             :hide-after="0"
           >
-          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
+            <el-switch
+              v-model="openDrawer"
+              class="switchstyle"
+              @change="openDrawerChange"
+            />
           </el-tooltip>
         </el-row>
       </div>
@@ -47,11 +51,7 @@
               placement="bottom"
               :hide-after="0"
             >
-              <el-icon
-                class="edit-pen"
-                @click="goEdit()"
-                ><EditPen
-              /></el-icon>
+              <el-icon class="edit-pen" @click="goEdit()"><EditPen /></el-icon>
             </el-tooltip>
           </div>
         </el-row>
@@ -109,8 +109,32 @@
           <div style="height: 30px"></div>
         </div>
       </div>
-      <div v-show="!hasDetailId" >
-        <div class="no-info">暂未设置课程大纲版本</div>
+      <div v-show="!hasDetailId">
+        <div>
+          <div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                margin-top: 100px;
+                font-size: 22px;
+              "
+            >
+              暂未设置课程大纲版本
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                color: grey;
+                font-size: 13px;
+                margin-top: 30px;
+              "
+            >
+              请联系课程负责人进行设置
+            </div>
+          </div>
+        </div>
       </div>
       <div v-show="hasDetailId && !hasObjective">
         <el-row class="no-info">
@@ -123,14 +147,14 @@
     </div>
   </div>
 
-  <reviewDrawer  v-bind:visible="openDrawer"/>
+  <reviewDrawer v-bind:visible="openDrawer" />
 </template>
 
 <script>
 import { Back, EditPen } from "@element-plus/icons-vue";
 import { getObjectives } from "@/api/basecourse";
-import { ElMessageBox, ElSwitch,} from "element-plus";
-import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue';
+import { ElMessageBox, ElSwitch } from "element-plus";
+import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getClassInfo } from "@/api/class";
 
 export default {
@@ -139,11 +163,11 @@ export default {
     Back,
     EditPen,
     reviewDrawer,
-    ElSwitch
+    ElSwitch,
   },
   data() {
     return {
-      openDrawer:false,
+      openDrawer: false,
       hasDetailId: true,
       hasObjective: true,
       isRespondent: false,
@@ -155,16 +179,15 @@ export default {
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
-    if(this.identity == '学院管理员'){
+    if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-      console.log('identity:',this.identity);
-    }
-    else{
-    this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-    console.log('identity:',this.identity);
+      console.log("identity:", this.identity);
+    } else {
+      this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+      console.log("identity:", this.identity);
     }
     console.log("this.classinfo", this.classInfo);
-    this.$store.commit("course/setDetailId",  this.classInfo.detailId);
+    this.$store.commit("course/setDetailId", this.classInfo.detailId);
 
     if (this.classInfo.isRespondent == 2) {
       this.isRespondent = true;
@@ -174,17 +197,17 @@ export default {
     // console.log("classInfo", this.classInfo);
     if (this.classInfo.detailId === null) {
       this.hasDetailId = false;
-      console.log("this.hasDetailId",this.hasDetailId);
+      console.log("this.hasDetailId", this.hasDetailId);
     } else {
       this.hasDetailId = true;
-      console.log("this.hasDetailId",this.hasDetailId);
+      console.log("this.hasDetailId", this.hasDetailId);
 
       // this.checkObjectives();
       this.checkClassInfo();
     }
   },
   methods: {
-    openDrawerChange(){
+    openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
     goEdit() {
@@ -208,7 +231,7 @@ export default {
                 object.serialNum = object.id;
               }
               if (object.hasOwnProperty("achievement")) {
-                object.achievementTwo=object.achievement.toFixed()
+                object.achievementTwo = object.achievement.toFixed();
                 object.hasAchieve = true;
               } else {
                 object.hasAchieve = false;
@@ -226,7 +249,7 @@ export default {
 </script>
 
 <style scoped>
-.switchstyle{
+.switchstyle {
   bottom: 4px;
 }
 .content {
@@ -306,7 +329,6 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
-
 }
 .go-edit {
   cursor: pointer;

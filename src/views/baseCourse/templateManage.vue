@@ -73,7 +73,7 @@
               style="margin-left: 10px"
               @click="addWorkbook = true"
             >
-              <Link />
+              <Switch />
             </el-icon>
           </el-tooltip>
         </div>
@@ -171,7 +171,7 @@
   </div>
 </template>
 <script>
-import { Back, Switch, Link, Delete } from "@element-plus/icons-vue";
+import { Back, Switch, Delete } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { WorkbookByCourseId, checkWorkbook, setWorkbook } from "@/api/workbook";
 export default {
@@ -179,7 +179,6 @@ export default {
   components: {
     Back,
     Switch,
-    Link,
     Delete,
   },
   data() {

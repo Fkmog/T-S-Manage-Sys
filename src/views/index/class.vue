@@ -391,6 +391,7 @@
       height: '60px',
       'text-overflow': ' ellipsis',
       'white-space': ' nowrap',
+      'cursor':'pointer'
     }"
     highlight-current-row
     :row-key="rowKey"

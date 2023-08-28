@@ -63,14 +63,14 @@
 <script>
 import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { checkWorkbookInfo, editWorkbookInfo } from "@/api/workbook";
-import { ElMessage,ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import _ from "lodash";
-import newUp from "@/components/form-designer/upload.js"
+import { uploadRule,helloword } from "@/components/form-designer/upload.js";
 export default {
   name: "TemplateEdit",
   components: {
     Back,
-    DocumentChecked,newUp
+    DocumentChecked,
   },
   data() {
     return {
@@ -197,18 +197,15 @@ export default {
       ],
     };
   },
-   created(){
-    
-    },
   mounted() {
-      //插入组件规则
-      // this.$refs.designer.addComponent(newUp);
-      //插入拖拽按钮到`main`分类下
-      this.$refs.designer.appendMenuItem('group1', {
-        icon: Back,
-        name: 'upload.name',
-        label: 'upload.label'
-      })
+    //插入组件规则
+    this.$refs.designer.addComponent(uploadRule);
+    //插入拖拽按钮到`main`分类下
+    this.$refs.designer.appendMenuItem("group1", {
+      icon: uploadRule.icon,
+      name: uploadRule.name,
+      label: uploadRule.label,
+    });
     this.workbookId = this.$route.query.workbookId;
     // console.log(this.workbookId);
     this.getWorkbookInfo();
@@ -217,6 +214,10 @@ export default {
     backList() {
       this.json = JSON.parse(this.$refs.designer.getJson());
       this.getOption();
+       console.log( _.isEqual(this.total.formJson, this.json),this.total.formJson, this.json);
+       console.log(   _.isEqual(this.total.cssJson, this.option),this.total.cssJson, this.option);
+
+
       if (
         _.isEqual(this.total.formJson, this.json) &&
         _.isEqual(this.total.cssJson, this.option)
@@ -238,8 +239,8 @@ export default {
     getOption() {
       this.option = this.$refs.designer.getOption();
       this.option.form.formCreateResetBtn = false;
-      this.option.form.formCreateSubmitBtn = true;
-      // console.log("getOption", this.option);
+      this.option.form.formCreateSubmitBtn = false;
+      console.log("getOption", this.option);
     },
     // 回显样式规则
     setOption() {
@@ -259,15 +260,22 @@ export default {
       checkWorkbookInfo(this.workbookId).then((res) => {
         console.log("getWorkbookInfo", res);
         this.total = res.data;
-
         this.json = res.data.formJson;
         this.option = res.data.cssJson;
-        this.option.onSubmit = function (e) {
-          console.log("Submit", e);
-        };
+        if (this.json === null) {
+          this.json = [];
+        }
+        if (this.option === null) {
+          this.option = {};
+          this.option.form = {};
+        }
+        console.log("option", this.option);
+
         this.option.form.formCreateResetBtn = false;
-        this.option.form.formCreateSubmitBtn = true;
-        // console.log("option", this.option);
+        
+        this.option.form.formCreateSubmitBtn = false;
+        console.log("option操作后", this.option, this.option.form.formCreateSubmitBtn );
+
         this.setJson();
         this.setOption();
       });
@@ -278,16 +286,27 @@ export default {
       this.getOption();
       this.total.formJson = this.json;
       this.total.cssJson = this.option;
-      editWorkbookInfo(this.total).then((res) => {
-        // console.log("editWorkbookInfo", res);
-        if (res.code === "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `更新成功`,
-            duration: 1500,
-          });
-        }
-      });
+      if (this.total.formJson.length > 0) {
+        this.total.formJson.forEach((form) => {
+          if (form.type === "upload") {
+            Reflect.deleteProperty(form, "component");
+          }
+        });
+      }
+      console.log("save", this.total);
+
+      this.total.formJson
+        editWorkbookInfo(this.total).then((res) => {
+          // console.log("editWorkbookInfo", res);
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            this.getWorkbookInfo()
+          }
+        });
     },
   },
 };

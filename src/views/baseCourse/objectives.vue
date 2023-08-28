@@ -82,7 +82,8 @@
                   <el-col :span="5">( {{ assessment.weight }}% )</el-col>
                   <el-col :span="12">
                     <el-row>
-                      <el-col :span="8"
+                      <el-col
+                        :span="8"
                         v-for="(activity, index) in assessment.activities.item"
                         :key="index"
                       >
@@ -98,11 +99,55 @@
         </div>
       </div>
       <div v-show="!hasDetailId">
-        <div class="no-info">暂未设置课程大纲版本</div>
+        <div>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              margin-top: 100px;
+              font-size: 22px;
+            "
+          >
+            暂未设置课程大纲版本
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              color: grey;
+              font-size: 13px;
+              margin-top: 30px;
+            "
+          >
+            请联系课程负责人进行设置
+          </div>
+        </div>
       </div>
       <div v-show="hasDetailId && !hasObjective">
-        <el-row class="no-info">
-          <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
+        <el-row>
+          <div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                margin-top: 100px;
+                font-size: 22px;
+              "
+            >
+              暂未设置课程大纲版本
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                color: grey;
+                font-size: 13px;
+                margin-top: 30px;
+              "
+            >
+              请联系课程负责人进行设置
+            </div>
+          </div>
           <el-col class="go-edit" @click="goEdit()" v-show="isRespondent"
             >去设置</el-col
           >
@@ -142,7 +187,7 @@ export default {
   mounted() {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
-     if (this.course.detailId === null) {
+    if (this.course.detailId === null) {
       this.hasDetailId = false;
     } else {
       this.hasDetailId = true;
@@ -163,19 +208,22 @@ export default {
         console.log(this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
-            this.hasObjective = true;
+          this.hasObjective = true;
           this.list.objectives.forEach((value) => {
             if (value.id.charAt(0) == "0") {
               value.serialNum = value.id.charAt(1);
             } else {
               value.serialNum = value.id;
             }
-              if (value.hasOwnProperty("achievement")&&value.achievement!==null) {
-                value.achievementTwo=value.achievement.toFixed()
-                value.hasAchieve = true;
-              } else {
-                value.hasAchieve = false;
-              }
+            if (
+              value.hasOwnProperty("achievement") &&
+              value.achievement !== null
+            ) {
+              value.achievementTwo = value.achievement.toFixed();
+              value.hasAchieve = true;
+            } else {
+              value.hasAchieve = false;
+            }
           });
         }
         console.log("getObjectives:", this.list);
