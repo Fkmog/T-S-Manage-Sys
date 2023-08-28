@@ -81,8 +81,9 @@
             :name="item.name">
           </el-tab-pane>
         </el-tabs>
-      <div layout="row" flex class="md-padding" v-show="hasActivities&&hasObjectives">
-          <div class="hot-table-container" flex id="courseHot"></div>
+
+      <div class="card-container"  v-show="hasActivities&&hasObjectives">
+          <div class="hot-table-container" id="courseHot"></div>  
       </div>
       
         <div v-show="!hasActivities" style=" padding-top: 120px;
@@ -130,12 +131,6 @@
     
     export default{
       name:'addTeacher',
-      inject:['reload'], 
-      provide(){
-          return{
-            reload:this.reload
-          }
-        },
       data(){
         let self = this;
         return{
@@ -244,8 +239,11 @@
             name: newTabName.toString(),
             value: newTabName
           });
-          this.editableTabsValue = newTabName.toString();
-          this.currenteditableTabsValue=1;
+          this.editableTabsValue = this.editableTabs[0].name;
+          this.currenteditableTabsValue = 1;
+          // this.hotInstance.updateSettings({
+          //       data:that.db.items[that.currenteditableTabsValue-1],
+          //     });
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue);
         }
         if (action === 'remove') {
@@ -306,13 +304,14 @@ activate(){
         this.departmentId = this.$store.state.currentInfo.departmentId;
         this.schoolId = this.$store.state.currentInfo.schoolId;
         this.programId = this.$store.state.major.programId;
-        if(this.identity == '学院管理员'){
+        if (this.identity == "学院管理员") {
           this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-          console.log('identity:',this.identity);
-        }
-        else{
+          console.log("identity:", this.identity);
+        } else if (this.identity == "课程负责人") {
+          this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        } else {
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-          console.log('identity:',this.identity);
+          console.log("identity:", this.identity);
         }
         
         console.log('this.departmentId',this.departmentId,'this.schoolId',this.schoolId,'this.programId',this.programId,'this.classInfo',this.classInfo);
@@ -365,7 +364,7 @@ activateHotcolumn(){
             preventOverflow: 'horizontal',
             manualColumnMove: false,
             copyPaste: true,
-            colWidths: 70,
+            colWidths: 100,
             
             contextMenu: {
               items:{
@@ -517,7 +516,8 @@ async getActivities(){
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
             course.activities.forEach((activity)=>{
-            that.handleTabsEdit(1,'add',activity.name);
+              console.log('activity["name"]',activity['name']);
+            that.handleTabsEdit(1,'add',activity['name']);
             let activityNumber = activity['item'].length;
             console.log('activityNumber:',activityNumber);
             let studentNum = course.scores.length;
@@ -604,12 +604,12 @@ async getActivities(){
         }
         else{
           console.log('res has no scores');
-          that.handleTabsEdit(1,'add');
+          // that.handleTabsEdit(1,'add');
           that.hasScores = false;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
             course.activities.forEach((activity)=>{
-            that.handleTabsEdit(1,'add');
+            that.handleTabsEdit(1,'add',activity['name']);
             let activityNumber = activity['item'].length;
             let studentNum = (course.scores)?course.scores.length:1;
             that.currentNumberofActivities = activityNumber;
@@ -709,16 +709,29 @@ async getActivities(){
                 };
                 for(let i=0;i<studentList.length;i++){
                   if(student[i]['studentNumber']==studentNumber){
-                    // console.log('socres:',student.values())
+                    console.log('socres:',student[i])
+                    let tempDict = {
+                      studentNumber:'',
+                      studentName:'',
+                      pass:'',
+                    }
                     for(var key in student[i]){
-                      // console.log('key',key,'student[key]',student[i][key])
-                      if(key == 'studentNumber'|| key == 'studentName'|| key == 'pass'){
-                        infoList.push(student[i][key]);
+                      console.log('key',key,'student[key]',student[i][key])
+                      if(key == 'studentNumber'){
+                        tempDict['studentNumber'] = student[i][key];
+                      }
+                      else if(key == 'studentName'){
+                        tempDict['studentName'] = student[i][key];
+                       
+                      }
+                      else if(key == 'pass'){
+                        tempDict['pass'] = student[i][key];
                       }
                       else{
                         gradList.push(student[i][key]);
                         
                       }
+                      infoList.push(tempDict);
                     }
                   }
                   
@@ -727,7 +740,7 @@ async getActivities(){
               })
               console.log('info:',infoList,'grade:',finalGrade);
               var scoreDist = {
-                'info':[infoList[0],infoList[1],infoList[2]],
+                'info':[infoList[0]['studentNumber'],infoList[0]['studentName'],infoList[0]['pass']],
                 'grade':finalGrade,
               }
               
@@ -944,13 +957,6 @@ async getActivities(){
       
       
     },
-    reload(){
-      this.isRouterAlive = false;
-      this.count = 0;
-      this.$nextTick(function () {
-        this.isRouterAlive = true;
-      });
-    },
     goTeacher(){
       console.log('goteacher:'+this.saving+this.dirty);//只有dirty = flase 或者 saving = true时才可以退出
       
@@ -1049,8 +1055,19 @@ async getActivities(){
     </script>
     
     <style  scoped>
+    .card-container{
+    margin-left: 10%;
+    width: 80%;
+    height: 600px;
+    background-color: white;
+    box-shadow: 0px 1px 3px rgb(164, 163, 163);
+  }
     .activity-tab{
-      margin-top: 100px;
+    margin-top: 68px;
+    background: white;
+    box-shadow: 0px 1px 3px rgb(164, 163, 163);
+    width:80%;
+    margin-left: 10%;
     }
     .no-program {
   display: flex;
@@ -1071,9 +1088,8 @@ async getActivities(){
   width: 100%;
 }
     .hot-table-container{
-    width: 50%;
-    margin-left: 20%;
-    margin-right: 25%;
+      float: left;
+      height: 100px;
   }
     .hotTable{
       box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
