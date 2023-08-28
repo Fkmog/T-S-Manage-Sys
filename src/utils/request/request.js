@@ -37,7 +37,7 @@ axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
 // 创建axios实例
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API,
-  baseURL: "http://81.68.103.96:8099/",
+  baseURL: "http://81.68.103.96:8080/",
   timeout: 20 * 1000, //超时请求时间：20s
 });
 
