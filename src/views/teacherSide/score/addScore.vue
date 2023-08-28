@@ -84,16 +84,24 @@
       <div layout="row" flex class="md-padding" v-show="hasActivities&&hasObjectives">
           <div class="hot-table-container" flex id="courseHot"></div>
       </div>
-      <div v-show="!hasActivities" class="no-program">
-        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      
+        <div v-show="!hasActivities" style=" padding-top: 120px;
+          display: flex;
+          justify-content: center;
+          font-size: 22px;
+          background-color: #f2f2f2;">
           未创建成绩项
-        </h2>
       </div>
-      <div v-show="!hasObjectives" class="no-program">
-        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      
+      
+        <div v-show="!hasObjectives" style=" padding-top: 120px;
+          display: flex;
+          justify-content: center;
+          font-size: 22px;
+          background-color: #f2f2f2;">
           未创建课程目标
-        </h2>
       </div>
+     
     </div>
 </template>
     
@@ -603,7 +611,7 @@ async getActivities(){
             course.activities.forEach((activity)=>{
             that.handleTabsEdit(1,'add');
             let activityNumber = activity['item'].length;
-            let studentNum = course.scores.length;
+            let studentNum = (course.scores)?course.scores.length:1;
             that.currentNumberofActivities = activityNumber;
           
           let tempList = [];

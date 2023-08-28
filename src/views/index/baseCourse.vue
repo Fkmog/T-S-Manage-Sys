@@ -20,9 +20,9 @@
             </el-col>
             <el-col :span="9">
               <el-select
-                v-model="currentVersion"
+                v-model="currentVersionId"
                 class="m-3"
-                @change="getCourseByYear(currentVersion)"
+                @change="getCourseByYear(currentVersionId)"
               >
                 <el-option
                   v-for="item in versions"
@@ -81,6 +81,18 @@
       </el-col>
 
       <el-col :span="6" v-show="identity == '课程负责人'">
+        <el-dropdown class="dropdownstyle">
+          <el-icon class="dropdownIcon"><MoreFilled /></el-icon>
+
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="this.addWorkbook()">
+                <el-icon><Collection /></el-icon>
+                &nbsp分配手册模版
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </el-col>
     </el-row>
   </div>
@@ -179,7 +191,7 @@
               </el-tooltip>
             </el-col>
             <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="查看信息">
+              <el-tooltip content="课程大纲">
                 <el-button
                   @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
                   class="deleteButton"
@@ -275,7 +287,7 @@
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
-            <span v-show="!scope.row.workbookName">未分配工作手册</span>
+            <span v-show="!scope.row.workbookName"> </span>
           </div>
         </template>
       </el-table-column>
@@ -284,7 +296,7 @@
         <template #default="scope">
           <el-row v-show="showToolIcon">
             <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="查看信息">
+              <el-tooltip content="课程大纲">
                 <el-button
                   @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
                   class="deleteButton"
@@ -473,90 +485,6 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showEditVersionDailogFlag"  title="课程大纲版本号维护">
-    <el-form :model="versionForm" :rules="editVersionRules">
-      <el-form-item
-        v-show="addFlag"
-        label="课程大纲版本号"
-        :label-width="formLabelWidth"
-        prop="name"
-        :error="C_ErrorMsg_editVersion_name"
-      >
-        <el-input v-model="versionForm.name" autocomplete="off" />
-      </el-form-item>
-      <el-form-item
-        v-show="editFlag || deleteFlag"
-        label="选择课程大纲版本"
-        :label-width="formLabelWidth"
-        prop="name"
-      >
-        <el-select
-          v-model="currentVersion"
-          placeholder="Please enter a keyword"
-          @change="selectVersion(currentVersion)"
-        >
-          <el-option
-            v-for="item in versions"
-            :key="item.versionId"
-            :label="item.label"
-            :value="item.versionId"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="面向年级"
-        :label-width="formLabelWidth"
-        prop="enrollYear"
-        :error="C_ErrorMsg_editVersion_enrollYear"
-      >
-        <el-input v-model="versionForm.enrollYear" autocomplete="off" />
-      </el-form-item>
-      <el-form-item
-        label="修订年份"
-        :label-width="formLabelWidth"
-        prop="reviseYear"
-        :error="C_ErrorMsg_editVersion_reviseYear"
-      >
-        <el-input v-model="versionForm.reviseYear" autocomplete="off" />
-      </el-form-item>
-    </el-form>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button
-          @click="
-            showEditVersionDailogFlag = false;
-            this.cancelVersionForm();
-          "
-          >取消</el-button
-        >
-        <el-button
-          v-show="addFlag"
-          type="primary"
-          :disabled="!submitFlag"
-          @click="addVersion()"
-        >
-          添加课程大纲版本号
-        </el-button>
-        <el-button
-          v-show="editFlag"
-          type="warning"
-          :disabled="!submitFlag"
-          @click="editVersion()"
-        >
-          修改课程大纲版本号
-        </el-button>
-        <el-button
-          v-show="deleteFlag"
-          type="danger"
-          :disabled="!submitFlag"
-          @click="deleteVersion()"
-        >
-          删除课程大纲版本号
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
   
   <el-dialog
     v-model="showAddWorkbook"
@@ -863,6 +791,7 @@ export default {
 
       //select
       currentVersion: "",
+      currentVersionName:"",
       currentVersionId: Number,
       loading: ref(false),
       options: [],
@@ -951,6 +880,7 @@ export default {
       console.log('versionId',versionId);
       for(const element of this.versions){
         if(element['versionId']==versionId){
+          this.currentVersionName = element["label"];
           this.versionForm.name = element["label"];
           this.versionForm.enrollYear = element["enrollYear"];
           this.versionForm.reviseYear = element["reviseYear"];
@@ -958,116 +888,6 @@ export default {
         }
       }
       console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
-    },
-    addVersion() {
-      let that = this;
-      return request({
-        url: "/detail/version",
-        method: "post",
-        data: {
-          enrollYear: that.versionForm.enrollYear,
-          reviseYear: that.versionForm.reviseYear,
-          versionName: that.versionForm.name,
-        },
-      })
-        .then((res) => {
-          console.log("edit version res:", res);
-          if (res.code == "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `新建成功`,
-              duration: 1000,
-            });
-            that.showEditVersionDailogFlag = false;
-            that.versionForm = {
-              name: "",
-              enrollYear: "",
-              reviseYear: "",
-              versionId: "",
-            };
-            that.getDict();
-          }
-        })
-        .catch((e) => {
-          console.log("edit version res error:", e);
-          ElMessage({
-            type: "error",
-            message: `新建失败`,
-            duration: 1000,
-          });
-        });
-    },
-    editVersion() {
-      let that = this;
-      return request({
-        url: "/detail/version",
-        method: "put",
-        data: {
-          enrollYear: that.versionForm.enrollYear,
-          reviseYear: that.versionForm.reviseYear,
-          versionName: that.versionForm.name,
-          versionId: that.versionForm.versionId,
-        },
-      })
-        .then((res) => {
-          console.log("edit version res:", res);
-          if (res.code == "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `更新成功`,
-              duration: 1000,
-            });
-            that.showEditVersionDailogFlag = false;
-            that.versionForm = {
-              name: "",
-              enrollYear: "",
-              reviseYear: "",
-              versionId: "",
-            };
-            that.getDict();
-          }
-        })
-        .catch((e) => {
-          console.log("edit version res error:", e);
-          ElMessage({
-            type: "error",
-            message: `更新失败`,
-            duration: 1000,
-          });
-        });
-    },
-    deleteVersion() {
-      let that = this;
-      return request({
-        url: "/detail/versionRemove/" + that.versionForm.versionId,
-        method: "delete",
-      })
-        .then((res) => {
-          console.log("delete version res:", res);
-          if (res === 204) {
-            ElMessage({
-              type: "success",
-              message: `删除成功`,
-              duration: 1000,
-            });
-            that.showEditVersionDailogFlag = false;
-            that.versionForm = {
-              name: "",
-              enrollYear: "",
-              reviseYear: "",
-              versionId: "",
-            };
-            that.getDict();
-          }
-        })
-        .catch((e) => {
-          console.log("edit version res error:", e);
-          ElMessage({
-            type: "error",
-            message: `删除失败`,
-            duration: 1000,
-          });
-        });
     },
     showEditVersionDailog() {
       this.showEditVersionDailogFlag = true;
@@ -1122,7 +942,9 @@ export default {
             console.log('baseCourseVersionId',this.$store.state.course.baseCourseVersionId,'that.versions[0].versionId',that.versions[0].versionId)
             for(const element of that.versions){
               if(element['versionId']==that.currentVersionId){
+                console.log('find same ');
                 that.currentVersion = element["label"];
+                that.currentVersionName = element["label"];
               }
           }
           }
@@ -1291,13 +1113,13 @@ export default {
     addWorkbook(){
       let that = this;
       this.showAddWorkbook = true;
+      this.workBookDetail = [];
       checkWorkbook(this.departmentId).then(function(res){
         console.log(res);
         if(res.code == "SUCCESS"){
           res.rows.forEach((workbook)=>{
             that.workBookDetail.push({'name':workbook.name,'workbookId':workbook.workbookId})
           });
-          
         }
       
       }).catch((e)=>{
@@ -1315,6 +1137,7 @@ export default {
         console.log('setWorkbook res',res);
         if(res.code == "SUCCESS"){
           that.showAddWorkbook = false;
+
           ElMessage({
             type: "success",
             message: `分配成功`,
@@ -1370,13 +1193,16 @@ export default {
       console.log('currentVersionId',this.currentVersionId);
       if(this.currentVersionId){
         let that = this;
-      this.versions.forEach((version) => {
-        if (version["value"] == that.currentVersionId) {
-          that.currentVersion = version["label"];
-        }
-      });
+      for(const element of this.versions){
+              if(element['versionId']==that.currentVersionId){
+                console.log('find same ');
+                that.currentVersion = element["label"];
+                that.currentVersionName = element["label"];
+              }
+          }
+      console.log('currentVersionName',this.currentVersionName);
       let versionMessage =
-        "是否确认添加课程大纲（版本：" + this.currentVersion + " ）?";
+        "是否确认添加课程大纲（版本：" + this.currentVersionName + " ）?";
       ElMessageBox.confirm(versionMessage, "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",

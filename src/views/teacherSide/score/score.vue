@@ -38,7 +38,7 @@
     <addBtn @click="goAddScore" v-show="identity=='教师'"></addBtn>
 
     <!-- editable @edit="handleTabsEdit"-->
-    <el-tabs v-model="editableTabsValue" type="card" class="activity-tab"  
+    <el-tabs v-model="editableTabsValue" v-show="hasScores" type="card" class="activity-tab"  
 
       @tab-click="editableTabsValueChange"
       
@@ -96,9 +96,15 @@
 </div>
    
   <div v-show="!hasScores" class="no-program">
-      <h2 style="display: flex; justify-content: center; margin-top: 100px">
-        未添加学生
-      </h2>
+      <div style="
+  padding-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+  background-color: #f2f2f2;
+">
+        任课教师尚未录入成绩
+      </div>
       
   </div>
   </div>
