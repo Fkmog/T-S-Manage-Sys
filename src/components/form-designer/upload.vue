@@ -9,6 +9,7 @@
     :data='data'
     accept='.doc,.docx,.pdf,.rar,.zip'
     showFileList
+    list-type='text' 
   >
     <el-button type="primary">点击上传</el-button>
   </el-upload>
@@ -22,7 +23,7 @@ export default {
     return {
       fileList: [],
       limit: 1,
-      action:'http://81.68.103.96:8099/common/upload/file',
+      action:'http://81.68.103.96:8099/common/upload/files',
       headers:{},
       data:{}
     };

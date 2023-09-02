@@ -41,9 +41,9 @@
     </div>
     </div>
     <div v-show="!hasStudent" class="no-program">
-      <h2 style="display: flex; justify-content: center; margin-top: 100px">
+      <div style="display: flex; justify-content: center;padding-top: 120px;font-size: 22px;background-color: #f2f2f2;">
       没有学生
-    </h2>
+      </div>
     <div style="display: flex; justify-content: center; color: grey">
         请先点击右上角圆形按钮添加学生
       </div>

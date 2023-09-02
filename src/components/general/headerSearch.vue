@@ -83,9 +83,8 @@ export default {
   margin-left: 50px;
 }
 .searchInput {
-  margin-top: 17px;
-  margin-left: 5px;
-  font-size: 16px;
+  margin-top: 13px;
+  /* font-size: 16px; */
   width: 0px;
   border-top-width: 0px;
   border-left-width: 0px;
@@ -105,7 +104,7 @@ export default {
   flex-direction: row;
 }
 .activeInput {
-  width: 220px;
+  width:370px;
   transition: all 0.3s;
   border-top-width: 0px;
   border-left-width: 0px;
@@ -115,7 +114,7 @@ export default {
   transition: 0.3s;
 }
 .searchBlock:hover .searchInput {
-  width: 220px;
+  width: 370px;
   transition: all 0.3s;
   border-top-width: 0px;
   border-left-width: 0px;

@@ -96,6 +96,7 @@ import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
 import _ from "lodash";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getClassInfo } from "@/api/class";
+import { downloadFile } from "@/api/common";
 import Cookies from "js-cookie";
 
 export default {
@@ -220,7 +221,34 @@ export default {
     },
     //当 status 为2，3时，无法编辑表单，注入disable属性
     disabledForm() {
+      console.log("!", this.workbook.formJson);
       this.workbook.formJson.forEach((form) => {
+        if (Array.isArray(form.children)) {
+          form.children.forEach((formChild) => {
+            if (typeof formChild === 'object') {
+              if (Array.isArray(formChild.children)) {
+                if (formChild.children[0] !== "") {
+                  formChild.children.forEach((grandson) => {
+                    if (typeof grandson === 'object') {
+                      if (grandson.props === undefined) {
+                        grandson.props = {};
+                      }
+                      grandson.props.disabled = true;
+                    }
+                  });
+                }
+              }
+              if (formChild.props === undefined) {
+                formChild.props = {};
+              }
+              formChild.props.disabled = true;
+            }
+          });
+        } else {
+        }
+        if (form.props === undefined) {
+          form.props = {};
+        }
         form.props.disabled = true;
       });
       console.log("disabled后", this.workbook);
@@ -256,21 +284,42 @@ export default {
               this.hasWorkbook = false;
             } else {
               this.hasWorkbook = true;
-              // 找到上传组件，注入props
+              // 找到上传组件，注入props配置
               res.data.formJson.forEach((form) => {
+                let that = this;
                 if (form.type === "upload") {
-                  form.props.action =
-                    "http://81.68.103.96:8080/common/upload/file";
-                  form.props.headers = {
-                    Authorization: "Bearer " + Cookies.get("Admin-Token"),
-                  };
-                  form.props.data = {
-                    param: this.classInfo.classId,
-                    type: "workbookFile",
-                  };
-                  form.props.onSuccess = function (res,file,fileList) {
-                    console.log("nanshou",res,file,fileList);
-                    // fileList.url=url.name
+                  console.log(form);
+                  const limit = form.props.limit;
+                  form.props = {
+                    limit: limit,
+                    listType: "text",
+                    multiple: true,
+                    name: "files",
+                    action: "http://81.68.103.96:8080/common/upload/files",
+                    headers: {
+                      Authorization: "Bearer " + Cookies.get("Admin-Token"),
+                    },
+                    data: {
+                      param: this.classInfo.classId,
+                      type: "workbookFile",
+                      field: form.field,
+                    },
+                    onSuccess: function (res, file) {
+                      console.log("upload", res, file);
+                      file.url = res.fileRecords[0].fileAddress;
+                      // form.value.push(file.url);
+                    },
+                    onExceed: function () {
+                      ElMessage({
+                        type: "warning",
+                        message: `超出上传文件数量限制`,
+                        duration: 1500,
+                      });
+                    },
+                    onPreview: function (file) {
+                      that.download(file);
+                      // console.log("!",file);
+                    },
                   };
                 }
               });
@@ -284,11 +333,18 @@ export default {
               this.option = res.data.cssJson;
               // 保存提交
               this.option.submitBtn = false;
-              // console.log(this.classInfo.status);
+              console.log(
+                "classInfo",
+                this.classInfo,
+                this.identity,
+                this.classInfo.status == 2 ||
+                  this.classInfo.status == 3 ||
+                  this.identity !== "教师"
+              );
               if (
                 this.classInfo.status == 2 ||
                 this.classInfo.status == 3 ||
-                !(this.identity == "教师")
+                this.identity !== "教师"
               ) {
                 this.disabledForm();
               } else {
@@ -315,6 +371,23 @@ export default {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
         }
         this.value = res.data.workbookJson;
+      });
+    },
+    // 下载文件
+    download(file) {
+      let fileAddress = file.url;
+      let fileName = file.name;
+      downloadFile(fileAddress).then((res) => {
+        // console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        const link = document.createElement("a");
+        link.download = decodeURI(fileName);
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
       });
     },
   },

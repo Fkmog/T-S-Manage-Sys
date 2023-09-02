@@ -449,7 +449,7 @@ export default {
         obj.type = "syllabusFile";
         array.push(obj);
         console.log("@@",array);
-        that.action = "http://81.68.103.96:8080/common/upload/file";
+        that.action = "http://81.68.103.96:8080/common/upload/files";
         that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
         that.getFile();
