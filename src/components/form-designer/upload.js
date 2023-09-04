@@ -3,10 +3,8 @@ import Cookies from "js-cookie";
 import upload from "./upload.vue";
 import { localeProps, makeRequiredRule } from "./utils";
 import { shallowRef } from "vue";
-import store from "@/store/index.js";
 const label = " 上传";
 const name = "upload";
-const classId = store.state.currentInfo;
 let i = 1;
 const uniqueId = () => `uni${i++}`;
 export const uploadRule = {
@@ -32,7 +30,7 @@ export const uploadRule = {
       },
       //这里设置组件的默认props配置项, 在下面的 props 方法里面设置无效
       props: {
-        action: "http://81.68.103.96:8099/common/upload/file",
+        action: "http://81.68.103.96:8099/common/upload/files",
         headers: { Authorization: "Bearer " + Cookies.get("Admin-Token") },
         data: [
           {
@@ -40,8 +38,10 @@ export const uploadRule = {
             type: "workbookFile",
           },
         ],
+        listType: text,
+
         onSuccess(res) {
-          console.log("suc");
+          console.log("suc", res);
         },
       },
     };
@@ -50,19 +50,6 @@ export const uploadRule = {
   props(_, { t }) {
     return localeProps(t, name + ".props", [
       makeRequiredRule(),
-      // {
-      //   type: "select",
-      //   field: "uploadType",
-      //   title: "上传类型",
-      //   value: "image",
-      //   options: [
-      //     { label: "图片", value: "image" },
-      //     {
-      //       label: "文件",
-      //       value: "file",
-      //     },
-      //   ],
-      // },
       { type: "switch", field: "multiple", title: "是否支持多选文件" },
       {
         type: "switch",
@@ -78,6 +65,3 @@ export const uploadRule = {
     ]);
   },
 };
-export function helloword() {
-  return console.log("123",classId);
-}

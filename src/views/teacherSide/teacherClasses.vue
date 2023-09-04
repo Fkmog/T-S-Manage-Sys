@@ -1,5 +1,5 @@
 <template>
-  <HeaderSearch msg="搜索课程名称" @SearchValue="getSearchValue"></HeaderSearch>
+  <HeaderSearch msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号" @SearchValue="getSearchValue"></HeaderSearch>
   <div class="classes-list">
     <div
       class="card"
