@@ -1,6 +1,6 @@
 <template>
   <!-- 顶部搜索栏 -->
-  <HeaderSearch msg="搜索课程名称" @SearchValue="getSearchValue">
+  <HeaderSearch msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号" @SearchValue="getSearchValue">
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
         <div class="selects">
@@ -228,12 +228,7 @@
               :value="item.value"
             />
           </el-select>
-          <!-- <el-autocomplete
-            style="width: 540px"
-            v-model="classEditForm.instructor"
-            hide-loading
-            :fetch-suggestions="querySearch"
-          ></el-autocomplete> -->
+
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -242,23 +237,6 @@
           :error="E_ErrorMsg"
         >
           <el-input v-model="classEditForm.courseCode" autocomplete="off" />
-        </el-form-item>
-        <el-form-item
-          label="课程大纲版本"
-          :label-width="formLabelWidth"
-          prop="versionName"
-        >
-          <el-select
-            v-model="classEditForm.versionName"
-            placeholder="设置课程大纲"
-          >
-            <el-option
-              v-for="item in this.detailList"
-              :key="item.detailId"
-              :label="item.versionName"
-              :value="item.detailId"
-            />
-          </el-select>
         </el-form-item>
         <el-form-item
           label="开课号"
