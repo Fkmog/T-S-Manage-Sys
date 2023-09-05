@@ -159,29 +159,55 @@
           <el-col style="margin-top: 45px">
             <el-row>
               <el-col class="detail-title">课程大纲</el-col>
-              <el-col :span="6" v-show="!hasFile">
+              <el-col :span="6">
                 <el-upload
+                  v-show="!hasFile"
                   class="upload-demo"
                   :action="action"
-                  :data='data'
+                  :data="data"
                   :headers="headers"
                   accept=".doc,.docx,.pdf,.rar,.zip"
                   :file-list="fileList"
                   :limit="1"
                   show-file-list
-                  name="file"
+                  name="files"
                   :on-success="uploadSuccess"
                   :on-exceed="uploadExceed"
-                  :before-remove="uploadBeforeRemove"
                   :on-remove="uploadRemove"
-                  :before-upload="beforeUpload"
                 >
                   <el-button size="small" type="primary"
                     >上传课程大纲</el-button
                   >
                 </el-upload>
               </el-col>
-              <el-col :span="6" v-show="hasFile" class="fileName">
+              <el-col>
+                <el-table
+                  v-show="hasFile"
+                  :data="filesList"
+                  style="cursor: pointer; margin-top: 10px; width: 225px"
+                  :show-header="false"
+                  @row-click="downloadFile"
+                >
+                  <el-table-column
+                    prop="originalName"
+                    label="文件名"
+                    width="180px"
+                  />
+                  <el-table-column width="45px">
+                    <template #default="scope">
+                      <el-tooltip content="移除" :hide-after="0">
+                        <el-button
+                          link
+                          style="color: #3f51b5"
+                          @click.stop="beforeRemove(scope.row)"
+                          ><el-icon><CircleClose /></el-icon
+                        ></el-button>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-col>
+              <!-- <el-col :span="6" v-show="hasFile" class="fileName">
                 <el-row>
                   <el-col :span="20" @click="downloadFile">
                     <el-tooltip
@@ -205,7 +231,7 @@
                       <el-icon><CircleClose /></el-icon> </el-tooltip
                   ></el-col>
                 </el-row>
-              </el-col>
+              </el-col> -->
             </el-row>
           </el-col>
         </el-col>
@@ -296,13 +322,13 @@ import Cookies from "js-cookie";
 import {
   getObjectives,
   downloadDetail,
-  removeDetail,
   getEditDetail,
   getVersion,
-  upload,
+  getFilesList,
   copyActAndObj,
 } from "@/api/basecourse";
 import DrawerSearch from "@/components/general/drawerSearch.vue";
+import { downloadFileId, downloadFile,removeFileId } from "@/api/common";
 
 export default {
   name: "baseCourseDetail",
@@ -323,6 +349,7 @@ export default {
   },
   data() {
     return {
+      filesList: [],
       checkList: ["成绩项", "课程目标"],
       currentRow: {},
       copyCourseList: [],
@@ -337,7 +364,7 @@ export default {
         Authorization: "Bearer " + Cookies.get("Admin-Token"),
       },
       action: "",
-      data:[],
+      data: [],
       //毕业要求
       indicators: [],
       departmentId: "",
@@ -436,23 +463,22 @@ export default {
           this.courseId,
         method: "get",
       }).then(function (res) {
-        console.log("getDetail:", res);
+        // console.log("getDetail:", res);
         res.rows.forEach(function (detail) {
           if (detail.versionId == that.versionId) {
             that.detailId = detail.detailId;
           }
         });
-        console.log("detailId", that.detailId);
+        // console.log("detailId", that.detailId);
         let array = [];
         let obj = {};
         obj.param = that.detailId;
         obj.type = "syllabusFile";
         array.push(obj);
-        console.log("@@",array);
         that.action = "http://81.68.103.96:8080/common/upload/files";
         that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
-        that.getFile();
+        that.checkFileList();
       });
     },
     //路由跳转
@@ -503,7 +529,7 @@ export default {
           message: `上传成功`,
           duration: 1500,
         });
-        this.getFile();
+        this.checkFileList();
       }
     },
     //文件上传数量限制
@@ -514,30 +540,23 @@ export default {
         duration: 1500,
       });
     },
-    //移除文件钩子前
-    uploadBeforeRemove(file, fileList) {
-      console.log("fileList", fileList);
-
-      return this.$confirm(`确认移除 ${file.name}？`);
-    },
     //移除文件前
-    beforeRemove() {
-      console.log("fileList", this.fileList);
-      ElMessageBox.confirm(`确认移除${this.object.fileName}？`, "", {
+    beforeRemove(row) {
+      ElMessageBox.confirm(`确认移除课程大纲文件？`, "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
           this.fileList = [];
-          this.uploadRemove();
+          this.uploadRemove(row);
         })
         .catch(() => {});
     },
-    //移除文件
-    uploadRemove(file, fileList) {
-      console.log("fileList", fileList);
-      removeDetail(this.detailId).then((res) => {
+    // 移除文件
+    uploadRemove(row) {
+      console.log("xcxscsdd", row);
+      removeFileId(row.fileId).then((res) => {
         console.log("removeDetail", res);
         if (res.code === "SUCCESS") {
           ElMessage({
@@ -545,7 +564,7 @@ export default {
             message: `删除成功`,
             duration: 1500,
           });
-          this.getFile();
+          this.checkFileList();
         }
       });
     },
@@ -559,29 +578,27 @@ export default {
         });
       }
     },
-    //查看有无文件
-    getFile() {
-      getObjectives(this.detailId).then((res) => {
-        console.log("getObjectives", res);
-        this.object = res.data;
-        if (
-          !(res.data.syllabusFileId === null || res.data.syllabusFileId === 0)
-        ) {
-          this.hasFile = true;
-        } else {
+    
+    //查看课程大纲文件列表
+    checkFileList() {
+      getFilesList(this.detailId).then((res) => {
+        this.filesList = res.data;
+        if (this.filesList.length == 0) {
           this.hasFile = false;
+        } else {
+          this.hasFile = true;
         }
       });
     },
     //下载文件
-    downloadFile() {
-      downloadDetail(this.detailId).then((res) => {
+    downloadFile(row) {
+      downloadFile(row.fileAddress).then((res) => {
         // console.log("downloadFile", res);
         const blob = new Blob([res]);
-        // console.log("blob",blob);
+        // console.log("blob", blob);
         // saveAs(blob, this.objectInfo.fileName)
         const link = document.createElement("a");
-        link.download = decodeURI(this.object.fileName);
+        link.download = decodeURI(row.originalName);
         link.style.display = "none";
         link.href = URL.createObjectURL(blob);
         document.body.appendChild(link);

@@ -378,7 +378,7 @@ export default {
       let fileAddress = file.url;
       let fileName = file.name;
       downloadFile(fileAddress).then((res) => {
-        // console.log("downloadFile", res);
+        console.log("downloadFile", res);
         const blob = new Blob([res]);
         const link = document.createElement("a");
         link.download = decodeURI(fileName);

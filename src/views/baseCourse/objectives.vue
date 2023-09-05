@@ -108,7 +108,7 @@
               font-size: 22px;
             "
           >
-            暂未设置课程大纲版本
+            暂未关联课程大纲
           </div>
           <div
             style="
@@ -134,7 +134,7 @@
                 font-size: 22px;
               "
             >
-              暂未设置课程大纲版本
+              暂未关联课程大纲
             </div>
             <div
               style="
@@ -234,10 +234,10 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .block {
   position: absolute;
   top: 110px;

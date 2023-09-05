@@ -422,10 +422,10 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .detail-Btn {
   margin-left: 100px;
 }
