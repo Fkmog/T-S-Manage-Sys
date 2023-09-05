@@ -562,10 +562,10 @@ export default {
 </script>
 
 <style scoped>
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .block {
   position: absolute;
   top: 110px;

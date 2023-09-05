@@ -120,7 +120,7 @@
                 font-size: 22px;
               "
             >
-              暂未设置课程大纲版本
+              暂未关联课程大纲
             </div>
             <div
               style="
@@ -252,10 +252,10 @@ export default {
 .switchstyle {
   bottom: 4px;
 }
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .block {
   position: absolute;
   top: 110px;
@@ -281,7 +281,7 @@ export default {
 .body {
   display: flex;
   justify-content: center;
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
 }
 .card {
   width: 800px;

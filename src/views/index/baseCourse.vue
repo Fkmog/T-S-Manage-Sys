@@ -1,13 +1,16 @@
 <template>
   <div v-show="!closeShow">
-    <HeaderSearch msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号" @SearchValue="getSearchValue">
+    <HeaderSearch
+      msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+      @SearchValue="getSearchValue"
+    >
       <template #rightTime>
         <div class="selectionBar">
-          <el-row>
+          <el-row class="selects">
             <el-col :span="9">
               <el-select
                 v-model="hasDetail"
-                class="m-3"
+                class="selecter"
                 @change="getSelectedBaseCourse(hasDetail)"
               >
                 <el-option
@@ -21,7 +24,7 @@
             <el-col :span="9">
               <el-select
                 v-model="currentVersionId"
-                class="m-3"
+                class="selecter"
                 @change="getCourseByYear(currentVersionId)"
               >
                 <el-option
@@ -32,7 +35,11 @@
                 />
               </el-select>
             </el-col>
-            <el-col :span="2" style="position: relative; top: 8px" v-show="identity == '学院管理员'">
+            <el-col
+              :span="2"
+              style="position: relative; top: 8px"
+              v-show="identity == '学院管理员'"
+            >
             </el-col>
           </el-row>
         </div>
@@ -59,21 +66,21 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="this.addPrincipal()">
                 <el-icon><User /></el-icon>
-                &nbsp添加课程负责人
+                &nbsp;添加课程负责人
               </el-dropdown-item>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp分配手册模版
+                &nbsp;分配手册模版
               </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
-                &nbsp删除课程负责人
+                &nbsp;删除课程负责人
               </el-dropdown-item>
               <el-dropdown-item
                 @click="this.multideleteBaseCourse(this.courseId)"
               >
                 <el-icon><Delete /></el-icon>
-                &nbsp删除课程
+                &nbsp;删除课程
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -88,7 +95,7 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp分配手册模版
+                &nbsp;分配手册模版
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -108,7 +115,7 @@
       @selection-change="handleSelectionChange"
       @row-click="editTrigger"
       class="el-table-container"
-      style="width: 1375px;text-overflow: ellipsis; white-space: nowrap;"
+      style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -170,7 +177,9 @@
       <el-table-column label="工作手册" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
+            <span v-show="scope.row.workbookName">{{
+              scope.row.workbookName
+            }}</span>
             <span v-show="!scope.row.workbookName"></span>
           </div>
         </template>
@@ -182,7 +191,9 @@
             <el-col :span="4">
               <el-tooltip content="删除课程">
                 <el-button
-                  @click.stop="deleteBaseCourse(scope.$index, scope.row.courseId)"
+                  @click.stop="
+                    deleteBaseCourse(scope.$index, scope.row.courseId)
+                  "
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -207,7 +218,8 @@
                   class="noBaseCourseDetail"
                   type="danger"
                   @click.stop="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag>
+                  >无课程大纲</el-tag
+                >
               </el-tooltip>
             </el-col>
           </el-row>
@@ -224,7 +236,7 @@
       class="el-table-container"
       @selection-change="handleSelectionChange"
       @row-click="editTrigger"
-      style="width: 1375px;text-overflow: ellipsis; white-space: nowrap;"
+      style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -286,7 +298,9 @@
       <el-table-column label="工作手册" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span v-show="scope.row.workbookName">{{ scope.row.workbookName }}</span>
+            <span v-show="scope.row.workbookName">{{
+              scope.row.workbookName
+            }}</span>
             <span v-show="!scope.row.workbookName"> </span>
           </div>
         </template>
@@ -322,10 +336,17 @@
     </el-table>
   </div>
 
-  <div v-show="(!hasBaseCourse && hasVersion)||(!hasBaseCourse && !hasVersion)" class="no-class">没有课程</div>
+  <div
+    v-show="(!hasBaseCourse && hasVersion) || (!hasBaseCourse && !hasVersion)"
+    class="no-class"
+  >
+    没有课程
+  </div>
 
-  <div v-show="!hasVersion && hasBaseCourse" class="no-class">没有版本信息，请去设置，设置版本信息</div>
-  <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
+  <div v-show="!hasVersion && hasBaseCourse" class="no-class">
+    没有版本信息，请去设置，设置版本信息
+  </div>
+  <el-dialog v-model="dialogFormVisible" title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -397,7 +418,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="dialogFormVisible1"  title="修改基础课程">
+  <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
     <el-form :model="preform">
       <el-form-item label="课程名称" :label-width="formLabelWidth">
         <el-input
@@ -455,7 +476,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showPrinciple"  title="添加负责人">
+  <el-dialog v-model="showPrinciple" title="添加负责人">
     <span> 请选择负责人姓名： </span>
 
     <el-select
@@ -478,14 +499,11 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="showPrinciple = false">取消</el-button>
-        <el-button type="primary" @click="addRespondent">
-          确认
-        </el-button>
+        <el-button type="primary" @click="addRespondent"> 确认 </el-button>
       </span>
     </template>
   </el-dialog>
 
-  
   <el-dialog
     v-model="showAddWorkbook"
     title="设置手册模版"
@@ -499,7 +517,7 @@
       placeholder="选择手册模版"
     >
       <el-option
-        v-for="(datail) in workBookDetail"
+        v-for="datail in workBookDetail"
         :key="datail.workbookId"
         :label="datail.name"
         :value="datail.workbookId"
@@ -513,7 +531,6 @@
       </span>
     </template>
   </el-dialog>
-  
 
   <div class="pagination-container" flex>
     <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
@@ -564,10 +581,10 @@ import {
   DocumentChecked,
   User,
   CircleClose,
-  Collection
+  Collection,
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
-import { setWorkbook,checkWorkbook } from "@/api/workbook";
+import { setWorkbook, checkWorkbook } from "@/api/workbook";
 
 export default {
   name: "BaseCourse",
@@ -605,7 +622,7 @@ export default {
     DocumentChecked,
     User,
     CircleClose,
-    Collection
+    Collection,
   },
   data() {
     var validateName = (rule, value, callback) => {
@@ -670,8 +687,7 @@ export default {
     };
 
     return {
-
-      hasVersion:Boolean,
+      hasVersion: Boolean,
 
       hasDetail: "全部",
       hasDetailSeletion: [
@@ -705,9 +721,9 @@ export default {
         ],
       },
 
-      showAddWorkbook:false,
-      workBookId:'',
-      workBookDetail:[],
+      showAddWorkbook: false,
+      workBookId: "",
+      workBookDetail: [],
 
       showEditVersionDailogFlag: false,
       C_ErrorMsg: "",
@@ -791,7 +807,7 @@ export default {
 
       //select
       currentVersion: "",
-      currentVersionName:"",
+      currentVersionName: "",
       currentVersionId: Number,
       loading: ref(false),
       options: [],
@@ -877,9 +893,9 @@ export default {
       this.reviseYearFlag = false;
     },
     selectVersion(versionId) {
-      console.log('versionId',versionId);
-      for(const element of this.versions){
-        if(element['versionId']==versionId){
+      console.log("versionId", versionId);
+      for (const element of this.versions) {
+        if (element["versionId"] == versionId) {
           this.currentVersionName = element["label"];
           this.versionForm.name = element["label"];
           this.versionForm.enrollYear = element["enrollYear"];
@@ -887,7 +903,14 @@ export default {
           this.versionForm.versionId = element["versionId"];
         }
       }
-      console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
+      console.log(
+        "name:",
+        this.versionForm.name,
+        "enrollYear:",
+        this.versionForm.enrollYear,
+        "reviseYear:",
+        this.versionForm.reviseYear
+      );
     },
     showEditVersionDailog() {
       this.showEditVersionDailogFlag = true;
@@ -923,9 +946,8 @@ export default {
       })
         .then((res) => {
           console.log("versionList:", res);
-          
+
           if (res.code == "SUCCESS" && res.data.length) {
-            
             that.hasVersion = true;
             res.data.forEach((year) => {
               let dict = {
@@ -938,29 +960,33 @@ export default {
               that.versionLabel.push(year.versionName);
             });
 
-            that.currentVersionId = (this.$store.state.course.baseCourseVersionId)?this.$store.state.course.baseCourseVersionId:that.versions[0].versionId;
-            console.log('baseCourseVersionId',this.$store.state.course.baseCourseVersionId,'that.versions[0].versionId',that.versions[0].versionId)
-            for(const element of that.versions){
-              if(element['versionId']==that.currentVersionId){
-                console.log('find same ');
+            that.currentVersionId = this.$store.state.course.baseCourseVersionId
+              ? this.$store.state.course.baseCourseVersionId
+              : that.versions[0].versionId;
+            console.log(
+              "baseCourseVersionId",
+              this.$store.state.course.baseCourseVersionId,
+              "that.versions[0].versionId",
+              that.versions[0].versionId
+            );
+            for (const element of that.versions) {
+              if (element["versionId"] == that.currentVersionId) {
+                console.log("find same ");
                 that.currentVersion = element["label"];
                 that.currentVersionName = element["label"];
               }
-          }
-          }
-          else{
+            }
+          } else {
             that.hasVersion = false;
             ElMessage({
-            type: "error",
-            message: `没有版本信息，请先添加版本！`,
-            duration: 1000,
-          });
+              type: "error",
+              message: `没有版本信息，请先添加版本！`,
+              duration: 1000,
+            });
           }
-
         })
         .catch((e) => {
           console.log("error:", e);
-          
         });
     },
 
@@ -1107,47 +1133,53 @@ export default {
         this.getBaseCourse(this.pageSize, this.pageNum);
       }
     },
-    printworkbook(){
-      console.log('workBookId',this.workBookId);
+    printworkbook() {
+      console.log("workBookId", this.workBookId);
     },
-    addWorkbook(){
+    addWorkbook() {
       let that = this;
       this.showAddWorkbook = true;
       this.workBookDetail = [];
-      checkWorkbook(this.departmentId).then(function(res){
-        console.log(res);
-        if(res.code == "SUCCESS"){
-          res.rows.forEach((workbook)=>{
-            that.workBookDetail.push({'name':workbook.name,'workbookId':workbook.workbookId})
-          });
-        }
-      
-      }).catch((e)=>{
-        console.log('e',e);
-      })
+      checkWorkbook(this.departmentId)
+        .then(function (res) {
+          console.log(res);
+          if (res.code == "SUCCESS") {
+            res.rows.forEach((workbook) => {
+              that.workBookDetail.push({
+                name: workbook.name,
+                workbookId: workbook.workbookId,
+              });
+            });
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
     },
-    submitWorkbook(){
+    submitWorkbook() {
       let that = this;
       let tempList = [];
-      this.courseId.forEach((courseId)=>{
-        tempList.push({'courseId':courseId,'workbookId':that.workBookId});
-      })
-      console.log('tempList',tempList);
-      setWorkbook(tempList).then((res)=>{
-        console.log('setWorkbook res',res);
-        if(res.code == "SUCCESS"){
-          that.showAddWorkbook = false;
+      this.courseId.forEach((courseId) => {
+        tempList.push({ courseId: courseId, workbookId: that.workBookId });
+      });
+      console.log("tempList", tempList);
+      setWorkbook(tempList)
+        .then((res) => {
+          console.log("setWorkbook res", res);
+          if (res.code == "SUCCESS") {
+            that.showAddWorkbook = false;
 
-          ElMessage({
-            type: "success",
-            message: `分配成功`,
-            duration: 1500,
-          });
-          that.getBaseCourse(that.pageSize, that.pageNum);
-        }
-      }).catch((e)=>{
-        console.log('e',e);
-      })
+            ElMessage({
+              type: "success",
+              message: `分配成功`,
+              duration: 1500,
+            });
+            that.getBaseCourse(that.pageSize, that.pageNum);
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
     },
     //添加课程负责人
     addPrincipal() {
@@ -1190,98 +1222,97 @@ export default {
       console.log("routeCourse:", this.routeCourseId);
     },
     addBaseCourseDetail(row) {
-      console.log('currentVersionId',this.currentVersionId);
-      if(this.currentVersionId){
+      console.log("currentVersionId", this.currentVersionId);
+      if (this.currentVersionId) {
         let that = this;
-      for(const element of this.versions){
-              if(element['versionId']==that.currentVersionId){
-                console.log('find same ');
-                that.currentVersion = element["label"];
-                that.currentVersionName = element["label"];
-              }
+        for (const element of this.versions) {
+          if (element["versionId"] == that.currentVersionId) {
+            console.log("find same ");
+            that.currentVersion = element["label"];
+            that.currentVersionName = element["label"];
           }
-      console.log('currentVersionName',this.currentVersionName);
-      let versionMessage =
-        "是否确认添加课程大纲（版本：" + this.currentVersionName + " ）?";
-      ElMessageBox.confirm(versionMessage, "", {
-        confirmButtonText: "确认",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        console.log(
-          "versionId",
-          that.currentVersionId,
-          "CourseId",
-          that.courseId
-        );
+        }
+        console.log("currentVersionName", this.currentVersionName);
+        let versionMessage =
+          "是否确认添加课程大纲（版本：" + this.currentVersionName + " ）?";
+        ElMessageBox.confirm(versionMessage, "", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          console.log(
+            "versionId",
+            that.currentVersionId,
+            "CourseId",
+            that.courseId
+          );
 
-        return request({
-          url: "/detail",
-          method: "post",
-          data: {
-            versionId: that.currentVersionId,
-            courseId: row.courseId,
-            departmentId: that.departmentId,
-            schoolId: that.schoolId,
-          },
-        })
-          .then(function (res) {
-            console.log(res);
-            if (res.code == "SUCCESS") {
-              ElMessage({
-                type: "success",
-                message: `新建成功`,
-                duration: 1000,
-              });
-              //成功后根据vesionId和basecouseId获取详细信息
-              that.getBaseCourse(that.pageSize, that.pageNum);
-            }
-            if (res.code == "UNPROCESSABLE ENTITY" && res.msg == "UNPROCESSABLE ENTIT") {
+          return request({
+            url: "/detail",
+            method: "post",
+            data: {
+              versionId: that.currentVersionId,
+              courseId: row.courseId,
+              departmentId: that.departmentId,
+              schoolId: that.schoolId,
+            },
+          })
+            .then(function (res) {
+              console.log(res);
+              if (res.code == "SUCCESS") {
+                ElMessage({
+                  type: "success",
+                  message: `新建成功`,
+                  duration: 1000,
+                });
+                //成功后根据vesionId和basecouseId获取详细信息
+                that.getBaseCourse(that.pageSize, that.pageNum);
+              }
+              if (
+                res.code == "UNPROCESSABLE ENTITY" &&
+                res.msg == "UNPROCESSABLE ENTIT"
+              ) {
+                ElMessage({
+                  type: "error",
+                  message: `没有选择课程大纲版本`,
+                  duration: 1000,
+                });
+                //成功后根据vesionId和basecouseId获取详细信息
+                that.getBaseCourse(that.pageSize, that.pageNum);
+              }
+            })
+            .catch((e) => {
+              console.log("e", e);
               ElMessage({
                 type: "error",
-                message: `没有选择课程大纲版本`,
+                message: `新建失败`,
                 duration: 1000,
               });
-              //成功后根据vesionId和basecouseId获取详细信息
+              //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize, that.pageNum);
-            }
-
-          })
-          .catch((e) => {
-            console.log("e", e);
-            ElMessage({
-              type: "error",
-              message: `新建失败`,
-              duration: 1000,
             });
-            //失败后退回basecouse页面
-            that.getBaseCourse(that.pageSize, that.pageNum);
-          });
-      });
-      }
-      else{
+        });
+      } else {
         ElMessage({
-            type: "error",
-            message: `请选择课程大纲！`,
-            duration: 1000,
-          });
+          type: "error",
+          message: `请选择课程大纲！`,
+          duration: 1000,
+        });
       }
     },
 
     getCourseByYear(value) {
-      if(value){
+      if (value) {
         this.currentVersionId = value;
         this.$store.commit(
-        "course/setbaseCourseVersionId",
-        this.currentVersionId
-      );
-      
+          "course/setbaseCourseVersionId",
+          this.currentVersionId
+        );
+
         this.getBaseCourse(this.pageSize, this.pageNum);
+      } else {
+        console.log("没有选择版本大纲", value);
       }
-      else{
-        console.log('没有选择版本大纲',value);
-      }
-     
     },
     clearForm() {
       this.form.courseId = "";
@@ -1405,125 +1436,123 @@ export default {
     },
     getBaseCourse(pageSize, pageNum) {
       let identity = this.identity;
-      let tempurl = '';
+      let tempurl = "";
       let tempparams = {};
 
       if (identity == "学院管理员") {
-        tempurl= "/baseCourse/list";
-        tempparams={pageSize: pageSize,
-            pageNum: pageNum,
-            versionId: this.currentVersionId,
-            hasDetail: this.hasDeatil,
-            departmentId: this.departmentId,
-            schoolId: this.schoolId,
-            selectKeyWord: this.keyword,}
+        tempurl = "/baseCourse/list";
+        tempparams = {
+          pageSize: pageSize,
+          pageNum: pageNum,
+          versionId: this.currentVersionId,
+          hasDetail: this.hasDeatil,
+          departmentId: this.departmentId,
+          schoolId: this.schoolId,
+          selectKeyWord: this.keyword,
+        };
       }
       if (identity == "课程负责人") {
-        tempurl= "/baseCourse/respondent";
-        tempparams={
-            pageSize: pageSize,
-            pageNum: pageNum,
-            versionId: this.currentVersionId,
-            userId: this.userId,
-            hasDetail: this.hasDeatil,
-            departmentId: this.departmentId,
-            schoolId: this.schoolId,
-            selectKeyWord: this.keyword,}
+        tempurl = "/baseCourse/respondent";
+        tempparams = {
+          pageSize: pageSize,
+          pageNum: pageNum,
+          versionId: this.currentVersionId,
+          userId: this.userId,
+          hasDetail: this.hasDeatil,
+          departmentId: this.departmentId,
+          schoolId: this.schoolId,
+          selectKeyWord: this.keyword,
+        };
       }
       console.log(
-          "pageSize:",
-          pageSize,
-          " pageNum:",
-          pageNum,
-          "versionId",
-          this.currentVersionId
-        );
-        let that = this;
-        let courses = [];
-        let courseshasVersion = [];
-        let numofcourseshasVersion = 0;
-        let courseshasNoVersion = [];
-        let numofcourseshasNoVersion = 0;
-        this.isloading = true;
-        this.loadmoreDisabled = true;
-        return request({
-          url: tempurl,
-          method: "get",
-          params: tempparams,
-        })
-          .then(function (res) {
-            that.isloading = false;
-            that.loadmoreDisabled = false;
-            console.log("courseDetails:", res);
-            console.log(
-              "department:",
-              that.departmentId,
-              "schoolId:",
-              that.schoolId
-            );
-            if (res.total != 0) {
-              that.hasBaseCourse = true;
-              res.rows.forEach(function (course) {
-                course.courseName = course.courseName;
-                course.courseCode = course.courseCode;
-                course.courseType = that.courseTypeSource[course.courseType];
-                course.courseNature =
-                  that.courseNatureSource[course.courseNature];
-                course.credit = course.credit;
-                if (course.bcDetails.length) {
-                  for (const element of course.bcDetails) {
-                    if (
-                      element.versionId == that.currentVersionId
-                    ) {
-                      course.versionId = true;
-                      break;
-                    } else {
-                      course.versionId = false;
-                    }
+        "pageSize:",
+        pageSize,
+        " pageNum:",
+        pageNum,
+        "versionId",
+        this.currentVersionId
+      );
+      let that = this;
+      let courses = [];
+      let courseshasVersion = [];
+      let numofcourseshasVersion = 0;
+      let courseshasNoVersion = [];
+      let numofcourseshasNoVersion = 0;
+      this.isloading = true;
+      this.loadmoreDisabled = true;
+      return request({
+        url: tempurl,
+        method: "get",
+        params: tempparams,
+      })
+        .then(function (res) {
+          that.isloading = false;
+          that.loadmoreDisabled = false;
+          console.log("courseDetails:", res);
+          console.log(
+            "department:",
+            that.departmentId,
+            "schoolId:",
+            that.schoolId
+          );
+          if (res.total != 0) {
+            that.hasBaseCourse = true;
+            res.rows.forEach(function (course) {
+              course.courseName = course.courseName;
+              course.courseCode = course.courseCode;
+              course.courseType = that.courseTypeSource[course.courseType];
+              course.courseNature =
+                that.courseNatureSource[course.courseNature];
+              course.credit = course.credit;
+              if (course.bcDetails.length) {
+                for (const element of course.bcDetails) {
+                  if (element.versionId == that.currentVersionId) {
+                    course.versionId = true;
+                    break;
+                  } else {
+                    course.versionId = false;
                   }
                 }
-
-                if (course.respondentInfos) {
-                 
-                  course.respondentInfos.forEach(function (respondent) {
-                    course.respondentName = respondent.respondentName;
-                    
-                  });
-                  
-                }
-                courses.push(course);
-                if (course.versionId) {
-                  numofcourseshasVersion++;
-                  courseshasVersion.push(course);
-                }
-                if (!course.versionId) {
-                  numofcourseshasNoVersion++;
-                  courseshasNoVersion.push(course);
-                }
-              });
-              that.tableData = courses;
-              that.result = res;
-
-              if (pageSize >= that.result.total) {
-                that.showLoadmore = false;
-              } else {
-                that.showLoadmore = true;
               }
-              console.log(
-                "pageSize:",
-                pageSize,
-                "result.total:",
-                that.result.total,
-                "showloadmore:",
-                that.showLoadmore
-              );
+
+              if (course.respondentInfos) {
+                course.respondentInfos.forEach(function (respondent) {
+                  course.respondentName = respondent.respondentName;
+                });
+              }
+              courses.push(course);
+              if (course.versionId) {
+                numofcourseshasVersion++;
+                courseshasVersion.push(course);
+              }
+              if (!course.versionId) {
+                numofcourseshasNoVersion++;
+                courseshasNoVersion.push(course);
+              }
+            });
+            that.tableData = courses;
+            that.result = res;
+
+            if (pageSize >= that.result.total) {
+              that.showLoadmore = false;
             } else {
-              that.hasBaseCourse = false;
+              that.showLoadmore = true;
             }
-          })
-          .catch((e) => {
-            console.log("e", e);
-          });
+            console.log(
+              "pageSize:",
+              pageSize,
+              "result.total:",
+              that.result.total,
+              "showloadmore:",
+              that.showLoadmore
+            );
+          } else {
+            that.hasBaseCourse = false;
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
     },
     multideleteBaseCourse(row) {
       let that = this;
@@ -1644,13 +1673,13 @@ export default {
     },
     goBaseCourseDetail(index, row) {
       console.log("goBaseCourseDetail", row);
-      let versionName = '';
-      for(const element of this.versions){
-        if(element['versionId']==this.currentVersionId){
+      let versionName = "";
+      for (const element of this.versions) {
+        if (element["versionId"] == this.currentVersionId) {
           versionName = element["label"];
         }
       }
-     
+
       this.$store.commit("course/setbaseCourseVersionName", versionName);
       this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
       this.$store.commit(
@@ -1785,7 +1814,7 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
-      
+
       if (this.identity == "课程负责人") {
         this.userId = this.$store.state.userInfo.userId;
       }
@@ -1793,18 +1822,17 @@ export default {
   },
   mounted() {
     this.activate();
-    this.getDict().then(()=>{
-    let identity = this.identity;
-    if (identity == "学院管理员") {
-      this.getRouter();
-      // this.getPrincipleInfo();
-      if (this.routeVersionId) {
-        this.currentVersionId = this.routeVersionId;
+    this.getDict().then(() => {
+      let identity = this.identity;
+      if (identity == "学院管理员") {
+        this.getRouter();
+        // this.getPrincipleInfo();
+        if (this.routeVersionId) {
+          this.currentVersionId = this.routeVersionId;
+        }
       }
-    }
-    this.getBaseCourse(this.pageSize, this.pageNum);
-    })
-    
+      this.getBaseCourse(this.pageSize, this.pageNum);
+    });
   },
 };
 </script>
@@ -1878,12 +1906,16 @@ export default {
 .selectionBar {
   position: absolute;
   right: 10%;
-  width: 700px;
+  width: 440px;
+  margin-top: 10px;
 }
-.m-3 {
-  float: right;
-  top: 6px;
-  right: 10%;
+.selects {
+  display: flex;
+  flex-direction: row;
+}
+.selecter {
+  margin-left: 15px;
+  width: 120px;
 }
 
 .dropDown {
@@ -1997,5 +2029,14 @@ export default {
   background: transparent;
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+:deep().el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow: 0 0 0 0px;
+  border-radius: 0;
 }
 </style>

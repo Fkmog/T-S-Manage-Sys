@@ -549,10 +549,10 @@ export default {
 .switchstyle {
   bottom: 4px;
 }
-.content {
+/* .content {
   height: 100vh;
   background-color: #f2f2f2;
-}
+} */
 .block {
   position: absolute;
   top: 110px;

@@ -108,12 +108,11 @@ export function downloadDetail(detailId) {
     responseType: 'blob',
   });
 }
-
-//移除课程大纲
-export function removeDetail(detailId) {
+// 查询课程大纲文件列表
+export function getFilesList(detailId) {
   return request({
-    url: "/detail/remove/syllabusFile/"+detailId,
-    method: "DELETE",
+    url: "/detail/getFile/"+ detailId,
+    method: "GET",
   });
 }
 
