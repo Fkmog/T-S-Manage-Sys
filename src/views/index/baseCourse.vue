@@ -322,9 +322,9 @@
     </el-table>
   </div>
 
-  <div v-show="(!hasBaseCourse && hasVersion)||(!hasBaseCourse && !hasVersion)" class="no-class">没有课程</div>
+  <div v-show="(hasNoBaseCourse && hasVersion)||(hasNoBaseCourse && hasNoVersion)" class="no-class">没有课程</div>
 
-  <div v-show="!hasVersion && hasBaseCourse" class="no-class">没有版本信息，请去设置，设置版本信息</div>
+  <div v-show="hasNoVersion && hasBaseCourse" class="no-class">没有版本信息，请去设置，设置版本信息</div>
   <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
@@ -672,6 +672,7 @@ export default {
     return {
 
       hasVersion:Boolean,
+      hasNoVersion:Boolean,
 
       hasDetail: "全部",
       hasDetailSeletion: [
@@ -720,6 +721,7 @@ export default {
       Respondentkeyword: "",
       isloading: true,
       hasBaseCourse: Boolean,
+      hasNoBaseCourse:Boolean,
       courseTypeSource: [],
       courseNatureSource: [],
       //showSetDetailPage:false,
@@ -927,6 +929,7 @@ export default {
           if (res.code == "SUCCESS" && res.data.length) {
             
             that.hasVersion = true;
+            that.hasNoVersion = false;
             res.data.forEach((year) => {
               let dict = {
                 label: year.versionName,
@@ -950,6 +953,7 @@ export default {
           }
           else{
             that.hasVersion = false;
+            that.hasNoVersion = true;
             ElMessage({
             type: "error",
             message: `没有版本信息，请先添加版本！`,
@@ -1463,6 +1467,7 @@ export default {
             );
             if (res.total != 0) {
               that.hasBaseCourse = true;
+              that.hasNoBaseCourse = false;
               res.rows.forEach(function (course) {
                 course.courseName = course.courseName;
                 course.courseCode = course.courseCode;
@@ -1519,6 +1524,7 @@ export default {
               );
             } else {
               that.hasBaseCourse = false;
+              that.hasNoBaseCourse = true;
             }
           })
           .catch((e) => {

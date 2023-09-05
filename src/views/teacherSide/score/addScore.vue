@@ -73,6 +73,7 @@
       <!-- editable @edit="handleTabsEdit"-->
       <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" 
         @tab-click="editableTabsValueChange"
+        v-show="hasActivities&&hasObjectives"
         >
           <el-tab-pane
             v-for="(item, index) in editableTabs"
@@ -86,7 +87,7 @@
           <div class="hot-table-container" id="courseHot"></div>  
       </div>
       
-        <div v-show="!hasActivities" style=" padding-top: 120px;
+        <div v-show="hasNoActivities" style=" padding-top: 120px;
           display: flex;
           justify-content: center;
           font-size: 22px;
@@ -95,7 +96,7 @@
       </div>
       
       
-        <div v-show="!hasObjectives" style=" padding-top: 120px;
+        <div v-show="hasNoObjectives" style=" padding-top: 120px;
           display: flex;
           justify-content: center;
           font-size: 22px;
@@ -142,9 +143,12 @@
 
 
 
-          hasActivities:Boolean,
-          hasScores:Boolean,
-          hasObjectives:Boolean,
+          hasActivities:false,
+          hasNoActivities:false,
+          hasScores:false,
+          hasNoScores:false,
+          hasObjectives:false,
+          hasNoObjectives:false,
           departmentId:'',
           schoolId:'',
           programId:'',
@@ -506,15 +510,19 @@ async getActivities(){
         let course = res.data;
         if(course.objectives){
           that.hasObjectives = true;
+          that.hasNoObjectives = false;
         }
         else{
           that.hasObjectives = false;
+          that.hasNoObjectives = true;
         }
         if(course.scores){
           that.hasScores = true;
+          that.hasNoScores = false;
           let count = 0;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
+            that.hasNoActivities = false;
             course.activities.forEach((activity)=>{
               console.log('activity["name"]',activity['name']);
             that.handleTabsEdit(1,'add',activity['name']);
@@ -599,6 +607,7 @@ async getActivities(){
           console.log('res has no activities');
           that.handleTabsEdit(1,'add');
           that.hasActivities = false;
+          that.hasNoActivities = false;
          
           }
         }
@@ -606,8 +615,10 @@ async getActivities(){
           console.log('res has no scores');
           // that.handleTabsEdit(1,'add');
           that.hasScores = false;
+          that.hasNoScores = true;
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
+            that.hasNoActivities = false;
             course.activities.forEach((activity)=>{
             that.handleTabsEdit(1,'add',activity['name']);
             let activityNumber = activity['item'].length;
