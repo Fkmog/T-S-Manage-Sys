@@ -141,6 +141,8 @@
           editableTabs: [],
           tabIndex: 0,
 
+          originData:[],
+
 
 
           hasActivities:false,
@@ -601,6 +603,7 @@ async getActivities(){
             });
           that.editableTabsValue = '1';
           that.currenteditableTabsValue = 1;
+          that.originData = JSON.parse(JSON.stringify(that.db.items));
           console.log('db.items',that.db.items,'columnList:',that.columnList);
         }
         else {
@@ -660,6 +663,7 @@ async getActivities(){
           that.columnList.push(tempcolumnList);
           that.db.items.push(tempList);
             });
+          that.originData = JSON.parse(JSON.stringify(that.db.items));
           console.log('db.items',that.db.items,'columnList:',that.columnList);
         }
         }
@@ -672,15 +676,38 @@ async getActivities(){
         return false;
       }
       else{
-        var result = this.toPostData();
+        var result = !this.compareArrays(this.originData,this.db.items);
         console.log('result:',result);
-          return !(!result);
+          return result;
       }
-
-
-
-       
       },
+      compareArrays(arr1, arr2) {
+        console.log('arr1',arr1,'arr2',arr2);
+  // 检查数组长度是否相等
+  console.log('length:',arr1.length,arr2.length);
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  // 深度比较每个对象
+  for (let i = 0; i < arr1.length; i++) {
+    // 检查对象属性数量是否相等
+    console.log('Object.keys:',Object.keys(arr1[i]).length,Object.keys(arr2[i]).length);
+    if (Object.keys(arr1[i]).length !== Object.keys(arr2[i]).length) {
+      return false;
+    }
+
+    // 检查对象属性值是否相等
+    for (let key in arr1[i]) {
+      console.log('keys:',arr1[i][key],arr2[i][key]);
+      if (arr1[i][key] !== arr2[i][key]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+},
       isNotDirty(){
         
         this.dirty=false;
@@ -708,6 +735,7 @@ async getActivities(){
                 }
             }
             let count=0;
+            console.log('allStudentsNumber:',allStudentsNumber,'studentList.length',studentList.length);
             allStudentsNumber.forEach((studentNumber)=>{
               
               let infoList = [];
@@ -718,7 +746,11 @@ async getActivities(){
                 for(let m=0;m<3;m++){
                   student.shift();
                 };
+                
                 for(let i=0;i<studentList.length;i++){
+                  console.log("student[i]",student[i]);
+                  if(student[i]){
+                  console.log("student[i]['studentNumber']",student[i]['studentNumber'],);
                   if(student[i]['studentNumber']==studentNumber){
                     console.log('socres:',student[i])
                     let tempDict = {
@@ -745,6 +777,11 @@ async getActivities(){
                       infoList.push(tempDict);
                     }
                   }
+                  }
+                  else{
+                    console.log('this activity do not add scores');
+                  }
+                  
                   
             }
             finalGrade.push(gradList);
@@ -1072,6 +1109,8 @@ async getActivities(){
     height: 600px;
     background-color: white;
     box-shadow: 0px 1px 3px rgb(164, 163, 163);
+    overflow: auto; 
+    /* 这里用auto而不是hidden，应为hidden会直接把多出的部分删除，而auto则会保留多出来的部分，形成页面滑动scroll */
   }
     .activity-tab{
     margin-top: 68px;
@@ -1099,7 +1138,7 @@ async getActivities(){
   width: 100%;
 }
     .hot-table-container{
-      float: left;
+      
       height: 100px;
   }
     .hotTable{
