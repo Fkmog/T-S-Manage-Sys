@@ -210,7 +210,7 @@
               </el-tooltip>
             </el-col>
             <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="课程大纲">
+              <el-tooltip content="修改课程信息">
                 <el-button
                   @click.stop="editTrigger(scope.row)"
                   class="deleteButton"
@@ -317,7 +317,7 @@
         <template #default="scope">
           <el-row v-show="showToolIcon">
             <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="课程大纲">
+              <el-tooltip content="修改课程信息">
                 <el-button
                   @click.stop="editTrigger(scope.row)"
                   class="deleteButton"
@@ -415,7 +415,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
+  <el-dialog v-model="dialogFormVisible1" title="修改课程信息">
     <el-form :model="preform">
       <el-form-item label="课程名称" :label-width="formLabelWidth">
         <el-input

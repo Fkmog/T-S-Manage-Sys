@@ -50,7 +50,7 @@
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-row >
-        <el-col :span="4">
+        <el-col :span="6">
           <el-tooltip content="删除">
             <el-button 
             class="deleteButton"
@@ -69,7 +69,7 @@
             
           </el-tooltip>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="6">
           <el-tooltip content="查看版本信息">
            <el-button 
             class="deleteButton"

@@ -798,7 +798,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         if(res.code=='SUCCESS'){
           ElMessage({
                 type: 'success',
-                message: `新建成功`,
+                message: `更新成功`,
                 duration:1000,
               });
         }
@@ -807,21 +807,21 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == 'OVERALL_NOT_SET'){
           ElMessage({
                   type: 'error',
-                  message: `新建失败，总评未设置`,
+                  message: `更新失败，总评未设置`,
                   duration:1500,
                 });
         }
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '有权重为空'){
           ElMessage({
                   type: 'error',
-                  message: `新建失败，有权重为空`,
+                  message: `更新失败，有权重为空`,
                   duration:1500,
                 });
         }
         if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '权重和不对'){
           ElMessage({
                   type: 'error',
-                  message: `新建失败，权重和不对`,
+                  message: `更新失败，权重之和必须为100%`,
                   duration:1500,
                 });
         }
