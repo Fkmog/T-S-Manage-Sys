@@ -277,7 +277,7 @@
       </el-dialog>
     </div>
     <!-- 弹出复制指标点drawer -->
-    <el-drawer v-model="drawer" :with-header="false">
+    <el-drawer v-model="drawer" >
       <el-row>
         <el-col :span="14">
           <DrawerSearch msg="搜索专业名称" @SearchValue="getSearchValue" />

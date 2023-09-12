@@ -1,11 +1,18 @@
 <template>
   <div class="content">
-    <addBtn @click="this.addFlag = true;
-                    this.deleteFlag = false;
-                    this.editFlag = false;
-                    this.showEditVersionDailogFlag = true;"></addBtn>
-   
-    <el-table :data="versions" class="el-table-container" :header-cell-style="{
+    <addBtn
+      @click="
+        this.addFlag = true;
+        this.deleteFlag = false;
+        this.editFlag = false;
+        this.showEditVersionDailogFlag = true;
+      "
+    ></addBtn>
+
+    <el-table
+      :data="versions"
+      class="el-table-container"
+      :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
         height: '48px',
@@ -17,85 +24,65 @@
         'font-size': '16px',
         height: '60px',
       }"
-      style="width: 1000px"
+      style="width: 800px"
       @row-click="goEdit"
-      >
-      
-       <el-table-column label="版本大纲名称" width="250">
+    >
+      <el-table-column label="版本大纲名称" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span>{{ scope.row.label}}</span>
+            <span>{{ scope.row.label }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="面向年级" width="250">
+      <el-table-column label="面向年级" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.enrollYear }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="修订年份" width="250">
+      <el-table-column label="修订年份" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.reviseYear }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250">
+      <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-row >
-        <!-- <el-col :span="4">
-          <el-tooltip content="更新">
-           <el-button 
-            class="deleteButton"
-            link
-            style="color: #3f51b5"
-           @click="this.editFlag = true;
-                    this.deleteFlag = false;
-                    this.addFlag = false;
-                    this.nameFlag = true;
-                    this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;">
-            <el-icon><Edit /></el-icon>
-           </el-button>
-              
-          </el-tooltip>
-        </el-col> -->
-        <el-col :span="4">
-          <el-tooltip content="删除">
-            <el-button 
-            class="deleteButton"
-            link
-            style="color: #3f51b5"
-            @click.stop="this.deleteFlag = true;
+          <el-row>
+            <el-col :span="4">
+              <el-tooltip content="删除">
+                <el-button
+                  class="deleteButton"
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="
+                    this.deleteFlag = true;
                     this.addFlag = false;
                     this.editFlag = false;
                     this.nameFlag = true;
                     this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;">
-              <el-icon>
-                  <Delete />
-            </el-icon>
-            </el-button>
-            
-          </el-tooltip>
-        </el-col>
-      </el-row>
+                    this.showEditVersionDailogFlag = true;
+                  "
+                >
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
         </template>
       </el-table-column>
     </el-table>
-    
   </div>
-  
-
-
 
   <el-dialog v-model="showEditVersionDailogFlag">
     <template #header>
-        <h4 v-show="addFlag">课程大纲版本号新建</h4>
-        <h4 v-show="editFlag">课程大纲版本号更新</h4>
-        <h4 v-show="deleteFlag">课程大纲版本号删除</h4>
+      <h4 v-show="addFlag">课程大纲版本号新建</h4>
+      <h4 v-show="editFlag">课程大纲版本号更新</h4>
+      <h4 v-show="deleteFlag">课程大纲版本号删除</h4>
     </template>
     <el-form :model="versionForm" :rules="editVersionRules">
       <el-form-item
@@ -114,7 +101,7 @@
         :error="C_ErrorMsg_editVersion_name"
         prop="name"
       >
-     <el-input v-model="versionForm.name" disabled autocomplete="off"/>
+        <el-input v-model="versionForm.name" disabled autocomplete="off" />
       </el-form-item>
       <el-form-item
         label="面向年级"
@@ -207,13 +194,13 @@ import {
   DocumentChecked,
   User,
   CircleClose,
-  Collection
+  Collection,
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
-import { setWorkbook,checkWorkbook } from "@/api/workbook";
+import { setWorkbook, checkWorkbook } from "@/api/workbook";
 export default {
   name: "Version",
-   components: {
+  components: {
     request,
     ElTooltip,
     ElIcon,
@@ -247,14 +234,13 @@ export default {
     DocumentChecked,
     User,
     CircleClose,
-    Collection
+    Collection,
   },
-  data(){
+  data() {
     var validateName = (rule, value, callback) => {
       if (value === "") {
         this.C_ErrorMsg_editVersion_name = "请输入版本名称";
-      }
-       else {
+      } else {
         let nameformat = /^\d{4}版$/;
         if (!nameformat.test(value)) {
           this.C_ErrorMsg_editVersion_name =
@@ -268,7 +254,7 @@ export default {
           }
         }
       }
-      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
+      console.log(this.nameFlag, this.enrollYearFlag, this.reviseYearFlag);
     };
     var validateEnrollYear = (rule, value, callback) => {
       if (value === "") {
@@ -290,9 +276,9 @@ export default {
           }
         }
       }
-      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
+      console.log(this.nameFlag, this.enrollYearFlag, this.reviseYearFlag);
     };
-     var validateReviseYear = (rule, value, callback) => {
+    var validateReviseYear = (rule, value, callback) => {
       if (value === "") {
         this.C_ErrorMsg_editVersion_reviseYear = "请输入年份";
       } else {
@@ -312,9 +298,9 @@ export default {
           }
         }
       }
-      console.log(this.nameFlag,this.enrollYearFlag,this.reviseYearFlag);
+      console.log(this.nameFlag, this.enrollYearFlag, this.reviseYearFlag);
     };
-    return{
+    return {
       formLabelWidth: "140px",
 
       submitFlag: false,
@@ -325,8 +311,8 @@ export default {
       editFlag: false,
       deleteFlag: false,
       versions: [],
-      versionLabel:[],
-      currentVersion:'',
+      versionLabel: [],
+      currentVersion: "",
       versionForm: {
         name: "",
         enrollYear: "",
@@ -346,15 +332,14 @@ export default {
         ],
       },
 
-      showEditVersionDailogFlag:false,
-
-    }
+      showEditVersionDailogFlag: false,
+    };
   },
-  mounted(){
+  mounted() {
     this.getDictionary();
   },
-  methods:{
-    goEdit(row){
+  methods: {
+    goEdit(row) {
       this.editFlag = true;
       this.deleteFlag = false;
       this.addFlag = false;
@@ -445,47 +430,51 @@ export default {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
-      }).then(()=>{
-        return request({
-        url: "/detail/versionRemove/" + that.versionForm.versionId,
-        method: "delete",
       })
-        .then((res) => {
-          console.log("delete version res:", res);
-          if (res === 204) {
-            ElMessage({
-              type: "success",
-              message: `删除成功`,
-              duration: 1000,
+        .then(() => {
+          return request({
+            url: "/detail/versionRemove/" + that.versionForm.versionId,
+            method: "delete",
+          })
+            .then((res) => {
+              console.log("delete version res:", res);
+              if (res === 204) {
+                ElMessage({
+                  type: "success",
+                  message: `删除成功`,
+                  duration: 1000,
+                });
+                if (
+                  this.$store.state.course.baseCourseVersionId ==
+                  that.versionForm.versionId
+                ) {
+                  this.$store.commit("course/setbaseCourseVersionId", "");
+                }
+                that.showEditVersionDailogFlag = false;
+                that.versionForm = {
+                  name: "",
+                  enrollYear: "",
+                  reviseYear: "",
+                  versionId: "",
+                };
+
+                this.getDictionary();
+              }
+            })
+            .catch((e) => {
+              console.log("edit version res error:", e);
+              ElMessage({
+                type: "error",
+                message: `删除失败`,
+                duration: 1000,
+              });
             });
-            if(this.$store.state.course.baseCourseVersionId == that.versionForm.versionId){
-              this.$store.commit("course/setbaseCourseVersionId",'');
-            }
-            that.showEditVersionDailogFlag = false;
-            that.versionForm = {
-              name: "",
-              enrollYear: "",
-              reviseYear: "",
-              versionId: "",
-            };
-            
-            this.getDictionary();
-          }
         })
         .catch((e) => {
-          console.log("edit version res error:", e);
-          ElMessage({
-            type: "error",
-            message: `删除失败`,
-            duration: 1000,
-          });
+          console.log("e", e);
         });
-      }).catch((e)=>{
-        console.log('e',e);
-      })
-      
     },
-     cancelVersionForm() {
+    cancelVersionForm() {
       this.addFlag = false;
       this.deleteFlag = false;
       this.editFlag = false;
@@ -503,16 +492,23 @@ export default {
       this.reviseYearFlag = false;
     },
     selectVersion(row) {
-      console.log('row',row);
-      for(const element of this.versions){
-        if(element['versionId']==row.versionId){
+      console.log("row", row);
+      for (const element of this.versions) {
+        if (element["versionId"] == row.versionId) {
           this.versionForm.name = element["label"];
           this.versionForm.enrollYear = element["enrollYear"];
           this.versionForm.reviseYear = element["reviseYear"];
           this.versionForm.versionId = element["versionId"];
         }
       }
-      console.log('name:',this.versionForm.name,'enrollYear:',this.versionForm.enrollYear,'reviseYear:',this.versionForm.reviseYear);
+      console.log(
+        "name:",
+        this.versionForm.name,
+        "enrollYear:",
+        this.versionForm.enrollYear,
+        "reviseYear:",
+        this.versionForm.reviseYear
+      );
     },
     getDictionary() {
       let that = this;
@@ -521,9 +517,10 @@ export default {
       return request({
         url: "detail/versionList",
         method: "get",
-      }).then((res) => {
-        console.log("versionList", res);
-        if (res.code == "SUCCESS") {
+      })
+        .then((res) => {
+          console.log("versionList", res);
+          if (res.code == "SUCCESS") {
             res.data.forEach((year) => {
               let dict = {
                 label: year.versionName,
@@ -537,13 +534,12 @@ export default {
             that.currentVersion =
               that.versionLabel[that.currentVersionValue - 1];
           }
-      
-       
-      }).catch((e)=>{
-        console.log("error:", e);
-      })
+        })
+        .catch((e) => {
+          console.log("error:", e);
+        });
     },
-  }
+  },
 };
 </script>
 
@@ -554,12 +550,12 @@ export default {
   margin-bottom: 0;
 }
 :deep().el-icon {
-    font-size: large;
+  font-size: large;
 }
-.colstyle{
+.colstyle {
   margin-top: 10px;
 }
-.rowstyle{
+.rowstyle {
   justify-content: center;
 }
 

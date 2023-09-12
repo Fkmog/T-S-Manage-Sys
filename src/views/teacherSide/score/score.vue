@@ -95,7 +95,7 @@
   
 </div>
    
-  <div v-show="!hasScores" class="no-program">
+  <div v-show="hasNoScores" class="no-program">
       <div style="
   padding-top: 120px;
   display: flex;
@@ -126,8 +126,9 @@ export default {
   data() {
     return {
       openDrawer:false,
-      hasActivities:Boolean,
-      hasScores:Boolean,
+      hasActivities:false,
+      hasScores:false,
+      hasNoScores:false,
 
       editableTabs:[],
       tabIndex: 0,
@@ -145,13 +146,15 @@ export default {
   mounted() {
     this.identity = this.$store.state.currentInfo.identity;
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
-    if(this.identity == '学院管理员'){
+    if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-      console.log('identity:',this.identity);
-    }
-    else{
-    this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-    console.log('identity:',this.identity);
+      console.log("identity:", this.identity);
+    } else if (this.identity == "课程负责人") {
+      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+      console.log("identity:", this.identity);
+    } else {
+      this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+      console.log("identity:", this.identity);
     }
     this.getActivities();
     
@@ -277,6 +280,7 @@ export default {
         let length = 0;
         if(course.scores){
           that.hasScores = true;
+          that.hasNoScores = false;
           let count = 0;
           if(course.activities.length){
         that.hasActivities = true;
@@ -328,6 +332,7 @@ export default {
         else{
           console.log('res has no scores');
           that.hasScores = false;
+          that.hasNoScores = true;
         }
         
         

@@ -75,3 +75,23 @@ export function editByTeacher(classId,workbookJson) {
       }
     });
   }
+  // 预设工作手册
+export function present(detailId,formPreset,courseId) {
+  return request({
+    url: "/workbook/preset" ,
+    method: "post",
+    data:{
+      detailId:detailId,
+      formPreset:formPreset,
+      courseId:courseId
+    }
+  });
+}
+  // 查看预设内容
+  export function getPresent(detailId) {
+    return request({
+      url: "/workbook/preset/"+detailId,
+      method: "get",
+    
+    });
+  }

@@ -82,7 +82,7 @@
           margin-top: 30px;
         "
       >
-        请先分配工作手册模板
+        请联系管理员分配工作手册模板
       </div>
     </div>
   </div>
@@ -98,6 +98,7 @@ import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getClassInfo } from "@/api/class";
 import { downloadFile } from "@/api/common";
 import Cookies from "js-cookie";
+import {  getPresent } from "@/api/workbook";
 
 export default {
   name: "Workbook",
@@ -114,6 +115,9 @@ export default {
       classInfo: {},
       noEdit: false,
       hasWorkbook: Boolean,
+      courseId:'',
+      detailId:'',
+      formPresent:[],
       workbook: [],
       //表单生成规则
       json: [],
@@ -125,7 +129,6 @@ export default {
       value: {},
     };
   },
-
   mounted() {
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     this.create();
@@ -166,19 +169,21 @@ export default {
           this.getClassInfo();
         }
       });
+      this.courseId=this.classInfo.courseId
+      this.detailId=this.classInfo.detailId
+      this.getPresent()
     },
     createValue() {
       return new Promise((resolve, reject) => {
         this.identity = this.$store.state.currentInfo.identity;
-        // console.log("identity",this.identity);
         if (this.identity == "学院管理员") {
           this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-          console.log("identity:", this.identity);
+          // console.log("identity:", this.identity);
         } else if (this.identity == "课程负责人") {
           this.classInfo = this.$store.state.currentInfo.respondClassInfo;
         } else {
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-          console.log("identity:", this.identity);
+          // console.log("identity:", this.identity);
         }
         if (this.classInfo.status == 2 || this.classInfo.status == 3) {
           // 状态为已提交或者已审核时，无法编辑
@@ -186,7 +191,7 @@ export default {
         } else {
           this.noEdit = false;
         }
-        console.log("this.classInfo", this.classInfo);
+        // console.log("this.classInfo", this.classInfo);
         if (!(this.classInfo.workbookJson === null)) {
           this.value = this.classInfo.workbookJson;
         }
@@ -221,15 +226,14 @@ export default {
     },
     //当 status 为2，3时，无法编辑表单，注入disable属性
     disabledForm() {
-      console.log("!", this.workbook.formJson);
       this.workbook.formJson.forEach((form) => {
         if (Array.isArray(form.children)) {
           form.children.forEach((formChild) => {
-            if (typeof formChild === 'object') {
+            if (typeof formChild === "object") {
               if (Array.isArray(formChild.children)) {
                 if (formChild.children[0] !== "") {
                   formChild.children.forEach((grandson) => {
-                    if (typeof grandson === 'object') {
+                    if (typeof grandson === "object") {
                       if (grandson.props === undefined) {
                         grandson.props = {};
                       }
@@ -251,19 +255,19 @@ export default {
         }
         form.props.disabled = true;
       });
-      console.log("disabled后", this.workbook);
+      // console.log("disabled后", this.workbook);
     },
     abledForm() {
       this.workbook.formJson.forEach((form) => {
         form.props.disabled = false;
       });
-      console.log("abled后", this.workbook);
+      // console.log("abled后", this.workbook);
     },
+    // 保存
     save() {
       this.fApi.submit((formData, fApi) => {
-        console.log("save", formData, fApi, this.value);
+        console.log("save", formData);
         editByTeacher(this.classInfo.classId, formData).then((res) => {
-          console.log("保存", res);
           if (res.code === "SUCCESS") {
             ElMessage({
               type: "success",
@@ -275,7 +279,7 @@ export default {
         });
       });
     },
-    // 查询对应的工作手册
+    // 查询对应的工作手册 by classId
     getWorkbook() {
       WorkbookByClass(this.classInfo.classId)
         .then((res) => {
@@ -288,9 +292,9 @@ export default {
               res.data.formJson.forEach((form) => {
                 let that = this;
                 if (form.type === "upload") {
-                  console.log(form);
                   const limit = form.props.limit;
                   form.props = {
+                    disabled: false,
                     limit: limit,
                     listType: "text",
                     multiple: true,
@@ -305,7 +309,7 @@ export default {
                       field: form.field,
                     },
                     onSuccess: function (res, file) {
-                      console.log("upload", res, file);
+                      // console.log("upload", res, file);
                       file.url = res.fileRecords[0].fileAddress;
                       // form.value.push(file.url);
                     },
@@ -318,7 +322,6 @@ export default {
                     },
                     onPreview: function (file) {
                       that.download(file);
-                      // console.log("!",file);
                     },
                   };
                 }
@@ -333,14 +336,6 @@ export default {
               this.option = res.data.cssJson;
               // 保存提交
               this.option.submitBtn = false;
-              console.log(
-                "classInfo",
-                this.classInfo,
-                this.identity,
-                this.classInfo.status == 2 ||
-                  this.classInfo.status == 3 ||
-                  this.identity !== "教师"
-              );
               if (
                 this.classInfo.status == 2 ||
                 this.classInfo.status == 3 ||
@@ -388,6 +383,38 @@ export default {
         link.click();
         URL.revokeObjectURL(link.href);
         document.body.removeChild(link);
+      });
+    },
+    // 查询预设信息
+    getPresent() {
+      getPresent(this.detailId).then((res) => {
+        console.log(res);
+        this.formPresent = res.data.preset.formPreset;
+        this.formPresent.forEach((i) => {
+          if (i.value[0] == "[") {
+            i.value = i.value.match(/\d+/g);
+            // console.log("!", i.value);
+          }
+        });
+        console.log("getPresent", this.formPresent);
+
+        this.showPresent(this.json);
+      });
+    },
+    // 回显预设信息
+    showPresent(forms) {
+      forms.forEach((form) => {
+        if (Array.isArray(form.children) && form.children.length > 0) {
+          this.showPresent(form.children);
+        } else {
+          if (form !== "") {
+            this.formPresent.forEach((present) => {
+              if (present.field == form.field&& form.value ===undefined) {
+                form.value = present.value;
+              }
+            });
+          }
+        }
       });
     },
   },

@@ -26,7 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="修改关联模板"
+            content="预设手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -35,6 +35,23 @@
               size="24px"
               color="rgb(137, 137, 137)"
               style="margin-left: 10px"
+              @click="goPresent()"
+            >
+              <Document />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="修改关联模板"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              style="margin-left: 20px"
               @click="changeWorkbook = true"
             >
               <Switch />
@@ -51,7 +68,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              style="margin-left:20px"
+              style="margin-left: 20px"
               @click="Delete"
             >
               <Delete />
@@ -171,7 +188,7 @@
   </div>
 </template>
 <script>
-import { Back, Switch, Delete } from "@element-plus/icons-vue";
+import { Back, Switch, Delete, Document } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { WorkbookByCourseId, checkWorkbook, setWorkbook } from "@/api/workbook";
 export default {
@@ -180,6 +197,7 @@ export default {
     Back,
     Switch,
     Delete,
+    Document,
   },
   data() {
     return {
@@ -200,6 +218,13 @@ export default {
     this.getWorkbooks();
   },
   methods: {
+    // 跳转预设页面
+    goPresent() {
+      this.$router.push({
+        name: "WorkbookPresent",
+      });
+    },
+    // 返回
     back() {
       this.$router.push("/baseCourseDetail");
     },
@@ -220,6 +245,7 @@ export default {
             this.hasWorkbook = true;
             this.workbookInfo = res.data;
             console.log("workbookInfo", this.workbookInfo);
+            this.workbookId = this.workbookInfo.workbookId;
           }
         })
         .catch((e) => {

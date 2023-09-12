@@ -1,6 +1,9 @@
 <template>
   <!-- 顶部搜索栏 -->
-  <HeaderSearch msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号" @SearchValue="getSearchValue">
+  <HeaderSearch
+    msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+    @SearchValue="getSearchValue"
+  >
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
         <div class="selects">
@@ -55,6 +58,9 @@
               </el-dropdown-item>
               <el-dropdown-item @click="associateCourse()">
                 关联课程库课程
+              </el-dropdown-item>
+              <el-dropdown-item @click="isAssessment = true">
+                修改考核方式设置
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -228,7 +234,6 @@
               :value="item.value"
             />
           </el-select>
-
         </el-form-item>
         <el-form-item
           label="课程号"
@@ -346,6 +351,41 @@
       </template>
     </el-dialog>
   </div>
+  <!-- 弹出修改考核方式设置 -->
+  <div class="assessmentDialog">
+    <el-dialog
+      v-model="isAssessment"
+      title="修改考核方式设置"
+      width="330px"
+      :show-close="false"
+      :align-center="true"
+    >
+      <el-row>
+        <el-col :span="17" style="margin-top: 5px; margin-left: 20px"
+          >允许任课教师修改考核方式</el-col
+        >
+        <el-col :span="4">
+          <el-switch
+            v-model="multIsRespondent"
+            inline-prompt
+            active-text="是"
+            inactive-text="否"
+            active-value="2"
+            inactive-value="0"
+          />
+        </el-col>
+      </el-row>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="isAssessment = false">取消</el-button>
+          <el-button type="primary" @click="changeAssessment()">
+            确认
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
   <!-- 教学班展示列表 -->
   <el-table
     v-show="hasClass"
@@ -369,19 +409,20 @@
       height: '60px',
       'text-overflow': ' ellipsis',
       'white-space': ' nowrap',
-      'cursor':'pointer'
+      cursor: 'pointer',
     }"
     highlight-current-row
     :row-key="rowKey"
   >
     <el-table-column
       type="selection"
-      width="50"
+      width="60"
       :selectable="canSelect"
       :reserve-selection="true"
+      column-key="select"
     >
     </el-table-column>
-    <el-table-column prop="className" label="课程名" width="200" />
+    <el-table-column prop="className" label="课程名" width="190" />
     <el-table-column prop="allTeacherName" label="任课教师" width="150" />
     <el-table-column prop="courseCode" label="课程号" width="150">
     </el-table-column>
@@ -419,22 +460,11 @@
         <span v-else></span>
       </template>
     </el-table-column>
-
-    <el-table-column width="150">
+    <el-table-column width="150" column-key="edit">
       <template #default="scope">
         <el-row>
           <el-col :span="16">
             <el-row v-show="canAction">
-              <el-col :span="12" v-show="identity === '学院管理员'">
-                <el-tooltip content="修改" :hide-after="0">
-                  <el-button
-                    link
-                    style="color: #3f51b5"
-                    @click.stop="editClass(scope.$index, scope.row)"
-                    ><el-icon><Edit /></el-icon
-                  ></el-button>
-                </el-tooltip>
-              </el-col>
               <el-col :span="12" v-show="identity === '学院管理员'">
                 <el-tooltip content="删除" :hide-after="0">
                   <el-button
@@ -442,6 +472,16 @@
                     style="color: #3f51b5"
                     @click.stop="deleteClass(scope.$index, scope.row)"
                     ><el-icon><Delete /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="12" v-show="identity === '学院管理员'">
+                <el-tooltip content="修改" :hide-after="0">
+                  <el-button
+                    link
+                    style="color: #3f51b5"
+                    @click.stop="editClass(scope.$index, scope.row)"
+                    ><el-icon><Edit /></el-icon
                   ></el-button>
                 </el-tooltip>
               </el-col>
@@ -517,6 +557,7 @@ export default {
   },
   data() {
     return {
+      multIsRespondent: "2",
       hasClass: false,
       noClass: false,
       canAction: true,
@@ -569,6 +610,7 @@ export default {
       },
       addVisible: false,
       editVisible: false,
+      isAssessment: false,
       formLabelWidth: "140px",
       classAddForm: {
         className: "",
@@ -684,19 +726,21 @@ export default {
   },
   methods: {
     //跳转到审核页面
-    goCheck(row) {
+    goCheck(row, column) {
       console.log("row:", row);
-      this.$store.commit("currentInfo/setOpenDrawer", false);
-      this.$store.commit("reviewInfo/setmessage", "");
-      this.$store.commit("reviewInfo/setcheckState", "");
-      if (this.identity == "学院管理员") {
-        this.$store.commit("currentInfo/setadminSideClassInfo", row);
-      } else if (this.identity == "课程负责人") {
-        this.$store.commit("currentInfo/setRespondClassInfo", row);
-      } else {
-        this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
+      if (column.columnKey === undefined) {
+        this.$store.commit("currentInfo/setOpenDrawer", false);
+        this.$store.commit("reviewInfo/setmessage", "");
+        this.$store.commit("reviewInfo/setcheckState", "");
+        if (this.identity == "学院管理员") {
+          this.$store.commit("currentInfo/setadminSideClassInfo", row);
+        } else if (this.identity == "课程负责人") {
+          this.$store.commit("currentInfo/setRespondClassInfo", row);
+        } else {
+          this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
+        }
+        this.$router.push({ name: "TeacherClass" });
       }
-      this.$router.push({ name: "TeacherClass" });
     },
     //跳转到批量添加
     goBatchAddClass() {
@@ -1154,8 +1198,6 @@ export default {
     },
     //确定分配课程大纲
     confirmAssign() {
-      console.log("confirmAssign");
-      // console.log("@#",this.assignedDetail,this.multipleSelection);
       this.multipleSelection.forEach((item) => {
         item.detailId = this.assignedDetail;
       });
@@ -1208,6 +1250,32 @@ export default {
             });
           }
         });
+    },
+    // 修改考核方式设置
+    changeAssessment() {
+      let array = [];
+      this.multipleSelection.forEach((item) => {
+        let obj = {
+          classId: item.classId,
+          departmentId: item.departmentId,
+          isRespondent: this.multIsRespondent,
+          schoolId: item.schoolId,
+        };
+        array.push(obj);
+      });
+      setPermission(array).then((res) => {
+        console.log(res);
+        if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: "更新成功",
+            duration: 1500,
+          });
+          this.isAssessment = false;
+          this.multIsRespondent = "2";
+          this.getClassList();
+        }
+      });
     },
     //加载更多
     loadMore() {

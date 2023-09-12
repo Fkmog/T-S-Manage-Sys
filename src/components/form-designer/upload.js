@@ -38,7 +38,7 @@ export const uploadRule = {
             type: "workbookFile",
           },
         ],
-        listType: text,
+        listType: 'text',
 
         onSuccess(res) {
           console.log("suc", res);

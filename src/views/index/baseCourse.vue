@@ -336,17 +336,10 @@
     </el-table>
   </div>
 
-  <div
-    v-show="(!hasBaseCourse && hasVersion) || (!hasBaseCourse && !hasVersion)"
-    class="no-class"
-  >
-    没有课程
-  </div>
+  <div v-show="(hasNoBaseCourse && hasVersion)||(hasNoBaseCourse && hasNoVersion)" class="no-class">没有课程</div>
 
-  <div v-show="!hasVersion && hasBaseCourse" class="no-class">
-    没有版本信息，请去设置，设置版本信息
-  </div>
-  <el-dialog v-model="dialogFormVisible" title="添加基础课程">
+  <div v-show="hasNoVersion && hasBaseCourse" class="no-class">没有版本信息，请先设置版本信息</div>
+  <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -687,7 +680,9 @@ export default {
     };
 
     return {
-      hasVersion: Boolean,
+
+      hasVersion:Boolean,
+      hasNoVersion:Boolean,
 
       hasDetail: "全部",
       hasDetailSeletion: [
@@ -736,6 +731,7 @@ export default {
       Respondentkeyword: "",
       isloading: true,
       hasBaseCourse: Boolean,
+      hasNoBaseCourse:Boolean,
       courseTypeSource: [],
       courseNatureSource: [],
       //showSetDetailPage:false,
@@ -949,6 +945,7 @@ export default {
 
           if (res.code == "SUCCESS" && res.data.length) {
             that.hasVersion = true;
+            that.hasNoVersion = false;
             res.data.forEach((year) => {
               let dict = {
                 label: year.versionName,
@@ -978,6 +975,7 @@ export default {
             }
           } else {
             that.hasVersion = false;
+            that.hasNoVersion = true;
             ElMessage({
               type: "error",
               message: `没有版本信息，请先添加版本！`,
@@ -1465,55 +1463,58 @@ export default {
         };
       }
       console.log(
-        "pageSize:",
-        pageSize,
-        " pageNum:",
-        pageNum,
-        "versionId",
-        this.currentVersionId
-      );
-      let that = this;
-      let courses = [];
-      let courseshasVersion = [];
-      let numofcourseshasVersion = 0;
-      let courseshasNoVersion = [];
-      let numofcourseshasNoVersion = 0;
-      this.isloading = true;
-      this.loadmoreDisabled = true;
-      return request({
-        url: tempurl,
-        method: "get",
-        params: tempparams,
-      })
-        .then(function (res) {
-          that.isloading = false;
-          that.loadmoreDisabled = false;
-          console.log("courseDetails:", res);
-          console.log(
-            "department:",
-            that.departmentId,
-            "schoolId:",
-            that.schoolId
-          );
-          if (res.total != 0) {
-            that.hasBaseCourse = true;
-            res.rows.forEach(function (course) {
-              course.courseName = course.courseName;
-              course.courseCode = course.courseCode;
-              course.courseType = that.courseTypeSource[course.courseType];
-              course.courseNature =
-                that.courseNatureSource[course.courseNature];
-              course.credit = course.credit;
-              if (course.bcDetails.length) {
-                for (const element of course.bcDetails) {
-                  if (element.versionId == that.currentVersionId) {
-                    course.versionId = true;
-                    break;
-                  } else {
-                    course.versionId = false;
+          "pageSize:",
+          pageSize,
+          " pageNum:",
+          pageNum,
+          "versionId",
+          this.currentVersionId
+        );
+        let that = this;
+        let courses = [];
+        let courseshasVersion = [];
+        let numofcourseshasVersion = 0;
+        let courseshasNoVersion = [];
+        let numofcourseshasNoVersion = 0;
+        this.isloading = true;
+        this.loadmoreDisabled = true;
+        return request({
+          url: tempurl,
+          method: "get",
+          params: tempparams,
+        })
+          .then(function (res) {
+            that.isloading = false;
+            that.loadmoreDisabled = false;
+            console.log("courseDetails:", res);
+            console.log(
+              "department:",
+              that.departmentId,
+              "schoolId:",
+              that.schoolId
+            );
+            if (res.total != 0) {
+              that.hasBaseCourse = true;
+              that.hasNoBaseCourse = false;
+              res.rows.forEach(function (course) {
+                course.courseName = course.courseName;
+                course.courseCode = course.courseCode;
+                course.courseType = that.courseTypeSource[course.courseType];
+                course.courseNature =
+                  that.courseNatureSource[course.courseNature];
+                course.credit = course.credit;
+                if (course.bcDetails.length) {
+                  for (const element of course.bcDetails) {
+                    if (
+                      element.versionId == that.currentVersionId
+                    ) {
+                      course.versionId = true;
+                      break;
+                    } else {
+                      course.versionId = false;
+                    }
                   }
                 }
-              }
 
               if (course.respondentInfos) {
                 course.respondentInfos.forEach(function (respondent) {
@@ -1533,26 +1534,27 @@ export default {
             that.tableData = courses;
             that.result = res;
 
-            if (pageSize >= that.result.total) {
-              that.showLoadmore = false;
+              if (pageSize >= that.result.total) {
+                that.showLoadmore = false;
+              } else {
+                that.showLoadmore = true;
+              }
+              console.log(
+                "pageSize:",
+                pageSize,
+                "result.total:",
+                that.result.total,
+                "showloadmore:",
+                that.showLoadmore
+              );
             } else {
-              that.showLoadmore = true;
+              that.hasBaseCourse = false;
+              that.hasNoBaseCourse = true;
             }
-            console.log(
-              "pageSize:",
-              pageSize,
-              "result.total:",
-              that.result.total,
-              "showloadmore:",
-              that.showLoadmore
-            );
-          } else {
-            that.hasBaseCourse = false;
-          }
-        })
-        .catch((e) => {
-          console.log("e", e);
-        });
+          })
+          .catch((e) => {
+            console.log("e", e);
+          });
     },
     multideleteBaseCourse(row) {
       let that = this;

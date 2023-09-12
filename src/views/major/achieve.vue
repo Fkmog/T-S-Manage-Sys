@@ -626,7 +626,7 @@ export default {
 .card {
   width: 800px;
   background: white;
-  margin-top: 85px;
+  margin-top: 55px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);

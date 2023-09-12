@@ -160,6 +160,8 @@
 import { ElMessageBox, ElMessage } from "element-plus";
 import { Back, DocumentChecked, Plus, Delete } from "@element-plus/icons-vue";
 import { checkProgramByProgramId, editProgram } from "@/api/program";
+import _ from "lodash";
+
 export default {
   name: "GoalEdit",
   components: {
@@ -231,14 +233,30 @@ export default {
     },
     //返回上级查看页面
     backGoal() {
-      this.$router.push("/goal");
+      console.log(_.isEqual(this.programInfo.graduateAttributes, this.requirements));
+      if (_.isEqual(this.programInfo.graduateAttributes, this.requirements)) {
+        this.$router.push("/goal");
+      } else {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push("/goal");
+
+          })
+          .catch(() => {});
+      }
     },
     //查询毕业要求
     checkRequirement() {
       checkProgramByProgramId(this.programId).then((res) => {
         this.programInfo = res.data;
         console.log("programInfo", this.programInfo);
-        this.requirements = res.data.graduateAttributes;
+        this.requirements = JSON.parse(
+          JSON.stringify(res.data.graduateAttributes)
+        );
         this.deleteAttributeId();
         this.newAttributeId();
         console.log("requirements", this.requirements);
@@ -255,11 +273,13 @@ export default {
       //确定serialNum以及id
       if (attribute.programIndicators.length > 0) {
         currentObj.serialNum =
-          attribute.programIndicators[attribute.programIndicators.length-1].serialNum;
-          // attribute.programIndicators.length
+          attribute.programIndicators[
+            attribute.programIndicators.length - 1
+          ].serialNum;
+        // attribute.programIndicators.length
         let parent = currentObj.serialNum.split("\.");
         //这里第二个元素变成number了 不是string
-        parent[1]=(++parent[1]).toString();
+        parent[1] = (++parent[1]).toString();
         //确定id
         console.log("parent", parent);
         if (parent[0].length == 1 && parent[1].length == 1) {
@@ -283,16 +303,13 @@ export default {
       }
       // if (attribute.programIndicators.length == 0)
       else {
-        console.log("进入else");
         currentObj.serialNum = attribute.serialNum + ".1";
-        console.log(currentObj,typeof(currentObj.serialNum),currentObj.serialNum.length);
         //确定id
-        let a =  currentObj.serialNum.split("\.")
-        currentObj.id = "0"+a[0]+"0"+a[1]
+        let a = currentObj.serialNum.split("\.");
+        currentObj.id = "0" + a[0] + "0" + a[1];
         let num = Number(attribute.serialNum);
         this.requirements[num - 1].programIndicators.push(currentObj);
       }
-      console.log("addDetail", currentObj);
     },
     // 删除指标点
     deleteDetail(attribute) {
@@ -321,7 +338,6 @@ export default {
       currentObj.description = null;
       currentObj.programIndicators = [];
       if (!(this.requirements === null) && this.requirements.length > 0) {
-        console.log("id", currentObj.id);
         // 确定serialNum
         if (this.requirements.length == 0) {
           currentObj.serialNum = "1";
@@ -331,8 +347,7 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
-        currentObj.id = "0"+ currentObj.serialNum
-
+        currentObj.id = "0" + currentObj.serialNum;
         this.requirements.push(currentObj);
       } else {
         currentObj.id = "01";
@@ -350,7 +365,6 @@ export default {
     },
     //删除要求点
     deleteAttribute() {
-      console.log("@", this.requirements);
       if (this.requirements.length > 0) {
         ElMessageBox.confirm(
           "是否确认删除毕业要求" + this.attributeIdDelete + "?",
@@ -384,7 +398,6 @@ export default {
               this.requirements[n].programIndicators[m].description == null ||
               this.requirements[n].programIndicators[m].description == ""
             ) {
-              //要不要弄个消息弹窗？!!
               return;
             }
           }
@@ -396,7 +409,6 @@ export default {
           return;
         }
       }
-      // this.requirements = this.requirements.concat(this.deteleArray);
       this.programInfo.graduateAttributes = this.requirements;
       console.log("save", this.programInfo);
       editProgram(this.programInfo).then((res) => {
