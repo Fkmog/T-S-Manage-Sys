@@ -95,7 +95,7 @@
   <el-dialog v-model="showEditVersionDailogFlag">
     <template #header>
       <h4 v-show="addFlag">课程大纲版本号新建</h4>
-      <h4 v-show="editFlag">课程大纲版本号更新</h4>
+      <h4 v-show="editFlag">版本信息</h4>
       <h4 v-show="deleteFlag">课程大纲版本号删除</h4>
     </template>
     <el-form :model="versionForm" :rules="editVersionRules">

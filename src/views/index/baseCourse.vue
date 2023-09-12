@@ -1658,7 +1658,8 @@ export default {
         });
     },
     goBaseCourseDetail(row) {
-      console.log("goBaseCourseDetail", row);
+      console.log("goBaseCourseDetail", row.bcDetails.length);
+      if(row.bcDetails.length){
       let versionName = "";
       for (const element of this.versions) {
         if (element["versionId"] == this.currentVersionId) {
@@ -1684,6 +1685,11 @@ export default {
       this.$router.push({
         path: "/baseCourseDetail",
       });
+      }
+      else{
+        this.addBaseCourseDetail(row)
+      }
+      
     },
     editTrigger(val) {
       console.log("选中的信息：", val.courseId);
