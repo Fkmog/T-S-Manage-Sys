@@ -268,6 +268,8 @@ export default {
   },
   data() {
     return {
+      isRespondent: "",
+
       reviewInfo: [],
       activeNames: "",
       openDrawer: false,
@@ -309,6 +311,7 @@ export default {
       console.log("identity:", this.identity);
     }
     this.getClassInfo();
+    
     // this.getReviewInfo();
     // console.log("classInfo", this.classInfo);
     this.getDictionary();
@@ -470,6 +473,7 @@ export default {
         if(this.identity =='教师'){
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+          this.isRespondent = this.classInfo.isRespondent;
         }
         else if(this.identity =='课程负责人'){
           this.$store.commit("currentInfo/setRespondClassInfo", res.data);

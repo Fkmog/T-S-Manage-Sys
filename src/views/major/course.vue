@@ -3,26 +3,29 @@
     <div v-show="hasCourse" >
       <HeaderSearch msg="搜索课程名称" v-show="!closeShow" >
     <template #rightTime>
+      <div class="rightSlot">
         <div class="selectionBar">
           
-              <el-select v-model="option1.value" class="m-2" clearable placeholder="更新时间⬇" size="large" @change="selectionOption1" >
-              <el-option
-                v-for="item in option1"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                class="option"
-              /></el-select>
-            <el-select v-model="option2.value" class="m-3" clearable placeholder="全部" size="large" @change="selectionOption2" >
+          <el-select v-model="option1.value" class="selecter" placeholder="更新时间⬇" @change="selectionOption1" >
           <el-option
-            v-for="item in option2"
+            v-for="item in option1"
             :key="item.value"
             :label="item.label"
             :value="item.value"
+            
           /></el-select>
-         
-          
-        </div>
+        <el-select v-model="option2.value" class="selecter" placeholder="全部"  @change="selectionOption2" >
+      <el-option
+        v-for="item in option2"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      /></el-select>
+     
+      
+    </div>
+      </div>
+        
     </template>
   </HeaderSearch>
  
@@ -169,9 +172,9 @@
             >
             <el-option
               v-for="item in versions"
-              :key="item.value"
+              :key="item.versionId"
               :label="item.label"
-              :value="item.value"
+              :value="item.versionId"
             />
           </el-select>
           </el-row>
@@ -459,25 +462,67 @@ methods:{
   async getDict(){
       let that = this;
       let num =1;
+      this.versions = [];
+      this.versionLabel = [];
       getDictionary().then((res)=>{
-        console.log(res);
+        console.log("Dict:", res);
         res.course_nature.forEach((nature)=>{
           that.courseNatureSource.push(nature.dictLabel);
         })
         res.course_type.forEach((type)=>{
           that.courseTypeSource.push(type.dictLabel);
         })
-        res.enroll_year.forEach((year)=>{
-          let dict={
-            label:year.dictLabel+'版',
-            value:num
-          }
-          num=num+1;
-          that.versions.push(dict);
-          that.versionLabel.push(year.dictLabel+'版')
+        return request({
+        url: "detail/versionList",
+        method: "get",
+      })
+      .then((res) => {
+          console.log("versionList:", res);
 
+          if (res.code == "SUCCESS" && res.data.length) {
+            that.hasVersion = true;
+            that.hasNoVersion = false;
+            res.data.forEach((year) => {
+              let dict = {
+                label: year.versionName,
+                enrollYear: year.enrollYear,
+                reviseYear: year.reviseYear,
+                versionId: year.versionId,
+              };
+              that.versions.push(dict);
+              that.versionLabel.push(year.versionName);
+            });
+
+            that.currentVersionId = this.$store.state.course.baseCourseVersionId
+              ? this.$store.state.course.baseCourseVersionId
+              : that.versions[0].versionId;
+            console.log(
+              "baseCourseVersionId",
+              this.$store.state.course.baseCourseVersionId,
+              "that.versions[0].versionId",
+              that.versions[0].versionId
+            );
+            for (const element of that.versions) {
+              if (element["versionId"] == that.currentVersionId) {
+                console.log("find same ");
+                that.currentVersion = element["label"];
+                that.currentVersionName = element["label"];
+              }
+            }
+          } else {
+            that.hasVersion = false;
+            that.hasNoVersion = true;
+            ElMessage({
+              type: "error",
+              message: `没有版本信息，请先添加版本！`,
+              duration: 1000,
+            });
+          }
         })
-        that.currentVersion = that.versionLabel[that.currentVersionValue-1];
+        .catch((e) => {
+          console.log("error:", e);
+        });
+        
         // that.courseTypeSource = res.
       })
     },
@@ -494,12 +539,16 @@ methods:{
     },
   //直接添加课程大纲
   addBaseCourseDetail(row){
-      let that = this;
-      this.versions.forEach((version)=>{
-        if(version['value']==that.currentVersionValue){
-          that.currentVersion = version['label']
+      if(this.currentVersionId){
+        let that = this;
+       for (const element of this.versions) {
+          if (element["versionId"] == that.currentVersionId) {
+            console.log("find same ");
+            that.currentVersion = element["label"];
+            that.currentVersionName = element["label"];
+          }
         }
-      });
+      console.log("currentVersionName", this.currentVersionName);
       let versionMessage = '是否确认添加课程大纲（版本：'+this.currentVersion+' ）?'
       ElMessageBox.confirm(
       versionMessage,
@@ -532,6 +581,18 @@ methods:{
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize,that.pageNum);
             }
+        if (
+            res.code == "UNPROCESSABLE ENTITY" &&
+            res.msg == "UNPROCESSABLE ENTIT"
+          ) {
+            ElMessage({
+              type: "error",
+              message: `没有选择课程大纲版本`,
+              duration: 1000,
+            });
+            //成功后根据vesionId和basecouseId获取详细信息
+            that.getBaseCourse(that.pageSize, that.pageNum);
+          }
             
       }).catch((e)=>{
         console.log('e',e);
@@ -545,6 +606,14 @@ methods:{
             
       })
       })
+      }
+      else{
+        ElMessage({
+          type: "error",
+          message: `请选择课程大纲！`,
+          duration: 1000,
+        });
+      }
     },
   //load course
   loadmoreCourse(){
@@ -562,7 +631,12 @@ methods:{
   //跳转到详细页面
   goBaseCourseDetail(index, row){
     console.log('goBaseCourseDetail',row);
-    let versionName = this.versions[this.currentVersionValue-1].label;
+    let versionName ="";
+    for (const element of this.versions) {
+        if (element["versionId"] == this.currentVersionId) {
+          versionName = element["label"];
+        }
+      }
 
     this.$store.commit("course/setbaseCourseVersionName", versionName);
     this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
@@ -1096,12 +1170,15 @@ ElMessageBox.confirm(
             }
           });
     });
-    this.versions.forEach((version)=>{
-        if(version['value']==that.currentVersionValue){
-          that.currentVersion = version['label']
+    for (const element of this.versions) {
+          if (element["versionId"] == that.currentVersionId) {
+            console.log("find same ");
+            that.currentVersion = element["label"];
+            that.currentVersionName = element["label"];
+          }
         }
-      });
-    let message = '是否确认将所选课程（课程大纲版本：'+this.currentVersion+'）添加到培养方案中 ？'
+    console.log("currentVersionName", this.currentVersionName);
+    let message = '是否确认将所选课程（课程大纲版本：'+this.currentVersionName+'）添加到培养方案中 ？'
     ElMessageBox.confirm(
       message,
     '',
@@ -1486,6 +1563,16 @@ watch: {
 </script>
 
 <style scoped> 
+.rightSlot {
+  position: absolute;
+  right: 10%;
+  width: 440px;
+  margin-top: 10px;
+}
+.selecter {
+  margin-left: 15px;
+  width: 120px;
+}
  .dropdownstyle{
    float: right;
    margin-right: 70px;
@@ -1672,14 +1759,11 @@ left:-46px;
   width: 50%;
 }
 .selectionBar{
-  
-  position: absolute;
-  right: 10%;
-  width: 700px;
+  display: flex;
+  flex-direction: row;
   
 }
 .m-2{
-  
   left: 10%;
   float: left;
   top: 6px;

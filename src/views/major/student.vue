@@ -1,6 +1,6 @@
 <template>
   <div v-show="hasProgram">
-    <div v-show="hasStudent">
+    <div >
       <div v-show="closeShow" class="submenu" >
         <el-row>
           <el-col :span="2" class="columnstyle">
@@ -21,6 +21,7 @@
           <el-table
           class="studentsTable"
           :data="studentsTable"
+          v-show="hasStudent"
           ref="multipleTable"
           style="width: 40%"
           :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
@@ -35,16 +36,16 @@
 
       <div class="pagination-container" flex>
       <el-row type="flex" justify="center" align="middle">
-        <el-button v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
+        <el-button v-show="showLoadmore && hasProgram && hasStudent" @click="loadmoreCourse()">加载更多</el-button>
       </el-row>
       
     </div>
     </div>
     <div v-show="!hasStudent" class="no-program">
-      <div style="display: flex; justify-content: center;padding-top: 120px;font-size: 22px;background-color: #f2f2f2;">
+      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
       没有学生
       </div>
-    <div style="display: flex; justify-content: center; color: grey">
+    <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
         请先点击右上角圆形按钮添加学生
       </div>
     </div>
@@ -53,7 +54,7 @@
     <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
       未创建培养方案
     </div>
-    <div style="display: flex; justify-content: center; color: grey;margin-top: 30px;font-size:13px;">
+    <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
         请先创建培养方案
       </div>
   </div>
@@ -161,10 +162,12 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
 } 
       }).then(function(res){
         console.log('student:',res);
-        res.rows.forEach(function(student){
+        if(res.total){
+          that.hasStudent = true;
+          that.hasNoStudent = false;
+          res.rows.forEach(function(student){
           student.studentName = student.studentName;
           student.studentNumber = student.studentNumber;
-
           students.push(student);
         });
         that.studentsTable = students;
@@ -172,6 +175,13 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
         if(pageSize>=res.total){
               that.showLoadmore = false;
             }
+        }
+        else{
+          that.hasStudent = false;
+          that.hasNoStudent = true;
+          that.showLoadmore = false;
+        }
+        
       })
     }
   },
@@ -188,25 +198,20 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
       multipleSelection:[],
       //result
       result:{},
-    pageSize:20,
-    pageNum:1,
+      pageSize:20,
+      pageNum:1,
       //showLoadmore
       showLoadmore:true,
       //是否有培养方案
-    hasProgram:Boolean,
-    //学生是否为空
-    hasStudent:Boolean,
+      hasProgram:false,
+      hasNoProgram:false,
+      //学生是否为空
+      hasStudent:false,
+      hasNoStudent:false,
 
-    programId:'',
-    studentsTable:[{
-        studentId:222050200,
-        studentName:'张三',
-      },
-      {
-        studentId:222050211,
-        studentName:'李四',
-      }]
-    }
+      programId:'',
+      studentsTable:[]
+      }
   },
   mounted:function(){
     this.programId = this.$store.state.major.programId;

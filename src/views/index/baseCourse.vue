@@ -11,6 +11,7 @@
               <el-select
                 v-model="hasDetail"
                 class="selecter"
+                placeholder="全部"
                 @change="getSelectedBaseCourse(hasDetail)"
               >
                 <el-option
@@ -104,16 +105,23 @@
     </el-row>
   </div>
 
-  <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'">
+  
+
+ 
+
+  <div v-show="hasNoVersion" class="no-class">没有版本信息，请先设置版本信息</div>
+  <div v-show="hasVersion">
+    <div v-show="hasNoBaseCourse" class="no-class">没有课程</div>
+    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员' && hasBaseCourse">
     <addBtn @click="dialogFormVisible = true"></addBtn>
 
     <el-table
       :data="tableData"
       v-loading="isloading"
-      v-show="hasBaseCourse && hasVersion"
+      
       ref="multipleTable1"
       @selection-change="handleSelectionChange"
-      @row-click="editTrigger"
+      @row-click="goBaseCourseDetail"
       class="el-table-container"
       style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
       :header-cell-style="{
@@ -204,7 +212,7 @@
             <el-col :span="4" v-show="scope.row.versionId">
               <el-tooltip content="课程大纲">
                 <el-button
-                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
+                  @click.stop="editTrigger(scope.row)"
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -227,15 +235,14 @@
       </el-table-column>
     </el-table>
   </div>
-  <div class="md-padding" layout="row" flex v-show="identity == '课程负责人'">
+  <div class="md-padding" layout="row" flex v-show="identity == '课程负责人' && hasBaseCourse">
     <el-table
       :data="tableData"
-      v-show="hasBaseCourse && hasVersion"
       v-loading="isloading"
       ref="multipleTable2"
       class="el-table-container"
       @selection-change="handleSelectionChange"
-      @row-click="editTrigger"
+      @row-click="goBaseCourseDetail"
       style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
       :header-cell-style="{
         'padding-left': '20px',
@@ -312,7 +319,7 @@
             <el-col :span="4" v-show="scope.row.versionId">
               <el-tooltip content="课程大纲">
                 <el-button
-                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
+                  @click.stop="editTrigger(scope.row)"
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
@@ -335,10 +342,7 @@
       </el-table-column>
     </el-table>
   </div>
-
-  <div v-show="(hasNoBaseCourse && hasVersion)||(hasNoBaseCourse && hasNoVersion)" class="no-class">没有课程</div>
-
-  <div v-show="hasNoVersion && hasBaseCourse" class="no-class">没有版本信息，请先设置版本信息</div>
+  </div>
   <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
@@ -681,8 +685,8 @@ export default {
 
     return {
 
-      hasVersion:Boolean,
-      hasNoVersion:Boolean,
+      hasVersion:false,
+      hasNoVersion:false,
 
       hasDetail: "全部",
       hasDetailSeletion: [
@@ -730,8 +734,8 @@ export default {
       keyword: "",
       Respondentkeyword: "",
       isloading: true,
-      hasBaseCourse: Boolean,
-      hasNoBaseCourse:Boolean,
+      hasBaseCourse: false,
+      hasNoBaseCourse:false,
       courseTypeSource: [],
       courseNatureSource: [],
       //showSetDetailPage:false,
@@ -887,26 +891,6 @@ export default {
       this.nameFlag = false;
       this.enrollYearFlag = false;
       this.reviseYearFlag = false;
-    },
-    selectVersion(versionId) {
-      console.log("versionId", versionId);
-      for (const element of this.versions) {
-        if (element["versionId"] == versionId) {
-          this.currentVersionName = element["label"];
-          this.versionForm.name = element["label"];
-          this.versionForm.enrollYear = element["enrollYear"];
-          this.versionForm.reviseYear = element["reviseYear"];
-          this.versionForm.versionId = element["versionId"];
-        }
-      }
-      console.log(
-        "name:",
-        this.versionForm.name,
-        "enrollYear:",
-        this.versionForm.enrollYear,
-        "reviseYear:",
-        this.versionForm.reviseYear
-      );
     },
     showEditVersionDailog() {
       this.showEditVersionDailogFlag = true;
@@ -1673,7 +1657,7 @@ export default {
           console.log("e", e);
         });
     },
-    goBaseCourseDetail(index, row) {
+    goBaseCourseDetail(row) {
       console.log("goBaseCourseDetail", row);
       let versionName = "";
       for (const element of this.versions) {
@@ -1863,10 +1847,10 @@ export default {
 }
 
 .no-class {
-  margin-top: 120px;
   display: flex;
   justify-content: center;
-  font-size: 22px;
+  margin-top: 100px;
+  font-size:22px
 }
 :deep().el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;

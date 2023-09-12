@@ -179,7 +179,7 @@ service.interceptors.response.use(
           duration: 1500,
         });
       }
-    } else if (error.response.status === 404) {
+    } else if (error.response.status === 404|| error.response.status === 422) {
       return Promise.reject(error.response.data);
     }
   }

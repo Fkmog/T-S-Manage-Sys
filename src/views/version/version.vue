@@ -18,7 +18,6 @@
         height: '60px',
       }"
       style="width: 1000px"
-      @row-click="goEdit"
       >
       
        <el-table-column label="版本大纲名称" width="250">
@@ -45,23 +44,6 @@
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row >
-        <!-- <el-col :span="4">
-          <el-tooltip content="更新">
-           <el-button 
-            class="deleteButton"
-            link
-            style="color: #3f51b5"
-           @click="this.editFlag = true;
-                    this.deleteFlag = false;
-                    this.addFlag = false;
-                    this.nameFlag = true;
-                    this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;">
-            <el-icon><Edit /></el-icon>
-           </el-button>
-              
-          </el-tooltip>
-        </el-col> -->
         <el-col :span="4">
           <el-tooltip content="删除">
             <el-button 
@@ -79,6 +61,23 @@
             </el-icon>
             </el-button>
             
+          </el-tooltip>
+        </el-col>
+        <el-col :span="4">
+          <el-tooltip content="查看版本信息">
+           <el-button 
+            class="deleteButton"
+            link
+            style="color: #3f51b5"
+           @click="this.editFlag = true;
+                    this.deleteFlag = false;
+                    this.addFlag = false;
+                    this.nameFlag = true;
+                    this.selectVersion(scope.row);
+                    this.showEditVersionDailogFlag = true;">
+            <el-icon><Document /></el-icon>
+           </el-button>
+              
           </el-tooltip>
         </el-col>
       </el-row>
@@ -207,7 +206,8 @@ import {
   DocumentChecked,
   User,
   CircleClose,
-  Collection
+  Collection,
+  
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
 import { setWorkbook,checkWorkbook } from "@/api/workbook";
