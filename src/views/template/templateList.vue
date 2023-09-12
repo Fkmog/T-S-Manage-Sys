@@ -4,7 +4,7 @@
     <el-table
       class="ListTable"
       :data="workbookList"
-      style="width: 700px"
+      style="width: 800px"
       :header-cell-style="{
         'padding-left': '20px',
         'font-size': '14.4px',
@@ -23,10 +23,20 @@
     >
       <el-table-column prop="name" label="模板名称" width="300" />
       <el-table-column prop="updateTime" label="更新时间" width="300" />
-      <el-table-column width="100">
+      <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-row>
-            <el-col :span="16">
+            <el-col :span="6">
+              <el-tooltip content="修改" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="editBook(scope.row)"
+                  ><el-icon><Edit /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="6">
               <el-tooltip content="删除" :hide-after="0">
                 <el-button
                   link
@@ -44,10 +54,15 @@
 </template>
 
 <script>
-import { Back, Delete } from "@element-plus/icons-vue";
+import { Back, Delete, Edit } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { checkWorkbook, newWorkbookInfo, deleteWorkbook } from "@/api/workbook";
+import {
+  checkWorkbook,
+  newWorkbookInfo,
+  deleteWorkbook,
+  editWorkbookInfo,
+} from "@/api/workbook";
 
 export default {
   name: "TemplateList",
@@ -55,6 +70,7 @@ export default {
     Back,
     addBtn,
     Delete,
+    Edit,
   },
   data() {
     return {
@@ -116,6 +132,30 @@ export default {
         }
       });
     },
+    // 修改工作手册名称
+    editBook(row) {
+      console.log(row);
+      ElMessageBox.prompt("新的工作手册名称：", "修改工作手册名称", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        inputValue: row.name,
+        //校验规则
+        inputPattern: /^.+$/,
+        inputErrorMessage: "请输入修改后的工作手册名称",
+      })
+        .then(({ value }) => {
+          row.name = value;
+          editWorkbookInfo(row).then((res) => {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            this.getWorkbookList();
+          });
+        })
+        .catch(() => {});
+    },
     // 删除工作手册
     deleteBook(row) {
       console.log(row);
@@ -172,5 +212,8 @@ export default {
   margin: 0 auto;
   margin-top: 85px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
+}
+:deep().el-icon {
+  font-size: large;
 }
 </style>

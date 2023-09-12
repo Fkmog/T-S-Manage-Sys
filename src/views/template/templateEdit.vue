@@ -33,7 +33,7 @@
             class="icon"
             size="24px"
             color="rgb(137, 137, 137)"
-            @click="changeWorkbookInfo()"
+            @click="save()"
             style="margin-left: 20px"
           >
             <DocumentChecked />
@@ -65,7 +65,7 @@ import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { checkWorkbookInfo, editWorkbookInfo } from "@/api/workbook";
 import { ElMessage, ElMessageBox } from "element-plus";
 import _ from "lodash";
-import { uploadRule,helloword } from "@/components/form-designer/upload.js";
+import { uploadRule } from "@/components/form-designer/upload.js";
 export default {
   name: "TemplateEdit",
   components: {
@@ -211,13 +211,20 @@ export default {
     this.getWorkbookInfo();
   },
   methods: {
+    // 返回
     backList() {
       this.json = JSON.parse(this.$refs.designer.getJson());
       this.getOption();
-       console.log( _.isEqual(this.total.formJson, this.json),this.total.formJson, this.json);
-       console.log(   _.isEqual(this.total.cssJson, this.option),this.total.cssJson, this.option);
-
-
+      console.log(
+        _.isEqual(this.total.formJson, this.json),
+        this.total.formJson,
+        this.json
+      );
+      console.log(
+        _.isEqual(this.total.cssJson, this.option),
+        this.total.cssJson,
+        this.option
+      );
       if (
         _.isEqual(this.total.formJson, this.json) &&
         _.isEqual(this.total.cssJson, this.option)
@@ -235,11 +242,38 @@ export default {
           .catch(() => {});
       }
     },
+    //保存修改工作手册
+    save() {
+      this.json = JSON.parse(this.$refs.designer.getJson());
+      this.getOption();
+      this.total.formJson = this.json;
+      this.total.cssJson = this.option;
+      if (this.total.formJson.length > 0) {
+        this.total.formJson.forEach((form) => {
+          if (form.type === "upload") {
+            Reflect.deleteProperty(form, "component");
+          }
+        });
+      }
+      // 处理单选框，多选框的value类型
+      this.searchChildren(this.total.formJson);
+      console.log("save", this.total);
+      editWorkbookInfo(this.total).then((res) => {
+        if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `更新成功`,
+            duration: 1500,
+          });
+          this.getWorkbookInfo();
+        }
+      });
+    },
     // 获取样式规则
     getOption() {
       this.option = this.$refs.designer.getOption();
-      this.option.form.formCreateResetBtn = false;
-      this.option.form.formCreateSubmitBtn = false;
+      this.option.form.formCreateResetBtn= this.option.resetBtn.show
+      this.option.form.formCreateSubmitBtn= this.option.submitBtn.show
       console.log("getOption", this.option);
     },
     // 回显样式规则
@@ -270,43 +304,36 @@ export default {
           this.option.form = {};
         }
         console.log("option", this.option);
-
-        this.option.form.formCreateResetBtn = false;
-        
-        this.option.form.formCreateSubmitBtn = false;
-        console.log("option操作后", this.option, this.option.form.formCreateSubmitBtn );
-
+        // this.option.form.formCreateResetBtn = false;
+        // this.option.form.formCreateSubmitBtn = true; 
         this.setJson();
         this.setOption();
       });
     },
-    //修改工作手册
-    changeWorkbookInfo() {
-      this.json = JSON.parse(this.$refs.designer.getJson());
-      this.getOption();
-      this.total.formJson = this.json;
-      this.total.cssJson = this.option;
-      if (this.total.formJson.length > 0) {
-        this.total.formJson.forEach((form) => {
-          if (form.type === "upload") {
-            Reflect.deleteProperty(form, "component");
+    // 遍历children
+    searchChildren(forms) {
+      forms.forEach((form) => {
+        if (Array.isArray(form.children) && form.children.length > 0) {
+          this.searchChildren(form.children);
+        } else {
+          if (form !== "") {
+            if (
+              form.type == "checkbox" ||
+              form.type == "radio" ||
+              form.type == "select"
+            ) {
+              form.options.forEach((option) => {
+                option.value = option.value + "";
+              });
+            }
+            if (form.type == "cascader") {
+              form.props.options.forEach((option) => {
+                option.value = option.value + "";
+              });
+            }
           }
-        });
-      }
-      console.log("save", this.total);
-
-      this.total.formJson
-        editWorkbookInfo(this.total).then((res) => {
-          // console.log("editWorkbookInfo", res);
-          if (res.code === "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `更新成功`,
-              duration: 1500,
-            });
-            this.getWorkbookInfo()
-          }
-        });
+        }
+      });
     },
   },
 };

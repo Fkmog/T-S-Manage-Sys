@@ -55,13 +55,22 @@
             </el-tooltip>
           </div>
         </el-row>
+        <div v-for="(info, index) in this.info" :key="index">
+          <el-alert
+            :title="info"
+            type="error"
+            :closable="false"
+            show-icon
+            style="width: 300px; margin-top: 5px"
+          />
+        </div>
         <div v-for="objective in objectives" :key="objective.id">
           <el-row>
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="4"
+              :span="3"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
@@ -73,7 +82,7 @@
               v-show="!objective.hasAchieve"
             >
             </el-col>
-            <el-col :span="16">
+            <el-col :span="18">
               <div class="objective-name">
                 {{ objective.name }}
               </div>
@@ -91,7 +100,7 @@
                   <el-col :span="5">
                     {{ assessment.name }}
                   </el-col>
-                  <el-col :span="5">( {{ assessment.weight }}% )</el-col>
+                  <el-col :span="4">( {{ assessment.weight }}% )</el-col>
                   <el-col :span="12">
                     <el-row>
                       <el-col
@@ -101,6 +110,9 @@
                         {{ activity }}
                       </el-col>
                     </el-row>
+                  </el-col>
+                  <el-col :span="3" class="assess-achieve">
+                    {{ assessment.achievementTwo }}
                   </el-col>
                 </el-row>
               </div>
@@ -167,6 +179,7 @@ export default {
   },
   data() {
     return {
+      info: [],
       openDrawer: false,
       hasDetailId: true,
       hasObjective: true,
@@ -223,6 +236,9 @@ export default {
     checkClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         // console.log("getClassInfo", res.data);
+        if (res.hasOwnProperty("info")) {
+          this.info = res.info;
+        }
         this.objectives = res.data.objectives;
         if (this.objectives) {
           if (this.objectives.length > 0) {
@@ -239,6 +255,13 @@ export default {
               } else {
                 object.hasAchieve = false;
               }
+              object.assessmentMethods.forEach((assess) => {
+                if (assess.achievement === null) {
+                  assess.achievementTwo = "0";
+                } else {
+                  assess.achievementTwo = assess.achievement.toFixed() + "%";
+                }
+              });
             });
           } else {
             this.hasObjective = false;
@@ -338,5 +361,18 @@ export default {
 }
 .go-edit:hover {
   color: #5c6bc0;
+}
+.assess-achieve {
+  font-size: 1em;
+  color: #ff5722;
+  font-weight: bold;
+}
+:deep().edit-pen .el-icon {
+  width: 20px;
+  height: 20px;
+}
+:deep().edit-pen .el-icon svg {
+  width: 20px;
+  height: 20px;
 }
 </style>

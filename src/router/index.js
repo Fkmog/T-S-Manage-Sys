@@ -38,6 +38,7 @@ import userLogin from "@/components/userLogin/index.vue";
 import TemplateList from "@/views/template/templateList.vue";
 import TemplateEdit from "@/views/template/templateEdit.vue";
 import Workbook from "@/views/template/workbook.vue";
+import WorkbookPresent from "@/views/template/workbookPresent.vue";
 
 //教师端组件
 import TeacherIndex from "@/views/teacherSide/teacherIndex.vue";
@@ -244,6 +245,13 @@ const router = createRouter({
           name: "Workbook",
           path: "/workbook",
           component: Workbook,
+          meta: { isMajor: false },
+        },
+        
+        {
+          name: "WorkbookPresent",
+          path: "/workbookPresent",
+          component: WorkbookPresent,
           meta: { isMajor: false },
         },
       ],

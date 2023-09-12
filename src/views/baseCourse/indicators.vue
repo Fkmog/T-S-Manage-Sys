@@ -182,8 +182,8 @@ export default {
             this.majorList[i].programVersion =
               this.majorList[i].majorName +
               "-" +
-              this.majorList[i].enrollyear +
-              "级";
+              this.majorList[i].enrollyear 
+              ;
             console.log("!", typeof this.majorList[i].indicators);
             this.programIdList[i] = this.majorList[i].programId;
           });

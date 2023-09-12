@@ -117,9 +117,7 @@
         >
           待审核
         </div>
-        <div v-show="status == '已退回' && identity == '教师'">
-          已退回
-        </div>
+        <div v-show="status == '已退回' && identity == '教师'">已退回</div>
         <div v-show="status == '已退回' && identity == '教师'">
           <el-tooltip
             class="box-item"
@@ -150,17 +148,18 @@
         <div v-show="status == '已审核'">已审核</div>
         <el-divider class="divider" direction="vertical" />
         <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="审核意见"
-            placement="bottom"
-            :hide-after="0"
-          >
-          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange" />
-          </el-tooltip>
-        
-        
-
+          class="box-item"
+          effect="dark"
+          content="审核意见"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-switch
+            v-model="openDrawer"
+            class="switchstyle"
+            @change="openDrawerChange"
+          />
+        </el-tooltip>
       </el-row>
     </div>
     <div class="body">
@@ -195,18 +194,20 @@
             <el-row>
               <el-col class="detail-title">课程大纲</el-col>
 
-              <el-col :span="6" v-show="hasFile">
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="点击下载"
-                  placement="bottom"
-                  :hide-after="0"
+              <el-col>
+                <el-table
+                  v-show="hasFile"
+                  :data="filesList"
+                  style="cursor: pointer; margin-top: 10px; width: 180px"
+                  :show-header="false"
+                  @row-click="downloadFile"
                 >
-                  <el-col class="fileName" @click="downloadFile">{{
-                    objectInfo.fileName
-                  }}</el-col>
-                </el-tooltip>
+                  <el-table-column
+                    prop="originalName"
+                    label="文件名"
+                    width="180px"
+                  />
+                </el-table>
               </el-col>
             </el-row>
           </el-col>
@@ -228,16 +229,12 @@ import {
   Finished,
   Management,
 } from "@element-plus/icons-vue";
-import {
-  submit,
-  getClassInfo,
-  submitFeedback,
-  createReview,
-  getReview,
-} from "@/api/class";
+import { submit, getClassInfo } from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
-import { getObjectives, downloadDetail } from "@/api/basecourse";
+import { getFilesList } from "@/api/basecourse";
+import { downloadFile } from "@/api/common";
+
 import {
   ElMessageBox,
   ElMessage,
@@ -311,11 +308,7 @@ export default {
       console.log("identity:", this.identity);
     }
     this.getClassInfo();
-    
-    // this.getReviewInfo();
-    // console.log("classInfo", this.classInfo);
-    this.getDictionary();
-    this.getFile();
+    this.checkFileList();
   },
   computed: {
     teacherInfoChange() {
@@ -348,15 +341,40 @@ export default {
     },
   },
   methods: {
+    //提交
     submit() {
-      console.log('submit',this.status,this.identity);
-      if(this.status == '已退回' && this.identity == '教师'){
-        ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
+      console.log("submit", this.status, this.identity);
+      if (this.status == "已退回" && this.identity == "教师") {
+        ElMessageBox.confirm("是否已按照审核意见进行修改?", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
-        }).then(()=>{
-          submit(this.classInfo.classId).then((res) => {
+        })
+          .then(() => {
+            submit(this.classInfo.classId)
+              .then((res) => {
+                console.log("res", res);
+                if (res.code == "SUCCESS") {
+                  ElMessage({
+                    type: "success",
+                    message: `提交成功`,
+                    duration: 1000,
+                  });
+                }
+                this.getClassInfo();
+              })
+              .catch((e) => {
+                ElMessage({
+                  type: "error",
+                  message: `提交失败`,
+                  duration: 1000,
+                });
+                console.log("e", e);
+              });
+          })
+          .catch(() => {});
+      } else {
+        submit(this.classInfo.classId).then((res) => {
           console.log("res", res);
           if (res.code == "SUCCESS") {
             ElMessage({
@@ -366,40 +384,15 @@ export default {
             });
           }
           this.getClassInfo();
-        }).catch((e)=>{
-          ElMessage({
-              type: "error",
-              message: `提交失败`,
-              duration: 1000,
-            });
-          console.log('e',e);
-        })
-        }).catch(()=>{
-
-        })
+        });
       }
-      else{
-        submit(this.classInfo.classId).then((res) => {
-        console.log("res", res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `提交成功`,
-            duration: 1000,
-          });
-        }
-        this.getClassInfo();
-      });
-      }
-      
     },
-    openDrawerChange(){
+    openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
-    getdata(val){
+    getdata(val) {
       this.openDrawer = val;
     },
-   
     //返回教师端首页
     backHome() {
       if (this.identity == "学院管理员" || this.identity == "课程负责人") {
@@ -450,27 +443,11 @@ export default {
         });
       });
     },
-    //查询课程审核信息
-    // getReviewInfo(){
-    //   getReview(this.classInfo.classId).then((res)=>{
-    //     console.log('getReviewInfo',res);
-        
-    //     if(res.total != 0){
-    //       this.hasNoReviewInfo = false;
-    //       this.reviewInfo = res.rows;
-    //     }
-    //     else{
-    //       this.hasNoReviewInfo = true;
-
-    //     }
-        
-    //   })
-    // },
     //查看教学班信息
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res.data);
-        if(this.identity =='教师'){
+        if (this.identity == "教师") {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
           this.isRespondent = this.classInfo.isRespondent;
@@ -478,37 +455,33 @@ export default {
         else if(this.identity =='课程负责人'){
           this.$store.commit("currentInfo/setRespondClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.respondClassInfo;
-        }
-        else {
+        } else {
           this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
         }
+        this.getDictionary();
         this.classStatus();
       });
     },
-    //查看有无课程大纲文件
-    getFile() {
-      getObjectives(this.classInfo.detailId).then((res) => {
-        console.log("getObjectives", res);
-        this.objectInfo = res.data;
-        if (
-          !(res.data.syllabusFileId === null || res.data.syllabusFileId === 0)
-        ) {
-          this.hasFile = true;
-        } else {
+    //查看课程大纲文件列表
+    checkFileList() {
+      getFilesList(this.classInfo.detailId).then((res) => {
+        this.filesList = res.data;
+        if (this.filesList.length == 0) {
           this.hasFile = false;
+        } else {
+          this.hasFile = true;
         }
       });
     },
     //下载课程大纲文件
-    downloadFile() {
-      downloadDetail(this.classInfo.detailId).then((res) => {
+    downloadFile(row) {
+      downloadFile(row.fileAddress).then((res) => {
         // console.log("downloadFile", res);
         const blob = new Blob([res]);
         // console.log("blob",blob);
-        // saveAs(blob, this.objectInfo.fileName)
         const link = document.createElement("a");
-        link.download = decodeURI(this.objectInfo.fileName);
+        link.download = decodeURI(row.originalName);
         link.style.display = "none";
         link.href = URL.createObjectURL(blob);
         document.body.appendChild(link);
@@ -533,24 +506,19 @@ export default {
           this.status = "已退回";
           break;
       }
-      console.log("this.status", this.status);
+      // console.log("this.status", this.status);
     },
   },
 };
 </script>
 
 <style scoped>
-#drawerbox .el-overlay {
-  position: satic;
-}
 .reviewBoxStyle {
   padding-top: 100px;
 }
-
 :deep().el-overlay {
   position: static;
 }
-
 .switchstyle {
   bottom: 4px;
 }

@@ -43,6 +43,15 @@
     </div>
     <div class="edit-body">
       <div class="card">
+        <div v-for="(info, index) in this.info" :key="index">
+          <el-alert
+            :title="info"
+            type="error"
+            :closable="false"
+            show-icon
+            style="width: 300px; margin-top: 5px; margin-left: 30px"
+          />
+        </div>
         <el-form :model="objectives" ref="objectives" label-position="top">
           <el-col v-for="(objective, idx) in objectives" :key="objective.id">
             <el-row style="margin-top: 20px">
@@ -55,30 +64,55 @@
                 </section>
               </el-col>
               <el-col :span="20">
-                <el-form-item label="简称" class="title">
-                  <el-input
-                    v-model="objective.name"
-                    maxlength="20"
-                    show-word-limit
-                    placeholder="简称"
-                  />
-                </el-form-item>
-                <el-form-item
-                  label="描述"
-                  class="title"
-                  style="margin-top: 50px"
+                <div
+                  v-show="
+                    this.$store.state.currentInfo.identity === '学院管理员' ||
+                    this.$store.state.currentInfo.identity === '课程负责人'
+                  "
                 >
-                  <el-input
-                    v-model="objective.description"
-                    autosize
-                    type="textarea"
-                    maxlength="1000"
-                    placeholder="描述"
-                  />
-                </el-form-item>
-                <div style="margin-top: 50px">
-                  <span style="color: grey; font-size: 14px">考核方式</span>
+                  <el-form-item label="简称" class="title">
+                    <el-input
+                      v-model="objective.name"
+                      maxlength="20"
+                      show-word-limit
+                      placeholder="简称"
+                    />
+                  </el-form-item>
+                  <el-form-item
+                    label="描述"
+                    class="title"
+                    style="margin-top: 50px"
+                  >
+                    <el-input
+                      v-model="objective.description"
+                      autosize
+                      type="textarea"
+                      maxlength="1000"
+                      placeholder="描述"
+                    />
+                  </el-form-item>
                 </div>
+                <div v-show="this.$store.state.currentInfo.identity === '教师'">
+                  <div class="objective-name">
+                    {{ objective.name }}
+                  </div>
+                  <div class="objective-description">
+                    {{ objective.description }}
+                  </div>
+                </div>
+                <el-row style="margin-top: 50px">
+                  <el-col :span="22">
+                    <span style="color: grey; font-size: 14px">考核方式</span>
+                  </el-col>
+                  <el-col :span="2" class="penIcon">
+                    <el-icon
+                      class="pen-icon"
+                      @click="editAssessments(objective, idx)"
+                      ><EditPen
+                    /></el-icon>
+                  </el-col>
+                </el-row>
+
                 <el-row v-if="objective.assessmentMethods.length !== 0">
                   <el-col
                     :span="23"
@@ -105,13 +139,13 @@
                       </el-col>
                     </el-row>
                   </el-col>
-                  <el-col :span="1" class="penIcon">
+                  <!-- <el-col :span="1" class="penIcon">
                     <el-icon
                       class="pen-icon"
                       @click="editAssessments(objective, idx)"
                       ><EditPen
                     /></el-icon>
-                  </el-col>
+                  </el-col> -->
                 </el-row>
                 <el-row
                   class="noAssessment"
@@ -130,7 +164,13 @@
             </el-row>
             <div style="height: 50px"></div>
           </el-col>
-          <el-row class="attribute-Btn">
+          <el-row
+            class="attribute-Btn"
+            v-show="
+              this.$store.state.currentInfo.identity === '学院管理员' ||
+              this.$store.state.currentInfo.identity === '课程负责人'
+            "
+          >
             <el-button style="color: #6573c0" text @click="addObject()">
               <el-icon :size="18" color="#6573c0"><Plus /></el-icon>
               新增课程目标
@@ -283,6 +323,7 @@ export default {
   },
   data() {
     return {
+      info: [],
       course: {
         name: "",
         detailId: Number,
@@ -328,7 +369,10 @@ export default {
           type: "warning",
         })
           .then(() => {
-            if (this.$store.state.currentInfo.identity == "学院管理员") {
+            if (
+              this.$store.state.currentInfo.identity == "学院管理员" ||
+              this.$store.state.currentInfo.identity == "课程负责人"
+            ) {
               this.$router.push("/baseCourseObjectives");
             } else {
               this.$router.push({
@@ -338,7 +382,11 @@ export default {
           })
           .catch(() => {});
       } else {
-        if (this.$store.state.currentInfo.identity == "学院管理员") {
+        if (
+          this.$store.state.currentInfo.identity == "学院管理员" ||
+          this.$store.state.currentInfo.identity == "课程负责人"
+        ) {
+          console.log(this.$store.state.currentInfo.identity);
           this.$router.push("/baseCourseObjectives");
         } else {
           this.$router.push({
@@ -401,6 +449,9 @@ export default {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
+        if (res.hasOwnProperty("info")) {
+          this.info = res.info;
+        }
         console.log("getObjectives", res);
         this.allActivities = this.list.activities;
         // console.log("初始list", this.list);
@@ -477,14 +528,14 @@ export default {
     //确定编辑考核方式
     confirmAddAssessment(dialogObject) {
       let sum = 0;
-      let isMethodsNameNull = false;
+      // let isMethodsNameNull = false;
       let isItemNull = false;
       let haveZero = false;
       dialogObject.assessmentMethods.forEach((assessment) => {
         sum = sum + Number(assessment.weight);
-        if (assessment.name == "") {
-          isMethodsNameNull = true;
-        }
+        // if (assessment.name == "") {
+        //   isMethodsNameNull = true;
+        // }
         if (assessment.activities.item.length == 0) {
           isItemNull = true;
         }
@@ -498,15 +549,15 @@ export default {
       if (sum !== 100) {
         ElMessage.error("权重之和必须为100%");
       }
-      if (isMethodsNameNull == true) {
-        ElMessage.error("考核方式不能为空");
-      }
+      // if (isMethodsNameNull == true) {
+      //   ElMessage.error("考核方式不能为空");
+      // }
       if (isItemNull == true) {
         ElMessage.error("请为考核方式选择成绩项");
       }
       if (
         sum == 100 &&
-        isMethodsNameNull == false &&
+        // isMethodsNameNull == false &&
         isItemNull == false &&
         haveZero == false
       ) {
@@ -521,12 +572,17 @@ export default {
           let array = assessmentMethod.activities.itemObject;
           console.log("array", array, array[0]);
           if (array.length === 1) {
-            console.log("this.allActivities",this.allActivities,this.allActivities.item);
-            let index = this.allActivities.itemObject.findIndex(itemObject => itemObject.value === array[0].value);
+            console.log(
+              "this.allActivities",
+              this.allActivities,
+              this.allActivities.item
+            );
+            let index = this.allActivities.itemObject.findIndex(
+              (itemObject) => itemObject.value === array[0].value
+            );
             console.log("index", index);
             if (index > -1) {
-
-            console.log( !assessmentMethod.activities.hasOwnProperty("value"));
+              console.log(!assessmentMethod.activities.hasOwnProperty("value"));
               if (!(assessmentMethod.activities.item.length == array.length)) {
                 assessmentMethod.activities.item.push(
                   this.allActivities[0].item[index]
@@ -537,13 +593,10 @@ export default {
                 !assessmentMethod.activities.hasOwnProperty("value")
               ) {
                 assessmentMethod.activities.value = [];
-              console.log('you value?');
-
               }
               assessmentMethod.activities.value.push(
                 this.allActivities[0].value[index]
               );
-              console.log('给value?');
               if (
                 assessmentMethod.activities.remark === null ||
                 !assessmentMethod.activities.hasOwnProperty("remark")
@@ -557,7 +610,9 @@ export default {
           }
           if (array.length > 1) {
             array.forEach((singleActivity) => {
-              let index = this.allActivities.itemObject.findIndex(itemObject => itemObject.value === singleActivity.value);
+              let index = this.allActivities.itemObject.findIndex(
+                (itemObject) => itemObject.value === singleActivity.value
+              );
               // console.log("多于1项的时候，",singleActivity,"index",index);
               if (index > -1) {
                 // console.log("zheli执行了几次", array);
@@ -763,6 +818,7 @@ export default {
 }
 .penIcon {
   opacity: 1;
+  margin-top: 5px;
 }
 .pen-icon {
   cursor: pointer;
@@ -816,5 +872,22 @@ export default {
 :deep().block .el-icon svg {
   width: 24px;
   height: 24px;
+}
+.objective-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-top: 33px;
+}
+.objective-description {
+  margin-top: 30px;
+}
+:deep().penIcon .el-icon {
+  width: 18px;
+  height: 18px;
+}
+:deep().penIcon .el-icon svg {
+  width: 18px;
+  height: 18px;
 }
 </style>

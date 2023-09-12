@@ -15,7 +15,7 @@
             size="24px"
             color="rgb(137, 137, 137)"
             style="margin-left: 50px"
-            @click="backBaseCourseDetail()"
+            @click="back()"
           >
             <Back />
           </el-icon>
@@ -23,7 +23,6 @@
         <div class="title">课程目标</div>
       </el-row>
     </div>
-    <!-- <editBtn @click="goEdit()"></editBtn> -->
     <div class="body">
       <div class="card">
         <el-row class="card-head" style="margin-top: 30px">
@@ -37,19 +36,28 @@
           >
             <el-icon
               class="edit-pen"
-              style="margin-top: -10px"
               @click="goEdit()"
               ><EditPen
             /></el-icon>
           </el-tooltip>
         </el-row>
+        <div v-for="(info, index) in this.info" :key="index">
+          <el-alert
+            :title='info'
+            type="error"
+            :closable="false"
+            show-icon
+            style="width: 300px;margin-top:5px"
+          />
+        </div>
+
         <div v-for="objective in list.objectives" :key="objective.id">
           <el-row>
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="4"
+              :span="3"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
@@ -61,7 +69,7 @@
               v-show="!objective.hasAchieve"
             >
             </el-col>
-            <el-col :span="16">
+            <el-col :span="18">
               <div class="objective-name">
                 {{ objective.name }}
               </div>
@@ -79,7 +87,7 @@
                   <el-col :span="5">
                     {{ assessment.name }}
                   </el-col>
-                  <el-col :span="5">( {{ assessment.weight }}% )</el-col>
+                  <el-col :span="4">( {{ assessment.weight }}% )</el-col>
                   <el-col :span="12">
                     <el-row>
                       <el-col
@@ -90,6 +98,9 @@
                         {{ activity }}
                       </el-col>
                     </el-row>
+                  </el-col>
+                  <el-col :span="3" class="assess-achieve">
+                    {{ assessment.achievementTwo }}
                   </el-col>
                 </el-row>
               </div>
@@ -171,6 +182,7 @@ export default {
   },
   data() {
     return {
+      info: [],
       hasDetailId: true,
       hasObjective: true,
       classInfo: [],
@@ -195,7 +207,7 @@ export default {
     this.checkObjectives();
   },
   methods: {
-    backBaseCourseDetail() {
+    back() {
       this.$router.push("/baseCourseDetail");
     },
     goEdit() {
@@ -205,6 +217,9 @@ export default {
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         this.list = res.data;
+        if (res.hasOwnProperty("info")) {
+          this.info = res.info;
+        }
         console.log(this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
@@ -224,6 +239,13 @@ export default {
             } else {
               value.hasAchieve = false;
             }
+            value.assessmentMethods.forEach((assess) => {
+              if (assess.achievement === null) {
+                assess.achievementTwo = "";
+              } else {
+                assess.achievementTwo = assess.achievement.toFixed() + "%";
+              }
+            });
           });
         }
         console.log("getObjectives:", this.list);
@@ -234,10 +256,6 @@ export default {
 </script>
 
 <style scoped>
-/* .content {
-  height: 100vh;
-  background-color: #f2f2f2;
-} */
 .block {
   position: absolute;
   top: 110px;
@@ -305,13 +323,27 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
+  margin-top: -10px
 }
 .no-info {
   padding-top: 120px;
-
   display: flex;
   justify-content: center;
   font-size: 22px;
   background-color: #f2f2f2;
+}
+.assess-achieve {
+  font-size: 1em;
+  color: #ff5722;
+  font-weight: bold;
+}
+
+:deep().edit-pen .el-icon {
+  width: 20px;
+  height: 20px;
+}
+:deep().edit-pen .el-icon svg {
+  width: 20px;
+  height: 20px;
 }
 </style>

@@ -139,12 +139,12 @@ export default{
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-      console.log("identity:", this.identity);
+      // console.log("identity:", this.identity);
     } else if (this.identity == "课程负责人") {
       this.classInfo = this.$store.state.currentInfo.respondClassInfo;
     } else {
       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-      console.log("identity:", this.identity);
+      // console.log("identity:", this.identity);
     }
     this.checkFeedback.message = this.$store.state.reviewInfo.message;
     this.checkFeedback.checkState = this.$store.state.reviewInfo.checkState;
@@ -192,7 +192,7 @@ export default{
     checkStateChange:{
         deep:true,
         handler(value){
-          console.log('checkFeedback state changes');
+          // console.log('checkFeedback state changes');
           this.$store.commit("reviewInfo/setmessage", this.checkFeedback.message);
           this.$store.commit("reviewInfo/setcheckState", this.checkFeedback.checkState);
           
@@ -201,7 +201,7 @@ export default{
     checkMessageChange:{
         deep:true,
         handler(value){
-          console.log('checkFeedback message changes');
+          // console.log('checkFeedback message changes');
           this.$store.commit("reviewInfo/setmessage", this.checkFeedback.message);
           this.$store.commit("reviewInfo/setcheckState", this.checkFeedback.checkState);
           
@@ -239,18 +239,18 @@ export default{
     },
     //向父组件船值
     sendopenDrawer(){
-        console.log('sending false to father')
+        // console.log('sending false to father')
         this.$emit("getData", false);
     },
     collapseHandleChange(val){
-      console.log('collapseHandleChange',val);
+      // console.log('collapseHandleChange',val);
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-        console.log('this.checkFeedback.checkState',this.checkFeedback.checkState);
+        // console.log('this.checkFeedback.checkState',this.checkFeedback.checkState);
         submitFeedback(this.classInfo.classId,this.checkFeedback.checkState).then((res)=>{
-        console.log('feedback res',res);
+        // console.log('feedback res',res);
         if(res.code == 'SUCCESS'){
           this.showCheckDialogFlag = false;
           ElMessage({
@@ -263,7 +263,7 @@ export default{
         }
       }).catch((e)=>{
         this.showCheckDialogFlag = false;
-        console.log('e',e);
+        // console.log('e',e);
         ElMessage({
             type: "error",
             message: `新建失败`,
@@ -271,9 +271,9 @@ export default{
           });
       });
       if(this.checkFeedback.checkState == '4'){
-        console.log('creating review',this.checkFeedback);
+        // console.log('creating review',this.checkFeedback);
         createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
-          console.log('creating review res',res);
+          // console.log('creating review res',res);
         if(res.code == 'SUCCESS'){
           ElMessage({
             type: "success",
@@ -285,7 +285,7 @@ export default{
           this.getReviewInfo();
         }
         }).catch((e)=>{
-          console.log('e',e);
+          // console.log('e',e);
         })
       }
         } else {
@@ -301,7 +301,7 @@ export default{
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
-        console.log("getDictionary", res);
+        // console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
         this.academicYear.forEach((year) => {
@@ -319,7 +319,7 @@ export default{
     //查询课程审核信息
     getReviewInfo(){
       getReview(this.classInfo.classId).then((res)=>{
-        console.log('getReviewInfo',res);
+        // console.log('getReviewInfo',res);
         
         if(res.total != 0){
           this.hasNoReviewInfo = false;
@@ -335,7 +335,7 @@ export default{
     //查看教学班信息
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
-        console.log("getClassInfo", res.data);
+        // console.log("getClassInfo", res.data);
         if(this.identity =='教师'){
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
@@ -353,7 +353,7 @@ export default{
     },
     //提交
     submit() {
-      console.log('submit',this.status,this.identity);
+      // console.log('submit',this.status,this.identity);
       if(this.status == '已退回' && this.identity == '教师'){
         ElMessageBox.confirm("是否已按照审核意见进行修改?","",{
           confirmButtonText: "确认",
@@ -361,7 +361,7 @@ export default{
           type: "warning",
         }).then(()=>{
           submit(this.classInfo.classId).then((res) => {
-          console.log("res", res);
+          // console.log("res", res);
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",
@@ -376,7 +376,7 @@ export default{
               message: `新建失败`,
               duration: 1000,
             });
-          console.log('e',e);
+          // console.log('e',e);
         })
         }).catch(()=>{
 
@@ -384,7 +384,7 @@ export default{
       }
       else{
         submit(this.classInfo.classId).then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         if (res.code == "SUCCESS") {
           ElMessage({
             type: "success",
@@ -413,7 +413,7 @@ export default{
           this.status = "已退回";
           break;
       }
-      console.log('this.status',this.status);
+      // console.log('this.status',this.status);
     },
   },
 }
