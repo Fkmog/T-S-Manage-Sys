@@ -464,7 +464,7 @@ export default {
       });
     },
     //查看课程大纲文件列表
-    checkFileList() {
+    checkFileList() { 
       getFilesList(this.classInfo.detailId).then((res) => {
         this.filesList = res.data;
         if (this.filesList.length == 0) {

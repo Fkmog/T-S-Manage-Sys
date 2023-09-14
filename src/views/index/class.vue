@@ -1393,7 +1393,6 @@ export default {
   display: flex;
   justify-content: center;
   font-size: 22px;
-  background-color: #f2f2f2;
 }
 .no-class-detail {
   display: flex;

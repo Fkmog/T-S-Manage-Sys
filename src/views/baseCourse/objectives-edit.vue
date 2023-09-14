@@ -645,7 +645,6 @@ export default {
             });
           }
 
-          // console.log("arrar", array[0]);
           console.log("all", this.allActivities);
         });
         this.objectives[this.index].assessmentMethods =
@@ -699,7 +698,6 @@ export default {
     },
     // 获取删除课程目标的serialNum
     getDeleteSerialNum() {
-      // console.log("!", this.objectives);
       if (this.objectives.length > 0) {
         this.deleteSerialNum =
           this.objectives[this.objectives.length - 1].serialNum;
@@ -727,10 +725,6 @@ export default {
 </script>
 
 <style scoped>
-/* .content {
-  height: 100vh;
-  background-color: #f2f2f2;
-} */
 .block {
   position: absolute;
   top: 110px;

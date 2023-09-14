@@ -6,3 +6,15 @@ export function getUserInfo() {
       method: 'get'
     })
   }
+// 用户修改密码
+export function updateUserPwd(oldPassword, newPassword) {
+  const data = {
+    oldPassword,
+    newPassword
+  }
+  return request({
+    url: '/system/user/profile/updatePwd',
+    method: 'put',
+    params: data
+  })
+}

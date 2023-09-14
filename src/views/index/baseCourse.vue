@@ -106,15 +106,22 @@
     </el-row>
   </div>
 
-  
-
- 
-
-  <div v-show="hasNoVersion" class="no-class">没有版本信息，请先设置版本信息</div>
+  <div v-show="hasNoVersion" class="no-class">
+    没有版本信息，请先设置版本信息
+  </div>
   <div v-show="hasVersion">
     <div v-show="hasNoBaseCourse" class="no-class">没有课程</div>
-    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员' && hasBaseCourse">
-    
+    <div v-show="hasNoBaseCourse" class="no-class-detail">
+      请先点击右上角圆形按钮添加课程
+    </div>
+
+    <div
+      layout="row"
+      flex
+      class="md-padding"
+      v-show="identity == '学院管理员' && hasBaseCourse"
+    >
+      <addBtn @click="dialogFormVisible = true"></addBtn>
 
     <el-table
       :data="tableData"
@@ -1448,58 +1455,56 @@ export default {
         };
       }
       console.log(
-          "pageSize:",
-          pageSize,
-          " pageNum:",
-          pageNum,
-          "versionId",
-          this.currentVersionId
-        );
-        let that = this;
-        let courses = [];
-        let courseshasVersion = [];
-        let numofcourseshasVersion = 0;
-        let courseshasNoVersion = [];
-        let numofcourseshasNoVersion = 0;
-        this.isloading = true;
-        this.loadmoreDisabled = true;
-        return request({
-          url: tempurl,
-          method: "get",
-          params: tempparams,
-        })
-          .then(function (res) {
-            that.isloading = false;
-            that.loadmoreDisabled = false;
-            console.log("courseDetails:", res);
-            console.log(
-              "department:",
-              that.departmentId,
-              "schoolId:",
-              that.schoolId
-            );
-            if (res.total != 0) {
-              that.hasBaseCourse = true;
-              that.hasNoBaseCourse = false;
-              res.rows.forEach(function (course) {
-                course.courseName = course.courseName;
-                course.courseCode = course.courseCode;
-                course.courseType = that.courseTypeSource[course.courseType];
-                course.courseNature =
-                  that.courseNatureSource[course.courseNature];
-                course.credit = course.credit;
-                if (course.bcDetails.length) {
-                  for (const element of course.bcDetails) {
-                    if (
-                      element.versionId == that.currentVersionId
-                    ) {
-                      course.versionId = true;
-                      break;
-                    } else {
-                      course.versionId = false;
-                    }
+        "pageSize:",
+        pageSize,
+        " pageNum:",
+        pageNum,
+        "versionId",
+        this.currentVersionId
+      );
+      let that = this;
+      let courses = [];
+      let courseshasVersion = [];
+      let numofcourseshasVersion = 0;
+      let courseshasNoVersion = [];
+      let numofcourseshasNoVersion = 0;
+      this.isloading = true;
+      this.loadmoreDisabled = true;
+      return request({
+        url: tempurl,
+        method: "get",
+        params: tempparams,
+      })
+        .then(function (res) {
+          that.isloading = false;
+          that.loadmoreDisabled = false;
+          console.log("courseDetails:", res);
+          console.log(
+            "department:",
+            that.departmentId,
+            "schoolId:",
+            that.schoolId
+          );
+          if (res.total != 0) {
+            that.hasBaseCourse = true;
+            that.hasNoBaseCourse = false;
+            res.rows.forEach(function (course) {
+              course.courseName = course.courseName;
+              course.courseCode = course.courseCode;
+              course.courseType = that.courseTypeSource[course.courseType];
+              course.courseNature =
+                that.courseNatureSource[course.courseNature];
+              course.credit = course.credit;
+              if (course.bcDetails.length) {
+                for (const element of course.bcDetails) {
+                  if (element.versionId == that.currentVersionId) {
+                    course.versionId = true;
+                    break;
+                  } else {
+                    course.versionId = false;
                   }
                 }
+              }
 
               if (course.respondentInfos) {
                 course.respondentInfos.forEach(function (respondent) {
@@ -1519,27 +1524,27 @@ export default {
             that.tableData = courses;
             that.result = res;
 
-              if (pageSize >= that.result.total) {
-                that.showLoadmore = false;
-              } else {
-                that.showLoadmore = true;
-              }
-              console.log(
-                "pageSize:",
-                pageSize,
-                "result.total:",
-                that.result.total,
-                "showloadmore:",
-                that.showLoadmore
-              );
+            if (pageSize >= that.result.total) {
+              that.showLoadmore = false;
             } else {
-              that.hasBaseCourse = false;
-              that.hasNoBaseCourse = true;
+              that.showLoadmore = true;
             }
-          })
-          .catch((e) => {
-            console.log("e", e);
-          });
+            console.log(
+              "pageSize:",
+              pageSize,
+              "result.total:",
+              that.result.total,
+              "showloadmore:",
+              that.showLoadmore
+            );
+          } else {
+            that.hasBaseCourse = false;
+            that.hasNoBaseCourse = true;
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
     },
     multideleteBaseCourse(row) {
       let that = this;
@@ -1668,20 +1673,23 @@ export default {
         }
       }
 
-      this.$store.commit("course/setbaseCourseVersionName", versionName);
-      this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-      this.$store.commit(
-        "course/setbaseCourseVersionId",
-        this.currentVersionId
-      );
-      this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-      this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-      this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-      this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-      this.$store.commit("course/setbaseCourseCourseNature", row.courseNature);
-      this.$store.commit("course/setbaseCourseCredit", row.credit);
-      this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-      this.$store.commit("course/setbaseCourseRemark", row.remark);
+        this.$store.commit("course/setbaseCourseVersionName", versionName);
+        this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+        this.$store.commit(
+          "course/setbaseCourseVersionId",
+          this.currentVersionId
+        );
+        this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+        this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+        this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+        this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+        this.$store.commit(
+          "course/setbaseCourseCourseNature",
+          row.courseNature
+        );
+        this.$store.commit("course/setbaseCourseCredit", row.credit);
+        this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+        this.$store.commit("course/setbaseCourseRemark", row.remark);
 
       this.$router.push({
         path: "/baseCourseDetail",
@@ -1856,8 +1864,15 @@ export default {
 .no-class {
   display: flex;
   justify-content: center;
-  margin-top: 100px;
-  font-size:22px
+  padding-top: 120px;
+  font-size: 22px;
+}
+.no-class-detail {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: #828d96;
 }
 :deep().el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;

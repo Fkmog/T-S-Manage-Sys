@@ -46,7 +46,7 @@
           <el-dropdown-menu>
             <el-dropdown-item @click="this.deleteBaseCourse()" >
               <el-icon><Delete /></el-icon>
-              &nbsp删除课程
+              &nbsp;删除课程
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
