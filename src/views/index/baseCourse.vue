@@ -47,6 +47,7 @@
       </template>
     </HeaderSearch>
   </div>
+  <addBtn @click="dialogFormVisible = true"></addBtn>
 
   <div v-show="closeShow" class="submenu">
     <el-row>
@@ -113,7 +114,7 @@
   <div v-show="hasVersion">
     <div v-show="hasNoBaseCourse" class="no-class">没有课程</div>
     <div layout="row" flex class="md-padding" v-show="identity == '学院管理员' && hasBaseCourse">
-    <addBtn @click="dialogFormVisible = true"></addBtn>
+    
 
     <el-table
       :data="tableData"
@@ -808,7 +809,7 @@ export default {
       //select
       currentVersion: "",
       currentVersionName: "",
-      currentVersionId: Number,
+      currentVersionId: '',
       loading: ref(false),
       options: [],
       versionLabel: [],

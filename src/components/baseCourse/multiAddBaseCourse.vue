@@ -411,7 +411,7 @@ export default {
       this.hotInstance.updateSettings({
         data: this.db.items,
       });
-      
+      this.$router.push({ path: "/baseCourse" });
     },
     
     goBaseCourse() {

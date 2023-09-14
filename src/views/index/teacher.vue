@@ -44,14 +44,13 @@
     </el-row>
     </div>
 
-    <div v-show="!hasBaseCourse" class="no-class">
+    <div v-show="hasNoBaseCourse" class="no-class">
       没有教师
     </div>
     
       <addBtn @click="goAddTeacher"></addBtn>
-      
+      <div v-show="hasBaseCourse" >
         <el-table
-        v-show="hasBaseCourse" 
           ref="multipleTable"
           :data="tableData"
           tooltip-effect="dark"
@@ -80,7 +79,8 @@
             label="邮箱"
             width="600"
           />
-        </el-table>
+        </el-table></div>
+       
       
     
 
@@ -129,19 +129,21 @@ registerAllModules();
 export default {
   data() {
     return {
-      loadmoreDisabled:Boolean,
-      hasBaseCourse:Boolean,
+      loadmoreDisabled:false,
+      hasBaseCourse:false,
+      hasNoBaseCourse:false,
       showLoadmore:true,
       departmentId: "",
       schoolId: "",
       keyword:'',
       pageNum:1,
       pageSize:20,
-      tableData: reactive([]),
+      tableData:[],
       multipleSelection: [],
       numSelected: 0,
       teacherId: [],
-      closeShow: ref(false),
+      closeShow: false,
+
       clickState: 0,
       form: reactive({
         queryString: "",
@@ -310,9 +312,11 @@ export default {
         console.log(res);
         if(res.total == 0){
           that.hasBaseCourse = false;
+          that.hasNoBaseCourse = true;
         }
         else{
           that.hasBaseCourse = true;
+          that.hasNoBaseCourse = false;
           that.tableData = res.rows;
           that.result = res;
           if(that.pageSize>=res.total){
