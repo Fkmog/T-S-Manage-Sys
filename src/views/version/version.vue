@@ -87,7 +87,7 @@
     </el-table>
   </div>
 
-  <el-dialog v-model="showEditVersionDailogFlag">
+  <el-dialog v-model="showEditVersionDailogFlag" width="500">
     <template #header>
       <h4 v-show="addFlag">课程大纲版本号新建</h4>
       <h4 v-show="editFlag">版本信息</h4>
