@@ -251,7 +251,7 @@ export default {
   top: 80px;
   width: 350px;
   animation: animate 0.5s ease;
-  z-index: 100;
+  z-index: 1000;
 }
 @keyframes animate {
   0% {

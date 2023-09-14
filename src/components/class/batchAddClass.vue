@@ -635,7 +635,7 @@ getDict(){
   
   #tip {
     position: absolute;
-    z-index: 1000000;
+    z-index: 100;
     left: 0px;
     top: 0px;
     bottom: 0px;
