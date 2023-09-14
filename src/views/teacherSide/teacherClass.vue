@@ -265,6 +265,8 @@ export default {
   },
   data() {
     return {
+      isRespondent: "",
+
       reviewInfo: [],
       activeNames: "",
       openDrawer: false,
@@ -448,7 +450,9 @@ export default {
         if (this.identity == "教师") {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-        } else if (this.identity == "课程负责人") {
+          this.isRespondent = this.classInfo.isRespondent;
+        }
+        else if(this.identity =='课程负责人'){
           this.$store.commit("currentInfo/setRespondClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.respondClassInfo;
         } else {
@@ -460,7 +464,7 @@ export default {
       });
     },
     //查看课程大纲文件列表
-    checkFileList() {
+    checkFileList() { 
       getFilesList(this.classInfo.detailId).then((res) => {
         this.filesList = res.data;
         if (this.filesList.length == 0) {

@@ -25,7 +25,6 @@
         height: '60px',
       }"
       style="width: 800px"
-      @row-click="goEdit"
     >
       <el-table-column label="版本大纲名称" width="200">
         <template #default="scope">
@@ -50,29 +49,44 @@
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-row>
-            <el-col :span="4">
-              <el-tooltip content="删除">
-                <el-button
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  @click.stop="
-                    this.deleteFlag = true;
+          <el-row >
+        <el-col :span="6">
+          <el-tooltip content="删除">
+            <el-button 
+            class="deleteButton"
+            link
+            style="color: #3f51b5"
+            @click.stop="this.deleteFlag = true;
                     this.addFlag = false;
                     this.editFlag = false;
                     this.nameFlag = true;
                     this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;
-                  "
-                >
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
-                </el-button>
-              </el-tooltip>
-            </el-col>
-          </el-row>
+                    this.showEditVersionDailogFlag = true;">
+              <el-icon>
+                  <Delete />
+            </el-icon>
+            </el-button>
+            
+          </el-tooltip>
+        </el-col>
+        <el-col :span="6">
+          <el-tooltip content="查看版本信息">
+           <el-button 
+            class="deleteButton"
+            link
+            style="color: #3f51b5"
+           @click="this.editFlag = true;
+                    this.deleteFlag = false;
+                    this.addFlag = false;
+                    this.nameFlag = true;
+                    this.selectVersion(scope.row);
+                    this.showEditVersionDailogFlag = true;">
+            <el-icon><Document /></el-icon>
+           </el-button>
+              
+          </el-tooltip>
+        </el-col>
+      </el-row>
         </template>
       </el-table-column>
     </el-table>
@@ -81,7 +95,7 @@
   <el-dialog v-model="showEditVersionDailogFlag">
     <template #header>
       <h4 v-show="addFlag">课程大纲版本号新建</h4>
-      <h4 v-show="editFlag">课程大纲版本号更新</h4>
+      <h4 v-show="editFlag">版本信息</h4>
       <h4 v-show="deleteFlag">课程大纲版本号删除</h4>
     </template>
     <el-form :model="versionForm" :rules="editVersionRules">
@@ -195,6 +209,7 @@ import {
   User,
   CircleClose,
   Collection,
+  
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
 import { setWorkbook, checkWorkbook } from "@/api/workbook";

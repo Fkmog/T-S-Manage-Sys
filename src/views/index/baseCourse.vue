@@ -11,6 +11,7 @@
               <el-select
                 v-model="hasDetail"
                 class="selecter"
+                placeholder="全部"
                 @change="getSelectedBaseCourse(hasDetail)"
               >
                 <el-option
@@ -104,242 +105,256 @@
     </el-row>
   </div>
 
-  <div layout="row" flex class="md-padding" v-show="identity == '学院管理员'">
-    <addBtn @click="dialogFormVisible = true"></addBtn>
-
-    <el-table
-      :data="tableData"
-      v-loading="isloading"
-      v-show="hasBaseCourse && hasVersion"
-      ref="multipleTable1"
-      @selection-change="handleSelectionChange"
-      @row-click="editTrigger"
-      class="el-table-container"
-      style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
-      :header-cell-style="{
-        'padding-left': '20px',
-        'font-size': '14.4px',
-        height: '48px',
-        'font-weight': 'bold',
-        color: 'black',
-      }"
-      :cell-style="{
-        'padding-left': '20px',
-        'font-size': '16px',
-        height: '60px',
-      }"
-      :row-key="rowKey"
-    >
-      <el-table-column width="55" type="selection" :reserve-selection="true">
-      </el-table-column>
-      <el-table-column label="课程名" width="250" label-class-name="textbold">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseName }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程号" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseCode }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程类型" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseType }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程性质" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseNature }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="学分" width="80">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.credit }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="负责人" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="工作手册" width="200">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span v-show="scope.row.workbookName">{{
-              scope.row.workbookName
-            }}</span>
-            <span v-show="!scope.row.workbookName"></span>
-          </div>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="操作" width="250">
-        <template #default="scope">
-          <el-row v-show="showToolIcon">
-            <el-col :span="4">
-              <el-tooltip content="删除课程">
-                <el-button
-                  @click.stop="
-                    deleteBaseCourse(scope.$index, scope.row.courseId)
-                  "
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Delete /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-            <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="课程大纲">
-                <el-button
-                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Document /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-            <el-col :span="8" v-show="!scope.row.versionId">
-              <el-tooltip content="添加课程大纲">
-                <el-tag
-                  class="noBaseCourseDetail"
-                  type="danger"
-                  @click.stop="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag
-                >
-              </el-tooltip>
-            </el-col>
-          </el-row>
-        </template>
-      </el-table-column>
-    </el-table>
+  <div v-show="hasNoVersion" class="no-class">
+    没有版本信息，请先设置版本信息
   </div>
-  <div class="md-padding" layout="row" flex v-show="identity == '课程负责人'">
-    <el-table
-      :data="tableData"
-      v-show="hasBaseCourse && hasVersion"
-      v-loading="isloading"
-      ref="multipleTable2"
-      class="el-table-container"
-      @selection-change="handleSelectionChange"
-      @row-click="editTrigger"
-      style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
-      :header-cell-style="{
-        'padding-left': '20px',
-        'font-size': '14.4px',
-        height: '48px',
-        'font-weight': 'bold',
-        color: 'black',
-      }"
-      :cell-style="{
-        'padding-left': '20px',
-        'font-size': '16px',
-        height: '60px',
-      }"
-      :row-key="rowKey"
+  <div v-show="hasVersion">
+    <div v-show="hasNoBaseCourse" class="no-class">没有课程</div>
+    <div v-show="hasNoBaseCourse" class="no-class-detail">
+      请先点击右上角圆形按钮添加课程
+    </div>
+
+    <div
+      layout="row"
+      flex
+      class="md-padding"
+      v-show="identity == '学院管理员' && hasBaseCourse"
     >
-      <el-table-column width="55" type="selection" :reserve-selection="true">
-      </el-table-column>
-      <el-table-column label="课程名" width="250">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseName }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程号" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseCode }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程类型" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseType }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程性质" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseNature }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="学分" width="80">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.credit }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="负责人" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="工作手册" width="200">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span v-show="scope.row.workbookName">{{
-              scope.row.workbookName
-            }}</span>
-            <span v-show="!scope.row.workbookName"> </span>
-          </div>
-        </template>
-      </el-table-column>
+      <addBtn @click="dialogFormVisible = true"></addBtn>
 
-      <el-table-column label="操作" width="250">
-        <template #default="scope">
-          <el-row v-show="showToolIcon">
-            <el-col :span="4" v-show="scope.row.versionId">
-              <el-tooltip content="课程大纲">
-                <el-button
-                  @click.stop="goBaseCourseDetail(scope.$index, scope.row)"
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Document /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-            <el-col :span="12" v-show="!scope.row.versionId">
-              <el-tooltip content="添加课程大纲">
-                <el-tag
-                  class="noBaseCourseDetail"
-                  type="danger"
-                  @click.stop="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag
-                >
-              </el-tooltip>
-            </el-col>
-          </el-row>
-        </template>
-      </el-table-column>
-    </el-table>
+      <el-table
+        :data="tableData"
+        v-loading="isloading"
+        ref="multipleTable1"
+        @selection-change="handleSelectionChange"
+        @row-click="goBaseCourseDetail"
+        class="el-table-container"
+        style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
+        :header-cell-style="{
+          'padding-left': '20px',
+          'font-size': '14.4px',
+          height: '48px',
+          'font-weight': 'bold',
+          color: 'black',
+        }"
+        :cell-style="{
+          'padding-left': '20px',
+          'font-size': '16px',
+          height: '60px',
+        }"
+        :row-key="rowKey"
+      >
+        <el-table-column width="55" type="selection" :reserve-selection="true">
+        </el-table-column>
+        <el-table-column label="课程名" width="250" label-class-name="textbold">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseName }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程号" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseCode }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程类型" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseType }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程性质" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseNature }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="学分" width="80">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.credit }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="负责人" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="工作手册" width="200">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span v-show="scope.row.workbookName">{{
+                scope.row.workbookName
+              }}</span>
+              <span v-show="!scope.row.workbookName"></span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="250">
+          <template #default="scope">
+            <el-row v-show="showToolIcon">
+              <el-col :span="4">
+                <el-tooltip content="删除课程">
+                  <el-button
+                    @click.stop="
+                      deleteBaseCourse(scope.$index, scope.row.courseId)
+                    "
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Delete /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="4" v-show="scope.row.versionId">
+                <el-tooltip content="修改课程信息">
+                  <el-button
+                    @click.stop="editTrigger(scope.row)"
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Document /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="8" v-show="!scope.row.versionId">
+                <el-tooltip content="添加课程大纲">
+                  <el-tag
+                    class="noBaseCourseDetail"
+                    type="danger"
+                    @click.stop="addBaseCourseDetail(scope.row)"
+                    >无课程大纲</el-tag
+                  >
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div
+      class="md-padding"
+      layout="row"
+      flex
+      v-show="identity == '课程负责人' && hasBaseCourse"
+    >
+      <el-table
+        :data="tableData"
+        v-loading="isloading"
+        ref="multipleTable2"
+        class="el-table-container"
+        @selection-change="handleSelectionChange"
+        @row-click="goBaseCourseDetail"
+        style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
+        :header-cell-style="{
+          'padding-left': '20px',
+          'font-size': '14.4px',
+          height: '48px',
+          'font-weight': 'bold',
+          color: 'black',
+        }"
+        :cell-style="{
+          'padding-left': '20px',
+          'font-size': '16px',
+          height: '60px',
+        }"
+        :row-key="rowKey"
+      >
+        <el-table-column width="55" type="selection" :reserve-selection="true">
+        </el-table-column>
+        <el-table-column label="课程名" width="250">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseName }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程号" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseCode }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程类型" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseType }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程性质" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseNature }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="学分" width="80">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.credit }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="负责人" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="工作手册" width="200">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span v-show="scope.row.workbookName">{{
+                scope.row.workbookName
+              }}</span>
+              <span v-show="!scope.row.workbookName"> </span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="250">
+          <template #default="scope">
+            <el-row v-show="showToolIcon">
+              <el-col :span="4" v-show="scope.row.versionId">
+                <el-tooltip content="修改课程信息">
+                  <el-button
+                    @click.stop="editTrigger(scope.row)"
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Document /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="12" v-show="!scope.row.versionId">
+                <el-tooltip content="添加课程大纲">
+                  <el-tag
+                    class="noBaseCourseDetail"
+                    type="danger"
+                    @click.stop="addBaseCourseDetail(scope.row)"
+                    >无课程大纲</el-tag
+                  >
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
-
-  <div v-show="(hasNoBaseCourse && hasVersion)||(hasNoBaseCourse && hasNoVersion)" class="no-class">没有课程</div>
-
-  <div v-show="hasNoVersion && hasBaseCourse" class="no-class">没有版本信息，请先设置版本信息</div>
-  <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
+  <el-dialog v-model="dialogFormVisible" title="添加基础课程">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -411,7 +426,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
+  <el-dialog v-model="dialogFormVisible1" title="修改课程信息">
     <el-form :model="preform">
       <el-form-item label="课程名称" :label-width="formLabelWidth">
         <el-input
@@ -680,9 +695,8 @@ export default {
     };
 
     return {
-
-      hasVersion:Boolean,
-      hasNoVersion:Boolean,
+      hasVersion: false,
+      hasNoVersion: false,
 
       hasDetail: "全部",
       hasDetailSeletion: [
@@ -730,8 +744,8 @@ export default {
       keyword: "",
       Respondentkeyword: "",
       isloading: true,
-      hasBaseCourse: Boolean,
-      hasNoBaseCourse:Boolean,
+      hasBaseCourse: false,
+      hasNoBaseCourse: false,
       courseTypeSource: [],
       courseNatureSource: [],
       //showSetDetailPage:false,
@@ -804,7 +818,7 @@ export default {
       //select
       currentVersion: "",
       currentVersionName: "",
-      currentVersionId: Number,
+      currentVersionId: '',
       loading: ref(false),
       options: [],
       versionLabel: [],
@@ -887,26 +901,6 @@ export default {
       this.nameFlag = false;
       this.enrollYearFlag = false;
       this.reviseYearFlag = false;
-    },
-    selectVersion(versionId) {
-      console.log("versionId", versionId);
-      for (const element of this.versions) {
-        if (element["versionId"] == versionId) {
-          this.currentVersionName = element["label"];
-          this.versionForm.name = element["label"];
-          this.versionForm.enrollYear = element["enrollYear"];
-          this.versionForm.reviseYear = element["reviseYear"];
-          this.versionForm.versionId = element["versionId"];
-        }
-      }
-      console.log(
-        "name:",
-        this.versionForm.name,
-        "enrollYear:",
-        this.versionForm.enrollYear,
-        "reviseYear:",
-        this.versionForm.reviseYear
-      );
     },
     showEditVersionDailog() {
       this.showEditVersionDailogFlag = true;
@@ -1463,58 +1457,56 @@ export default {
         };
       }
       console.log(
-          "pageSize:",
-          pageSize,
-          " pageNum:",
-          pageNum,
-          "versionId",
-          this.currentVersionId
-        );
-        let that = this;
-        let courses = [];
-        let courseshasVersion = [];
-        let numofcourseshasVersion = 0;
-        let courseshasNoVersion = [];
-        let numofcourseshasNoVersion = 0;
-        this.isloading = true;
-        this.loadmoreDisabled = true;
-        return request({
-          url: tempurl,
-          method: "get",
-          params: tempparams,
-        })
-          .then(function (res) {
-            that.isloading = false;
-            that.loadmoreDisabled = false;
-            console.log("courseDetails:", res);
-            console.log(
-              "department:",
-              that.departmentId,
-              "schoolId:",
-              that.schoolId
-            );
-            if (res.total != 0) {
-              that.hasBaseCourse = true;
-              that.hasNoBaseCourse = false;
-              res.rows.forEach(function (course) {
-                course.courseName = course.courseName;
-                course.courseCode = course.courseCode;
-                course.courseType = that.courseTypeSource[course.courseType];
-                course.courseNature =
-                  that.courseNatureSource[course.courseNature];
-                course.credit = course.credit;
-                if (course.bcDetails.length) {
-                  for (const element of course.bcDetails) {
-                    if (
-                      element.versionId == that.currentVersionId
-                    ) {
-                      course.versionId = true;
-                      break;
-                    } else {
-                      course.versionId = false;
-                    }
+        "pageSize:",
+        pageSize,
+        " pageNum:",
+        pageNum,
+        "versionId",
+        this.currentVersionId
+      );
+      let that = this;
+      let courses = [];
+      let courseshasVersion = [];
+      let numofcourseshasVersion = 0;
+      let courseshasNoVersion = [];
+      let numofcourseshasNoVersion = 0;
+      this.isloading = true;
+      this.loadmoreDisabled = true;
+      return request({
+        url: tempurl,
+        method: "get",
+        params: tempparams,
+      })
+        .then(function (res) {
+          that.isloading = false;
+          that.loadmoreDisabled = false;
+          console.log("courseDetails:", res);
+          console.log(
+            "department:",
+            that.departmentId,
+            "schoolId:",
+            that.schoolId
+          );
+          if (res.total != 0) {
+            that.hasBaseCourse = true;
+            that.hasNoBaseCourse = false;
+            res.rows.forEach(function (course) {
+              course.courseName = course.courseName;
+              course.courseCode = course.courseCode;
+              course.courseType = that.courseTypeSource[course.courseType];
+              course.courseNature =
+                that.courseNatureSource[course.courseNature];
+              course.credit = course.credit;
+              if (course.bcDetails.length) {
+                for (const element of course.bcDetails) {
+                  if (element.versionId == that.currentVersionId) {
+                    course.versionId = true;
+                    break;
+                  } else {
+                    course.versionId = false;
                   }
                 }
+              }
 
               if (course.respondentInfos) {
                 course.respondentInfos.forEach(function (respondent) {
@@ -1534,27 +1526,27 @@ export default {
             that.tableData = courses;
             that.result = res;
 
-              if (pageSize >= that.result.total) {
-                that.showLoadmore = false;
-              } else {
-                that.showLoadmore = true;
-              }
-              console.log(
-                "pageSize:",
-                pageSize,
-                "result.total:",
-                that.result.total,
-                "showloadmore:",
-                that.showLoadmore
-              );
+            if (pageSize >= that.result.total) {
+              that.showLoadmore = false;
             } else {
-              that.hasBaseCourse = false;
-              that.hasNoBaseCourse = true;
+              that.showLoadmore = true;
             }
-          })
-          .catch((e) => {
-            console.log("e", e);
-          });
+            console.log(
+              "pageSize:",
+              pageSize,
+              "result.total:",
+              that.result.total,
+              "showloadmore:",
+              that.showLoadmore
+            );
+          } else {
+            that.hasBaseCourse = false;
+            that.hasNoBaseCourse = true;
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
     },
     multideleteBaseCourse(row) {
       let that = this;
@@ -1673,33 +1665,40 @@ export default {
           console.log("e", e);
         });
     },
-    goBaseCourseDetail(index, row) {
-      console.log("goBaseCourseDetail", row);
-      let versionName = "";
-      for (const element of this.versions) {
-        if (element["versionId"] == this.currentVersionId) {
-          versionName = element["label"];
+    goBaseCourseDetail(row) {
+      console.log("goBaseCourseDetail", row.bcDetails.length);
+      if (row.bcDetails.length) {
+        let versionName = "";
+        for (const element of this.versions) {
+          if (element["versionId"] == this.currentVersionId) {
+            versionName = element["label"];
+          }
         }
+
+        this.$store.commit("course/setbaseCourseVersionName", versionName);
+        this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+        this.$store.commit(
+          "course/setbaseCourseVersionId",
+          this.currentVersionId
+        );
+        this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+        this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+        this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+        this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+        this.$store.commit(
+          "course/setbaseCourseCourseNature",
+          row.courseNature
+        );
+        this.$store.commit("course/setbaseCourseCredit", row.credit);
+        this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+        this.$store.commit("course/setbaseCourseRemark", row.remark);
+
+        this.$router.push({
+          path: "/baseCourseDetail",
+        });
+      } else {
+        this.addBaseCourseDetail(row);
       }
-
-      this.$store.commit("course/setbaseCourseVersionName", versionName);
-      this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-      this.$store.commit(
-        "course/setbaseCourseVersionId",
-        this.currentVersionId
-      );
-      this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-      this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-      this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-      this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-      this.$store.commit("course/setbaseCourseCourseNature", row.courseNature);
-      this.$store.commit("course/setbaseCourseCredit", row.credit);
-      this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-      this.$store.commit("course/setbaseCourseRemark", row.remark);
-
-      this.$router.push({
-        path: "/baseCourseDetail",
-      });
     },
     editTrigger(val) {
       console.log("选中的信息：", val.courseId);
@@ -1863,10 +1862,17 @@ export default {
 }
 
 .no-class {
-  margin-top: 120px;
   display: flex;
   justify-content: center;
+  padding-top: 120px;
   font-size: 22px;
+}
+.no-class-detail {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: #828d96;
 }
 :deep().el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;

@@ -22,6 +22,29 @@
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
       <el-tooltip
+        class="box-item"
+        effect="dark"
+        placement="bottom"
+        
+        
+        :hide-after="0"
+      >
+      <template #content>
+        <span v-show="hasDetail">
+          成绩项
+        </span>
+        <span v-show="hasNoDetail">
+          请先关联课程大纲
+        </span>
+      </template>
+      <el-icon class="icon"
+          size="24px"
+          color="rgb(137, 137, 137)"
+          @click="goActivity"
+          ><Histogram /></el-icon>
+          </el-tooltip>
+      <el-divider class="divider" direction="vertical" />
+      <el-tooltip
             class="box-item"
             effect="dark"
             content="审核意见"
@@ -38,7 +61,8 @@
     <addBtn @click="goAddScore" v-show="identity=='教师'"></addBtn>
 
     <!-- editable @edit="handleTabsEdit"-->
-    <el-tabs v-model="editableTabsValue" v-show="hasScores" type="card" class="activity-tab"  
+    <div v-show="hasDetail">
+<el-tabs v-model="editableTabsValue" v-show="hasScores" type="card" class="activity-tab"  
 
       @tab-click="editableTabsValueChange"
       
@@ -75,7 +99,8 @@
             <span>{{item}}</span>
           </el-row>
           <el-row>
-            <span class="subtabletitle">({{currentactivityScores[i]}})</span>
+            <span class="subtabletitle">({{currentactivityScores[i]}})/</span>
+            <span>{{currentactivityweight[i]}}%</span>
           </el-row>
         </el-col>
         
@@ -107,24 +132,42 @@
       </div>
       
   </div>
+    </div>
+    <div v-show="hasNoDetail" class="no-program">
+      <div style="
+  padding-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+  background-color: #f2f2f2;
+">
+        该课程尚未关联课程大纲
+      </div>
+      
+  </div>
   </div>
   <reviewDrawer  v-bind:visible="openDrawer"/>
 </template>
 
 <script>
-import { Back } from "@element-plus/icons-vue";
+import { Back,Histogram } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
-import { ElMessageBox, ElSwitch,} from "element-plus";
+import { ElMessageBox, ElSwitch,ElMessage} from "element-plus";
 import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
 
 import request from "@/utils/request/request";
 export default {
   name: "Score",
   components: {
-    Back,addBtn,request,ElSwitch,reviewDrawer
+    Back,addBtn,request,ElSwitch,reviewDrawer,Histogram,ElMessage
   },
   data() {
     return {
+      isRespondent:'',
+
+      hasDetail:false,
+      hasNoDetail:false,
+
       openDrawer:false,
       hasActivities:false,
       hasScores:false,
@@ -139,6 +182,8 @@ export default {
       currentactivityName:[],
       activityScores:[],
       currentactivityScores:[],
+      activityweight:[],
+      currentactivityweight:[],
       studentsTable:[],
       tableWidth:'',
     };
@@ -161,6 +206,21 @@ export default {
     
   },
   methods: {
+    goActivity(){
+      if(this.hasDetail){
+        this.$store.commit("course/setbaseCourseCourseId", this.classInfo.courseId);
+        this.$store.commit("course/setDetailId", this.classInfo.detailId);
+        this.$router.push({ path: "/baseCourseActivities",query: { parentName: 'Score' },});
+      }
+      else{
+        ElMessage({
+                    type: 'error',
+                    message: `请先关联课程大纲`,
+                    duration:1000,
+                  });
+      }
+      
+    },
     openDrawerChange(){
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
@@ -174,11 +234,10 @@ export default {
         this.currenteditableTabsValue = Number(pane.props.name);
         this.currentactivityName = this.activityName[this.currenteditableTabsValue-1];
         this.currentactivityScores = this.activityScores[this.currenteditableTabsValue-1];
+        this.currentactivityweight = this.activityweight[this.currenteditableTabsValue-1];
         length = (this.currentactivityName.length+1)*180+100;
         this.tableWidth = length.toString()+'px';
         return console.log('currenteditableTabsValue:',Number(pane.props.name));
-        
-        
       },
       handleTabsEdit(targetName, action,activityName) {
         let that = this;
@@ -270,12 +329,16 @@ export default {
     },
     async getActivities(){
       let that = this;
-      return request({
+      if(this.classInfo.detailId){
+        this.hasDetail = true;
+        this.hasNoDetail = false;
+        return request({
         url:'/classes/'+this.classInfo.classId,
         method:'get',
       }).then(function(res){
         console.log('class Info',res);
-        
+        that.isRespondent = res.data.isRespondent;
+        console.log('isRespondent',that.isRespondent);
         let course = res.data;
         let length = 0;
         if(course.scores){
@@ -289,6 +352,8 @@ export default {
           let activityNumber = activity['item'].length;
           that.activityName.push(activity['item']);
           that.activityScores.push(activity['value']);
+          that.activityweight.push(activity['weight']);
+          
 
           let studentNum = course.scores.length;
           let tempStudents = [];
@@ -296,7 +361,7 @@ export default {
           if(count+1 >course.scores[i]['grade'].length){
             let tempscores=[];
             for(let j=0;j<activityNumber;j++){
-              tempscores.push(0);
+              tempscores.push(null);
               }
               course.scores[i]['grade'].push(tempscores);
           }
@@ -309,11 +374,15 @@ export default {
           tempStudents.push(student);
         
           };
+          
           that.studentsTable.push(tempStudents);
+          
           count++;
-        })
+        });
+        console.log('studentsTable',that.studentsTable);
         that.currentactivityName = that.activityName[0];
         that.currentactivityScores = that.activityScores[0];
+        that.currentactivityweight = that.activityweight[0];
         let length = 0;
         length = (that.currentactivityName.length+1)*180+100;
         that.tableWidth = length.toString()+'px';
@@ -322,7 +391,7 @@ export default {
         
         that.editableTabsValue = '1';
         that.currenteditableTabsValue = 1;
-        console.log('activityName',that.activityName,'activityScores:',that.activityScores);
+        console.log('activityName',that.activityName,'activityScores:',that.activityScores,'activityWeight',that.activityweight);
         }
         else {
           console.log('res has no activities');
@@ -336,7 +405,12 @@ export default {
         }
         
         
-      })
+      });
+      }else{
+        this.hasDetail = false;
+        this.hasNoDetail = true;
+      }
+      
     },
   },
 };
@@ -349,13 +423,13 @@ export default {
 .activity-tab{
   background: white;
   margin-left: 5%;
-  width: 1200px;
+  margin-right: 5%;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 
 .studentCard{
   margin-left: 5%;
-  width: 1200px;
+  margin-right: 5%;
   height: 500px;
 }
 .scoreintable{
@@ -363,7 +437,7 @@ export default {
 }
 .subtabletitle{
   color: grey;
-  margin-left: 14px;
+  
   font-weight: 500;
 }
    .no-program {

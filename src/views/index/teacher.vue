@@ -47,7 +47,9 @@
     <div v-show="!hasBaseCourse" class="no-class">
       没有教师
     </div>
-    
+     <div class="no-major-detail" v-show="!hasBaseCourse">
+    请先点击右上角圆形按钮添加教师
+  </div>
       <addBtn @click="goAddTeacher"></addBtn>
       
         <el-table
@@ -525,7 +527,13 @@ export default {
     border-bottom: 1px solid #d0d0d0;
     background-color: #f2f2f2;
 }
-
+.no-major-detail {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: #828d96;
+}
 /* .el-button {
     
         display: inline-block;

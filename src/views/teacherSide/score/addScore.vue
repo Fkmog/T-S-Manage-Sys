@@ -341,7 +341,7 @@ activateHotcolumn(){
                 else if (index === 1) {
                 return '姓名';
                 } else if (index === 2) {
-                return '不及格';
+                return '考试情况';
                 } else {
                 return '成绩项';
                 }
@@ -370,7 +370,7 @@ activateHotcolumn(){
             preventOverflow: 'horizontal',
             manualColumnMove: false,
             copyPaste: true,
-            colWidths: 100,
+            colWidths: 120,
             
             contextMenu: {
               items:{
@@ -432,13 +432,6 @@ getHotCellsFunction() {
                 // cellProperties.type = 'string';
                 cellProperties.className = 'cell-disallow';
                 }
-                if (col === 2 && row >= 3) {
-                // fail(不及格) column
-                cellProperties.type = 'checkbox';
-                cellProperties.checkedTemplate = 'F', // F: fail
-                cellProperties.uncheckedTemplate = '',
-                cellProperties.className = 'cell-disallow';
-                }
                 if (row != 0 && row != 2 && col >= 3) { 
                 // for 2nd row(分值), also validScore
                 cellProperties.type = 'numeric';  // by default: 'string'
@@ -469,6 +462,11 @@ getHotCellsFunction() {
                 cellProperties.allowEmpty = true;
                 cellProperties.className = 'ht-s-size';
                 //   cellProperties.validator = that.validScoreSetting();
+                }
+                if(col === 2 && row > 2){
+                  cellProperties.type = 'dropdown';
+                  cellProperties.source = [' ','缺考','缓考','不及格','取消考试资格'];
+                  cellProperties.allowEmpty = true;
                 }
 
                 return cellProperties;
@@ -525,8 +523,9 @@ async getActivities(){
           if(course.activities&&that.hasObjectives){
             that.hasActivities = true;
             that.hasNoActivities = false;
+            let currentactivitCount =0;
             course.activities.forEach((activity)=>{
-              console.log('activity["name"]',activity['name']);
+            console.log('activity["name"]',activity['name']);
             that.handleTabsEdit(1,'add',activity['name']);
             let activityNumber = activity['item'].length;
             console.log('activityNumber:',activityNumber);
@@ -570,12 +569,13 @@ async getActivities(){
             // that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
             tempList[3+i]['studentName'] = course.scores[i]['info'][1];
             // that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
-            tempList[3+i]['pass'] = (course.scores[i]['info'][2]=='')? '':'F';
+            
+            tempList[3+i]['pass'] = course.scores[i]['status'][currentactivitCount];
             if(count+1 >course.scores[i]['grade'].length){
               // console.log('该成绩项下，并未添加学生成绩')
               
               for(let j=0;j<activityNumber;j++){
-                tempList[3+i][activity['item'][j]] = 0;
+                tempList[3+i][activity['item'][j]] = null;
               }
               
             }
@@ -584,7 +584,7 @@ async getActivities(){
               if(!course.scores[i]['grade'][count][j]){
                 //[count++]
                 // that.db.items[3+i][course.activities[0]['item'][j]] = 0;
-                tempList[3+i][activity['item'][j]] = 0;
+                tempList[3+i][activity['item'][j]] = null;
               }
               else{
                 // that.db.items[3+i][course.activities[0]['item'][j]] = course.scores[i]['grade'][j];
@@ -600,7 +600,8 @@ async getActivities(){
           that.columnList.push(tempcolumnList);
           that.db.items.push(tempList);
           count++;
-            });
+          currentactivitCount++;
+        });
           that.editableTabsValue = '1';
           that.currenteditableTabsValue = 1;
           that.originData = JSON.parse(JSON.stringify(that.db.items));
@@ -715,6 +716,7 @@ async getActivities(){
       save() {
         this.saving = true;
         this.dirty = false;
+        this.postData.scores = [];
         var result = this.isValid();
           if (!result) {
             this.saving = false;
@@ -740,8 +742,10 @@ async getActivities(){
               
               let infoList = [];
               let finalGrade = [];
+              let finalPass = [];
               that.db.items.forEach((activity)=>{
                 let gradList = [];
+                let passList = '';
                 let student = JSON.parse(JSON.stringify(activity));
                 for(let m=0;m<3;m++){
                   student.shift();
@@ -756,7 +760,7 @@ async getActivities(){
                     let tempDict = {
                       studentNumber:'',
                       studentName:'',
-                      pass:'',
+                      
                     }
                     for(var key in student[i]){
                       console.log('key',key,'student[key]',student[i][key])
@@ -768,7 +772,8 @@ async getActivities(){
                        
                       }
                       else if(key == 'pass'){
-                        tempDict['pass'] = student[i][key];
+                        passList=student[i][key];
+                        
                       }
                       else{
                         gradList.push(student[i][key]);
@@ -785,23 +790,20 @@ async getActivities(){
                   
             }
             finalGrade.push(gradList);
+            finalPass.push(passList);
               })
               console.log('info:',infoList,'grade:',finalGrade);
               var scoreDist = {
-                'info':[infoList[0]['studentNumber'],infoList[0]['studentName'],infoList[0]['pass']],
+                'info':[infoList[0]['studentNumber'],infoList[0]['studentName']],
+                'status':finalPass,
                 'grade':finalGrade,
               }
               
               console.log('scoreDist',scoreDist,count++);
               that.postData.scores.push(scoreDist);
             });
-
-            that.addScores(that.postData.scores);
-         
-            
-            
-
-            
+            console.log('postData.scores',that.postData.scores);
+            that.addScores(that.postData.scores); 
       
     },
       toPostData(){
@@ -1073,22 +1075,22 @@ async getActivities(){
                 'scores':postData,
             }
         }).then(function(res){
-            console.log('saving scores res:',res);
-            that.firstActivities = true;
-            if(res.code == 'SUCCESS'){
-                ElMessage({
-                    type: 'success',
-                    message: `更新成功`,
-                    duration:1500,
-                  });
-                 that.goBackandClean();
-            }
-             
-              
-      
+          that.postData.scores = [];
+          console.log('saving scores res:',res);
+          that.firstActivities = true;
+          if(res.code == 'SUCCESS'){
+              ElMessage({
+                  type: 'success',
+                  message: `更新成功`,
+                  duration:1500,
+                });
+                that.goBackandClean();
+          }
+          console.log('postData.scores', that.postData.scores);
         }).catch(e=>{
           console.log('e:',e);
-          that.postData.scores = [];
+          
+          console.log('postData.scores', that.postData.scores);
         })
     }
     

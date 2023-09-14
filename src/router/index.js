@@ -173,6 +173,7 @@ const router = createRouter({
         },
         {
           path: "/baseCourseActivities",
+          name:'baseCourseActivities',
           component: baseCourseActivities,
           meta: { isMajor: false },
         },

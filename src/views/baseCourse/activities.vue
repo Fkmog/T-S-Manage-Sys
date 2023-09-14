@@ -173,10 +173,12 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   
   
   export default{
-    name:'addTeacher',
+    name:'activities',
     data(){
       let that = this;
       return{
+        from:'',//路由来自哪里
+        classInfo:[],//当前课程数据
 
         //角色信息
         identity: "",
@@ -231,6 +233,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
       ,CirclePlus,DocumentChecked,Sortable,EditPen,Checked,CloseBold
     },
+    
     methods:{
     dragTab(){
     let that = this;
@@ -296,19 +299,52 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         
         let that = this;
         this.currenteditableTabsValue = Number(pane.props.name);
-        // if(this.currenteditableTabsValue ==1){
-        //   this.sortable.option('sort',false);
-        // }
-        // else{
-        //   this.sortable.option('sort',true);
-        // }
-          
-        
-        // let tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
-        // console.log('this.tempEditabel:',tempEditabel);
-        this.hotInstance.updateSettings({
+        if(this.isRespondent != '2'&& Number(pane.props.name) == 1){
+          console.log('the teacher can not edit the first tab content');
+          this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
+                cells(row, col){
+                  var cellProperties = {};
+                  if (row === 2) {
+                    cellProperties.type = "dropdown";
+                    cellProperties.source = [" ", "总评", "期末"];
+                    cellProperties.allowEmpty = true;
+                    cellProperties.className = "ht-s-size";
+                    //   cellProperties.validator = that.validScoreSetting();
+                  }
+                  if (row === 3) {
+                    cellProperties.allowEmpty = false;
+                  }
+                  if(row < 4 && col >=0){
+                    cellProperties.readOnly = true;
+                  }
+                  return cellProperties;
+                }
               });
+        }
+        else{
+          console.log('the teacher can edit the first tab content');
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+                cells(row, col){
+                  var cellProperties = {};
+                  if (row === 2) {
+                    cellProperties.type = "dropdown";
+                    cellProperties.source = [" ", "总评", "期末"];
+                    cellProperties.allowEmpty = true;
+                    cellProperties.className = "ht-s-size";
+                    //   cellProperties.validator = that.validScoreSetting();
+                  }
+                  if (row === 3) {
+                    cellProperties.allowEmpty = false;
+                  }
+                  if(row < 4 && col >=0){
+                    cellProperties.readOnly = false;
+                  }
+                  return cellProperties;
+                }
+              });
+        }
         return console.log('currenteditableTabsValue:',Number(pane.props.name));
         
         
@@ -449,15 +485,6 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         
        
       },
-      activate(){
-              this.departmentId = this.$store.state.currentInfo.departmentId;
-              this.schoolId = this.$store.state.currentInfo.schoolId;
-              this.courseId = this.$store.state.course.baseCourseCourseId;
-              this.identity = this.$store.state.currentInfo.identity;
-              this.detailId = this.$store.state.course.detailId;
-              this.activateHotcolumn();
-              
-              console.log('db items:',this.db.items);},
     activateHotcolumn(){
       let self = this;
       let that = this;
@@ -534,10 +561,10 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       });
     },
     getHotCellsFunction() {
+      let that = this;
       return function (row, col, prop) {
         // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
         var cellProperties = {};
-        let that = this;
         if (row === 2) {
           cellProperties.type = "dropdown";
           cellProperties.source = [" ", "总评", "期末"];
@@ -548,12 +575,82 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         if (row === 3) {
           cellProperties.allowEmpty = false;
         }
+        if(row < 4 && col >=0){
+          if(that.identity!='教师'){
+            
+            cellProperties.readOnly = false;
+          }
+          else{
+           
+            if(that.isRespondent == '2'){
+              
+              cellProperties.readOnly = false;
+            }
+            else{
+              
+              cellProperties.readOnly = true;
+            }
+          }
+          
+        }
         return cellProperties;
       };
     },
     async getActivities() {
       let that = this;
-      return request({
+      if(this.from == 'Score'){
+        console.log('this is the activity from class');
+        return request({
+        url:'/classes/'+that.classInfo.classId,
+        method:'get',
+      }).then(function(res){
+        console.log('class Info',res);
+        that.isRespondent = res.data.isRespondent;
+        console.log('isRespondent',that.isRespondent);
+        let course = res.data;
+        
+        if(course.activities){
+        course.activities.forEach((activity)=>{
+          that.handleTabsEdit(1,'add',activity.name);
+          let tempdata = [];
+            tempdata.push(activity.item);
+            tempdata.push(activity.value);
+            tempdata.push(activity.remark);
+          if (!activity.weight) {
+              let templist = [];
+              for (let i = 0; i < activity.item.length; i++) {
+                templist.push("");
+              }
+              tempdata.push(templist);
+            } else {
+              tempdata.push(activity.weight);
+            }
+            that.db.items.push(tempdata);
+        });
+        that.editableTabsValue = "1";
+        that.currenteditableTabsValue = 1;
+        console.log('res has activities:',that.db.items);
+        that.dragTab();
+        }
+        else {
+          console.log("res has no activities");
+          that.handleTabsEdit(1, "add");
+          let item = [""];
+          let value = [""];
+          let remark = [""];
+          let weight = [""];
+          let tempdata = [];
+          tempdata.push(item);
+          tempdata.push(value);
+          tempdata.push(remark);
+          tempdata.push(weight);
+          that.db.items.push(tempdata);
+          }
+      });
+      }
+      else{
+        console.log('this is the activity from detail');
+        return request({
         url: "/detail/" + this.detailId,
         method: "get",
       }).then(function (res) {
@@ -604,6 +701,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           that.db.items.push(tempdata);
         }
       });
+      }
+      
     },
     isValid() {
       if (this.firstActivities) {
@@ -681,7 +780,55 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
               });
       }
       else{
-        return request({
+        if(this.from == 'Score'){
+          return request({
+        url:'/classes/editActivities',
+        method:'post',
+        data:{
+        'classId':this.classInfo.classId,
+        "activities": activities,
+        'schoolId':this.schoolId,
+        'departmentId': this.departmentId,
+      }
+      }).then(function(res){
+        
+        that.firstActivities = true;
+        console.log('res:',res);
+        // that.getActivities();
+        if(res.code=='SUCCESS'){
+          ElMessage({
+                type: 'success',
+                message: `更新成功`,
+                duration:1000,
+              });
+        }
+      }).catch((e)=>{
+        console.log('e:',e);
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == 'OVERALL_NOT_SET'){
+          ElMessage({
+                  type: 'error',
+                  message: `更新失败，总评未设置`,
+                  duration:1500,
+                });
+        }
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '有权重为空'){
+          ElMessage({
+                  type: 'error',
+                  message: `更新失败，有权重为空`,
+                  duration:1500,
+                });
+        }
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '权重和不对'){
+          ElMessage({
+                  type: 'error',
+                  message: `更新失败，权重之和必须为100%`,
+                  duration:1500,
+                });
+        }
+      });
+        }
+        else{
+          return request({
         url:'/detail',
         method:'put',
         data:{
@@ -696,23 +843,16 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         that.firstActivities = true;
         console.log('res:',res);
         // that.getActivities();
-        if(res.code == 'SUCCESS'){
+        if(res.code=='SUCCESS'){
           ElMessage({
                 type: 'success',
                 message: `新建成功`,
                 duration:1000,
               });
         }
-        else{
-          ElMessage({
-                  type: 'error',
-                  message: `新建失败`,
-                  duration:1000,
-                });
-        }
       }).catch((e)=>{
         console.log('e:',e);
-        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == '总评未设置'){
+        if(e.code == 'UNPROCESSABLE_ENTITY'&&e.msg == 'OVERALL_NOT_SET'){
           ElMessage({
                   type: 'error',
                   message: `新建失败，总评未设置`,
@@ -733,7 +873,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
                   duration:1500,
                 });
         }
-      })
+      });
+        }
+       
       }
       
   },
@@ -795,21 +937,63 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       }
     )
       .then(() => {
-        this.$router.push({ path:'/baseCourseDetail'});
+        console.log('from',this.from);
+        if(this.from == 'Score'){
+          console.log('go score');
+          this.$router.push({ name: "Score",});
+        }
+        else{
+          this.$router.push({ path:'/baseCourseDetail'});
+        }
+        
       })
       .catch(() => {
         
       })
     }
     else{
-      
-      this.$router.push({ path:'/baseCourseDetail'});
+      console.log('from',this.from);
+      if(this.from == 'Score'){
+        console.log('go score');
+          this.$router.push({ name: "Score",});
+        }
+        else{
+          this.$router.push({ path:'/baseCourseDetail'});
+        }
     
     }
   },
     },
     mounted:function(){
-      this.activate();
+      this.departmentId = this.$store.state.currentInfo.departmentId;
+      this.schoolId = this.$store.state.currentInfo.schoolId;
+      this.courseId = this.$store.state.course.baseCourseCourseId;
+      this.identity = this.$store.state.currentInfo.identity;
+      this.detailId = this.$store.state.course.detailId;
+      if (this.identity == "学院管理员") {
+      this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+      console.log("identity:", this.identity);
+    } else if (this.identity == "课程负责人") {
+      this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+      console.log("identity:", this.identity);
+    } else {
+      this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+      console.log("identity:", this.identity);
+    }
+     
+     
+      console.log('db items:',this.db.items);
+      console.log('router', this.$route.query['parentName']);
+      if( this.$route.query['parentName'] == 'Score'){
+          this.from = this.$route.query['parentName'];
+      }
+      else{
+        this.from = '';
+      }
+      console.log('from',this.from);
+      this.activateHotcolumn();
+      
+     
       
     },
   }
@@ -822,7 +1006,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   .card-container{
     margin-left: 10%;
     width: 80%;
-    height: 120px;
+    height: 150px;
     background-color: white;
     box-shadow: 0px 1px 3px rgb(164, 163, 163);
   }

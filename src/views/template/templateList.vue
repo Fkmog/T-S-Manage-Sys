@@ -27,22 +27,22 @@
         <template #default="scope">
           <el-row>
             <el-col :span="6">
-              <el-tooltip content="修改" :hide-after="0">
-                <el-button
-                  link
-                  style="color: #3f51b5"
-                  @click.stop="editBook(scope.row)"
-                  ><el-icon><Edit /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-            <el-col :span="6">
               <el-tooltip content="删除" :hide-after="0">
                 <el-button
                   link
                   style="color: #3f51b5"
                   @click.stop="deleteBook(scope.row)"
                   ><el-icon><Delete /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip content="修改" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="editBook(scope.row)"
+                  ><el-icon><Edit /></el-icon
                 ></el-button>
               </el-tooltip>
             </el-col>
