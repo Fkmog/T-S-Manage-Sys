@@ -907,7 +907,7 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1000,
+            duration: 1500,
           });
           this.drawer=false
 

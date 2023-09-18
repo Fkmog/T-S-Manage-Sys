@@ -427,7 +427,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
             //成功后根据vesionId和basecouseId获取详细信息
             that.isVisiable = true;
@@ -436,7 +436,7 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败`,
-              duration: 1000,
+              duration: 1500,
             });
             //失败后退回basecouse页面
             that.goBaseCourse();
@@ -675,7 +675,7 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1000,
+            duration: 1500,
           });
           this.drawer = false;
         }

@@ -3,31 +3,25 @@
     <div
       class="submenu"
     >
-    <el-row>
-      <el-tooltip content="返回" style="float: left">
-        <el-button
-          class="md-icon-button button-back"
-          md-no-ink
-          aria-label="返回"
-          @click="goBaseCourse"
-          link
-        >
-          <el-icon :size="24"><Back /></el-icon>
-        </el-button>
+    <el-row class="toolbar">
+      <el-tooltip content="返回" >
+        
+          <el-icon :size="22" style="cursor: pointer;" class="button-back" @click="goBaseCourse"><Back /></el-icon>
+        
       </el-tooltip>
-      <div class="s-v-bar" style="float: left">&nbsp;</div>
-      <el-tooltip content="保存" style="float: left">
+      <el-divider class="divider" direction="vertical" />
+      <el-tooltip content="保存">
         <el-button
-          class="md-icon-button"
+          
           aria-label="保存"
           @click="save"
           link
           :disabled="!isValid()"
         >
-          <el-icon :size="24"><DocumentChecked /></el-icon>
+          <el-icon :size="22"><DocumentChecked /></el-icon>
         </el-button>
       </el-tooltip>
-      <div flex></div>
+      
     </el-row>
       
     </div>
@@ -287,7 +281,7 @@ export default {
           ElMessage({
                 type: "success",
                 message: `新建成功`,
-                duration: 1000,
+                duration: 1500,
               });
 
           that.goBackandClean();
@@ -316,7 +310,7 @@ export default {
             ElMessage({
                 type: 'error',
                 message: `新建失败,标红课程已存在`,
-                duration:2000,
+                duration:1500,
               })
 
           }
@@ -324,7 +318,7 @@ export default {
             ElMessage({
                 type: "error",
                 message: `新建失败`,
-                duration: 1000,
+                duration: 1500,
               });
           }
 
@@ -449,7 +443,13 @@ export default {
         console.log("localres", localres);
         return localres;
       }).catch(e =>{
-        return e;
+        if(e.response){
+            return e.response.data;
+          }
+        else{
+          return e;
+        }
+        
       })
     },
     async handleEvent(event){
@@ -481,7 +481,20 @@ export default {
 };
 </script>
     
-    <style  scoped>
+<style  scoped>
+.toolbar{
+  display: flex;
+  align-items: center
+}
+.divider {
+  margin-left: 20px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+}
+.button-back{
+  margin-left: 50px;
+}
 .md-padding {
   margin-top: 10px;
   display: flex;
@@ -495,8 +508,10 @@ export default {
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {
-  color: #3f51b5;
+  
+  height: 56px;
   position: relative;
+  display: flex;
   border-bottom: 1px solid #d0d0d0;
   background-color: transparent;
 }

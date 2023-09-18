@@ -351,7 +351,7 @@
     </el-table>
   </div>
   </div>
-  <el-dialog v-model="dialogFormVisible"  title="添加基础课程">
+  <el-dialog v-model="dialogFormVisible"  title="添加基础课程" width="580">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -407,18 +407,18 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="goAddBaseCourses">批量添加</el-button>
-
-        <el-button type="primary" @click="submitForm('ruleForm')">
-          确认
-        </el-button>
-        <el-button @click="resetForm('ruleForm')"> 重置 </el-button>
         <el-button
           @click="
             dialogFormVisible = false;
             resetForm('ruleForm');
           "
-          >取消</el-button
-        >
+          >取消</el-button>
+
+        <el-button type="primary" @click="submitForm('ruleForm')">
+          确认
+        </el-button>
+        <!-- <el-button @click="resetForm('ruleForm')"> 重置 </el-button> -->
+        
       </span>
     </template>
   </el-dialog>
@@ -849,7 +849,7 @@ export default {
       schoolId: "",
       dialogFormVisible: ref(false),
       dialogFormVisible1: ref(false),
-      formLabelWidth: "140px",
+      formLabelWidth: "100px",
 
       form: reactive({
         courseName: "",
@@ -971,7 +971,7 @@ export default {
             ElMessage({
               type: "error",
               message: `没有版本信息，请先添加版本！`,
-              duration: 1000,
+              duration: 1500,
             });
           }
         })
@@ -1033,13 +1033,13 @@ export default {
               ElMessage({
                 type: "success",
                 message: `删除成功`,
-                duration: 1000,
+                duration: 1500,
               });
             } else {
               ElMessage({
                 type: "error",
                 message: `删除失败`,
-                duration: 1000,
+                duration: 1500,
               });
             }
           });
@@ -1071,13 +1071,13 @@ export default {
           ElMessage({
             type: "success",
             message: `新建成功`,
-            duration: 1000,
+            duration: 1500,
           });
         } else {
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1000,
+            duration: 1500,
           });
         }
       });
@@ -1194,7 +1194,7 @@ export default {
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1000,
+            duration: 1500,
           });
           return false;
         }
@@ -1253,7 +1253,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `新建成功`,
-                  duration: 1000,
+                  duration: 1500,
                 });
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1265,7 +1265,7 @@ export default {
                 ElMessage({
                   type: "error",
                   message: `没有选择课程大纲版本`,
-                  duration: 1000,
+                  duration: 1500,
                 });
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1276,7 +1276,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `新建失败`,
-                duration: 1000,
+                duration: 1500,
               });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1286,7 +1286,7 @@ export default {
         ElMessage({
           type: "error",
           message: `请选择课程大纲！`,
-          duration: 1000,
+          duration: 1500,
         });
       }
     },
@@ -1391,7 +1391,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
             that.clearForm();
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1404,14 +1404,14 @@ export default {
             ElMessage({
               type: "error",
               message: "新建失败，课程已存在",
-              duration: 2000,
+              duration: 1500,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else if (e.code == "DATA_DUPLICATED") {
             ElMessage({
               type: "error",
               message: "新建失败，数据重复",
-              duration: 2000,
+              duration: 1500,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
           } else {
@@ -1419,7 +1419,7 @@ export default {
               type: "error",
               message: "新建失败",
 
-              duration: 1000,
+              duration: 1500,
             });
           }
         });
@@ -1591,7 +1591,7 @@ export default {
                 ElMessage({
                   type: "error",
                   message: emessage,
-                  duration: 2000,
+                  duration: 1500,
                 });
               } else {
                 ElMessage({
@@ -1628,7 +1628,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `删除成功`,
-                  duration: 1000,
+                  duration: 1500,
                 });
 
                 that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1646,13 +1646,13 @@ export default {
                 ElMessage({
                   type: "error",
                   message: `删除失败,该课程已加入培养方案`,
-                  duration: 1000,
+                  duration: 1500,
                 });
               } else {
                 ElMessage({
                   type: "error",
                   message: `删除失败`,
-                  duration: 1000,
+                  duration: 1500,
                 });
               }
 
@@ -1726,7 +1726,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1000,
+              duration: 1500,
             });
 
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1741,21 +1741,21 @@ export default {
             ElMessage({
               type: "error",
               message: "更新失败，课程已存在",
-              duration: 1000,
+              duration: 1500,
             });
             that.C_ErrorMsg_edit = "课程已存在，请重新输入";
           } else if (e.code == "UNAUTHENTICATED") {
             ElMessage({
               type: "error",
               message: "更新失败，无权限",
-              duration: 1000,
+              duration: 1500,
             });
           } else {
             ElMessage({
               type: "error",
               message: "更新失败",
 
-              duration: 1000,
+              duration: 1500,
             });
           }
         });

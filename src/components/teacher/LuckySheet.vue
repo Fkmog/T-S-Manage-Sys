@@ -3,29 +3,32 @@
 
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
-      <el-tooltip content="返回" >
-        <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
-        <el-icon :size="24"><Back /></el-icon>
-      </el-button>
+      <el-row class="toolbar">
+        <el-tooltip content="返回" >
+        
+        <el-icon :size="22" style="cursor: pointer;" class="button-back" @click="goTeacher"><Back /></el-icon>
+     
       </el-tooltip>
       <el-divider class="divider" direction="vertical" />
       <el-tooltip content="保存">
-        <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
-          <el-icon :size="24"><DocumentChecked /></el-icon>
+        <el-button aria-label="保存" @click="save" link :disabled="!isValid()">
+          <el-icon :size="22"><DocumentChecked /></el-icon>
         </el-button>  
       </el-tooltip>
       <!--  -->
        
       
-        <el-icon :size="24" style="padding: 20px;top: 7px;"><InfoFilled /></el-icon>
+        <el-icon :size="22" class="button-back"><InfoFilled /></el-icon>
         
-        <span class="displayCenter">可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
-        
+        <div class="displayCenter">可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</div>
+
+      </el-row>
+      
       
 
       
       
-      <div flex></div>
+     
     </div>
 
     <div layout="row" flex class="md-padding" >
@@ -222,7 +225,7 @@ export default{
             ElMessage({
                 type: 'success',
                 message: `新建成功`,
-                duration:1000,
+                duration:1500,
               })
             that.isNotDirty();
             that.goBackandClean();
@@ -247,7 +250,7 @@ export default{
             ElMessage({
                 type: 'error',
                 message: `新建失败,标红教师已存在`,
-                duration:2000,
+                duration:1500,
               })
             
 
@@ -272,7 +275,7 @@ export default{
             ElMessage({
                 type: 'error',
                 message: `新建失败,标红教师重复`,
-                duration:2000,
+                duration:1500,
               })
           }
           else if(res.code == 'DATA_DUPLICATED'){
@@ -293,14 +296,14 @@ export default{
             ElMessage({
                 type: 'error',
                 message: `新建失败,标红数据重复`,
-                duration:2000,
+                duration:1500,
               })
           }
           else{
             ElMessage({
                 type: 'error',
                 message: `新建失败`,
-                duration:1000,
+                duration:1500,
               })
           }
           
@@ -440,11 +443,20 @@ async handleEvent(event){
 </script>
 
 <style  scoped>
+.toolbar{
+  display: flex;
+  align-items: center
+}
 .divider {
   margin-left: 20px;
   height: 24px;
+  display: flex;
+  justify-content: center;
 }
 .displayCenter{
+  color: #3f51b5;
+  margin-left: 5px;
+  font-size:14px;
   display: inline-flex;
   justify-content: center;
 }
@@ -465,10 +477,12 @@ async handleEvent(event){
 }
 
 .submenu{
-    color: #3f51b5;
-    position: relative;
-    border-bottom: 1px solid #d0d0d0;
-    background-color: transparent;
+  
+  height: 56px;
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid #d0d0d0;
+  background-color: transparent;
 }
 .md-icon-button{
   padding: 20px;

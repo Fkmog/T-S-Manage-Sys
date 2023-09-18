@@ -375,7 +375,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
             that.showEditVersionDailogFlag = false;
             that.versionForm = {
@@ -392,7 +392,7 @@ export default {
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1000,
+            duration: 1500,
           });
         });
     },
@@ -414,7 +414,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1000,
+              duration: 1500,
             });
             that.showEditVersionDailogFlag = false;
             that.versionForm = {
@@ -431,7 +431,7 @@ export default {
           ElMessage({
             type: "error",
             message: `更新失败`,
-            duration: 1000,
+            duration: 1500,
           });
         });
     },
@@ -454,7 +454,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `删除成功`,
-                  duration: 1000,
+                  duration: 1500,
                 });
                 if (
                   this.$store.state.course.baseCourseVersionId ==
@@ -478,7 +478,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `删除失败`,
-                duration: 1000,
+                duration: 1500,
               });
             });
         })

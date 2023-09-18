@@ -358,7 +358,7 @@ export default {
                   ElMessage({
                     type: "success",
                     message: `提交成功`,
-                    duration: 1000,
+                    duration: 1500,
                   });
                 }
                 this.getClassInfo();
@@ -367,7 +367,7 @@ export default {
                 ElMessage({
                   type: "error",
                   message: `提交失败`,
-                  duration: 1000,
+                  duration: 1500,
                 });
                 console.log("e", e);
               });
@@ -380,7 +380,7 @@ export default {
             ElMessage({
               type: "success",
               message: `提交成功`,
-              duration: 1000,
+              duration: 1500,
             });
           }
           this.getClassInfo();

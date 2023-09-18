@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       //现在直接给默认值，之后浏览器session拿 !todo
-      year: "2021级",
+      year: "2021",
       enroll_year: [],
     };
   },

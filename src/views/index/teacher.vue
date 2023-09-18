@@ -273,7 +273,7 @@ export default {
               ElMessage({
                     type: "success",
                     message: `删除成功`,
-                    duration:1000,
+                    duration:1500,
                   });
               that.getTeacherList();
               that.$refs.multipleTable.clearSelection();
@@ -285,7 +285,7 @@ export default {
               ElMessage({
                     type: "error",
                     message: `删除失败`,
-                    duration:1000,
+                    duration:1500,
                   });
             }
             return localres;

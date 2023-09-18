@@ -1,27 +1,25 @@
 <template>
     <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
-        <div class="submenu" layout="row" layout-align="center center" style="justify-content: left">
-          <el-tooltip content="返回" style="float:left;">
-            <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
-            <el-icon :size="24"><Back /></el-icon>
-          </el-button>
+        <div class="submenu">
+          <el-row class="toolbar">
+            <el-tooltip content="返回" >
+            
+            <el-icon :size="22" style="cursor: pointer;" class="button-back" @click="goTeacher"><Back /></el-icon>
+          
           </el-tooltip>
-          <div class="s-v-bar" style="float:left;">&nbsp;</div>
-          <el-tooltip content="保存" style="float:left;">
-            <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
-              <el-icon :size="24"><DocumentChecked /></el-icon>
+          <el-divider class="divider" direction="vertical" />
+          <el-tooltip content="保存" >
+            <el-button aria-label="保存" @click="save" link :disabled="!isValid()">
+              <el-icon :size="22"><DocumentChecked /></el-icon>
             </el-button>  
           </el-tooltip>
           <!--  -->
-              <div class="s-v-bar" style="float:left;">&nbsp;</div>
-          <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link >
-            <el-icon style="float:left;" :size="24"><InfoFilled /></el-icon>
-            <div layout="row" layout-align="center center" style="float:right;">
-            <span>可直接从excel拷贝；可拖动列的顺序；学院最多可添加2000个学生</span>
-          </div>
-          </el-button>
           
-          <div flex></div>
+            <el-icon :size="22" class="button-back"><InfoFilled /></el-icon>
+            
+            <span  class="displayCenter">可直接从excel拷贝；可拖动列的顺序；学院最多可添加2000个学生</span>
+
+          </el-row>          
         </div>
     
         <div layout="row" flex class="md-padding" >
@@ -67,13 +65,7 @@
     
     
     export default{
-      name:'addTeacher',
-      inject:['reload'], 
-      provide(){
-          return{
-            reload:this.reload
-          }
-        },
+      name:'addStudent',
       data(){
         let self = this;
         return{
@@ -208,7 +200,7 @@
                 ElMessage({
                     type: 'success',
                     message: `新建成功`,
-                    duration:1000,
+                    duration:1500,
                   })
                 that.isNotDirty();
                 that.goBackandClean();}
@@ -216,11 +208,13 @@
               ElMessage({
                     type: 'error',
                     message: `新建失败`,
-                    duration:1000,
+                    duration:1500,
                   })
               that.goBackandClean();
         }
-            });
+            }).catch((e)=>{
+              console.log('e',e);
+            })
     
     
           
@@ -333,6 +327,19 @@
     </script>
     
     <style  scoped>
+    .divider {
+  margin-left: 20px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+}
+    .button-back{
+  margin-left: 50px;
+}
+    .toolbar{
+  display: flex;
+  align-items: center
+}
     .hotTable{
       box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
     }
@@ -344,13 +351,13 @@
     flex-direction: column;
     }
     .submenu{
-        color: #3f51b5;
-        
-        position: relative;
-       
-        border-bottom: 1px solid #d0d0d0;
-        background-color: transparent;
-    }
+  color: #3f51b5;
+  height: 56px;
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid #d0d0d0;
+  background-color: transparent;
+}
     .md-icon-button{
       padding: 20px;
     }

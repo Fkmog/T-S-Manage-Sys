@@ -1,7 +1,7 @@
 <template>
   <div v-show="hasProgram">
     <div v-show="hasCourse" >
-      <HeaderSearch msg="搜索课程名称" v-show="!closeShow" >
+      <HeaderSearch msg="搜索课程名称" v-show="!closeShow" @SearchValue="getSearchValueformProgram">
     <template #rightTime>
       <div class="rightSlot">
         <div class="selectionBar">
@@ -64,7 +64,7 @@
     
     <addBtn @click="this.drawerShow()"></addBtn>
     <div class="el-table-container">
-      <el-table :data="drawertableData"  ref="multipleTable" style="width: 100%"
+      <el-table :data="drawertableData"  ref="multipleTable" style="width: 1135px;text-overflow: ellipsis; white-space: nowrap"
       :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -85,7 +85,7 @@
         <el-table-column prop="courseType" label="课程类型" width="180" />
         <el-table-column prop="courseNature" label="课程性质" width="180" />
         <el-table-column prop="credit" label="学分" width="180" />
-        <el-table-column prop="versionName" label="版本"  />
+        <el-table-column prop="versionName" label="版本"  width="180"/>
       </el-table>
    </div>
   </div>
@@ -136,22 +136,24 @@
   </el-dialog>
     </div>
     <div v-show="!hasCourse" class="no-program">
-        <HeaderSearch v-show="!closeShow"></HeaderSearch>
+        <HeaderSearch v-show="!closeShow" @SearchValue="getSearchValueformProgram"></HeaderSearch>
 
         <div layout="row" flex class="md-padding" >
           <addBtn @click="this.drawerShow()"></addBtn>
         </div>
-        <h2 style="display: flex; justify-content: center; margin-top: 100px">
+        <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
           没有课程
-        </h2>
-        <div style="display: flex; justify-content: center; color: grey">
+        </div>
+        <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
             请先点击右上角圆形按钮添加课程
         </div>
     </div>
 
-    <el-drawer v-model="drawer" :direction="direction" size="42%"  :show-close="true">
-    
-      <el-col :span="24">
+    <el-drawer v-model="drawer" :direction="direction"  size="42%"  :show-close="false">
+
+      <template #header="{ close, titleId, titleClass }">
+      <div :id="titleId" :class="titleClass">
+        <el-col :span="24">
         <el-row>
         <el-col :span="12">
           <el-row class="row-style">
@@ -184,14 +186,27 @@
       <el-row>
         <el-col :span="24">
           <div  class="drawersubmenu">
+            <!-- <el-button @click="this.drawertoggleSelection()"  class="clearSelected" >取消选择</el-button> -->
             <div class="numSelectedTeacher" >已选中 {{drawernumSelected-programInfoCourseCount}} 节基础课程</div>
             <div class="drawerdeleteButton">
               <el-button @click="this.getBCMId();"  ><el-icon ><Plus class="iconSize" /></el-icon></el-button>
             </div>
+            
           </div>
         </el-col>
       </el-row>
       </el-col>
+      </div>
+      <div style="height: 100%;">
+        <el-button style="top: 10px;" @click="drawerClose">
+        <el-icon><CircleCloseFilled /></el-icon>
+        Close
+      </el-button>
+      </div>
+      
+    </template>
+    
+     
       
    <!-- 具体basecourse页面，分页 可搜索-->
       <div class="drawerBlock" flex>
@@ -255,7 +270,7 @@ import HeaderSearch from "@/components/general/headerSearch.vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive,}from 'vue';
 import { ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption,ElTag,ElCheckbox,ElDropdown } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document,MoreFilled} from '@element-plus/icons-vue'
+import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit,Document,MoreFilled,CircleCloseFilled} from '@element-plus/icons-vue'
 import request from '@/utils/request/request'
 import { getDictionary } from "@/api/dictionary";
 import { checkProgram } from "@/api/program";
@@ -266,7 +281,7 @@ name:"Courses",
 components:{
   HeaderSearch,ElIcon,ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElSelect,ElOption
   , Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, addBtn,
-  ElTag,ElCheckbox,Document,ElDropdown,MoreFilled
+  ElTag,ElCheckbox,Document,ElDropdown,MoreFilled,CircleCloseFilled
 },
 data(){
   return{
@@ -276,6 +291,7 @@ data(){
     courseTypeSource:[],
     courseNatureSource:[],
     keyword:'',
+    keywordforProgrameCourse:'',
     //show loadmore
     showLoadmore:true,
 
@@ -418,6 +434,7 @@ data(){
 
   currentVersion:'',
   currentVersionValue:1,
+  currentVersionId:'',
   versions:[],
   versionLabel:[],
 
@@ -459,6 +476,15 @@ result:reactive({}),
   }
 },
 methods:{
+  drawerClose(){
+    this.$refs.drawermultipleTable.clearSelection();
+    this.drawer = false;
+  },
+  getSearchValueformProgram(data){
+    console.log('searching for class');
+    this.keywordforProgrameCourse = data;
+    this.getProgramCourse();
+  },
   async getDict(){
       let that = this;
       let num =1;
@@ -515,7 +541,7 @@ methods:{
             ElMessage({
               type: "error",
               message: `没有版本信息，请先添加版本！`,
-              duration: 1000,
+              duration: 1500,
             });
           }
         })
@@ -559,13 +585,13 @@ methods:{
         type: 'warning',
       }
     ).then(() => {
-      console.log('versionId',that.currentVersionValue,'CourseId',that.courseId);
+      console.log('versionId',that.currentVersionId,'CourseId',that.courseId);
   
         return request({
         url:'/detail',
         method:'post',
         data:{
-          'versionId':that.currentVersionValue,
+          'versionId':that.currentVersionId,
           'courseId':row.courseId,
           'departmentId':that.departmentId,
           'schoolId':that.schoolId
@@ -576,7 +602,7 @@ methods:{
           ElMessage({
                   type: 'success',
                   message: `新建成功`,
-                  duration:1000,
+                  duration:1500,
                 });
               //成功后根据vesionId和basecouseId获取详细信息
               that.getBaseCourse(that.pageSize,that.pageNum);
@@ -588,7 +614,7 @@ methods:{
             ElMessage({
               type: "error",
               message: `没有选择课程大纲版本`,
-              duration: 1000,
+              duration: 1500,
             });
             //成功后根据vesionId和basecouseId获取详细信息
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -599,7 +625,7 @@ methods:{
               ElMessage({
                     type: 'error',
                     message: `新建失败`,
-                    duration:1000,
+                    duration:1500,
                   });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize,that.pageNum);
@@ -611,7 +637,7 @@ methods:{
         ElMessage({
           type: "error",
           message: `请选择课程大纲！`,
-          duration: 1000,
+          duration: 1500,
         });
       }
     },
@@ -640,7 +666,7 @@ methods:{
 
     this.$store.commit("course/setbaseCourseVersionName", versionName);
     this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
+    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionId);
     this.$store.commit("course/setbaseCourseCourseId", row.courseId);
     this.$store.commit("course/setbaseCourseCourseName", row.courseName);
     this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
@@ -661,6 +687,7 @@ methods:{
     else{
       this.hasProgram = false;
     }
+    console.log('hasProgram',this.hasProgram);
   },
   
   //drawer show
@@ -668,6 +695,7 @@ methods:{
     let that = this;
     console.log('drawerShow:');
     this.drawer = true;
+
     this.getBaseCourse(this.pageSize,this.pageNum)
   },
   //是否可选
@@ -687,13 +715,13 @@ methods:{
     let that = this;
     let coursedetaiId = '';
     return request({
-      url:'/detail/list'+'?vesionId='+this.currentVersionValue+'&courseId='+courseId,
+      url:'/detail/list'+'?vesionId='+this.currentVersionId+'&courseId='+courseId,
       method:'get'
     }).then(
       function(res){
       console.log('getDetail:',res);
       res.rows.forEach(function(detail){
-        if(detail.versionId == that.currentVersionValue){
+        if(detail.versionId == that.currentVersionId){
           console.log('detailId',detail.detailId);
           coursedetaiId = detail.detailId;
         }
@@ -724,21 +752,27 @@ methods:{
   //   })
   // },
   getCourseByYear(label){
-    this.currentVersionValue = label;
-    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionValue);
+    this.currentVersionId = label;
+    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionId);
     this.getBaseCourse(this.pageSize,this.pageNum);
   },
-  async getProgramCourse(){
+ getProgramCourse(){
     let that = this;
     that.drawertableData = [];
     that.origintableData = [];
     let courses = [];
     let eachCourse = [];
     let CourseId = [];
-    console.log('programId:',this.programId);
+    console.log('currentprogramId:',this.programId,'keyword:',this.keywordforProgrameCourse);
     return request({
-      url:'/baseCourse/program/'+this.programId,
+      url:'/baseCourse/program',
       method:'get',
+      params:{
+        'schoolId':that.schoolId,
+        'departmentId':that.departmentId,
+        'programId':that.programId,
+        'selectKeyWord':that.keywordforProgrameCourse
+      }
     }).then(function(res){
       console.log('courseInPrograme:',res);
       console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId);
@@ -780,6 +814,9 @@ methods:{
           console.log('programeCourseInfo is ',that.programeCourseInfo);
           // that.origintableData = courses;
           that.drawerresult = res;
+    }).catch((e)=>{
+      console.log('e',e);
+      that.hasCourse = false;
     })
   },
   selectionOption1(val){
@@ -995,7 +1032,7 @@ methods:{
             ElMessage({
                 type: 'success',
                 message: `新建成功`,
-                duration:1000,
+                duration:1500,
               });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -1007,7 +1044,7 @@ methods:{
             ElMessage({
                   type: 'error',
                   message: `新建失败`,
-                  duration:1000,
+                  duration:1500,
                 });
             that.clearForm();
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -1086,7 +1123,7 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `删除成功`,
-                duration:1000,
+                duration:1500,
               });
             // that.clearForm();
             that.getProgramCourse();
@@ -1103,7 +1140,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `删除失败`,
-                  duration:1000,
+                  duration:1500,
                 });
             // that.clearForm();
             // that.getProgramCourse();
@@ -1204,13 +1241,13 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `新建成功`,
-                duration:1000,
+                duration:1500,
               });
             that.drawercourseId=[];
             that.drawerCourseIndex = [];
             that.getProgramCourse();
             that.getBaseCourse(that.pageSize,that.pageNum);
-            // that.$refs.drawermultipleTable.clearSelection();
+            that.$refs.drawermultipleTable.clearSelection();
 
             if(that.drawerclickState == 1){
               that.drawerclickState=0;
@@ -1224,7 +1261,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `新建失败`,
-                  duration:1000,
+                  duration:1500,
                 });
             that.drawercourseId=[];
             that.drawerCourseIndex = [];
@@ -1261,7 +1298,7 @@ ElMessageBox.confirm(
         ElMessage({
                 type: 'success',
                 message: `更新成功`,
-                duration:1000,
+                duration:1500,
               });
             
             that.getBaseCourse(that.pageSize,that.pageNum);
@@ -1273,7 +1310,7 @@ ElMessageBox.confirm(
             ElMessage({
                   type: 'error',
                   message: `更新失败`,
-                  duration:1000,
+                  duration:1500,
                 });
             that.getBaseCourse(that.pageSize,that.pageNum);
           
@@ -1404,14 +1441,14 @@ ElMessageBox.confirm(
             'pageSize':pageSize,
             'pageNum':pageNum,
             'departmentId':that.departmentId,
-            'versionId':that.currentVersionValue,
+            'versionId':that.currentVersionId,
             'schoolId':that.schoolId,
             'selectKeyWord':that.keyword
             },
         }).then(function(res){
           that.loadmoreDisabled = false;
           console.log('courseDetails:',res);
-          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionValue',that.currentVersionValue);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionId',that.currentVersionId);
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
             
@@ -1420,13 +1457,13 @@ ElMessageBox.confirm(
             course.courseCode=course.courseCode;
             
             
-            course.remark = '';//用remark来判断是否选课
+            course.remark = false;//用remark来判断是否选课
             
             course.trueversionId = course.versionId;
             if(course.bcDetails.length){
                 
                 for(let i=0;i<course.bcDetails.length;i++){
-                  if(course.bcDetails[i].versionId == that.currentVersionValue){
+                  if(course.bcDetails[i].versionId == that.currentVersionId){
                     course.versionId = true;
                     break;
                   }
@@ -1452,30 +1489,32 @@ ElMessageBox.confirm(
             count++;
           });
           
-          
+          if(that.hasProgram){
             that.programeCourseInfo.forEach(function(courseInfo){
-              try{
-                 
-              courses.forEach(function(course){
-                // console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
-                if(!course.remark){
+                try{
                   
-                if(courseInfo.courseId == course.courseId ){
-                  that.programInfoCourseCount = that.programInfoCourseCount +1;
-                      course.remark = true;
-                      throw new Error("remark")
+                courses.forEach(function(course){
+                  // console.log('courseId:',courseInfo.courseId,course.courseId,' versionId: ',courseInfo.versionId,course.trueversionId)
+                  if(!course.remark){
                     
+                  if(courseInfo.courseId == course.courseId ){
+                    that.programInfoCourseCount = that.programInfoCourseCount +1;
+                        course.remark = true;
+                        throw new Error("remark")
+                      
+                    }
+                    else{
+                      course.remark = false;
+                    }
                   }
-                  else{
-                    course.remark = false;
-                  }
-                }
-                
-              });
-          }catch(e){
-            if(e.message!='remark') throw e;
+                  
+                });
+              }catch(e){
+                if(e.message!='remark') throw e;
+              }
+            });
           }
-          })
+            
           
           
             that.tableData = courses;
@@ -1491,7 +1530,7 @@ ElMessageBox.confirm(
         }).then(function(){
       that.tableData.forEach(function(data){
       if(data.remark){
-       
+        console.log('course has selected!');
         that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
       }
       else{
@@ -1503,14 +1542,24 @@ ElMessageBox.confirm(
     
   },
   checkCurrentProgram() {
+    console.log('year has changed');
     checkProgram(
         this.majorId,
         this.$store.state.currentInfo.year
       ).then((res)=>{
+        console.log('res',res);
         if (res.msg == "操作成功" && res.code === 'SUCCESS') {
+          this.hasProgram = true;
           this.programId = res.data.programId;
           this.$store.commit("major/setProgramId", this.programId);
         }
+        this.getProgramCourse();
+      }).catch((e)=>{
+        console.log('e',e);
+        if(e.code == 'PROGRAM_NOT_FIND'){
+          this.hasProgram = false;
+        }
+        
       })
   },
   async activate(){
@@ -1520,7 +1569,7 @@ ElMessageBox.confirm(
             this.majorName = this.$store.state.major.majorName;
             this.programId = this.$store.state.major.programId;
            
-            this.currentVersionValue = this.$store.state.course.baseCourseVersionId;
+            this.currentVersionId = this.$store.state.course.baseCourseVersionId;
             this.checkCurrentProgram();
             this.getDict();
             console.log('schoolId+departmentId+majorId',this.schoolId,this.departmentId,this.majorId);
@@ -1532,9 +1581,7 @@ mounted:function(){
   this.checkProgram();
   
   if(this.hasProgram){
-    this.activate().then(()=>{
-      that.getProgramCourse();
-    })
+    this.activate()
    
   }
   
@@ -1553,7 +1600,6 @@ watch: {
       deep: true,
       handler(value) {
         this.checkCurrentProgram();
-        this.getProgramCourse();
       },
     },
   },
@@ -1745,6 +1791,8 @@ left:-46px;
 }
 .md-padding {
   margin-top: 85px;
+  display: flex;
+  justify-content: center;
   
 }
 
@@ -1783,9 +1831,10 @@ left:-46px;
   right: 40px;
 }
 .el-table-container{
-  
-  width: 80%;
-  margin-left: 10%;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .addIcon{

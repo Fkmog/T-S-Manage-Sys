@@ -553,7 +553,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
             this.dialogFormVisible = false;
           }

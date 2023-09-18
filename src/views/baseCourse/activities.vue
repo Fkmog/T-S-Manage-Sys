@@ -799,7 +799,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           ElMessage({
                 type: 'success',
                 message: `更新成功`,
-                duration:1000,
+                duration:1500,
               });
         }
       }).catch((e)=>{

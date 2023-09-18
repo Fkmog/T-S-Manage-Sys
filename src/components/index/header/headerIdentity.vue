@@ -182,7 +182,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `更新成功`,
-                  duration: 1000,
+                  duration: 1500,
                 });
               }
               if(res.code==="ERROR"){
@@ -190,7 +190,7 @@ export default {
                 ElMessage({
                   type: "error",
                   message: res.msg,
-                  duration: 1000,
+                  duration: 1500,
                 });
               }
             }
