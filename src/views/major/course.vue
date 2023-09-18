@@ -90,50 +90,52 @@
    </div>
   </div>
 
-
-   
-  <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
-    <el-form :model="preform">
-      <el-form-item label="课程名称" :label-width="formLabelWidth">
-        <el-input v-model="preform.courseName" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="课程代码" :label-width="formLabelWidth">
-        <el-input v-model="preform.courseCode" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="学分" :label-width="formLabelWidth">
-        <el-input v-model="preform.credit" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="课程性质" :label-width="formLabelWidth">
-        <el-select v-model="preform.courseNature" placeholder="请选择课程性质">
-          <el-option label="专业任选" value="0" />
-          <el-option label="还未确定" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="课程类型" :label-width="formLabelWidth">
-        <el-select v-model="preform.courseType" placeholder="请选择课程类型">
-          <el-option label="学科基础课" value="0" />
-          <el-option label="还未确定" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="学年" :label-width="formLabelWidth">
-        <el-select v-model="preform.courseYear" placeholder="请选择学年">
-          <el-option label="2022" value="0" />
-          <el-option label="2023" value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="备注" :label-width="formLabelWidth">
-        <el-input v-model="preform.remark" autocomplete="off" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogFormVisible1 = false">取消</el-button>
-        <el-button type="primary" @click="editBaseCourse">
-          确认
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
+      <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
+        <el-form :model="preform">
+          <el-form-item label="课程名称" :label-width="formLabelWidth">
+            <el-input v-model="preform.courseName" autocomplete="off" />
+          </el-form-item>
+          <el-form-item label="课程代码" :label-width="formLabelWidth">
+            <el-input v-model="preform.courseCode" autocomplete="off" />
+          </el-form-item>
+          <el-form-item label="学分" :label-width="formLabelWidth">
+            <el-input v-model="preform.credit" autocomplete="off" />
+          </el-form-item>
+          <el-form-item label="课程性质" :label-width="formLabelWidth">
+            <el-select
+              v-model="preform.courseNature"
+              placeholder="请选择课程性质"
+            >
+              <el-option label="专业任选" value="0" />
+              <el-option label="还未确定" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="课程类型" :label-width="formLabelWidth">
+            <el-select
+              v-model="preform.courseType"
+              placeholder="请选择课程类型"
+            >
+              <el-option label="学科基础课" value="0" />
+              <el-option label="还未确定" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="学年" :label-width="formLabelWidth">
+            <el-select v-model="preform.courseYear" placeholder="请选择学年">
+              <el-option label="2022" value="0" />
+              <el-option label="2023" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注" :label-width="formLabelWidth">
+            <el-input v-model="preform.remark" autocomplete="off" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible1 = false">取消</el-button>
+            <el-button type="primary" @click="editBaseCourse"> 确认 </el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
     <div v-show="!hasCourse" class="no-program">
         <HeaderSearch v-show="!closeShow" @SearchValue="getSearchValueformProgram"></HeaderSearch>
@@ -210,27 +212,47 @@
       
    <!-- 具体basecourse页面，分页 可搜索-->
       <div class="drawerBlock" flex>
-        
-        <div >
-          <el-table 
-          :data="tableData"  
-          ref="drawermultipleTable" 
-          style="width: 100%;" 
-          @selection-change="drawerchandleSelectionChange" 
-          :row-key="rowKey"
+        <div>
+          <el-table
+            :data="tableData"
+            ref="drawermultipleTable"
+            style="width: 100%"
+            @selection-change="drawerchandleSelectionChange"
+            :row-key="rowKey"
           >
-            <el-table-column width="55" type="selection" :selectable="selectable" :reserve-selection="true">
+            <el-table-column
+              width="55"
+              type="selection"
+              :selectable="selectable"
+              :reserve-selection="true"
+            >
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="180" />
-            <el-table-column prop="respondentName" label="课程负责人" width="120" />
-            <el-table-column  label="课程大纲" width="180" >
+            <el-table-column
+              prop="respondentName"
+              label="课程负责人"
+              width="120"
+            />
+            <el-table-column label="课程大纲" width="180">
               <template #default="scope">
                 <el-tooltip content="查看课程大纲">
-                  <el-button v-show="scope.row.versionId" @click="goBaseCourseDetail(scope.$index, scope.row)"  class="deleteButton" link style="color:#3f51b5;"><el-icon><Document /></el-icon></el-button>
+                  <el-button
+                    v-show="scope.row.versionId"
+                    @click="goBaseCourseDetail(scope.$index, scope.row)"
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Document /></el-icon
+                  ></el-button>
                 </el-tooltip>
                 <el-tooltip content="添加课程大纲">
-                  <el-button v-show="!scope.row.versionId"  type="danger" @click="addBaseCourseDetail(scope.row)">无课程大纲</el-button>
+                  <el-button
+                    v-show="!scope.row.versionId"
+                    type="danger"
+                    @click="addBaseCourseDetail(scope.row)"
+                    >无课程大纲</el-button
+                  >
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -238,30 +260,49 @@
         </div>
       </div>
 
-     
-      
-    
-    
       <div style="flex: auto" class="drawerFooter">
-       
-        
         <div class="pagination-container" flex>
-        <el-row type="flex" justify="center" align="middle" class="loadmorestyle">
-          <el-button :disabled="loadmoreDisabled" link plain v-show="showLoadmore" @click="loadmoreCourse()">加载更多</el-button>
-        </el-row>
-        
+          <el-row
+            type="flex"
+            justify="center"
+            align="middle"
+            class="loadmorestyle"
+          >
+            <el-button
+              :disabled="loadmoreDisabled"
+              link
+              plain
+              v-show="showLoadmore"
+              @click="loadmoreCourse()"
+              >加载更多</el-button
+            >
+          </el-row>
+        </div>
       </div>
-      </div>
-    
-  </el-drawer>
+    </el-drawer>
   </div>
   <div v-show="!hasProgram" class="no-program">
-    <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        margin-top: 100px;
+        font-size: 22px;
+      "
+    >
       未创建培养方案
     </div>
-    <div style="display: flex; justify-content: center; color: grey;margin-top: 30px;font-size:13px;">
-        请先创建培养方案
-      </div>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        color: grey;
+        margin-top: 30px;
+        font-size: 13px;
+      "
+    >
+      请先创建培养方案
+    </div>
   </div>
 </template>
 
@@ -274,7 +315,6 @@ import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete,
 import request from '@/utils/request/request'
 import { getDictionary } from "@/api/dictionary";
 import { checkProgram } from "@/api/program";
-
 
 export default {
 name:"Courses",
@@ -303,133 +343,133 @@ data(){
     //checkbox
     checkList:ref([' ']),
 
-    //programeInfo
-    programeInfo:[
-      {
-    "bcdmId": 0,
-    "courseId": 0,
-    "detailId": 0,
-    "groupId": 0,
-    "programId": 0
-      }
-    ],
-    programInfoCourseId:[0,0],
-    programInfoCourseCount:0,
+      //programeInfo
+      programeInfo: [
+        {
+          bcdmId: 0,
+          courseId: 0,
+          detailId: 0,
+          groupId: 0,
+          programId: 0,
+        },
+      ],
+      programInfoCourseId: [0, 0],
+      programInfoCourseCount: 0,
 
+      //需要删除的信息
+      deleteProgrameInfo: [
+        {
+          bcdmId: 0,
+          courseId: 0,
+          detailId: 0,
+          groupId: 0,
+          programId: 0,
+        },
+      ],
+      //programe中已经添加的课程
+      programeCourseInfo: [
+        {
+          courseId: 0,
+          versionId: 0,
+        },
+      ],
+      //drawer
+      drawer: false,
+      direction: "ltr",
+      drawercloseShow: ref(false),
+      drawermultipleSelection: [],
+      drawernumSelected: 0,
+      drawerclickState: 0,
+      drawercourseId: [], //clear after add,
+      drawerCourseIndex: [], //clear after add,
+      drawerresult: reactive({}),
+      drawertableData: [
+        {
+          courseName: "",
+          courseCode: "",
+          courseType: "",
+          courseNature: "",
+          credit: "",
+          courseYear: "",
+          remark: "",
+        },
+      ],
+      origintableData: [
+        {
+          courseName: "",
+          courseCode: "",
+          courseType: "",
+          courseNature: "",
+          credit: "",
+          courseYear: "",
+          remark: "",
+        },
+      ],
 
-    //需要删除的信息
-    deleteProgrameInfo:[
-      {
-    "bcdmId": 0,
-    "courseId": 0,
-    "detailId": 0,
-    "groupId": 0,
-    "programId": 0
-      }
-    ],
-    //programe中已经添加的课程
-    programeCourseInfo:[
-      {
-        'courseId':0,
-        'versionId':0
-      }
-    ],
-    //drawer
-    drawer:false,
-    direction:'ltr',
-    drawercloseShow:ref(false),
-    drawermultipleSelection: [],
-    drawernumSelected:0,
-    drawerclickState:0,
-    drawercourseId:[],//clear after add,
-    drawerCourseIndex:[],//clear after add,
-    drawerresult:reactive({}),
-    drawertableData:[
-  {
-    courseName:'',
-    courseCode:'',
-    courseType:'',
-    courseNature:'',
-    credit:'',
-    courseYear:'',
-    remark:'',
-  },],
-    origintableData:[
-  {
-    courseName:'',
-    courseCode:'',
-    courseType:'',
-    courseNature:'',
-    credit:'',
-    courseYear:'',
-    remark:'',
-  },],
+      //学校部门专业信息
+      departmentId: "",
+      schoolId: "",
+      majorId: Number,
+      majorName: "",
+      programId: "",
 
-    //学校部门专业信息
-    departmentId:'',
-    schoolId:'',
-    majorId:Number,
-    majorName:'',
-    programId:'',
+      closeShow: ref(false),
+      multipleSelection: [],
+      numSelected: 0,
+      clickState: 0,
 
-    
-    closeShow : ref(false),
-    multipleSelection: [],
-    numSelected:0,
-    clickState:0,
+      //对话框信息
+      dialogFormVisible: ref(false),
+      dialogFormVisible1: ref(false),
+      formLabelWidth: "140px",
+      form: reactive({
+        courseName: "",
+        courseCode: "",
+        courseType: "",
+        courseNature: "",
+        credit: "",
+        courseYear: "",
+        remark: "",
+      }),
 
-    //对话框信息
-    dialogFormVisible:ref(false),
-    dialogFormVisible1:ref(false),
-    formLabelWidth : '140px',
-    form : reactive({
-      courseName: '',
-      courseCode: '',
-      courseType: '',
-      courseNature: '',
-      credit: '',
-      courseYear: '',
-      remark: '',}),
+      preform: reactive({
+        courseName: "",
+        courseCode: "",
+        courseType: "",
+        courseNature: "",
+        credit: "",
+        courseYear: "",
+        remark: "",
+      }),
 
-    preform:reactive({
-      courseName: '',
-      courseCode: '',
-      courseType: '',
-      courseNature: '',
-      credit: '',
-      courseYear: '',
-      remark: '',
-      
-    }),
+      //el-table
+      tableData: [
+        {
+          courseName: "",
+          courseCode: "",
+          courseType: "",
+          courseNature: "",
+          credit: "",
+          courseYear: "",
+          remark: "",
+        },
+      ],
 
-    //el-table
-    tableData: [
-  {
-    courseName:'',
-    courseCode:'',
-    courseType:'',
-    courseNature:'',
-    credit:'',
-    courseYear:'',
-    remark:'',
-  },],
-   
+      //分页参数
+      pageSize: ref(20),
+      pageNum: ref(1),
 
-  //分页参数
-  pageSize:ref(20),
-  pageNum:ref(1),
-
-  //搜索
-  searchItems:{
-    programId:'',
-    courseId:'',
-    courseName:'',
-  },
-  sortBy:{
-    option1:'',
-    option2:'',
-  },
-  searchCourseId:[0,0],
+      //搜索
+      searchItems: {
+        programId: "",
+        courseId: "",
+        courseName: "",
+      },
+      sortBy: {
+        option1: "",
+        option2: "",
+      },
+      searchCourseId: [0, 0],
 
 
   currentVersion:'',
@@ -487,37 +527,37 @@ methods:{
   },
   async getDict(){
       let that = this;
-      let num =1;
+      let num = 1;
       this.versions = [];
       this.versionLabel = [];
-      getDictionary().then((res)=>{
+      getDictionary().then((res) => {
         console.log("Dict:", res);
-        res.course_nature.forEach((nature)=>{
+        res.course_nature.forEach((nature) => {
           that.courseNatureSource.push(nature.dictLabel);
-        })
-        res.course_type.forEach((type)=>{
+        });
+        res.course_type.forEach((type) => {
           that.courseTypeSource.push(type.dictLabel);
-        })
+        });
         return request({
-        url: "detail/versionList",
-        method: "get",
-      })
-      .then((res) => {
-          console.log("versionList:", res);
+          url: "detail/versionList",
+          method: "get",
+        })
+          .then((res) => {
+            console.log("versionList:", res);
 
-          if (res.code == "SUCCESS" && res.data.length) {
-            that.hasVersion = true;
-            that.hasNoVersion = false;
-            res.data.forEach((year) => {
-              let dict = {
-                label: year.versionName,
-                enrollYear: year.enrollYear,
-                reviseYear: year.reviseYear,
-                versionId: year.versionId,
-              };
-              that.versions.push(dict);
-              that.versionLabel.push(year.versionName);
-            });
+            if (res.code == "SUCCESS" && res.data.length) {
+              that.hasVersion = true;
+              that.hasNoVersion = false;
+              res.data.forEach((year) => {
+                let dict = {
+                  label: year.versionName,
+                  enrollYear: year.enrollYear,
+                  reviseYear: year.reviseYear,
+                  versionId: year.versionId,
+                };
+                that.versions.push(dict);
+                that.versionLabel.push(year.versionName);
+              });
 
             that.currentVersionId = this.$store.state.course.baseCourseVersionId
               ? this.$store.state.course.baseCourseVersionId
@@ -550,24 +590,24 @@ methods:{
         });
         
         // that.courseTypeSource = res.
-      })
+      });
     },
-  getSearchValue(data){
+    getSearchValue(data) {
       this.keyword = data;
-      this.getBaseCourse(this.pageSize,this.pageNum);
-      },
-  getSearchValueforClass(data){
-    this.keyword = data;
-    this.getBaseCourse(this.pageSize,this.pageNum);
-  },
-  rowKey(row) {
+      this.getBaseCourse(this.pageSize, this.pageNum);
+    },
+    getSearchValueforClass(data) {
+      this.keyword = data;
+      this.getBaseCourse(this.pageSize, this.pageNum);
+    },
+    rowKey(row) {
       return row.courseId;
     },
-  //直接添加课程大纲
-  addBaseCourseDetail(row){
-      if(this.currentVersionId){
+    //直接添加课程大纲
+    addBaseCourseDetail(row) {
+      if (this.currentVersionId) {
         let that = this;
-       for (const element of this.versions) {
+        for (const element of this.versions) {
           if (element["versionId"] == that.currentVersionId) {
             console.log("find same ");
             that.currentVersion = element["label"];
@@ -628,12 +668,10 @@ methods:{
                     duration:1500,
                   });
               //失败后退回basecouse页面
-              that.getBaseCourse(that.pageSize,that.pageNum);
-            
-      })
-      })
-      }
-      else{
+              that.getBaseCourse(that.pageSize, that.pageNum);
+            });
+        });
+      } else {
         ElMessage({
           type: "error",
           message: `请选择课程大纲！`,
@@ -641,24 +679,21 @@ methods:{
         });
       }
     },
-  //load course
-  loadmoreCourse(){
-    if(this.result.total-this.pageSize>=20){
-      this.pageSize +=20;
-      this.getBaseCourse(this.pageSize,this.pageNum);
-    }
-    else{
-      this.pageSize +=(this.result.total-this.pageSize);
-      this.getBaseCourse(this.pageSize,this.pageNum);
-    }
-    
-
-  },
-  //跳转到详细页面
-  goBaseCourseDetail(index, row){
-    console.log('goBaseCourseDetail',row);
-    let versionName ="";
-    for (const element of this.versions) {
+    //load course
+    loadmoreCourse() {
+      if (this.result.total - this.pageSize >= 20) {
+        this.pageSize += 20;
+        this.getBaseCourse(this.pageSize, this.pageNum);
+      } else {
+        this.pageSize += this.result.total - this.pageSize;
+        this.getBaseCourse(this.pageSize, this.pageNum);
+      }
+    },
+    //跳转到详细页面
+    goBaseCourseDetail(index, row) {
+      console.log("goBaseCourseDetail", row);
+      let versionName = "";
+      for (const element of this.versions) {
         if (element["versionId"] == this.currentVersionId) {
           versionName = element["label"];
         }
@@ -780,32 +815,30 @@ methods:{
           if(res.total){
             res.rows.forEach(function(course){
             that.hasCourse = true;
-            let eachCourseId = '';
-            
+            let eachCourseId = "";
 
             eachCourseId = course.courseId;
-            
-            course.courseName=course.courseName;
-            course.courseCode=course.courseCode;
-            
+
+            course.courseName = course.courseName;
+            course.courseCode = course.courseCode;
+
             course.courseType = that.courseTypeSource[course.courseType];
-            course.courseNature= that.courseNatureSource[course.courseNature];
-           
+            course.courseNature = that.courseNatureSource[course.courseNature];
+
             course.versionId = course.bcDetails[0].versionId;
             course.versionName = course.bcDetails[0].versionName;
             courses.push(course);
             let courseDict = {
-              'courseId':eachCourseId,
+              courseId: eachCourseId,
               // 'versionId':eachVersionId,
             };
-            
+
             eachCourse.push(courseDict);
             CourseId.push(eachCourseId);
           });
-          }
-          else{
-            that.hasCourse = false;
-          }
+        } else {
+          that.hasCourse = false;
+        }
 
           that.drawertableData = courses;
           that.origintableData = courses;
@@ -963,79 +996,78 @@ methods:{
   //         }
   //         });
 
-  //         that.searchCourseId.forEach(function(courseId){
-  //           if(that.programInfoCourseId.includes(courseId)){
-  //             countofSelected++;
-  //           }
-  //         });
+    //         that.searchCourseId.forEach(function(courseId){
+    //           if(that.programInfoCourseId.includes(courseId)){
+    //             countofSelected++;
+    //           }
+    //         });
 
-  //         that.tableData = courses;
-  //         that.programInfoCourseCount = countofSelected;
-  //         that.result = res;
+    //         that.tableData = courses;
+    //         that.programInfoCourseCount = countofSelected;
+    //         that.result = res;
 
+    //         }
+    //         else{
+    //           flag = false;
+    //           ElMessage({
+    //                 type: 'error',
+    //                 message: `搜索失败`,
+    //                 duration:1000,
+    //               });
 
-  //         }
-  //         else{
-  //           flag = false;
-  //           ElMessage({
-  //                 type: 'error',
-  //                 message: `搜索失败`,
-  //                 duration:1000,
-  //               });
-           
-  //         }
-  //   }).then(function(){
-  //     if(flag){
-  //       that.tableData.forEach(function(data){
-  //     if(data.remark){
-  //       console.log('data.remark:',data.remark);
-  //       that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
-  //     }
-  //     else{
-  //       console.log('data.remark is null',data.remark);
-  //     }
-  //   })
-  //     }
-      
-  //   });
-  // },
+    //         }
+    //   }).then(function(){
+    //     if(flag){
+    //       that.tableData.forEach(function(data){
+    //     if(data.remark){
+    //       console.log('data.remark:',data.remark);
+    //       that.$refs.drawermultipleTable.toggleRowSelection(that.tableData[data.index],true);
+    //     }
+    //     else{
+    //       console.log('data.remark is null',data.remark);
+    //     }
+    //   })
+    //     }
 
-  cancelClick() {
-  this.drawer = false;
-},
-  // handleCurrentChange(val) {
-  //   this.pageNum = val
-  //   console.log(`当前页: ${val}`);
-  //   this.getBaseCourse(this.pageSize,this.pageNum);
-   
-  // },
-  // handleSizeChange(val) {
-  //   this.pageSize = val;
-  //   console.log(`每页 ${val} 条`);
-  //   this.getBaseCourse(this.pageSize,this.pageNum);
-  // },
-  addBaseCourse(){
-    this.dialogFormVisible = false;
-    console.log(this.form);
-    
-    let that = this;
-    let postData = this.formTopostData(this.form);
-    console.log('postData:',postData);
-    
-    return request({
-            url:'/baseCourse/add',
-            method:'post',
-            data:postData
-        }).then(function(res){
-          
-          if(res.code == 'SUCCESS'){
+    //   });
+    // },
+
+    cancelClick() {
+      this.drawer = false;
+    },
+    // handleCurrentChange(val) {
+    //   this.pageNum = val
+    //   console.log(`当前页: ${val}`);
+    //   this.getBaseCourse(this.pageSize,this.pageNum);
+
+    // },
+    // handleSizeChange(val) {
+    //   this.pageSize = val;
+    //   console.log(`每页 ${val} 条`);
+    //   this.getBaseCourse(this.pageSize,this.pageNum);
+    // },
+    addBaseCourse() {
+      this.dialogFormVisible = false;
+      console.log(this.form);
+
+      let that = this;
+      let postData = this.formTopostData(this.form);
+      console.log("postData:", postData);
+
+      return request({
+        url: "/baseCourse/add",
+        method: "post",
+        data: postData,
+      })
+        .then(function (res) {
+          if (res.code == "SUCCESS") {
             ElMessage({
                 type: 'success',
                 message: `新建成功`,
                 duration:1500,
               });
             that.clearForm();
-            that.getBaseCourse(that.pageSize,that.pageNum);
+            that.getBaseCourse(that.pageSize, that.pageNum);
           }
           
         }).catch((e)=>{
@@ -1097,46 +1129,42 @@ methods:{
     course.courseYear=(course.courseYear == '0') ? '2022' : '2023';
     course.remark=(course.remark) ? '' : course.remark.trim();
 
-    return course;
-
-  },
-  // goAddBaseCourses(){
-  //   this.$router.push({ path:'/courses'}) 
-  // },
-  deleteBaseCourse(){
-    let that = this;
-ElMessageBox.confirm(
-    '是否确认将所选课程从培养方案中移除？',
-    '',
-    {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  ).then(() => {
-    return request({
-      url:'/baseCourse/program/remove',
-      method:'delete',
-      data: that.deleteProgrameInfo,
-    }).then(function(res){
-      if(res == 204){
-        ElMessage({
-                type: 'success',
+      return course;
+    },
+    // goAddBaseCourses(){
+    //   this.$router.push({ path:'/courses'})
+    // },
+    deleteBaseCourse() {
+      let that = this;
+      ElMessageBox.confirm("是否确认将所选课程从培养方案中移除？", "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        return request({
+          url: "/baseCourse/program/remove",
+          method: "delete",
+          data: that.deleteProgrameInfo,
+        })
+          .then(function (res) {
+            if (res == 204) {
+              ElMessage({
+                type: "success",
                 message: `删除成功`,
                 duration:1500,
               });
-            // that.clearForm();
-            that.getProgramCourse();
-            that.$refs.multipleTable.clearSelection();
-                that.numSelected = 0;
-                if (that.clickState == 1) {
-                  that.clickState = 0;
-                  that.closeShow = !that.closeShow;
-                }
-          }
-          
-    }).catch((e)=>{
-      console.log('e',e);
+              // that.clearForm();
+              that.getProgramCourse();
+              that.$refs.multipleTable.clearSelection();
+              that.numSelected = 0;
+              if (that.clickState == 1) {
+                that.clickState = 0;
+                that.closeShow = !that.closeShow;
+              }
+            }
+          })
+          .catch((e) => {
+            console.log("e", e);
             ElMessage({
                   type: 'error',
                   message: `删除失败`,
@@ -1144,66 +1172,68 @@ ElMessageBox.confirm(
                 });
             // that.clearForm();
             // that.getProgramCourse();
-          
-    })
-    }) 
-  },
-  
-  //总步骤
-  getProgrameInfo(){
-    let that = this;
-    this.getBaseCourseDictforProgram();
-   
-  },
-  //组建向programe里添加课程信息的字典
-  getBaseCourseDictforProgram(){
-    var postData = [];
-    let that = this;
-    this.drawercourseId.forEach(function(courseId){
-    let courseBCDMId = '';
-    let courseDetailId = '';
-    if(!that.programInfoCourseId.includes(courseId)){
-      that.getDetail(courseId).then(function(res){
-      
-      if(res){
-        courseDetailId = res;
-      }
-      else{
-       
-        return console.log('detailId is null');
-      }
-    }).then(function(){
-      
-    var programCoursedict = {
-     'bcmdId':courseBCDMId,
-     'detailId':courseDetailId,
-     'programId':that.programId,
-     'courseId':courseId
-   }
-   postData.push(programCoursedict);
-    }).then(function(){ 
-  that.programeInfo = postData;
-  console.log('getBaseCourseDictforProgram:',that.programeInfo);
-    })
-    }
-    
-    }); 
-  },
-  getBCMId(){
-    let that = this;
-    this.programeInfo.forEach(function(courseInfo){
-      let courseBCDMId = '';
-      console.log('getBCMId:',courseInfo.detailId);
-      that.getBaseCourse(that.pageSize,that.pageNum,that.majorId,courseInfo.detailId).then(function(res){
-        
-            console.log('BCMId: ',res);
-            if(res){
-              console.log('bcdmId is :',res);
+          });
+      });
+    },
+
+    //总步骤
+    getProgrameInfo() {
+      let that = this;
+      this.getBaseCourseDictforProgram();
+    },
+    //组建向programe里添加课程信息的字典
+    getBaseCourseDictforProgram() {
+      var postData = [];
+      let that = this;
+      this.drawercourseId.forEach(function (courseId) {
+        let courseBCDMId = "";
+        let courseDetailId = "";
+        if (!that.programInfoCourseId.includes(courseId)) {
+          that
+            .getDetail(courseId)
+            .then(function (res) {
+              if (res) {
+                courseDetailId = res;
+              } else {
+                return console.log("detailId is null");
+              }
+            })
+            .then(function () {
+              var programCoursedict = {
+                bcmdId: courseBCDMId,
+                detailId: courseDetailId,
+                programId: that.programId,
+                courseId: courseId,
+              };
+              postData.push(programCoursedict);
+            })
+            .then(function () {
+              that.programeInfo = postData;
+              console.log("getBaseCourseDictforProgram:", that.programeInfo);
+            });
+        }
+      });
+    },
+    getBCMId() {
+      let that = this;
+      this.programeInfo.forEach(function (courseInfo) {
+        let courseBCDMId = "";
+        console.log("getBCMId:", courseInfo.detailId);
+        that
+          .getBaseCourse(
+            that.pageSize,
+            that.pageNum,
+            that.majorId,
+            courseInfo.detailId
+          )
+          .then(function (res) {
+            console.log("BCMId: ", res);
+            if (res) {
+              console.log("bcdmId is :", res);
               courseBCDMId = res;
               courseInfo.bcmdId = courseBCDMId;
-            }
-            else{
-              console.log('bcdmId is null');
+            } else {
+              console.log("bcdmId is null");
             }
           });
     });
@@ -1249,11 +1279,10 @@ ElMessageBox.confirm(
             that.getBaseCourse(that.pageSize,that.pageNum);
             that.$refs.drawermultipleTable.clearSelection();
 
-            if(that.drawerclickState == 1){
-              that.drawerclickState=0;
+            if (that.drawerclickState == 1) {
+              that.drawerclickState = 0;
               that.drawercloseShow = !that.drawercloseShow;
-            };
-            
+            }
           }
           
     }).catch((e)=>{
@@ -1363,70 +1392,69 @@ ElMessageBox.confirm(
         });
         this.drawernumSelected = this.drawermultipleSelection.length;
 
-        if(this.drawerclickState != 1){
-          this.drawercloseShow = !this.drawercloseShow;
-          this.drawerclickState = 1;
-        }
-        if(this.drawerclickState==1&&this.drawernumSelected == 0)
-        {
-          this.drawerclickState=0;
-            this.drawercloseShow = !this.drawercloseShow;
-        }
-        this.drawercourseId = courseId;
-        this.drawerCourseIndex = courseIndex;
-        console.log('courseId:',this.drawercourseId,'courseIndex:',this.drawerCourseIndex);
-        this.getBaseCourseDictforProgram();
-      },
-  toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        } else {
-          this.$refs.multipleTable.clearSelection();
-          if(this.clickState == 1){
-            this.clickState=0;
-            this.closeShow = !this.closeShow;
-          }
-          
-        }
-      },
-  drawertoggleSelection(rows) {
-        if (rows) {
-          
-        } else {
-          this.$refs.drawermultipleTable.clearSelection();
-          if(this.drawerclickState == 1){
-            this.drawerclickState=0;
-            this.drawercloseShow = !this.drawercloseShow;
-          }
-          
-        }
+      if (this.drawerclickState != 1) {
+        this.drawercloseShow = !this.drawercloseShow;
+        this.drawerclickState = 1;
+      }
+      if (this.drawerclickState == 1 && this.drawernumSelected == 0) {
+        this.drawerclickState = 0;
+        this.drawercloseShow = !this.drawercloseShow;
+      }
+      this.drawercourseId = courseId;
+      this.drawerCourseIndex = courseIndex;
+      console.log(
+        "courseId:",
+        this.drawercourseId,
+        "courseIndex:",
+        this.drawerCourseIndex
+      );
+      this.getBaseCourseDictforProgram();
     },
-   async getBaseCourse(pageSize,pageNum,majorId,detailId){
-    let that = this;
-    let courses = [];
-    let realurl ='';
-    let courseBCDMId = '';
-    let count=0;
-    this.loadmoreDisabled = true;
-    this.programInfoCourseCount = 0;
-    if(majorId){
-      realurl = '/detailProgram/list';//通过majorId来显示已经添加的detail，可以获取到courseId
-      return request({
-            url:realurl+'?'+'majorId='+this.majorId,
-            method:'get',
-        }).then(function(res){
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach((row) => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+        if (this.clickState == 1) {
+          this.clickState = 0;
+          this.closeShow = !this.closeShow;
+        }
+      }
+    },
+    drawertoggleSelection(rows) {
+      if (rows) {
+      } else {
+        this.$refs.drawermultipleTable.clearSelection();
+        if (this.drawerclickState == 1) {
+          this.drawerclickState = 0;
+          this.drawercloseShow = !this.drawercloseShow;
+        }
+      }
+    },
+    async getBaseCourse(pageSize, pageNum, majorId, detailId) {
+      let that = this;
+      let courses = [];
+      let realurl = "";
+      let courseBCDMId = "";
+      let count = 0;
+      this.loadmoreDisabled = true;
+      this.programInfoCourseCount = 0;
+      if (majorId) {
+        realurl = "/detailProgram/list"; //通过majorId来显示已经添加的detail，可以获取到courseId
+        return request({
+          url: realurl + "?" + "majorId=" + this.majorId,
+          method: "get",
+        }).then(function (res) {
           that.loadmoreDisabled = false;
-          if(res.rows){
-            res.rows.forEach(function(course){
-              
-              if(course.detailId == detailId){
-                
+          if (res.rows) {
+            res.rows.forEach(function (course) {
+              if (course.detailId == detailId) {
                 courseBCDMId = course.bcdmId;
               }
-          });
-          };
+            });
+          }
 
           return courseBCDMId;
         });
@@ -1466,17 +1494,14 @@ ElMessageBox.confirm(
                   if(course.bcDetails[i].versionId == that.currentVersionId){
                     course.versionId = true;
                     break;
-                  }
-                  else{
+                  } else {
                     course.versionId = false;
                   }
                 }
-                
-              };
-              if(course.respondentInfos){
-                
+              }
+              if (course.respondentInfos) {
                 // let teacherName =[];
-                course.respondentInfos.forEach(function(respondent){
+                course.respondentInfos.forEach(function (respondent) {
                   course.respondentName = respondent.respondentName;
                   // teacherName.push(respondent.respondentName);
                 });
@@ -1519,10 +1544,9 @@ ElMessageBox.confirm(
           
             that.tableData = courses;
             that.result = res;
-            if(pageSize>=res.total){
+            if (pageSize >= res.total) {
               that.showLoadmore = false;
-            }
-            else{
+            } else {
               that.showLoadmore = true;
             }
           
@@ -1595,7 +1619,7 @@ computed: {
       return this.$store.state.currentInfo.year;
     },
   },
-watch: {
+  watch: {
     yearChange: {
       deep: true,
       handler(value) {
@@ -1603,12 +1627,10 @@ watch: {
       },
     },
   },
-  
-
-}
+};
 </script>
 
-<style scoped> 
+<style scoped>
 .rightSlot {
   position: absolute;
   right: 10%;
@@ -1619,31 +1641,31 @@ watch: {
   margin-left: 15px;
   width: 120px;
 }
- .dropdownstyle{
-   float: right;
-   margin-right: 70px;
-  }
-  .dropdownIcon{
-    margin-top: 10px;
-    cursor:pointer;
-  }
-.loadmorestyle{
-  padding-top:24px;
+.dropdownstyle {
+  float: right;
+  margin-right: 70px;
+}
+.dropdownIcon {
+  margin-top: 10px;
+  cursor: pointer;
+}
+.loadmorestyle {
+  padding-top: 24px;
   padding-bottom: 24px;
-  }
-.rowStyle{
+}
+.rowStyle {
   top: 10px;
 }
-  :deep().el-input__wrapper {
+:deep().el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;
   background-color: transparent;
   border-top: 0;
   border-right: 0;
   border-left: 0;
-  box-shadow:0 0 0 0px;
+  box-shadow: 0 0 0 0px;
   border-radius: 0;
 }
-.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper{
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
 }
 :deep().searchBlock .el-icon {
@@ -1663,77 +1685,75 @@ watch: {
   width: 18px;
 }
 
-.row-style{
-  padding-top:5px
+.row-style {
+  padding-top: 5px;
 }
-.el-checkbox__input.is-disabled{
-    background-color: #0e5cd0;
+.el-checkbox__input.is-disabled {
+  background-color: #0e5cd0;
 }
-.el-table.tableColumn{
-  --el-table-tr-bg-color:rgb(189, 189, 189);
+.el-table.tableColumn {
+  --el-table-tr-bg-color: rgb(189, 189, 189);
 }
-.el-table__body{
+.el-table__body {
   background-color: rgb(189, 189, 189);
 }
-
 
 /* .drawerFooter{
   padding-bottom: 100px;
 } */
-.pagination-container{
+.pagination-container {
   bottom: 10px;
 }
-#rightTime{
+#rightTime {
   color: #3f51b5;
 }
 
-.drawerBlock{
+.drawerBlock {
   position: relative;
   color: rgb(189, 189, 189);
 }
-.iconSize{
+.iconSize {
   top: 7px;
   height: 20px;
   width: 20px;
   color: black;
-  
 }
-.deleteButton{
+.deleteButton {
   margin-right: 10%;
   margin-top: 0;
   margin-bottom: 0;
 }
-.searchIndrawer{
-position:relative;
-top:0px;
-border-bottom:none;
-left:-46px;
+.searchIndrawer {
+  position: relative;
+  top: 0px;
+  border-bottom: none;
+  left: -46px;
 }
-.drawerdeleteButton{
-  float:right;
+.drawerdeleteButton {
+  float: right;
   margin-left: 30px;
   margin-top: 0;
   margin-bottom: 0;
 }
-.drawersubmenu{
+.drawersubmenu {
   color: #3f51b5;
-    font-size: 14px;
-    font-weight: 500;
-    height: 44px;
-    min-height: 44px;
-    line-height: 3em;
-    margin-bottom: 13px;
-    position: relative;
-    padding: 6px 6px 5px 5px;
-    /* border-bottom: 1px solid #d0d0d0; */
-    background-color: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  height: 44px;
+  min-height: 44px;
+  line-height: 3em;
+  margin-bottom: 13px;
+  position: relative;
+  padding: 6px 6px 5px 5px;
+  /* border-bottom: 1px solid #d0d0d0; */
+  background-color: transparent;
 }
 .numSelectedTeacher {
   min-height: 36px;
   color: #3f51b5;
   display: inline-block;
   position: relative;
-  
+
   min-height: 36px;
   min-width: 88px;
   line-height: 36px;
@@ -1742,24 +1762,20 @@ left:-46px;
   text-align: center;
   border-radius: 2px;
   box-sizing: border-box;
-  
-  
+
   user-select: none;
-  
+
   border: 0;
   padding: 0 6px;
   margin: 0;
-  
-  
+
   font-weight: 500;
   font-size: 14px;
-  
 
-  
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.clearSelected{
+.clearSelected {
   color: black;
   margin-top: 2px;
   line-height: 55px;
@@ -1770,24 +1786,24 @@ left:-46px;
   outline: none;
   border: 0;
   padding: 0 6px;
-  background-color:#f2f2f2;
-  transition: box-shadow .4s cubic-bezier(.25,.8,.25,1),background-color .4s cubic-bezier(.25,.8,.25,1);
-  }
-  .clearSelected:hover{
-    background-color:#c4c4c4;
-  }
+  background-color: #f2f2f2;
+  transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.clearSelected:hover {
+  background-color: #c4c4c4;
+}
 .submenu {
-    color: #3f51b5;
-    font-size: 14px;
-    font-weight: 500;
-    height: 55px;
-    position: absolute;
-    top: 110px;
-    left: 0px;
-    width: 100%;
-    border-bottom: 1px solid #d0d0d0;
-    background-color: #f2f2f2;
-   
+  color: #3f51b5;
+  font-size: 14px;
+  font-weight: 500;
+  height: 55px;
+  position: absolute;
+  top: 110px;
+  left: 0px;
+  width: 100%;
+  border-bottom: 1px solid #d0d0d0;
+  background-color: #f2f2f2;
 }
 .md-padding {
   margin-top: 85px;
@@ -1796,34 +1812,32 @@ left:-46px;
   
 }
 
-.searchBar{
+.searchBar {
   display: inline-block;
   width: 100%;
   border: 1px solid rgb(189, 189, 189);
 }
-.headerSearch{
+.headerSearch {
   border: 0;
   float: left;
   width: 50%;
 }
-.selectionBar{
+.selectionBar {
   display: flex;
   flex-direction: row;
-  
 }
-.m-2{
+.m-2 {
   left: 10%;
   float: left;
   top: 6px;
-  
 }
-.m-3{
+.m-3 {
   float: right;
   top: 6px;
   right: 10%;
 }
-.addCourseButton{
-  background-color:rgb(33,150,243);
+.addCourseButton {
+  background-color: rgb(33, 150, 243);
   min-height: 56px;
   min-width: 56px;
   float: right;
@@ -1837,15 +1851,15 @@ left:-46px;
   margin: 0 auto;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
-.addIcon{
+.addIcon {
   color: white;
   width: 24px;
   height: 24px;
   top: 3px;
 }
-.addCourseButton:hover{
-  background-color:rgb(41,98,255);
-  transition: all .3s cubic-bezier(.55,0,.55,.2);
+.addCourseButton:hover {
+  background-color: rgb(41, 98, 255);
+  transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
 }
 .no-program {
   display: flex;

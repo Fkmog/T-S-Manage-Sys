@@ -160,7 +160,6 @@ export default {
         .then((res) => {
           console.log("checkProgram", res);
           this.programId = res.data.programId;
-          console.log("@", this.programId);
           this.noProgram = false;
         })
         .catch((e) => {

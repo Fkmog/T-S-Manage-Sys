@@ -113,7 +113,7 @@ export default {
     };
   },
   mounted() {
-    this.$store.commit("currentInfo/setYear", this.year);
+    this.$store.commit("currentInfo/setYear", '2021');
     this.getDictionary();
   },
 
@@ -121,7 +121,7 @@ export default {
     //获取数据字典
     getDictionary() {
       getDictionary().then((res) => {
-        // console.log("getDictionary", res);
+        console.log("getDictionary", res);
         this.enroll_year = res.enroll_year;
       });
     },
