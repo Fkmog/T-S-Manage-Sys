@@ -33,7 +33,7 @@
               <el-option
                 v-for="item in enroll_year"
                 :key="item.dictValue"
-                :label="item.dictLabel + '级'"
+                :label="item.dictLabel"
                 :value="item.dictLabel"
               />
             </el-select>
@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       //现在直接给默认值，之后浏览器session拿 !todo
-      year: "2021",
+      year: "2021级",
       enroll_year: [],
     };
   },
