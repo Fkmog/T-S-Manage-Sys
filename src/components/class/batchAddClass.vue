@@ -311,7 +311,7 @@ getDict(){
           console.log("res:", res);
           
           that.firstActivities = true;    
-          if (res.code == "SUCCESS") {
+          if (res.code == "SUCCESS"){
             ElMessage({
                   type: "success",
                   message: `新建成功`,
@@ -517,7 +517,7 @@ getDict(){
         this.hotInstance.updateSettings({
           data: this.db.items,
         });
-        
+        this.$router.push({ path: "/class" });
       },
       
       goBaseCourse() {
@@ -555,7 +555,7 @@ getDict(){
           console.log("localres", localres);
           return localres;
         }).catch(e => {
-          return e;
+          return e.response.data;
         })
       },
       async handleEvent(event){
@@ -635,7 +635,7 @@ getDict(){
   
   #tip {
     position: absolute;
-    z-index: 1000000;
+    z-index: 100;
     left: 0px;
     top: 0px;
     bottom: 0px;

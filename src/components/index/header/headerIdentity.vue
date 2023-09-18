@@ -162,7 +162,7 @@ export default {
         .then(() => {
           ElMessage({
             type: "success",
-            message: "已退出登录！",
+            message: "已退出登录",
             duration: 1500,
           });
           Cookies.remove("Admin-Token");
@@ -251,7 +251,7 @@ export default {
   top: 80px;
   width: 350px;
   animation: animate 0.5s ease;
-  z-index: 100;
+  z-index: 1000;
 }
 @keyframes animate {
   0% {

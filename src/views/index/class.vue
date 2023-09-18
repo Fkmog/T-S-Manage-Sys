@@ -182,7 +182,7 @@
         <span class="dialog-footer">
           <el-button @click="goBatchAddClass">批量添加</el-button>
           <el-button @click="addVisible = false">取消</el-button>
-          <el-button link plain @click="addClass(classAddForm)">
+          <el-button type="primary" @click="addClass(classAddForm)">
             确认
           </el-button>
         </span>

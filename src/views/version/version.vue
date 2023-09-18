@@ -56,12 +56,7 @@
             class="deleteButton"
             link
             style="color: #3f51b5"
-            @click.stop="this.deleteFlag = true;
-                    this.addFlag = false;
-                    this.editFlag = false;
-                    this.nameFlag = true;
-                    this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;">
+            @click.stop="this.deleteVersion(scope.row);">
               <el-icon>
                   <Delete />
             </el-icon>
@@ -70,7 +65,7 @@
           </el-tooltip>
         </el-col>
         <el-col :span="6">
-          <el-tooltip content="查看版本信息">
+          <el-tooltip content="修改版本信息">
            <el-button 
             class="deleteButton"
             link
@@ -92,7 +87,7 @@
     </el-table>
   </div>
 
-  <el-dialog v-model="showEditVersionDailogFlag">
+  <el-dialog v-model="showEditVersionDailogFlag" width="500">
     <template #header>
       <h4 v-show="addFlag">课程大纲版本号新建</h4>
       <h4 v-show="editFlag">版本信息</h4>
@@ -155,7 +150,7 @@
         <el-button
           v-show="editFlag"
           type="primary"
-          :disabled="!submitFlag"
+          
           @click="editVersion()"
         >
           确认
@@ -209,6 +204,7 @@ import {
   User,
   CircleClose,
   Collection,
+  
   
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
@@ -354,7 +350,7 @@ export default {
     this.getDictionary();
   },
   methods: {
-    goEdit(row) {
+    goEdit(row){
       this.editFlag = true;
       this.deleteFlag = false;
       this.addFlag = false;
@@ -439,8 +435,9 @@ export default {
           });
         });
     },
-    deleteVersion() {
+    deleteVersion(row) {
       let that = this;
+      console.log('row',row)
       ElMessageBox.confirm("是否确认删除课程大纲版本？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
@@ -448,7 +445,7 @@ export default {
       })
         .then(() => {
           return request({
-            url: "/detail/versionRemove/" + that.versionForm.versionId,
+            url: "/detail/versionRemove/" + row.versionId,
             method: "delete",
           })
             .then((res) => {

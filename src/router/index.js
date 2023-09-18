@@ -108,6 +108,7 @@ const router = createRouter({
         },
         {
           path: "/departmentSetting",
+          redirect:'/version',
           component: DepartmentSetting,
           name: "DepartmentSetting",
           meta: { isMajor: false },
@@ -229,12 +230,6 @@ const router = createRouter({
           path: "/addTeacher",
           component: AddTeacher,
         },
-        // {
-        //   name: "TemplateList",
-        //   path: "/templateList",
-        //   component: TemplateList,
-        //   meta: { isMajor: false },
-        // },
         {
           name: "TemplateEdit",
           path: "/templateEdit",

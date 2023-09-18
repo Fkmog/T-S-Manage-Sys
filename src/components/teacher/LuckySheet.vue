@@ -3,25 +3,27 @@
 
 <div layout="column" flex class="ng-scope layout-column flex" >
     <div class="submenu">
-      <el-tooltip content="返回" style="float:left;">
+      <el-tooltip content="返回" >
         <el-button class="md-icon-button button-back" md-no-ink aria-label="返回" @click="goTeacher" link>
         <el-icon :size="24"><Back /></el-icon>
       </el-button>
       </el-tooltip>
-      <div class="s-v-bar" style="float:left;">&nbsp;</div>
-      <el-tooltip content="保存" style="float:left;">
+      <el-divider class="divider" direction="vertical" />
+      <el-tooltip content="保存">
         <el-button class="md-icon-button" aria-label="保存" @click="save" link :disabled="!isValid()">
           <el-icon :size="24"><DocumentChecked /></el-icon>
         </el-button>  
       </el-tooltip>
       <!--  -->
-          <div class="s-v-bar" style="float:left;">&nbsp;</div>
-      <el-button class="md-icon-button yw-unclickable" aria-label="帮助" link >
-        <el-icon style="float:left;" :size="24"><InfoFilled /></el-icon>
-        <div layout="row" layout-align="center center" style="float:right;">
-        <span>可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
-      </div>
-      </el-button>
+       
+      
+        <el-icon :size="24" style="padding: 20px;top: 7px;"><InfoFilled /></el-icon>
+        
+        <span class="displayCenter">可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</span>
+        
+      
+
+      
       
       <div flex></div>
     </div>
@@ -197,7 +199,6 @@ export default{
       }
   },
   isNotDirty(){
-    
     this.dirty=false;
   },
   save() {
@@ -216,7 +217,7 @@ export default{
         
         this.addTeacher(teacherList).then(function(res){
           console.log('res:',res);
-          that.firstActivities = true; 
+          that.firstActivities = true;
           if(res.code == 'SUCCESS'){                                                                
             ElMessage({
                 type: 'success',
@@ -227,13 +228,9 @@ export default{
             that.goBackandClean();
           }
          else{
-          
-          
           if(res.code == 'E_TEACHER_EXIST'){
             
             res.data.forEach(function(teacher){
-              
-             
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
@@ -244,7 +241,6 @@ export default{
 
             that.hotInstance.validateCells((valid) =>{
               if(valid){
-                
               }
             });
 
@@ -310,7 +306,9 @@ export default{
           
             that.count = 0;
     }
-        });
+        }).catch((e)=>{
+          console.log('e',e);
+        })
 },
   toPostData(){
     let that = this;
@@ -368,7 +366,8 @@ goBackandClean(){
   this.count = 0;
   this.hotInstance.updateSettings({
       data:this.db.items
-  })
+  });
+  this.$router.push({ path:'/teacher'});
   // console.log('datas:', this.db.items,this.postData.teachers);
 },
 goTeacher(){
@@ -408,7 +407,7 @@ addTeacher(postData){
           console.log('localres',localres);
           return localres;
         }).catch(e=>{
-          return e;
+          return e.response.data;
         });
 },
 async handleEvent(event){
@@ -441,6 +440,14 @@ async handleEvent(event){
 </script>
 
 <style  scoped>
+.divider {
+  margin-left: 20px;
+  height: 24px;
+}
+.displayCenter{
+  display: inline-flex;
+  justify-content: center;
+}
 .cell-exist{
   background-color: red;
 }
@@ -465,6 +472,10 @@ async handleEvent(event){
 }
 .md-icon-button{
   padding: 20px;
+  
+}
+.button-back{
+  margin-left: 50px;
 }
 
 #luckysheet {

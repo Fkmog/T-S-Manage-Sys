@@ -59,13 +59,14 @@ export default {
   watch: {},
   mounted() {
     // 点击"设置"后，默认进入版本页面，后期可能会出现bug
-    if (this.$route.matched.length == 2) {
-      this.toVersion();
-    }
+    // console.log(this.$route);
+    // if (this.$route.matched.length == 2) {
+    //   this.toVersion();
+    // }
   },
   methods: {
     toVersion() {
-      console.log(this.$route);
+      // console.log(this.$route);
       this.$router.push({ name: "Version" });
     },
     //跳转到模板编辑页面
