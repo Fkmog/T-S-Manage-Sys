@@ -43,7 +43,7 @@
                 style="margin-left: 20px"
               >
             
-                <FolderChecked />
+                <DocumentChecked />
               </el-icon>
             </el-button>
             </el-tooltip>
@@ -116,7 +116,7 @@
     
     import   Action  from 'element-plus'
     
-    import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus} from '@element-plus/icons-vue'
+    import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus,DocumentChecked} from '@element-plus/icons-vue'
     import Handsontable from 'handsontable';
     import request from '@/utils/request/request'
     import '@/components/teacher/addTeacher.js'
@@ -190,7 +190,7 @@
         ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
         ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
         Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action,
-        CirclePlus
+        CirclePlus,DocumentChecked
       },
       methods:{
         editableTabsValueChange(pane){
@@ -417,10 +417,10 @@ activateHotcolumn(){
         });
 },
 getHotCellsFunction() {
-                
+              let that = this;
             return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
                 var cellProperties = {};
-                let that = this;
+                
                 if (col === 0) {  // studentNo column
                    
                 cellProperties.readOnly = true;
@@ -440,6 +440,15 @@ getHotCellsFunction() {
                 } else {
                 //   cellProperties.validator =  that.validString();
                 }
+
+
+                // if(col === 1 ){
+                  
+                //   cellProperties.type = 'numeric';
+                // }
+                // if(col === 2 ){
+                //   cellProperties.type = 'text';
+                // }
 
             
 
@@ -472,15 +481,23 @@ getHotCellsFunction() {
                 return cellProperties;
             };
     },
-    _validScore(value) {
-      if (/^[1]?[0-9]{1,2}(\.[0-9]+)?$/.test(value)) { // && value <= 100) {
+    validStudentNumber(value) {
+     
+      console.log('validStudentNumber',value);
+      if (/^\d+$/.test(value)) { // 测试是否为纯数字
         return true;
       } else {
         return false;
       }
     },
-    validScore(value, callback) {
-      callback(_validScore(value));
+    validStudentName(value) {
+      
+      console.log('validStudentName',value);
+      if (/^[\u4e00-\u9fa5]+$/.test(value)) { // 测试是否为纯中文
+        return true;
+      } else {
+        return false;
+      }
     },
     validString(value, callback) {
       if (value && value.length > 0) {

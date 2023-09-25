@@ -146,7 +146,7 @@
       }"
       :row-key="rowKey"
     >
-      <el-table-column width="55" type="selection" :reserve-selection="true">
+      <el-table-column width="55" column-key="select" type="selection" :reserve-selection="true">
       </el-table-column>
       <el-table-column label="课程名" width="250" label-class-name="textbold">
         <template #default="scope">
@@ -266,7 +266,7 @@
       }"
       :row-key="rowKey"
     >
-      <el-table-column width="55" type="selection" :reserve-selection="true">
+      <el-table-column width="55" column-key="select" type="selection" :reserve-selection="true">
       </el-table-column>
       <el-table-column label="课程名" width="250">
         <template #default="scope">
@@ -423,7 +423,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="dialogFormVisible1" title="修改课程信息">
+  <el-dialog v-model="dialogFormVisible1" title="修改课程信息" width="580">
     <el-form :model="preform">
       <el-form-item label="课程名称" :label-width="formLabelWidth">
         <el-input
@@ -481,7 +481,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showPrinciple" title="添加负责人">
+  <el-dialog v-model="showPrinciple" title="添加负责人" width="580">
     <span> 请选择负责人姓名： </span>
 
     <el-select
@@ -1492,8 +1492,7 @@ export default {
               course.courseName = course.courseName;
               course.courseCode = course.courseCode;
               course.courseType = that.courseTypeSource[course.courseType];
-              course.courseNature =
-                that.courseNatureSource[course.courseNature];
+              course.courseNature = that.courseNatureSource[course.courseNature];
               course.credit = course.credit;
               if (course.bcDetails.length) {
                 for (const element of course.bcDetails) {
@@ -1663,9 +1662,10 @@ export default {
           console.log("e", e);
         });
     },
-    goBaseCourseDetail(row) {
-      console.log("goBaseCourseDetail", row.bcDetails.length);
-      if(row.bcDetails.length){
+    goBaseCourseDetail(row,column) {
+      // console.log("goBaseCourseDetail", row.bcDetails.length);
+      if (column.columnKey === undefined){
+        if(row.bcDetails.length){
       let versionName = "";
       for (const element of this.versions) {
         if (element["versionId"] == this.currentVersionId) {
@@ -1698,6 +1698,8 @@ export default {
       else{
         this.addBaseCourseDetail(row)
       }
+      }
+      
       
     },
     editTrigger(val) {

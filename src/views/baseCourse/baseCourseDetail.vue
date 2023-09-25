@@ -153,7 +153,7 @@
           <el-col style="margin-top: 25px">
             <div class="detail-title">备注</div>
             <div class="detail-info" style="margin-top: 10px">
-              {{ form.remark }}
+              <!-- {{ form.remark }} -->
             </div>
           </el-col>
           <el-col style="margin-top: 45px">
@@ -349,6 +349,7 @@ export default {
   },
   data() {
     return {
+      from:'',
       filesList: [],
       checkList: ["成绩项", "课程目标"],
       currentRow: {},
@@ -448,6 +449,14 @@ export default {
       this.getDetail();
       this.checkVersion();
     }
+    console.log('router from', this.$route.query['parentName']);
+      if( this.$route.query['parentName'] == 'courseInMajor'){
+          this.from = this.$route.query['parentName'];
+      }
+      else{
+        this.from = '';
+      }
+      console.log('from',this.from);
   },
   methods: {
     //获取学校和部门ID
@@ -482,8 +491,15 @@ export default {
       });
     },
     //路由跳转
-    backBaseCourse() {
-      this.$router.push("/baseCourse");
+    backBaseCourse(){
+      console.log('from:',this.from);
+      if(this.from == 'courseInMajor'){
+        this.$router.push("/courses");
+      }
+      else{
+        this.$router.push("/baseCourse");
+      }
+      
     },
     toActivities() {
       this.$router.push("/baseCourseActivities");

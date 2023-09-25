@@ -64,7 +64,10 @@
     
     <addBtn @click="this.drawerShow()"></addBtn>
     <div class="el-table-container">
-      <el-table :data="drawertableData"  ref="multipleTable" style="width: 1135px;text-overflow: ellipsis; white-space: nowrap"
+      <el-table 
+      :data="drawertableData"  
+      ref="multipleTable" 
+      style="width: 1135px;"
       :header-cell-style="{
       'padding-left': '20px',
       'font-size': '14.4px',
@@ -76,10 +79,15 @@
       'padding-left': '20px',
       'font-size': '16px',
       height: '60px',
+      'text-overflow': 'ellipsis',
+       'white-space': 'nowrap',
+       cursor: 'pointer',
     }"
+   
     :row-key="rowKey"
-      @selection-change="handleSelectionChange">
-        <el-table-column  type="selection" width="55" :reserve-selection="true" />
+    @row-click="goBaseCourseDetail"
+    @selection-change="handleSelectionChange">
+        <el-table-column  type="selection" width="55" column-key="select" :reserve-selection="true" />
         <el-table-column prop="courseName" label="课程名" width="180" />           
         <el-table-column prop="courseCode" label="课程号" width="180" />
         <el-table-column prop="courseType" label="课程类型" width="180" />
@@ -200,9 +208,8 @@
       </el-col>
       </div>
       <div style="height: 100%;">
-        <el-button style="top: 10px;" @click="drawerClose">
+        <el-button style="top: 10px;" @click="drawerClose" link>
         <el-icon><CircleCloseFilled /></el-icon>
-        Close
       </el-button>
       </div>
       
@@ -216,15 +223,17 @@
           <el-table
             :data="tableData"
             ref="drawermultipleTable"
-            style="width: 100%"
+            style="width: 100%;cursor: pointer;"
             @selection-change="drawerchandleSelectionChange"
             :row-key="rowKey"
+            @row-click="goBaseCourseDetail"
           >
             <el-table-column
               width="55"
               type="selection"
               :selectable="selectable"
               :reserve-selection="true"
+              column-key="select"
             >
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
@@ -236,16 +245,16 @@
             />
             <el-table-column label="课程大纲" width="180">
               <template #default="scope">
-                <el-tooltip content="查看课程大纲">
+                <!-- <el-tooltip content="查看课程大纲">
                   <el-button
                     v-show="scope.row.versionId"
-                    @click="goBaseCourseDetail(scope.$index, scope.row)"
+                    @click="goBaseCourseDetail(scope.row)"
                     class="deleteButton"
                     link
                     style="color: #3f51b5"
                     ><el-icon><Document /></el-icon
                   ></el-button>
-                </el-tooltip>
+                </el-tooltip> -->
                 <el-tooltip content="添加课程大纲">
                   <el-button
                     v-show="!scope.row.versionId"
@@ -325,6 +334,9 @@ components:{
 },
 data(){
   return{
+
+    
+
     loadmoreDisabled:Boolean,
     
 
@@ -516,6 +528,7 @@ result:reactive({}),
   }
 },
 methods:{
+ 
   drawerClose(){
     this.$refs.drawermultipleTable.clearSelection();
     this.drawer = false;
@@ -690,29 +703,45 @@ methods:{
       }
     },
     //跳转到详细页面
-    goBaseCourseDetail(index, row) {
-      console.log("goBaseCourseDetail", row);
-      let versionName = "";
-      for (const element of this.versions) {
-        if (element["versionId"] == this.currentVersionId) {
-          versionName = element["label"];
+    goBaseCourseDetail(row,column) {
+      // console.log('columnKey',column.columnKey)
+      // console.log("goBaseCourseDetail", row.bcDetails.length,row);
+      if (column.columnKey === undefined){
+        if(row.bcDetails.length){
+        let versionName = "";
+        for (const element of this.versions) {
+          if (element["versionId"] == this.currentVersionId) {
+            versionName = element["label"];
+          }
+        }
+          this.$store.commit("course/setbaseCourseVersionName", versionName);
+          this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+          this.$store.commit(
+            "course/setbaseCourseVersionId",
+            this.currentVersionId
+          );
+          this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+          this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+          this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+          this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+          this.$store.commit(
+            "course/setbaseCourseCourseNature",
+            row.courseNature
+          );
+          this.$store.commit("course/setbaseCourseCredit", row.credit);
+          this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+          this.$store.commit("course/setbaseCourseRemark", row.remark);
+
+        this.$router.push({
+          path: "/baseCourseDetail",
+          query: { parentName: 'courseInMajor' },
+        });
+        }
+        else{
+          this.addBaseCourseDetail(row)
         }
       }
-
-    this.$store.commit("course/setbaseCourseVersionName", versionName);
-    this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-    this.$store.commit("course/setbaseCourseVersionId", this.currentVersionId);
-    this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-    this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-    this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-    this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-    this.$store.commit("course/setbaseCourseCourseNature", row.courseNature);
-    this.$store.commit("course/setbaseCourseCredit",  row.credit);
-    this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-    this.$store.commit("course/setbaseCourseRemark", row.remark);
-    this.$router.push({
-      path:'/baseCourseDetail',
-    })
+    
   },
   //是否有program
   async checkProgram(){
@@ -1483,15 +1512,15 @@ methods:{
            
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
-            
+            course.courseType = that.courseTypeSource[course.courseType];
+            course.courseNature = that.courseNatureSource[course.courseNature];
             
             course.remark = false;//用remark来判断是否选课
             
             course.trueversionId = course.versionId;
             if(course.bcDetails.length){
-                
-                for(let i=0;i<course.bcDetails.length;i++){
-                  if(course.bcDetails[i].versionId == that.currentVersionId){
+              for (const element of course.bcDetails) {
+                  if (element.versionId == that.currentVersionId) {
                     course.versionId = true;
                     break;
                   } else {

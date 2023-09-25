@@ -296,10 +296,33 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           }
       },
       editableTabsValueChange(pane){
-        
         let that = this;
         this.currenteditableTabsValue = Number(pane.props.name);
-        if(this.isRespondent != '2'&& Number(pane.props.name) == 1){
+        if(this.identity == '学院管理员'||this.identity == '课程负责人'){
+          console.log('the teacher can edit the first tab content');
+          this.hotInstance.updateSettings({
+                data:that.db.items[that.currenteditableTabsValue-1],
+                cells(row, col){
+                  var cellProperties = {};
+                  if (row === 2) {
+                    cellProperties.type = "dropdown";
+                    cellProperties.source = [" ", "总评", "期末"];
+                    cellProperties.allowEmpty = true;
+                    cellProperties.className = "ht-s-size";
+                    //   cellProperties.validator = that.validScoreSetting();
+                  }
+                  if (row === 3) {
+                    cellProperties.allowEmpty = false;
+                  }
+                  if(row < 4 && col >=0){
+                    cellProperties.readOnly = false;
+                  }
+                  return cellProperties;
+                }
+              });
+        }
+        else{
+          if(this.isRespondent != '2'&& Number(pane.props.name) == 1){
           console.log('the teacher can not edit the first tab content');
           this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
@@ -345,6 +368,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
                 }
               });
         }
+        }
+        
         return console.log('currenteditableTabsValue:',Number(pane.props.name));
         
         
