@@ -137,7 +137,11 @@ export default {
   watch: {
     $route: {
       handler(val, oldval) {
-        if (val.meta.isMajor !== oldval.meta.isMajor) {
+        // console.log("#@##", val, oldval);
+        if (
+          val.meta.isMajor !== oldval.meta.isMajor &&
+          oldval.name !== "Courses"&& val.name !== "Courses"
+        ) {
           this.activeDisplay1 = 0;
           this.activeDisplay2 = 0;
         }

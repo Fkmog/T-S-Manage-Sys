@@ -27,11 +27,9 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="deleteTeacher" >
-                删除教师&nbsp
+                删除教师
                 
-                  <el-icon  >
-                    <Delete />
-                  </el-icon>
+             
                 
               </el-dropdown-item>
               <!-- <el-dropdown-item>Action 3</el-dropdown-item>

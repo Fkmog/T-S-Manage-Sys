@@ -328,7 +328,7 @@ import {
   copyActAndObj,
 } from "@/api/basecourse";
 import DrawerSearch from "@/components/general/drawerSearch.vue";
-import { downloadFileId, downloadFile,removeFileId } from "@/api/common";
+import { downloadFileId, downloadFile, removeFileId } from "@/api/common";
 
 export default {
   name: "baseCourseDetail",
@@ -404,6 +404,7 @@ export default {
     this.getRouter();
     this.$store.commit("course/setCourseName", this.form.courseName);
     this.$store.commit("course/setCourseId", this.courseId);
+
     let that = this;
     //如果没有版本信息，提示添加
     if (!this.versionFlag) {
@@ -491,15 +492,15 @@ export default {
       });
     },
     //路由跳转
-    backBaseCourse(){
-      console.log('from:',this.from);
-      if(this.from == 'courseInMajor'){
+    backBaseCourse() {
+      console.log("from:", this.from);
+      if (this.from == "courseInMajor") {
+        this.$store.commit("navInfo/setActiveDisplay2", 1);
+
         this.$router.push("/courses");
-      }
-      else{
+      } else {
         this.$router.push("/baseCourse");
       }
-      
     },
     toActivities() {
       this.$router.push("/baseCourseActivities");
@@ -594,7 +595,7 @@ export default {
         });
       }
     },
-    
+
     //查看课程大纲文件列表
     checkFileList() {
       getFilesList(this.detailId).then((res) => {
