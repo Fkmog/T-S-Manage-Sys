@@ -122,27 +122,41 @@
    
   <div v-show="hasNoScores" class="no-program">
       <div style="
-  padding-top: 120px;
   display: flex;
   justify-content: center;
+  padding-top: 120px;
   font-size: 22px;
-  background-color: #f2f2f2;
 ">
         任课教师尚未录入成绩
       </div>
       
+      <div style=" 
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      font-size: 13px;
+      color: #828d96;">
+      请先点击右上角圆形按钮添加课程
+    </div>
   </div>
     </div>
     <div v-show="hasNoDetail" class="no-program">
       <div style="
-  padding-top: 120px;
   display: flex;
   justify-content: center;
+  padding-top: 120px;
   font-size: 22px;
-  background-color: #f2f2f2;
 ">
         该课程尚未关联课程大纲
       </div>
+      <div style=" 
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      font-size: 13px;
+      color: #828d96;">
+      请联系学院管理员关联课程大纲
+    </div>
       
   </div>
   </div>

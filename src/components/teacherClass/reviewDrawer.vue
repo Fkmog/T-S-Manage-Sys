@@ -27,7 +27,7 @@
         size="24px"
         v-show="identity != '教师'"
         color="rgb(137, 137, 137)"
-        style="float:right"
+        style="float:right;margin: 5px;"
         @click="deleteReview(review.reviewId)"
       >
           <Delete />
@@ -275,11 +275,11 @@ export default{
         createReview(this.classInfo.classId,this.checkFeedback).then((res)=>{
           // console.log('creating review res',res);
         if(res.code == 'SUCCESS'){
-          ElMessage({
-            type: "success",
-            message: `新建成功`,
-            duration: 1500,
-          });
+          // ElMessage({
+          //   type: "success",
+          //   message: `新建成功`,
+          //   duration: 1500,
+          // });
           this.status = "已退回"
           this.getClassInfo();
           this.getReviewInfo();

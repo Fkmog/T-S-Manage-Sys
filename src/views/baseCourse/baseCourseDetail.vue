@@ -153,7 +153,7 @@
           <el-col style="margin-top: 25px">
             <div class="detail-title">备注</div>
             <div class="detail-info" style="margin-top: 10px">
-              {{ form.remark }}
+              <!-- {{ form.remark }} -->
             </div>
           </el-col>
           <el-col style="margin-top: 45px">
@@ -328,7 +328,7 @@ import {
   copyActAndObj,
 } from "@/api/basecourse";
 import DrawerSearch from "@/components/general/drawerSearch.vue";
-import { downloadFileId, downloadFile,removeFileId } from "@/api/common";
+import { downloadFileId, downloadFile, removeFileId } from "@/api/common";
 
 export default {
   name: "baseCourseDetail",
@@ -349,6 +349,7 @@ export default {
   },
   data() {
     return {
+      from: "",
       filesList: [],
       checkList: ["成绩项", "课程目标"],
       currentRow: {},
@@ -403,6 +404,7 @@ export default {
     this.getRouter();
     this.$store.commit("course/setCourseName", this.form.courseName);
     this.$store.commit("course/setCourseId", this.courseId);
+
     let that = this;
     //如果没有版本信息，提示添加
     if (!this.versionFlag) {
@@ -448,6 +450,13 @@ export default {
       this.getDetail();
       this.checkVersion();
     }
+    console.log("router from", this.$route.query["parentName"]);
+    if (this.$route.query["parentName"] == "courseInMajor") {
+      this.from = this.$route.query["parentName"];
+    } else {
+      this.from = "";
+    }
+    console.log("from", this.from);
   },
   methods: {
     //获取学校和部门ID
@@ -483,7 +492,14 @@ export default {
     },
     //路由跳转
     backBaseCourse() {
-      this.$router.push("/baseCourse");
+      console.log("from:", this.from);
+      if (this.from == "courseInMajor") {
+        this.$store.commit("navInfo/setActiveDisplay2", 1);
+
+        this.$router.push("/courses");
+      } else {
+        this.$router.push("/baseCourse");
+      }
     },
     toActivities() {
       this.$router.push("/baseCourseActivities");
@@ -578,7 +594,7 @@ export default {
         });
       }
     },
-    
+
     //查看课程大纲文件列表
     checkFileList() {
       getFilesList(this.detailId).then((res) => {
