@@ -159,7 +159,7 @@
         </div>
     </div>
 
-    <el-drawer v-model="drawer" :direction="direction"  size="42%"  :show-close="false">
+    <el-drawer v-model="drawer" :direction="direction"  size="500"  :show-close="false">
 
       <template #header="{ close, titleId, titleClass }">
       <div :id="titleId" :class="titleClass">
