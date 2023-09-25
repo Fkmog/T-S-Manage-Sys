@@ -160,7 +160,6 @@ export default {
         .then((res) => {
           console.log("checkProgram", res);
           this.programId = res.data.programId;
-          console.log("@", this.programId);
           this.noProgram = false;
         })
         .catch((e) => {
@@ -267,7 +266,7 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1000,
+            duration: 1500,
           });
           this.drawer = false;
         }

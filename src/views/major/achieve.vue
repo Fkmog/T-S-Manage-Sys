@@ -1,92 +1,109 @@
 <template>
   <div class="content">
     <!-- 头部栏 -->
-    <!-- <div class="Block"></div> -->
     <div v-show="hasProgram" class="body-check">
-      <div class="card">
-        <div class="noAttribute" v-if="!hasAttribute">
-          <span>尚未设置毕业要求</span>
+      <div class="noAttribute" v-if="!hasAttribute">
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            margin-top: 100px;
+            font-size: 22px;
+          "
+        >
+          未创建毕业要求
         </div>
-        <div v-if="hasAttribute">
-          <div
-            class="graduate-attribute"
-            v-for="(attribute, index1) in requirements"
-            :key="attribute.id"
-          >
-            <div class="attribute">
-              <div class="two-digits">
-                <section class="num-title">
-                  <section class="num-wrap">
-                    <span class="title-text">{{ attribute.serialNum }}</span>
-                  </section>
-                  <section class="rotate-bar"></section>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            color: grey;
+            font-size: 13px;
+            margin-top: 30px;
+          "
+        >
+          请先创建毕业要求
+        </div>
+      </div>
+      <div class="card" v-if="hasAttribute">
+        <div
+          class="graduate-attribute"
+          v-for="(attribute, index1) in requirements"
+          :key="attribute.id"
+        >
+          <div class="attribute">
+            <div class="two-digits">
+              <section class="num-title">
+                <section class="num-wrap">
+                  <span class="title-text">{{ attribute.serialNum }}</span>
                 </section>
+                <section class="rotate-bar"></section>
+              </section>
+            </div>
+            <div class="attribute-content">
+              <div class="name">
+                {{ attribute.name }}
               </div>
-              <div class="attribute-content">
-                <div class="name">
-                  {{ attribute.name }}
-                </div>
-                <div class="desc">
-                  {{ attribute.description }}
-                </div>
+              <div class="desc">
+                {{ attribute.description }}
               </div>
             </div>
-            <div
-              v-for="(detail, index2) in attribute.programIndicators"
-              :key="detail.id"
-            >
-              <div class="attribute-detail">
-                <div class="detail-num">
-                  {{ detail.serialNum }}
-                </div>
-                <div class="detail-content">
-                  <div class="name">{{ detail.name }}</div>
-                  <div class="desc">{{ detail.description }}</div>
+          </div>
+          <div
+            v-for="(detail, index2) in attribute.programIndicators"
+            :key="detail.id"
+          >
+            <div class="attribute-detail">
+              <div class="detail-num">
+                {{ detail.serialNum }}
+              </div>
+              <div class="detail-content">
+                <div class="name">{{ detail.name }}</div>
+                <div class="desc">{{ detail.description }}</div>
+              </div>
+            </div>
+            <div class="support-course" style="margin: 30px 0 30px 120px">
+              <div class="support-head">
+                <span style="color: grey; font-size: 14px">支撑课程</span>
+                <div class="penIcon">
+                  <el-tooltip
+                    effect="dark"
+                    content="编辑"
+                    placement="bottom"
+                    :hide-after="0"
+                  >
+                    <el-icon
+                      class="pen-icon"
+                      @click="
+                        editSupportCourse(attribute, detail, index1, index2)
+                      "
+                      ><EditPen
+                    /></el-icon>
+                  </el-tooltip>
                 </div>
               </div>
-              <div class="support-course" style="margin: 30px 0 30px 120px">
-                <div class="support-head">
-                  <span style="color: grey; font-size: 14px">支撑课程</span>
-                  <div class="penIcon">
-                    <el-tooltip
-                      effect="dark"
-                      content="编辑"
-                      placement="bottom"
-                      :hide-after="0"
-                    >
-                      <el-icon
-                        class="pen-icon"
-                        @click="
-                          editSupportCourse(attribute, detail, index1, index2)
-                        "
-                        ><EditPen
-                      /></el-icon>
-                    </el-tooltip>
-                  </div>
-                </div>
-                <div class="methods" style="margin: 20px 0 20px 100px">
-                  <el-row
-                    v-for="coreBaseCourse in detail.coreBaseCourses"
-                    :key="coreBaseCourse.id"
+              <div class="methods" style="margin: 20px 0 20px 100px">
+                <el-row
+                  v-for="coreBaseCourse in detail.coreBaseCourses"
+                  :key="coreBaseCourse.id"
+                >
+                  <el-col :span="8" class="method-weight"
+                    >{{ coreBaseCourse.courseName }}
+                  </el-col>
+                  <el-tooltip
+                    effect="dark"
+                    content="权重"
+                    placement="bottom"
+                    :hide-after="0"
                   >
-                    <el-col :span="8" class="method-weight"
-                      >{{ coreBaseCourse.courseName }}
-                    </el-col>
-                    <el-tooltip
-                      effect="dark"
-                      content="权重"
-                      placement="bottom"
-                      :hide-after="0"
+                    <el-col
+                      :span="5"
+                      class="method-desc"
+                      style="margin-left: 80px"
+                      >（ {{ coreBaseCourse.weight }}% ）</el-col
                     >
-                      <el-col
-                        :span="5"
-                        class="method-desc"
-                        style="margin-left: 80px"
-                        >（ {{ coreBaseCourse.weight }}% ）</el-col
-                      >
-                    </el-tooltip>
-                  </el-row>
-                </div>
+                  </el-tooltip>
+                </el-row>
               </div>
             </div>
           </div>
@@ -287,7 +304,7 @@ export default {
       hasProgram: false,
       noProgram: false,
       hasAttribute: Boolean,
-      currentMajorId: Number,
+      currentMajorId: "",
       currentMajorName: "",
       currentSchoolId: "",
       currentYear: "",
@@ -299,7 +316,7 @@ export default {
         enrollyear: "",
       },
       totalInfo: [],
-      requirements: [],
+      requirements: null,
       programId: "",
       dialogDetail: [],
       index1: Number,
@@ -380,20 +397,22 @@ export default {
             this.hasProgram = true;
             this.programId = res.data.programId;
             this.$store.commit("major/setProgramId", this.programId);
-            this.requirements = res.data.graduateAttributes;
-            // 将为null的coreBaseCourses处理为空数组
-            this.requirements.forEach((requirement) => {
-              requirement.programIndicators.forEach((programIndicator) => {
-                if (programIndicator.coreBaseCourses === null) {
-                  programIndicator.coreBaseCourses = [];
-                }
-              });
-            });
-            if (this.requirements == null) {
+            if (res.data.graduateAttributes === null) {
               this.hasAttribute = false;
+              console.log(this.hasAttribute);
+            } else {
+              this.requirements = res.data.graduateAttributes;
+              // 将为null的coreBaseCourses处理为空数组
+              this.requirements.forEach((requirement) => {
+                requirement.programIndicators.forEach((programIndicator) => {
+                  if (programIndicator.coreBaseCourses === null) {
+                    programIndicator.coreBaseCourses = [];
+                  }
+                });
+              });
             }
             this.totalInfo = res.data;
-            // console.log("this.totalInfo", this.totalInfo);
+
             console.log("requirements", this.requirements);
             if (this.requirements !== null && this.requirements.length == 0) {
               this.hasAttribute = false;
@@ -402,6 +421,7 @@ export default {
               this.hasAttribute = true;
             }
           }
+          console.log(this.hasAttribute);
         })
         .catch((e) => {
           if (e.msg == "资源不存在" && e.code == "PROGRAM_NOT_FIND") {
@@ -436,7 +456,7 @@ export default {
       results.forEach((result) => {
         result.value = result.courseName;
       });
-      // console.log("result后", results);
+      console.log("result后", results);
       cb(results);
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
@@ -553,7 +573,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
             this.dialogFormVisible = false;
           }
@@ -615,13 +635,6 @@ export default {
 .no-program {
   display: flex;
   flex-direction: column;
-}
-.noAttribute {
-  height: 100px;
-  text-align: center;
-  margin-top: 80px;
-  color: rgb(143, 142, 142);
-  font-size: 16px;
 }
 .card {
   width: 800px;

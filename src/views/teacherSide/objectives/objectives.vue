@@ -70,7 +70,7 @@
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="3"
+              :span="4"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
@@ -104,6 +104,7 @@
                   <el-col :span="12">
                     <el-row>
                       <el-col
+                        :span="8"
                         v-for="(activity, index) in assessment.activities.item"
                         :key="index"
                       >
@@ -250,16 +251,16 @@ export default {
                 object.serialNum = object.id;
               }
               if (object.hasOwnProperty("achievement")) {
-                object.achievementTwo = object.achievement.toFixed();
+                object.achievementTwo = object.achievement.toFixed(2);
                 object.hasAchieve = true;
               } else {
                 object.hasAchieve = false;
               }
               object.assessmentMethods.forEach((assess) => {
                 if (assess.achievement === null) {
-                  assess.achievementTwo = "0";
+                  assess.achievementTwo = "";
                 } else {
-                  assess.achievementTwo = assess.achievement.toFixed() + "%";
+                  assess.achievementTwo = assess.achievement.toFixed(2) + "%";
                 }
               });
             });

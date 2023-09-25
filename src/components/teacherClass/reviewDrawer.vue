@@ -292,7 +292,7 @@ export default{
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1000,
+            duration: 1500,
           });
           return false;
         }
@@ -366,7 +366,7 @@ export default{
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1000,
+              duration: 1500,
             });
           }
           this.getClassInfo();
@@ -374,7 +374,7 @@ export default{
           ElMessage({
               type: "error",
               message: `新建失败`,
-              duration: 1000,
+              duration: 1500,
             });
           // console.log('e',e);
         })
@@ -389,7 +389,7 @@ export default{
           ElMessage({
             type: "success",
             message: `新建成功`,
-            duration: 1000,
+            duration: 1500,
           });
         }
         this.getClassInfo();

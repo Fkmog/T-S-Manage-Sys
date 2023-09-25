@@ -98,7 +98,7 @@ import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getClassInfo } from "@/api/class";
 import { downloadFile } from "@/api/common";
 import Cookies from "js-cookie";
-import {  getPresent } from "@/api/workbook";
+import { getPresent } from "@/api/workbook";
 
 export default {
   name: "Workbook",
@@ -115,9 +115,9 @@ export default {
       classInfo: {},
       noEdit: false,
       hasWorkbook: Boolean,
-      courseId:'',
-      detailId:'',
-      formPresent:[],
+      courseId: "",
+      detailId: "",
+      formPresent: [],
       workbook: [],
       //表单生成规则
       json: [],
@@ -131,7 +131,7 @@ export default {
   },
   mounted() {
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
-    this.create();
+    this.getPre();
   },
   computed: {
     teacherInfoChange() {
@@ -141,6 +141,10 @@ export default {
     respondInfoChange() {
       // console.log('teacherSideClassInfo changed');
       return this.$store.state.currentInfo.respondClassInfo;
+    },
+    adminInfoChange() {
+      // console.log('teacherSideClassInfo changed');
+      return this.$store.state.currentInfo.adminSideClassInfo;
     },
   },
   watch: {
@@ -160,30 +164,44 @@ export default {
         }
       },
     },
+    adminInfoChange: {
+      deep: true,
+      handler(value) {
+        if (this.identity == "学院管理员") {
+          this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
+        }
+      },
+    },
   },
   methods: {
+    async getPre() {
+      await this.create();
+      console.log("123");
+      this.courseId = this.classInfo.courseId;
+      this.detailId = this.classInfo.detailId;
+      console.log("this.derau",this.detailId);
+      this.getPresent();
+    },
     async create() {
       await this.createValue();
-      editByTeacher(this.classInfo.classId, this.value).then((res) => {
+      console.log("!!",this.classInfo);
+      console.log("456");
+      await editByTeacher(this.classInfo.classId, this.value).then((res) => {
+        console.log("789");
         if (res.code === "SUCCESS") {
           this.getClassInfo();
         }
       });
-      this.courseId=this.classInfo.courseId
-      this.detailId=this.classInfo.detailId
-      this.getPresent()
     },
     createValue() {
       return new Promise((resolve, reject) => {
         this.identity = this.$store.state.currentInfo.identity;
         if (this.identity == "学院管理员") {
           this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
-          // console.log("identity:", this.identity);
         } else if (this.identity == "课程负责人") {
           this.classInfo = this.$store.state.currentInfo.respondClassInfo;
         } else {
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
-          // console.log("identity:", this.identity);
         }
         if (this.classInfo.status == 2 || this.classInfo.status == 3) {
           // 状态为已提交或者已审核时，无法编辑
@@ -191,7 +209,6 @@ export default {
         } else {
           this.noEdit = false;
         }
-        // console.log("this.classInfo", this.classInfo);
         if (!(this.classInfo.workbookJson === null)) {
           this.value = this.classInfo.workbookJson;
         }
@@ -409,7 +426,7 @@ export default {
         } else {
           if (form !== "") {
             this.formPresent.forEach((present) => {
-              if (present.field == form.field&& form.value ===undefined) {
+              if (present.field == form.field && form.value === undefined) {
                 form.value = present.value;
               }
             });

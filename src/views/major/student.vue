@@ -1,6 +1,6 @@
 <template>
   <div v-show="hasProgram">
-    <div >
+   
       <div v-show="closeShow" class="submenu" >
         <el-row>
           <el-col :span="2" class="columnstyle">
@@ -14,14 +14,15 @@
           </el-col>
         </el-row>
       </div>
-
-        <div layout="row" flex class="md-padding">
-          <addBtn @click="goAddStudent"></addBtn>
+      <HeaderSearch msg="搜索学生名称" v-show="!closeShow" @SearchValue="getSearchValue"></HeaderSearch>
+      <addBtn @click="goAddStudent"></addBtn>
+        <div layout="row" flex v-show="hasStudent" class="md-padding">
+          
           <!-- 学生信息列表 -->
           <el-table
           class="studentsTable"
           :data="studentsTable"
-          v-show="hasStudent"
+          
           ref="multipleTable"
           style="width: 40%"
           :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
@@ -32,15 +33,17 @@
           <el-table-column prop="studentNumber" label="学号"  width="200"/>
           <el-table-column prop="studentName" label="姓名" />
         </el-table>
+
+
+        <div class="pagination-container" flex>
+        <el-row type="flex" justify="center" align="middle">
+          <el-button v-show="showLoadmore && hasProgram && hasStudent" @click="loadmoreCourse()">加载更多</el-button>
+        </el-row>
+      </div>
       </div>
 
-      <div class="pagination-container" flex>
-      <el-row type="flex" justify="center" align="middle">
-        <el-button v-show="showLoadmore && hasProgram && hasStudent" @click="loadmoreCourse()">加载更多</el-button>
-      </el-row>
       
-    </div>
-    </div>
+    
     <div v-show="!hasStudent" class="no-program">
       <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
       没有学生
@@ -68,7 +71,8 @@ import addBtn from "@/components/general/addBtn.vue";
 import { ref,reactive, version,}from 'vue';
 import { ElTooltip,ElIcon,ElInput,ElForm, ElButton, ElTable,ElMessage, ElMessageBox,ElDialog,ElDropdown,ElTag } from 'element-plus'
 import { Back , FolderChecked, InfoFilled, Loading, Search, Close, Plus, Delete, Edit, MoreFilled, ArrowDown,Document} from '@element-plus/icons-vue'
-  
+import { checkProgram } from "@/api/program";
+
 export default {
   name: "Student",
   components: {
@@ -77,7 +81,46 @@ export default {
     ref,reactive,Delete,Edit,HeaderSearch, addBtn, MoreFilled, ElDropdown, ArrowDown,
     Document,ElTag
   },
+  computed: {
+    yearChange() {
+      return this.$store.state.currentInfo.year;
+    },
+  },
+watch: {
+    yearChange: {
+      deep: true,
+      handler(value) {
+        this.checkCurrentProgram();
+      },
+    },
+  },
   methods:{
+    checkCurrentProgram() {
+    console.log('year has changed');
+    checkProgram(
+        this.majorId,
+        this.$store.state.currentInfo.year
+      ).then((res)=>{
+        console.log('res',res);
+        if (res.msg == "操作成功" && res.code === 'SUCCESS') {
+          this.hasProgram = true;
+          this.programId = res.data.programId;
+          this.$store.commit("major/setProgramId", this.programId);
+        }
+        console.log('current programId:',this.programId);
+        this.getStudents(this.pageSize, this.pageNum);
+      }).catch((e)=>{
+        console.log('e',e);
+        if(e.code == 'PROGRAM_NOT_FIND'){
+          this.hasProgram = false;
+        }
+        
+      })
+  },
+    getSearchValue(data) {
+      this.keyword = data;
+      this.getStudents(this.pageSize, this.pageNum);
+    },
     //清空选项
     toggleSelection(rows) {
           if (rows) {
@@ -141,14 +184,6 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
       console.log('go add student');
       this.$router.push("/baseAddStudent");
     },
-    async checkProgram(){
-    if(this.$store.state.major.programId){
-      this.hasProgram = true;
-    }
-    else{
-      this.hasProgram = false;
-    }
-  },
   getStudents(pageSize,pageNum){
     let that = this;
     let students = [];
@@ -158,7 +193,10 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
         params:{
           'pageSize':pageSize,
           'pageNum':pageNum,
-          'programId':this.programId
+          'programId':this.programId,
+          'schoolId':this.schoolId,
+          'departmentId':this.departmentId,
+          'selectKeyWord':this.keyword,
 } 
       }).then(function(res){
         console.log('student:',res);
@@ -182,13 +220,18 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
           that.showLoadmore = false;
         }
         
+      }).catch((e)=>{
+        console.log('e',e);
       })
     }
   },
   data(){
     return{
+      keyword:'',
       //studentId
       studentId:[],
+      schoolId:'',
+      departmentId:'',
       closeShow : false,
       //clickState:0,
       clickState:0,
@@ -214,9 +257,11 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
       }
   },
   mounted:function(){
+    this.departmentId = this.$store.state.currentInfo.departmentId;
+    this.schoolId = this.$store.state.currentInfo.schoolId;
+    this.majorId = this.$store.state.major.majorId;
     this.programId = this.$store.state.major.programId;
-    this.getStudents(this.pageSize,this.pageNum);
-    this.checkProgram();
+    this.checkCurrentProgram();
   }
 };
 </script>
@@ -327,5 +372,7 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
 .no-program {
   display: flex;
   flex-direction: column;
+  margin-top: 85px;
 }
+
 </style>

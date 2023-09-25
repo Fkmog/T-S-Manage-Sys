@@ -21,11 +21,7 @@ export default {
   components: {},
   data() {
     return {
-      fileList: [],
-      limit: 1,
-      action:'http://81.68.103.96:8099/common/upload/files',
-      headers:{},
-      data:{}
+    
     };
   },
 };

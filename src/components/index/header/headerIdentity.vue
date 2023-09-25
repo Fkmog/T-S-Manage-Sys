@@ -40,18 +40,16 @@
           </el-tag>
         </el-col>
       </el-row>
-      <div v-show="identity.roleName == '课程负责人'">
+      <el-row v-show="identity.roleName == '课程负责人'">
         <el-col :span="18">
-          <el-tag effect="plain">
-            {{ identity.roleName }}
-          </el-tag>
+            {{ identity.departmentName }}
         </el-col>
         <el-col :span="6">
           <el-tag effect="plain">
             {{ identity.roleName }}
           </el-tag>
         </el-col>
-      </div>
+      </el-row>
     </div>
   </el-card>
   <!-- 修改密码 -->
@@ -162,7 +160,7 @@ export default {
         .then(() => {
           ElMessage({
             type: "success",
-            message: "已退出登录！",
+            message: "已退出登录",
             duration: 1500,
           });
           Cookies.remove("Admin-Token");
@@ -182,7 +180,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `更新成功`,
-                  duration: 1000,
+                  duration: 1500,
                 });
               }
               if(res.code==="ERROR"){
@@ -190,7 +188,7 @@ export default {
                 ElMessage({
                   type: "error",
                   message: res.msg,
-                  duration: 1000,
+                  duration: 1500,
                 });
               }
             }
@@ -251,7 +249,7 @@ export default {
   top: 80px;
   width: 350px;
   animation: animate 0.5s ease;
-  z-index: 100;
+  z-index: 1000;
 }
 @keyframes animate {
   0% {

@@ -182,6 +182,9 @@ service.interceptors.response.use(
     } else if (error.response.status === 404|| error.response.status === 422) {
       return Promise.reject(error.response.data);
     }
+    else{
+      return Promise.reject(error);
+    }
   }
 );
 

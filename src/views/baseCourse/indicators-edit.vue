@@ -222,7 +222,7 @@
           <el-col :span="4" v-show="support.isEditWeight" class="editWeight">
             <el-row>
               <el-col :span="12">
-                <el-input v-model="support.weight"></el-input>
+                <el-input v-model="support.weight"  @keyup.enter="saveWeight(support)"></el-input>
               </el-col>
               <el-col :span="12">
                 <el-icon @click="saveWeight(support)"
@@ -277,7 +277,7 @@
       </el-dialog>
     </div>
     <!-- 弹出复制指标点drawer -->
-    <el-drawer v-model="drawer" >
+    <el-drawer v-model="drawer">
       <el-row>
         <el-col :span="14">
           <DrawerSearch msg="搜索专业名称" @SearchValue="getSearchValue" />
@@ -459,8 +459,8 @@ export default {
         this.$router.push("/baseCourseIndicators");
       }
     },
+    //判断有无未编辑支撑方式的指标点，有则不能保存
     judgeBeforeSave() {
-      //判断有无未编辑支撑方式的指标点，有则不能保存
       this.wrongNum = 0;
       this.majorList.forEach((major) => {
         major.indicators.forEach((item) => {
@@ -480,6 +480,7 @@ export default {
         this.save();
       }
     },
+    // 保存
     save() {
       this.successNum = 0;
       this.majorList.forEach((major) => {
@@ -907,10 +908,9 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1000,
+            duration: 1500,
           });
-          this.drawer=false
-
+          this.drawer = false;
         }
       });
     },
