@@ -216,7 +216,8 @@ export default {
       this.json = JSON.parse(this.$refs.designer.getJson());
       this.getOption();
       console.log(
-        _.isEqual(this.total.formJson, this.json),
+        "!",
+        _.isEqual(this.total.formJson, this.JSON),
         this.total.formJson,
         this.json
       );

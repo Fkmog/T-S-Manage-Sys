@@ -40,18 +40,16 @@
           </el-tag>
         </el-col>
       </el-row>
-      <div v-show="identity.roleName == '课程负责人'">
+      <el-row v-show="identity.roleName == '课程负责人'">
         <el-col :span="18">
-          <el-tag effect="plain">
-            {{ identity.roleName }}
-          </el-tag>
+            {{ identity.departmentName }}
         </el-col>
         <el-col :span="6">
           <el-tag effect="plain">
             {{ identity.roleName }}
           </el-tag>
         </el-col>
-      </div>
+      </el-row>
     </div>
   </el-card>
   <!-- 修改密码 -->

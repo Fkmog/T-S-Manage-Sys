@@ -229,7 +229,7 @@
           <el-col :span="4" v-show="assessment.isEditWeight" class="editWeight">
             <el-row>
               <el-col :span="12">
-                <el-input v-model="assessment.weight"></el-input>
+                <el-input v-model="assessment.weight" @keyup.enter="saveWeight(assessment)"></el-input>
               </el-col>
               <el-col :span="12">
                 <el-icon @click="saveWeight(assessment)"

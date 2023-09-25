@@ -57,7 +57,7 @@
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="3"
+              :span="4"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
@@ -234,7 +234,7 @@ export default {
               value.hasOwnProperty("achievement") &&
               value.achievement !== null
             ) {
-              value.achievementTwo = value.achievement.toFixed();
+              value.achievementTwo = value.achievement.toFixed(2);
               value.hasAchieve = true;
             } else {
               value.hasAchieve = false;
@@ -243,7 +243,7 @@ export default {
               if (assess.achievement === null) {
                 assess.achievementTwo = "";
               } else {
-                assess.achievementTwo = assess.achievement.toFixed() + "%";
+                assess.achievementTwo = assess.achievement.toFixed(2) + "%";
               }
             });
           });
