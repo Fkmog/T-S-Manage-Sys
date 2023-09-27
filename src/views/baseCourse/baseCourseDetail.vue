@@ -349,7 +349,7 @@ export default {
   },
   data() {
     return {
-      from: "",
+      from:'',
       filesList: [],
       checkList: ["成绩项", "课程目标"],
       currentRow: {},
@@ -450,13 +450,14 @@ export default {
       this.getDetail();
       this.checkVersion();
     }
-    console.log("router from", this.$route.query["parentName"]);
-    if (this.$route.query["parentName"] == "courseInMajor") {
-      this.from = this.$route.query["parentName"];
-    } else {
-      this.from = "";
-    }
-    console.log("from", this.from);
+    console.log('router from', this.$route.query['parentName']);
+      if( this.$route.query['parentName'] == 'courseInMajor'){
+          this.from = this.$route.query['parentName'];
+      }
+      else{
+        this.from = '';
+      }
+      console.log('from',this.from);
   },
   methods: {
     //获取学校和部门ID

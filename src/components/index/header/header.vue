@@ -113,7 +113,7 @@ export default {
     };
   },
   mounted() {
-    this.$store.commit("currentInfo/setYear", '2021');
+    this.$store.commit("currentInfo/setYear", '2021级');
     this.getDictionary();
   },
 

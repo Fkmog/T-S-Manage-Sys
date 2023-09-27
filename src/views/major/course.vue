@@ -69,47 +69,43 @@
         </el-row>
       </div>
 
-      <div layout="row" flex class="md-padding">
-        <addBtn @click="this.drawerShow()"></addBtn>
-        <div class="el-table-container">
-          <el-table
-            :data="drawertableData"
-            ref="multipleTable"
-            style="width: 1135px"
-            :header-cell-style="{
-              'padding-left': '20px',
-              'font-size': '14.4px',
-              height: '48px',
-              'font-weight': 'bold',
-              color: 'black',
-            }"
-            :cell-style="{
-              'padding-left': '20px',
-              'font-size': '16px',
-              height: '60px',
-              'text-overflow': 'ellipsis',
-              'white-space': 'nowrap',
-              cursor: 'pointer',
-            }"
-            :row-key="rowKey"
-            @row-click="goBaseCourseDetail"
-            @selection-change="handleSelectionChange"
-          >
-            <el-table-column
-              type="selection"
-              width="55"
-              column-key="select"
-              :reserve-selection="true"
-            />
-            <el-table-column prop="courseName" label="课程名" width="180" />
-            <el-table-column prop="courseCode" label="课程号" width="180" />
-            <el-table-column prop="courseType" label="课程类型" width="180" />
-            <el-table-column prop="courseNature" label="课程性质" width="180" />
-            <el-table-column prop="credit" label="学分" width="180" />
-            <el-table-column prop="versionName" label="版本" width="180" />
-          </el-table>
-        </div>
-      </div>
+<div layout="row" flex class="md-padding" >
+    
+    <addBtn @click="this.drawerShow()"></addBtn>
+    <div class="el-table-container">
+      <el-table 
+      :data="drawertableData"  
+      ref="multipleTable" 
+      style="width: 1135px;"
+      :header-cell-style="{
+      'padding-left': '20px',
+      'font-size': '14.4px',
+      height: '48px',
+      'font-weight': 'bold',
+      color: 'black',
+    }"
+    :cell-style="{
+      'padding-left': '20px',
+      'font-size': '16px',
+      height: '60px',
+      'text-overflow': 'ellipsis',
+       'white-space': 'nowrap',
+       cursor: 'pointer',
+    }"
+   
+    :row-key="rowKey"
+    @row-click="goBaseCourseDetail"
+    @selection-change="handleSelectionChange">
+        <el-table-column  type="selection" width="55" column-key="select" :reserve-selection="true" />
+        <el-table-column prop="courseName" label="课程名" width="180" />           
+        <el-table-column prop="courseCode" label="课程号" width="180" />
+        <el-table-column prop="courseType" label="课程类型" width="180" />
+        <el-table-column prop="courseNature" label="课程性质" width="180" />
+        <el-table-column prop="credit" label="学分" width="180" />
+        <el-table-column prop="versionName" label="版本"  width="180"/>
+      </el-table>
+   </div>
+  </div>
 
       <el-dialog v-model="dialogFormVisible1" title="修改基础课程">
         <el-form :model="preform">
@@ -1420,47 +1416,39 @@ export default {
 
           return courseBCDMId;
         });
-      } else {
-        realurl = "/baseCourse/list"; //根据获取到的已经添加过的courseId来排除搜索到的detail，两个限制vesionId和couseId
-
-        return request({
-          url: realurl,
-          method: "get",
-          params: {
-            pageSize: pageSize,
-            pageNum: pageNum,
-            departmentId: that.departmentId,
-            versionId: that.currentVersionId,
-            schoolId: that.schoolId,
-            selectKeyWord: that.keyword,
-          },
-        })
-          .then(function (res) {
-            that.loadmoreDisabled = false;
-            console.log("courseDetails:", res);
-            console.log(
-              "department:",
-              that.departmentId,
-              "schoolId:",
-              that.schoolId,
-              "majorId:",
-              that.majorId,
-              "currentVersionId",
-              that.currentVersionId
-            );
-            console.log("已经选择的课：", that.programeCourseInfo);
-            res.rows.forEach(function (course) {
-              course.courseName = course.courseName;
-              course.courseCode = course.courseCode;
-              course.courseType = that.courseTypeSource[course.courseType];
-              course.courseNature =
-                that.courseNatureSource[course.courseNature];
-
-              course.remark = false; //用remark来判断是否选课
-
-              course.trueversionId = course.versionId;
-              if (course.bcDetails.length) {
-                for (const element of course.bcDetails) {
+    }
+    else{
+      realurl = '/baseCourse/list';//根据获取到的已经添加过的courseId来排除搜索到的detail，两个限制vesionId和couseId
+      
+      return request({
+            url:realurl,
+            method:'get',
+            params:{
+            'pageSize':pageSize,
+            'pageNum':pageNum,
+            'departmentId':that.departmentId,
+            'versionId':that.currentVersionId,
+            'schoolId':that.schoolId,
+            'selectKeyWord':that.keyword
+            },
+        }).then(function(res){
+          that.loadmoreDisabled = false;
+          console.log('courseDetails:',res);
+          console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionId',that.currentVersionId);
+          console.log('已经选择的课：',that.programeCourseInfo);
+          res.rows.forEach(function(course){
+            
+           
+            course.courseName=course.courseName;
+            course.courseCode=course.courseCode;
+            course.courseType = that.courseTypeSource[course.courseType];
+            course.courseNature = that.courseNatureSource[course.courseNature];
+            
+            course.remark = false;//用remark来判断是否选课
+            
+            course.trueversionId = course.versionId;
+            if(course.bcDetails.length){
+              for (const element of course.bcDetails) {
                   if (element.versionId == that.currentVersionId) {
                     course.versionId = true;
                     break;

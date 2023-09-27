@@ -61,7 +61,7 @@
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
-              {{ objective.achievementTwo }}%
+              {{ objective.achievementTwo }}
             </el-col>
             <el-col
               :span="2"
@@ -234,7 +234,7 @@ export default {
               value.hasOwnProperty("achievement") &&
               value.achievement !== null
             ) {
-              value.achievementTwo = value.achievement.toFixed(2);
+              value.achievementTwo = value.achievement.toFixed(3);
               value.hasAchieve = true;
             } else {
               value.hasAchieve = false;
@@ -243,7 +243,7 @@ export default {
               if (assess.achievement === null) {
                 assess.achievementTwo = "";
               } else {
-                assess.achievementTwo = assess.achievement.toFixed(2) + "%";
+                assess.achievementTwo = assess.achievement.toFixed(3) ;
               }
             });
           });

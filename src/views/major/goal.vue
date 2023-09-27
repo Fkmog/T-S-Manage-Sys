@@ -61,10 +61,25 @@
       </div>
     </div>
     <div v-show="noProgram" class="no-program">
-      <div style="display: flex; justify-content: center; margin-top: 100px;font-size:22px">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          margin-top: 100px;
+          font-size: 22px;
+        "
+      >
         未创建培养方案
       </div>
-      <div style="display: flex; justify-content: center; color: grey;font-size:13px;margin-top: 30px">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          color: grey;
+          font-size: 13px;
+          margin-top: 30px;
+        "
+      >
         请先点击右上角圆形按钮创建培养方案
       </div>
 
@@ -177,41 +192,36 @@ export default {
     },
     //查询有无培养计划
     checkProgram() {
-      checkProgram(
-        this.currentMajorId,
-        this.$store.state.currentInfo.year
-      ).then((res) => {
-        console.log("checkProgram", res);
-        if (res.msg == "未查到" && res.code === 'SUCCESS') {
-          this.hasProgram = false;
-          this.noProgram = true;
-          this.$store.commit("major/setProgramId", "");
-        }
-        if (res.msg == "操作成功" && res.code === 'SUCCESS') {
-          this.noProgram = false;
-          this.hasProgram = true;
-          this.programId = res.data.programId;
-          this.$store.commit("major/setProgramId", this.programId);
-          this.requirements = res.data.graduateAttributes;
-          if (this.requirements == null) {
-            this.hasAttribute = false;
+      checkProgram(this.currentMajorId, this.$store.state.currentInfo.year)
+        .then((res) => {
+          console.log("checkProgram", res);
+          if (res.msg == "未查到" && res.code === "SUCCESS") {
+            this.hasProgram = false;
+            this.noProgram = true;
+            this.$store.commit("major/setProgramId", "");
           }
-          console.log("requirements", this.requirements);
-          if (this.requirements !== null && this.requirements.length == 0) {
-            this.hasAttribute = false;
+          if (res.msg == "操作成功" && res.code === "SUCCESS") {
+            this.noProgram = false;
+            this.hasProgram = true;
+            this.programId = res.data.programId;
+            this.$store.commit("major/setProgramId", this.programId);
+            this.requirements = res.data.graduateAttributes;
+            if (this.requirements === null || this.requirements.length == 0) {
+              this.hasAttribute = false;
+            }
+            if (this.requirements !== null && this.requirements.length > 0) {
+              this.hasAttribute = true;
+            }
+            console.log("requirements", this.requirements, this.hasAttribute);
           }
-          if (this.requirements !== null) {
-            this.hasAttribute = true;
+        })
+        .catch((e) => {
+          console.log("e", e);
+          if (e.msg == "资源不存在") {
+            this.noProgram = true;
+            this.hasProgram = false;
           }
-        }
-      })
-      .catch((e)=>{
-        console.log("e",e);
-        if(e.msg=="资源不存在"){
-          this.noProgram = true
-          this.hasProgram = false
-        }
-      })
+        });
     },
     //新增培养计划
     addProgram() {
