@@ -190,7 +190,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="工作手册" width="200">
+      <el-table-column label="工作手册" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span v-show="scope.row.workbookName">{{
@@ -201,10 +201,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="250">
+      <el-table-column label="操作" width="150">
         <template #default="scope">
           <el-row v-show="showToolIcon">
-            <el-col :span="4">
+            <el-col :span="8">
               <el-tooltip content="删除课程">
                 <el-button
                   @click.stop="
@@ -217,7 +217,7 @@
                 ></el-button>
               </el-tooltip>
             </el-col>
-            <el-col :span="4" v-show="scope.row.versionId">
+            <el-col :span="8">
               <el-tooltip content="修改课程信息">
                 <el-button
                   @click.stop="editTrigger(scope.row)"
@@ -227,6 +227,19 @@
                   ><el-icon><Document /></el-icon
                 ></el-button>
               </el-tooltip>
+            </el-col>
+          </el-row>
+        </template>
+      </el-table-column>
+      <el-table-column label="课程大纲" width="150">
+        <template #default="scope">
+          <el-row>
+            <el-col :span="8" v-show="scope.row.versionId">
+                <el-tag
+                  class="noBaseCourseDetail"
+                  type="prime"
+                  >{{ currentVersionName }}
+                </el-tag>
             </el-col>
             <el-col :span="8" v-show="!scope.row.versionId">
               <el-tooltip content="添加课程大纲">
@@ -239,6 +252,7 @@
               </el-tooltip>
             </el-col>
           </el-row>
+          
         </template>
       </el-table-column>
     </el-table>
@@ -1298,7 +1312,11 @@ export default {
           "course/setbaseCourseVersionId",
           this.currentVersionId
         );
-
+        for (const element of this.versions) {
+        if (element["versionId"] == this.currentVersionId) {
+          this.currentVersionName = element["label"];
+        }
+      }
         this.getBaseCourse(this.pageSize, this.pageNum);
       } else {
         console.log("没有选择版本大纲", value);

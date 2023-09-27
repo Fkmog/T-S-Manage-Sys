@@ -200,6 +200,7 @@
         this.hotInstance.updateSettings({
                 columns:that.columnList[that.currenteditableTabsValue-1],
                 data:that.db.items[that.currenteditableTabsValue-1],
+                cells: that.getHotCellsFunction(), 
               });
         return console.log('currenteditableTabsValue:',Number(pane.props.name));
         
@@ -232,6 +233,7 @@
           this.editableTabsValue = newTabName.toString();
           this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
+                cells: that.getHotCellsFunction(), 
               });
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
         }
@@ -278,6 +280,7 @@
           }
           this.hotInstance.updateSettings({
                 data:that.db.items[Number(activeName-1)],
+                cells: that.getHotCellsFunction(), 
               });
           
           this.editableTabsValue = activeName;
@@ -461,21 +464,32 @@ getHotCellsFunction() {
                 if(col >=0 && col <= 2){
                   if(row >= 0 && row <= 2){
                     cellProperties.readOnly = true;
-
+                    
                   }
                 }
 
-                if (col > 2 && row === 2) {
-                cellProperties.type = 'dropdown';
-                cellProperties.source = [' ','总评','期末'];
-                cellProperties.allowEmpty = true;
-                cellProperties.className = 'ht-s-size';
-                //   cellProperties.validator = that.validScoreSetting();
-                }
+                // if (col > 2 && row === 2) {
+                // cellProperties.type = 'dropdown';
+                // cellProperties.source = [' ','总评','期末'];
+                // cellProperties.allowEmpty = true;
+                // cellProperties.className = 'ht-s-size';
+                // //   cellProperties.validator = that.validScoreSetting();
+                // }
                 if(col === 2 && row > 2){
-                  cellProperties.type = 'dropdown';
-                  cellProperties.source = [' ','缺考','缓考','不及格','取消考试资格'];
-                  cellProperties.allowEmpty = true;
+                  console.log('updating cell rules current currenteditableTabsValue:',that.currenteditableTabsValue);
+                  if(that.currenteditableTabsValue - 1 == 0||that.currenteditableTabsValue == 0){
+                    cellProperties.type = 'dropdown';
+                    cellProperties.source = [' ','缺考','缓考','不及格','取消考试资格'];
+                    cellProperties.allowEmpty = true;
+                  }
+                  else{
+                    cellProperties.readOnly = true;
+                  }
+                  
+                }
+                if(row <= 2){
+                  cellProperties.readOnly = true;
+                  
                 }
 
                 return cellProperties;
