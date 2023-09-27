@@ -284,11 +284,11 @@
                 </el-tooltip> -->
                 <div v-show="scope.row.versionId">{{ currentVersionName }}</div>
                 <el-tooltip content="添加课程大纲">
-                  <el-button
+                  <el-tag
                     v-show="!scope.row.versionId"
                     type="danger"
                     @click.stop="addBaseCourseDetail(scope.row)"
-                    >无课程大纲</el-button
+                    >无课程大纲</el-tag
                   >
                 </el-tooltip>
               </template>

@@ -200,7 +200,30 @@
           </div>
         </template>
       </el-table-column>
-
+      <el-table-column label="课程大纲" width="150">
+        <template #default="scope">
+          <el-row>
+            <el-col :span="8" v-show="scope.row.versionId">
+                <el-tag
+                  class="noBaseCourseDetail"
+                  type="prime"
+                  >{{ currentVersionName }}
+                </el-tag>
+            </el-col>
+            <el-col :span="8" v-show="!scope.row.versionId">
+              <el-tooltip content="添加课程大纲">
+                <el-tag
+                  class="noBaseCourseDetail"
+                  type="danger"
+                  @click.stop="addBaseCourseDetail(scope.row)"
+                  >无课程大纲</el-tag
+                >
+              </el-tooltip>
+            </el-col>
+          </el-row>
+          
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="150">
         <template #default="scope">
           <el-row v-show="showToolIcon">
@@ -231,30 +254,7 @@
           </el-row>
         </template>
       </el-table-column>
-      <el-table-column label="课程大纲" width="150">
-        <template #default="scope">
-          <el-row>
-            <el-col :span="8" v-show="scope.row.versionId">
-                <el-tag
-                  class="noBaseCourseDetail"
-                  type="prime"
-                  >{{ currentVersionName }}
-                </el-tag>
-            </el-col>
-            <el-col :span="8" v-show="!scope.row.versionId">
-              <el-tooltip content="添加课程大纲">
-                <el-tag
-                  class="noBaseCourseDetail"
-                  type="danger"
-                  @click.stop="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag
-                >
-              </el-tooltip>
-            </el-col>
-          </el-row>
-          
-        </template>
-      </el-table-column>
+      
     </el-table>
   </div>
   <div class="md-padding" layout="row" flex v-show="identity == '课程负责人' && hasBaseCourse">
