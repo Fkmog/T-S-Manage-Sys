@@ -74,7 +74,7 @@
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
-              {{ objective.achievementTwo }}%
+              {{ objective.achievementTwo }}
             </el-col>
             <el-col
               :span="2"
@@ -251,7 +251,7 @@ export default {
                 object.serialNum = object.id;
               }
               if (object.hasOwnProperty("achievement")) {
-                object.achievementTwo = object.achievement.toFixed(2);
+                object.achievementTwo = object.achievement.toFixed(3);
                 object.hasAchieve = true;
               } else {
                 object.hasAchieve = false;
@@ -260,7 +260,7 @@ export default {
                 if (assess.achievement === null) {
                   assess.achievementTwo = "";
                 } else {
-                  assess.achievementTwo = assess.achievement.toFixed(2) + "%";
+                  assess.achievementTwo = assess.achievement.toFixed(3) ;
                 }
               });
             });

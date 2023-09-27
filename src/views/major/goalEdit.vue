@@ -47,7 +47,7 @@
     </div>
     <div class="edit-body">
       <div class="card">
-        <el-form :model="requirements" ref="requirements" label-position="top">
+        <el-form :model="requirements" :rules="rules" ref="requirements" label-position="top">
           <el-col v-for="attribute in requirements" :key="attribute.id">
             <el-col>
               <el-row>
@@ -68,7 +68,7 @@
                       placeholder="简称"
                     />
                   </el-form-item>
-                  <el-form-item label="描述" class="title">
+                  <el-form-item label="描述" class="title" prop="desc">
                     <el-input
                       v-model="attribute.description"
                       autosize
@@ -98,7 +98,7 @@
                           placeholder="简称"
                         />
                       </el-form-item>
-                      <el-form-item label="描述" class="title">
+                      <el-form-item label="描述" class="title" prop="desc">
                         <el-input
                           v-model="detail.description"
                           autosize
@@ -173,7 +173,7 @@ export default {
   data() {
     return {
       currentMajorId: "",
-      currentSchoolId: "",
+      currentSchoolId: "", 
       currentDepartmentId: "",
       programId: "",
       programInfo: {},
@@ -183,6 +183,11 @@ export default {
       hasDetail: true,
       deteleArray: [],
       canDelete: true, //控制删除毕业要求按钮显示
+      rules:{
+        desc:[{
+           required: true, message: '描述不能为空', trigger: 'blur'
+        }]
+      }
     };
   },
   mounted() {
@@ -233,7 +238,9 @@ export default {
     },
     //返回上级查看页面
     backGoal() {
-      console.log(_.isEqual(this.programInfo.graduateAttributes, this.requirements));
+      console.log(
+        _.isEqual(this.programInfo.graduateAttributes, this.requirements)
+      );
       if (_.isEqual(this.programInfo.graduateAttributes, this.requirements)) {
         this.$router.push("/goal");
       } else {
@@ -244,7 +251,6 @@ export default {
         })
           .then(() => {
             this.$router.push("/goal");
-
           })
           .catch(() => {});
       }
@@ -398,6 +404,11 @@ export default {
               this.requirements[n].programIndicators[m].description == null ||
               this.requirements[n].programIndicators[m].description == ""
             ) {
+              ElMessage({
+                type: "error",
+                message: `指标点描述不能为空`,
+                duration: 1500,
+              });
               return;
             }
           }
@@ -406,6 +417,11 @@ export default {
           this.requirements[n].description == null ||
           this.requirements[n].description == ""
         ) {
+          ElMessage({
+            type: "error",
+            message: `要求点描述不能为空`,
+            duration: 1500,
+          });
           return;
         }
       }

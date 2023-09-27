@@ -59,7 +59,7 @@
               <el-dropdown-item @click="associateCourse()">
                 关联课程库课程
               </el-dropdown-item>
-              <el-dropdown-item @click="isAssessment = true">
+              <el-dropdown-item @click="openAssess()">
                 修改考核方式设置
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -356,12 +356,14 @@
     <el-dialog
       v-model="isAssessment"
       title="修改考核方式设置"
-      width="330px"
+      width="350px"
       :show-close="false"
       :align-center="true"
     >
       <el-row>
-        <el-col :span="17" style="margin-top: 5px; margin-left: 20px"
+        <el-col
+          :span="18"
+          style="margin-top: 5px; margin-left: 20px; font-size: 17px"
           >允许任课教师修改考核方式</el-col
         >
         <el-col :span="4">
@@ -375,7 +377,16 @@
           />
         </el-col>
       </el-row>
-
+      <el-row
+        v-show="multIsRespondent === '0'"
+        style="
+          margin-top: 15px;
+          margin-left: 20px;
+          font-size: 14px;
+          color: grey;
+        "
+        >任课教师仍可以修改成绩小项</el-row
+      >
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="isAssessment = false">取消</el-button>
@@ -557,7 +568,7 @@ export default {
   },
   data() {
     return {
-      multIsRespondent: "2",
+      multIsRespondent: "",
       hasClass: false,
       noClass: false,
       canAction: true,
@@ -1150,7 +1161,6 @@ export default {
       if (this.multipleSelection.length > 0) {
         this.selectedCourseId = this.multipleSelection[0].courseId;
         this.canAction = false;
-
         // console.log("this.selectedCourseId", this.selectedCourseId);
         this.canSelectAll = false;
       } else {
@@ -1222,6 +1232,7 @@ export default {
         }
       });
     },
+
     //关联课程库课程
     associateCourse() {
       console.log(" this.multipleSelection", this.multipleSelection);
@@ -1250,6 +1261,15 @@ export default {
             });
           }
         });
+    },
+    // 唤起修改考核方式设置
+    openAssess() {
+      this.isAssessment = true;
+      if (this.multipleSelection.length > 1) {
+        this.multIsRespondent = "2";
+      } else {
+        this.multIsRespondent = this.multipleSelection[0].isRespondent;
+      }
     },
     // 修改考核方式设置
     changeAssessment() {

@@ -26,6 +26,23 @@
           <el-tooltip
             class="box-item"
             effect="dark"
+            content="设置关联模板"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              style="margin-left: 20px"
+              @click="changeWorkbook = true"
+            >
+              <Switch />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
             content="预设手册模板"
             placement="bottom"
             :hide-after="0"
@@ -38,23 +55,6 @@
               @click="goPresent()"
             >
               <Document />
-            </el-icon>
-          </el-tooltip>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="修改关联模板"
-            placement="bottom"
-            :hide-after="0"
-          >
-            <el-icon
-              class="icon"
-              size="24px"
-              color="rgb(137, 137, 137)"
-              style="margin-left: 20px"
-              @click="changeWorkbook = true"
-            >
-              <Switch />
             </el-icon>
           </el-tooltip>
           <el-tooltip
