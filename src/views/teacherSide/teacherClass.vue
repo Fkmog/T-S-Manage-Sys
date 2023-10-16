@@ -73,6 +73,24 @@
             <Management />
           </el-icon>
         </el-tooltip>
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="下载报告"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="downloadReport()"
+          >
+            <Download />
+          </el-icon>
+        </el-tooltip>
+
         <el-divider class="divider" direction="vertical" />
         <div v-show="status == '未提交' && identity == '教师'">
           <el-tooltip
@@ -229,7 +247,7 @@ import {
   Finished,
   Management,
 } from "@element-plus/icons-vue";
-import { submit, getClassInfo } from "@/api/class";
+import { submit, getClassInfo,downloadReport } from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getFilesList } from "@/api/basecourse";
@@ -451,8 +469,7 @@ export default {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
           this.isRespondent = this.classInfo.isRespondent;
-        }
-        else if(this.identity =='课程负责人'){
+        } else if (this.identity == "课程负责人") {
           this.$store.commit("currentInfo/setRespondClassInfo", res.data);
           this.classInfo = this.$store.state.currentInfo.respondClassInfo;
         } else {
@@ -464,7 +481,7 @@ export default {
       });
     },
     //查看课程大纲文件列表
-    checkFileList() { 
+    checkFileList() {
       getFilesList(this.classInfo.detailId).then((res) => {
         this.filesList = res.data;
         if (this.filesList.length == 0) {
@@ -508,6 +525,24 @@ export default {
       }
       // console.log("this.status", this.status);
     },
+    // 下载报告
+    downloadReport(){
+      downloadReport(this.classInfo.classId).then((res)=>{
+        console.log("下载报告",res);
+          // console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        // console.log("blob", blob);
+        // saveAs(blob, this.objectInfo.fileName)
+        const link = document.createElement("a");
+        link.download = decodeURI('报告.doc');
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      })
+    }
   },
 };
 </script>

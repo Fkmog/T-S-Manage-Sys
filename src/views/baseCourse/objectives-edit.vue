@@ -562,13 +562,17 @@ export default {
         haveZero == false
       ) {
         // 处理activities
-        // console.log("dialogObject",dialogObject);zhiy
+        // console.log("dialogObject",dialogObject);
         this.dialogObject.assessmentMethods.forEach((assessmentMethod) => {
           console.log("assessmentMethod", assessmentMethod);
           if (!assessmentMethod.hasOwnProperty("itemObject")) {
             assessmentMethod.activities.itemObject =
               assessmentMethod.activities.item.map((item) => ({ value: item }));
           }
+          // 先将value与remark全部置空，以免后面重复添加
+          assessmentMethod.activities.remark=[]
+          assessmentMethod.activities.value=[]
+          // console.log("制空后的assessmentMethod", assessmentMethod);
           let array = assessmentMethod.activities.itemObject;
           console.log("array", array, array[0]);
           if (array.length === 1) {

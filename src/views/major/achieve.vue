@@ -443,7 +443,7 @@ export default {
         // console.log("checkCoreBaseCourseList", res);
         if (res.code == "SUCCESS") {
           that.allCoreBaseCourse = res.data;
-          // console.log("allCoreBaseCourse", that.allCoreBaseCourse);
+          console.log("allCoreBaseCourse", that.allCoreBaseCourse);
         }
       });
     },
@@ -474,7 +474,7 @@ export default {
     //新增支持课程
     addCoreBaseCourse(searchValue, index1, index2) {
       try {
-        // console.log(searchValue, index1, index2);
+        console.log(searchValue, index1, index2);
         // console.log(
         //   "一开始的requirements[index1].programIndicators",
         //   this.requirements[index1].programIndicators
@@ -482,6 +482,14 @@ export default {
         //处理一下要存进去的coreBasecourse对象，searchValue中只有courseName
         let newCoreBaseCourse = {};
         newCoreBaseCourse.courseName = searchValue;
+
+        // 需要根据courseName去对比allCoreBaseCourse，拿到对应的courseId，bcdmId
+        let index = this.allCoreBaseCourse.findIndex(
+          (itemObject) => itemObject.courseName ===   newCoreBaseCourse.courseName
+        );
+        newCoreBaseCourse.courseId=this.allCoreBaseCourse[index].courseId
+        newCoreBaseCourse.bcdmId=this.allCoreBaseCourse[index].bcdmId
+        // console.log("@!",index);
         newCoreBaseCourse.id = Number;
         this.allCoreBaseCourse.forEach((item) => {
           if ((item.value = searchValue)) {
@@ -533,10 +541,10 @@ export default {
     },
     // 确认添加支撑课程
     confirmAddCoreBaseCourse(dialogDetail) {
-      // console.log("@", dialogDetail,this.index2);
+      console.log("@", dialogDetail, this.index2);
       // index2表示某毕业要求的第几个指标点,temp临时保存对应的指标点信息
       let temp = dialogDetail.programIndicators[this.index2];
-      // console.log("temp",temp);
+      console.log("temp", temp);
       this.requirements[this.index1].programIndicators[this.index2] = temp;
       let sum = 0;
       let isItemNull = false;
@@ -568,7 +576,7 @@ export default {
 
       if (sum == 100 && isItemNull == false && haveZero == false) {
         editProgram(this.totalInfo).then((res) => {
-          // console.log("confirmAddCoreBaseCourse", res);
+          console.log("confirmAddCoreBaseCourse", res);
           if (res.code == "SUCCESS") {
             ElMessage({
               type: "success",

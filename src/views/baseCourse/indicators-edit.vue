@@ -533,8 +533,7 @@ export default {
             this.majorList[i].programVersion =
               this.majorList[i].majorName +
               "-" +
-              this.majorList[i].enrollyear +
-              "级";
+              this.majorList[i].enrollyear 
             this.programIdList[i] = this.majorList[i].programId;
           });
         }
@@ -721,7 +720,7 @@ export default {
           }
           if (Number(i[1]) > 9) {
             newIndicator.id = newIndicator.id + i[1];
-          } else {
+          } else {chosenMajor
             newIndicator.id = newIndicator.id + "0" + i[1];
           }
           this.majorList[index1].indicators.push(newIndicator);

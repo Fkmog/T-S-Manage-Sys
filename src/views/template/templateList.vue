@@ -21,9 +21,38 @@
       highlight-current-row
       @row-click="goEdit"
     >
-      <el-table-column prop="name" label="模板名称" width="300" />
-      <el-table-column prop="updateTime" label="更新时间" width="300" />
-      <el-table-column label="操作" width="200">
+      <el-table-column prop="name" label="模板名称" width="200" />
+      <el-table-column prop="updateTime" label="更新时间" width="250" />
+      <el-table-column prop="report" label="报告模板" width="200">
+        <template #default="scope">
+          <el-row v-show="scope.row.templateFile === null">
+            <el-col>
+              <el-tooltip content="添加模板" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="check(scope.row)"
+                  ><el-icon><DocumentAdd /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+          <el-row v-show="scope.row.templateFile !== null">
+            <el-col>
+              <el-tooltip content="查看模板" :hide-after="0">
+                <el-button
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="check(scope.row)"
+                  ><el-icon><Document /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="150">
         <template #default="scope">
           <el-row>
             <el-col :span="6">
@@ -50,11 +79,70 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 唤起的dialog -->
+    <el-dialog v-model="dialogVisible" width="400px" :show-close="false">
+      <el-row style="margin-left: 30px">
+        <el-col v-show="hasFile">
+          <el-table
+            :data="filesList"
+            style="cursor: pointer; margin-top: 10px; width: 280px"
+            :show-header="false"
+            @row-click="downloadFile"
+          >
+            <el-table-column prop="originalName" label="文件名" width="280px" />
+            <!-- <el-table-column width="80px"> -->
+            <!-- <template #default="scope">
+                <el-tooltip content="移除" :hide-after="0">
+                  <el-button
+                    link
+                    style="color: #3f51b5"
+                    @click.stop="beforeRemove(scope.row)"
+                    ><el-icon><CircleClose /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </template> -->
+            <!-- </el-table-column> -->
+          </el-table>
+        </el-col>
+        <el-row style="margin-top: 30px">
+          <el-upload
+            :show-file-list="false"
+            class="upload-demo"
+            :action="action"
+            :headers="headers"
+            accept=".doc,.docx"
+            name="files"
+            :data="data"
+            :limit="1"
+            :on-success="uploadSuccess"
+            :on-exceed="uploadExceed"
+          >
+            <el-button type="primary">上传模板</el-button>
+          </el-upload>
+        </el-row>
+      </el-row>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="dialogVisible = false">
+            确认
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { Back, Delete, Edit } from "@element-plus/icons-vue";
+import {
+  Back,
+  Delete,
+  Edit,
+  Document,
+  DocumentAdd,
+  CircleClose,
+} from "@element-plus/icons-vue";
+import Cookies from "js-cookie";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -63,6 +151,7 @@ import {
   deleteWorkbook,
   editWorkbookInfo,
 } from "@/api/workbook";
+import { downloadFileId, downloadFile, removeFileId } from "@/api/common";
 
 export default {
   name: "TemplateList",
@@ -71,11 +160,28 @@ export default {
     addBtn,
     Delete,
     Edit,
+    Document,
+    DocumentAdd,
+    CircleClose,
   },
   data() {
     return {
       departmentId: "",
       workbookList: [],
+      dialogVisible: false,
+      hasFile: false,
+      fileName: "",
+      filesList: [],
+      rowInfo: {},
+      //上传文件
+      headers: {
+        Authorization: "Bearer " + Cookies.get("Admin-Token"),
+      },
+      action: "http://47.113.206.164:8080/common/upload/files",
+      data: {
+        type: "reportTemplateFile",
+        param: "",
+      },
     };
   },
   mounted() {
@@ -174,6 +280,51 @@ export default {
             });
           }
         });
+      });
+    },
+    //查看报告模板情况
+    check(row) {
+      console.log("check", row);
+      this.data.param = row.workbookId;
+      this.rowInfo = row;
+      if (row.templateFile === null) {
+        this.hasFile = false;
+      } else {
+        this.hasFile = true;
+        this.filesList = [];
+        this.filesList.push(row.templateFile);
+        this.fileName = row.templateFile.originalName;
+      }
+      this.dialogVisible = true;
+    },
+    // 上传成功
+    uploadSuccess(response, file, fileList) {
+      console.log("response", response, file, "file", fileList, "fileList");
+      if (response.code == "SUCCESS") {
+        ElMessage({
+          type: "success",
+          message: `上传成功`,
+          duration: 1500,
+        });
+        this.dialogVisible = false;
+        this.getWorkbookList();
+      }
+    },
+    //下载文件
+    downloadFile(row) {
+      downloadFile(row.fileAddress).then((res) => {
+        // console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        // console.log("blob", blob);
+        // saveAs(blob, this.objectInfo.fileName)
+        const link = document.createElement("a");
+        link.download = decodeURI(row.originalName);
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
       });
     },
   },

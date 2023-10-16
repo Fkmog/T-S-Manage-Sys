@@ -120,3 +120,11 @@ export function deleteReview(reviewId){
     method:'DELETE'
   })
 }
+// 下载报告
+export function downloadReport(classId){
+  return request({
+    url:'/classes/exportReport/'+classId,
+    method:'POST',
+    responseType: 'blob',
+  })
+}
