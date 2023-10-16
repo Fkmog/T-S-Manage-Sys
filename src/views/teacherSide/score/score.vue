@@ -44,7 +44,7 @@
           @click="goActivity"
           ><Histogram /></el-icon>
           </el-tooltip>
-      <el-divider class="divider" direction="vertical" />
+      <el-divider class="divider" v-show="this.identity == '教师'||this.identity == '学院管理员'" direction="vertical" />
       <el-tooltip
             class="box-item"
             effect="dark"
@@ -92,8 +92,7 @@
   >
     <el-table-column fixed prop="studentNumber" label="学号"  width="180px"/>
     <el-table-column fixed prop="studentName" label="姓名" width="180px"/>
-    <el-table-column fixed prop="studentStatus" label="考试情况" width="160px"/>
-
+    <el-table-column fixed prop="studentStatus" label="考试情况" width="160px" v-if="(this.currenteditableTabsValue-1)==0" />
     <el-table-column v-for="(item,i) in currentactivityName"  :label="item" :key="item" width="180px">
       <template #header>
         <el-col>
