@@ -26,7 +26,6 @@
         effect="dark"
         placement="bottom"
         
-        
         :hide-after="0"
       >
       <template #content>
@@ -37,7 +36,9 @@
           请先关联课程大纲
         </span>
       </template>
-      <el-icon class="icon"
+      <el-icon 
+      v-show="this.identity == '教师'||this.identity == '学院管理员'"
+          class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
           @click="goActivity"
@@ -91,6 +92,7 @@
   >
     <el-table-column fixed prop="studentNumber" label="学号"  width="180px"/>
     <el-table-column fixed prop="studentName" label="姓名" width="180px"/>
+    <el-table-column fixed prop="studentStatus" label="考试情况" width="160px"/>
 
     <el-table-column v-for="(item,i) in currentactivityName"  :label="item" :key="item" width="180px">
       <template #header>
@@ -177,6 +179,7 @@ export default {
   },
   data() {
     return {
+      identity:'',
       isRespondent:'',
 
       hasDetail:false,
@@ -382,6 +385,7 @@ export default {
             var student = {
               studentNumber:course.scores[i]['info'][0],
               studentName:course.scores[i]['info'][1],
+              studentStatus:course.scores[i]['status'][0],
               scores:course.scores[i]['grade'],
             }
           

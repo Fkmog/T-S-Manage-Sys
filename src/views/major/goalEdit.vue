@@ -47,8 +47,16 @@
     </div>
     <div class="edit-body">
       <div class="card">
-        <el-form :model="requirements" :rules="rules" ref="requirements" label-position="top">
-          <el-col v-for="attribute in requirements" :key="attribute.id">
+        <el-form
+          :model="requirements"
+          :rules="rules"
+          ref="requirements"
+          label-position="top"
+        >
+          <el-col
+            v-for="(attribute, index1) in requirements"
+            :key="attribute.id"
+          >
             <el-col>
               <el-row>
                 <el-col :span="2" class="two-digits">
@@ -60,7 +68,11 @@
                   </section>
                 </el-col>
                 <el-col :span="22">
-                  <el-form-item label="简称" class="title">
+                  <el-form-item
+                    :prop="'requirements.' + index1 + '.name'"
+                    label="简称"
+                    class="title"
+                  >
                     <el-input
                       v-model="attribute.name"
                       maxlength="20"
@@ -68,7 +80,12 @@
                       placeholder="简称"
                     />
                   </el-form-item>
-                  <el-form-item label="描述" class="title" prop="desc">
+                  <el-form-item
+                    label="描述"
+                    class="title"
+                    :prop="'requirements.' + index1 + '.description'"
+                    :rules="rules.description"
+                  >
                     <el-input
                       v-model="attribute.description"
                       autosize
@@ -82,7 +99,7 @@
               <el-col>
                 <div
                   class="attribute-detail"
-                  v-for="detail in attribute.programIndicators"
+                  v-for="(detail, index2) in attribute.programIndicators"
                   :key="detail.id"
                 >
                   <el-row>
@@ -98,7 +115,11 @@
                           placeholder="简称"
                         />
                       </el-form-item>
-                      <el-form-item label="描述" class="title" prop="desc">
+                      <el-form-item
+                        label="描述"
+                        class="title"
+                        :prop="'programIndicators.' + index2 + '.description'"
+                      >
                         <el-input
                           v-model="detail.description"
                           autosize
@@ -173,7 +194,7 @@ export default {
   data() {
     return {
       currentMajorId: "",
-      currentSchoolId: "", 
+      currentSchoolId: "",
       currentDepartmentId: "",
       programId: "",
       programInfo: {},
@@ -183,11 +204,15 @@ export default {
       hasDetail: true,
       deteleArray: [],
       canDelete: true, //控制删除毕业要求按钮显示
-      rules:{
-        desc:[{
-           required: true, message: '描述不能为空', trigger: 'blur'
-        }]
-      }
+      rules: {
+        description: [
+          // {
+          //   required: true,
+          //   message: "描述不能为空",
+          //   trigger: "blur",
+          // },
+        ],
+      },
     };
   },
   mounted() {

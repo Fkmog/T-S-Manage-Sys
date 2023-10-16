@@ -176,16 +176,12 @@ export default {
   methods: {
     async getPre() {
       await this.create();
-      console.log("123");
       this.courseId = this.classInfo.courseId;
       this.detailId = this.classInfo.detailId;
-      console.log("this.derau",this.detailId);
       this.getPresent();
     },
     async create() {
       await this.createValue();
-      console.log("!!",this.classInfo);
-      console.log("456");
       await editByTeacher(this.classInfo.classId, this.value).then((res) => {
         console.log("789");
         if (res.code === "SUCCESS") {
@@ -316,7 +312,7 @@ export default {
                     listType: "text",
                     multiple: true,
                     name: "files",
-                    action: "http://81.68.103.96:8080/common/upload/files",
+                    action: "http://47.113.206.164:8080/common/upload/files",
                     headers: {
                       Authorization: "Bearer " + Cookies.get("Admin-Token"),
                     },

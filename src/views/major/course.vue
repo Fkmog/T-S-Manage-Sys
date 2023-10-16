@@ -49,7 +49,7 @@
             >
           </el-col>
           <el-col :span="16">
-            <div class="numSelectedTeacher">
+            <div class="numSelectedCourse">
               已选中 {{ numSelected }} 门课程
             </div>
           </el-col>
@@ -222,13 +222,20 @@
           </el-row>
           <el-row class="drawersubmenu">
             <el-col :span="16">
-              <div style="margin-top: 7px">
+              <div style="margin-top: 7px;width: 150px;">
                 已选中
                 {{ drawernumSelected - programInfoCourseCount }} 节基础课程
               </div>
             </el-col>
-            <el-col :span="4" class="drawerdeleteButton">
-              <el-button @click="this.getBCMId()"
+            <el-col :span="1">
+              <div style="width:1px">
+
+              </div>
+            </el-col>
+            <el-col :span="3" class="drawerdeleteButton">
+              <el-button 
+              @click="this.getBCMId()"
+              v-show="drawernumSelected - programInfoCourseCount"
                 ><el-icon><Plus class="iconSize" /></el-icon
               ></el-button>
             </el-col>
@@ -246,7 +253,7 @@
             width="645"
             @selection-change="drawerchandleSelectionChange"
             :row-key="rowKey"
-            @row-click="goBaseCourseDetail"
+            
           >
             <el-table-column
               width="55"
@@ -275,13 +282,13 @@
                     ><el-icon><Document /></el-icon
                   ></el-button>
                 </el-tooltip> -->
-                <div v-show="scope.row.versionId">{{ currentVersion }}</div>
+                <div v-show="scope.row.versionId">{{ currentVersionName }}</div>
                 <el-tooltip content="添加课程大纲">
-                  <el-button
+                  <el-tag
                     v-show="!scope.row.versionId"
                     type="danger"
                     @click.stop="addBaseCourseDetail(scope.row)"
-                    >无课程大纲</el-button
+                    >无课程大纲</el-tag
                   >
                 </el-tooltip>
               </template>
@@ -403,6 +410,7 @@ export default {
   data() {
     return {
       loadmoreDisabled: Boolean,
+      currentVersionName:'',
 
       courseTypeSource: [],
       courseNatureSource: [],
@@ -759,43 +767,44 @@ export default {
     },
     //跳转到详细页面
     goBaseCourseDetail(row, column) {
+      this.$refs.drawermultipleTable.toggleRowSelection(row);//选中前面的selection
       // console.log('row',row)
       // console.log("goBaseCourseDetail", row.bcDetails.length,row);
-      if (column.columnKey === undefined) {
-        if (row.bcDetails.length) {
-          let versionName = "";
-          for (const element of this.versions) {
-            if (element["versionId"] == this.currentVersionId) {
-              versionName = element["label"];
-            }
-          }
-          this.$store.commit("course/setbaseCourseVersionName", versionName);
-          this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-          this.$store.commit(
-            "course/setbaseCourseVersionId",
-            this.currentVersionId
-          );
-          this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-          this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-          this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-          this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-          this.$store.commit(
-            "course/setbaseCourseCourseNature",
-            row.courseNature
-          );
-          this.$store.commit("course/setbaseCourseCredit", row.credit);
-          this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-          this.$store.commit("course/setbaseCourseRemark", row.remark);
-          // 设置Nav
-          this.$store.commit("navInfo/setActiveDisplay1", 1);
-          this.$router.push({
-            path: "/baseCourseDetail",
-            query: { parentName: "courseInMajor" },
-          });
-        } else {
-          this.addBaseCourseDetail(row);
-        }
-      }
+      // if (column.columnKey === undefined) {
+      //   if (row.bcDetails.length) {
+      //     let versionName = "";
+      //     for (const element of this.versions) {
+      //       if (element["versionId"] == this.currentVersionId) {
+      //         versionName = element["label"];
+      //       }
+      //     }
+      //     this.$store.commit("course/setbaseCourseVersionName", versionName);
+      //     this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+      //     this.$store.commit(
+      //       "course/setbaseCourseVersionId",
+      //       this.currentVersionId
+      //     );
+      //     this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+      //     this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+      //     this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+      //     this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+      //     this.$store.commit(
+      //       "course/setbaseCourseCourseNature",
+      //       row.courseNature
+      //     );
+      //     this.$store.commit("course/setbaseCourseCredit", row.credit);
+      //     this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+      //     this.$store.commit("course/setbaseCourseRemark", row.remark);
+      //     // 设置Nav
+      //     this.$store.commit("navInfo/setActiveDisplay1", 1);
+      //     this.$router.push({
+      //       path: "/baseCourseDetail",
+      //       query: { parentName: "courseInMajor" },
+      //     });
+      //   } else {
+      //     this.addBaseCourseDetail(row);
+      //   }
+      // }
     },
     //是否有program
     async checkProgram() {
@@ -874,6 +883,11 @@ export default {
         "course/setbaseCourseVersionId",
         this.currentVersionId
       );
+      for (const element of this.versions) {
+        if (element["versionId"] == this.currentVersionId) {
+          this.currentVersionName = element["label"];
+        }
+      }
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     getProgramCourse() {
@@ -1581,6 +1595,10 @@ export default {
 </script>
 
 <style scoped>
+.numSelectedCourse{
+  display: flex;
+  line-height:35px;
+}
 .rightSlot {
   position: absolute;
   right: 10%;
@@ -1655,12 +1673,6 @@ export default {
 .drawerBlock {
   position: relative;
   color: rgb(189, 189, 189);
-}
-.iconSize {
-  top: 7px;
-  height: 20px;
-  width: 20px;
-  color: black;
 }
 .deleteButton {
   margin-right: 10%;

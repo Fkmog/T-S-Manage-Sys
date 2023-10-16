@@ -79,7 +79,7 @@
             <el-icon 
               size="22px"
               color="rgb(137, 137, 137)"
-              style="float: left;top: 4px;"
+              style="float: left;top: 4px;cursor: pointer;"
               @click="tabsContent(item,item.name)" 
               >
               <EditPen />
@@ -88,21 +88,23 @@
         </span>
         
         <el-input v-else-if="!!item.inputFlag" :ref="`myInput${item.name}`"
-            v-model="item.title" type="text" 
-            style="display: inline-block;width: 200px;text-align: center;padding: 10px;font-size: large;"
+            v-model="newActivityTitle" type="text" 
+            style="width: 250px;margin-left: 10px;"
             clearable
-            @blur="item.inputFlag=false" />
+            @clear="item.inputFlag = false;item.title = originActivityTitle"
+            >
+            <template #append>
+              
+                <el-icon size="22px" style="cursor: pointer;" @click="item.inputFlag = false;item.title = newActivityTitle">
+                  <Checked />
+                </el-icon>
+              
+            </template>
+    </el-input>
+            <!--  item.title = originActivityTitle;item.inputFlag = false; -->
             
         <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
-        <el-icon 
-              size="22px"
-              color="rgb(137, 137, 137)"
-              v-show="!!item.inputFlag"
-              style="padding-right: 30px;top: 6px;"
-              @click="item.inputFlag=false"
-              >
-              <Checked />
-        </el-icon>
+        
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -132,16 +134,6 @@
   <div class="card-container">
     <div class="hot-table-container" id="courseHot"></div>  
   </div>
-    
-
-  
-
-      
-
-
-
-
-
     </div>
   
     
@@ -177,6 +169,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     data(){
       let that = this;
       return{
+        activityTitleConfirm:true,
+        originActivityTitle:'',
+        newActivityTitle:'',
         from:'',//路由来自哪里
         classInfo:[],//当前课程数据
 
@@ -235,6 +230,28 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     },
     
     methods:{
+      blurDelay(){
+        setTimeout(()=>{
+              return this.originActivityTitle
+            },300)
+      },
+      confirmSave(newval,oldVal){
+        this.activityTitleConfirm = true;
+        ElMessageBox.confirm(
+            '是否保存更改后的成绩项名称？',
+            '',
+            {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              type: 'warning',
+            }
+          ).then(()=>{
+            console.log('确认')
+            return false;
+          }).catch(()=>{
+            console.log('取消')
+          })
+      },
     dragTab(){
     let that = this;
     var tab = document.querySelector("#drag-tab .el-tabs__nav"); //获取需要拖拽的tab
@@ -283,6 +300,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
           console.log(val, index, '双击编辑tabs');
+          
           if(index == '1' && this.identity == '教师'){
             val.inputFlag = false;
             ElMessage({
@@ -292,6 +310,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             });
           }
           else{
+            this.originActivityTitle = val.title;
+            this.newActivityTitle = val.title;
             val.inputFlag = true;
           }
       },
@@ -398,6 +418,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             name: newTabName.toString(),
             value: newTabName,
             inputFlag:false,
+            input: '成绩项'+' '+newTabName,
             
           });
           this.editableTabsValue = newTabName.toString();
@@ -417,7 +438,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
             name: newTabName.toString(),
             value: newTabName,
             inputFlag:false,
-            
+            input:(activityName ? activityName:'成绩项'+' '+newTabName),
           });
           console.log('editableTabs after add ',this.editableTabs);
           this.editableTabsValue = newTabName.toString();

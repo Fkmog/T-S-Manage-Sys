@@ -294,6 +294,8 @@
       <el-checkbox-group v-model="checkList">
         <el-checkbox label="成绩项"></el-checkbox>
         <el-checkbox label="课程目标"></el-checkbox>
+        <el-checkbox label="预设手册模板"></el-checkbox>
+        
       </el-checkbox-group>
       <template #footer>
         <span class="dialog-footer">
@@ -316,7 +318,7 @@ import {
   Checked,
   CircleClose,
   CopyDocument,
-  Management,
+  Management,Download
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import {
@@ -345,13 +347,13 @@ export default {
     List,
     Checked,
     CircleClose,
-    Management,
+    Management,Download
   },
   data() {
     return {
-      from:'',
+      from: "",
       filesList: [],
-      checkList: ["成绩项", "课程目标"],
+      checkList: ["成绩项", "课程目标",'预设手册模板'],
       currentRow: {},
       copyCourseList: [],
       keyword: "",
@@ -450,14 +452,13 @@ export default {
       this.getDetail();
       this.checkVersion();
     }
-    console.log('router from', this.$route.query['parentName']);
-      if( this.$route.query['parentName'] == 'courseInMajor'){
-          this.from = this.$route.query['parentName'];
-      }
-      else{
-        this.from = '';
-      }
-      console.log('from',this.from);
+    console.log("router from", this.$route.query["parentName"]);
+    if (this.$route.query["parentName"] == "courseInMajor") {
+      this.from = this.$route.query["parentName"];
+    } else {
+      this.from = "";
+    }
+    console.log("from", this.from);
   },
   methods: {
     //获取学校和部门ID
@@ -485,7 +486,7 @@ export default {
         obj.param = that.detailId;
         obj.type = "syllabusFile";
         array.push(obj);
-        that.action = "http://81.68.103.96:8080/common/upload/files";
+        that.action = "http://47.113.206.164:8080/common/upload/files";
         that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
         that.checkFileList();
@@ -572,7 +573,6 @@ export default {
     },
     // 移除文件
     uploadRemove(row) {
-      console.log("xcxscsdd", row);
       removeFileId(row.fileId).then((res) => {
         console.log("removeDetail", res);
         if (res.code === "SUCCESS") {
@@ -684,6 +684,11 @@ export default {
         obj.isCopyObjectives = 1;
       } else {
         obj.isCopyObjectives = 0;
+      }
+      if (this.checkList.indexOf("预设手册模板") !== -1) {
+        obj.isCopyFormPreset = 1;
+      } else {
+        obj.isCopyFormPreset = 0;
       }
       copyActAndObj(obj).then((res) => {
         console.log("copyActAndObj", res);
