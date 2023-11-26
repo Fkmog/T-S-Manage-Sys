@@ -337,7 +337,12 @@ export default {
         currentObj.serialNum = attribute.serialNum + ".1";
         //确定id
         let a = currentObj.serialNum.split("\.");
+        if(a[0]<=9){
         currentObj.id = "0" + a[0] + "0" + a[1];
+        }else{
+        currentObj.id = a[0] + "0" + a[1];
+
+        }
         let num = Number(attribute.serialNum);
         this.requirements[num - 1].programIndicators.push(currentObj);
       }
@@ -363,11 +368,13 @@ export default {
     },
     //新增要求点
     addAttribute() {
+      
       let currentObj = new Object();
       //处理内部字段
       currentObj.name = null;
       currentObj.description = null;
       currentObj.programIndicators = [];
+      console.log("!!!");
       if (!(this.requirements === null) && this.requirements.length > 0) {
         // 确定serialNum
         if (this.requirements.length == 0) {
@@ -378,7 +385,14 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
+        console.log("@",currentObj.serialNum,typeof currentObj.serialNum);
+
+        if(Number(currentObj.serialNum)<=9){
+
         currentObj.id = "0" + currentObj.serialNum;
+        }else{
+        currentObj.id =  currentObj.serialNum+'';
+        }
         this.requirements.push(currentObj);
       } else {
         currentObj.id = "01";
