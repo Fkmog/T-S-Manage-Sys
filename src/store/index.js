@@ -205,6 +205,9 @@ export default createStore({
       state: {
         majorNum: "0",
         majorProgramId: Number,
+        bcdmId:'',
+        classId:'',
+        courseCode:'',
       },
       getters: {},
       mutations: {
@@ -213,6 +216,15 @@ export default createStore({
         },
         setmajorProgramId(state, newVal) {
           state.majorProgramId = newVal;
+        },
+        setmajorbcdmId(state, newVal) {
+          state.bcdmId = newVal;
+        },
+        setmajorclassId(state, newVal) {
+          state.classId = newVal;
+        },
+        setmajorcourseCode(state, newVal) {
+          state.courseCode = newVal;
         },
       },
       actions: {},

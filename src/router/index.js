@@ -11,6 +11,7 @@ import Goal from "../views/major/goal.vue";
 import GoalEdit from "../views/major/goalEdit.vue";
 import Manage from "../views/major/manage.vue";
 import Setting from "../views/major/setting.vue";
+import CourseDetail from '../views/major/courseDetail.vue'
 
 import Index from "@/components/index/index.vue";
 
@@ -195,6 +196,12 @@ const router = createRouter({
           path: "/courses",
           component: Courses,
           meta: { isMajor: true },
+        },
+        {
+          name:'CourseDetail',
+          path:'/courseDetail',
+          component:CourseDetail,
+          meta:{ isMajor:true }
         },
         {
           name: "Achieve",

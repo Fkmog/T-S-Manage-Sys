@@ -282,14 +282,17 @@
                     ><el-icon><Document /></el-icon
                   ></el-button>
                 </el-tooltip> -->
-                <div v-show="scope.row.versionId">{{ currentVersionName }}</div>
+                <!-- <div v-show="scope.row.versionId">{{ currentVersionName }}</div> -->
+                  <el-tag v-show="scope.row.versionId"  type="prime">
+                      {{ currentVersionName }}
+                  </el-tag>
                 <el-tooltip content="添加课程大纲">
                   <el-tag
                     v-show="!scope.row.versionId"
                     type="danger"
-                    @click.stop="addBaseCourseDetail(scope.row)"
-                    >无课程大纲</el-tag
-                  >
+                    @click.stop="addBaseCourseDetail(scope.row)">
+                    无课程大纲
+                  </el-tag>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -767,44 +770,11 @@ export default {
     },
     //跳转到详细页面
     goBaseCourseDetail(row, column) {
-      this.$refs.drawermultipleTable.toggleRowSelection(row);//选中前面的selection
-      // console.log('row',row)
-      // console.log("goBaseCourseDetail", row.bcDetails.length,row);
-      // if (column.columnKey === undefined) {
-      //   if (row.bcDetails.length) {
-      //     let versionName = "";
-      //     for (const element of this.versions) {
-      //       if (element["versionId"] == this.currentVersionId) {
-      //         versionName = element["label"];
-      //       }
-      //     }
-      //     this.$store.commit("course/setbaseCourseVersionName", versionName);
-      //     this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-      //     this.$store.commit(
-      //       "course/setbaseCourseVersionId",
-      //       this.currentVersionId
-      //     );
-      //     this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-      //     this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-      //     this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-      //     this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-      //     this.$store.commit(
-      //       "course/setbaseCourseCourseNature",
-      //       row.courseNature
-      //     );
-      //     this.$store.commit("course/setbaseCourseCredit", row.credit);
-      //     this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-      //     this.$store.commit("course/setbaseCourseRemark", row.remark);
-      //     // 设置Nav
-      //     this.$store.commit("navInfo/setActiveDisplay1", 1);
-      //     this.$router.push({
-      //       path: "/baseCourseDetail",
-      //       query: { parentName: "courseInMajor" },
-      //     });
-      //   } else {
-      //     this.addBaseCourseDetail(row);
-      //   }
-      // }
+      console.log('row',row,"bcdmid",row.bcDetails[0].bcDetailProgramVoList[0].bcdmId);
+      this.$store.commit("baseCourseDetailProgram/setmajorbcdmId", row.bcDetails[0].bcDetailProgramVoList[0].bcdmId);
+      this.$store.commit("baseCourseDetailProgram/setmajorclassId", row.courseId);
+      this.$store.commit("baseCourseDetailProgram/setmajorcourseCode", row.courseCode);
+      this.$router.push('/courseDetail');
     },
     //是否有program
     async checkProgram() {
@@ -1451,8 +1421,6 @@ export default {
           console.log('department:',that.departmentId,'schoolId:',that.schoolId,'majorId:',that.majorId,'currentVersionId',that.currentVersionId);
           console.log('已经选择的课：',that.programeCourseInfo);
           res.rows.forEach(function(course){
-            
-           
             course.courseName=course.courseName;
             course.courseCode=course.courseCode;
             course.courseType = that.courseTypeSource[course.courseType];
@@ -1644,14 +1612,7 @@ export default {
   height: 24px;
   width: 24px;
 }
-:deep().el-icon svg {
-  height: 18px;
-  width: 18px;
-}
-:deep().el-icon {
-  height: 18px;
-  width: 18px;
-}
+
 
 .row-style {
   padding-top: 5px;
