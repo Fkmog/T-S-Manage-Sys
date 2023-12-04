@@ -110,7 +110,7 @@
         :error="C_ErrorMsg_editVersion_name"
         prop="name"
       >
-        <el-input v-model="versionForm.name" disabled autocomplete="off" />
+        <el-input v-model="versionForm.name"  autocomplete="off" />
       </el-form-item>
       <el-form-item
         label="面向年级"
