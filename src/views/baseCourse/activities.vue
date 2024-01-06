@@ -59,7 +59,6 @@
 
   <!-- @tab-add="this.handleTabsEdit('','add')"   -->
   <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" editable 
-
   @tab-click="editableTabsValueChange"
   @edit="handleTabsEdit"
   id="drag-tab"
@@ -396,8 +395,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       },
       handleTabsEdit(targetName, action, activityName) {
         let that = this;
-        console.log('action',action);
-        if (action === 'add'&& !targetName) {
+        console.log('action',action,targetName);
+        if (action === 'add'&& targetName==undefined) {
           
           let item = ['']
           let value = ['']
@@ -423,13 +422,14 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           });
           this.editableTabsValue = newTabName.toString();
           console.log('editableTabs after add ',this.editableTabs);
+          console.log('@@@@@@@@@@@@@@@@',this.hotInstance)
           this.hotInstance.updateSettings({
                 data:that.db.items[that.currenteditableTabsValue-1],
               });
           this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
           console.log('currenteditableTabsValue:',this.currenteditableTabsValue,'maxTabsValue:',this.maxeditableTabsValue);
         }
-        if (action === 'add' && targetName ) {
+        if (action === 'add' && targetName!=undefined ) {
           this.currenteditableTabsValue = this.tabIndex;
           this.maxeditableTabsValue = this.tabIndex;
           let newTabName = ++this.tabIndex + '';
@@ -604,7 +604,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           data: that.db.items[0],
           cells: that.getHotCellsFunction(),
         });
-      });
+      }).catch((e)=>{
+        console.log(e)
+      })
     },
     getHotCellsFunction() {
       let that = this;
@@ -695,7 +697,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       });
       }
       else{
-        console.log('this is the activity from detail');
+        console.log('this is the activity from detail',this.detailId);
         return request({
         url: "/detail/" + this.detailId,
         method: "get",
@@ -746,7 +748,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           tempdata.push(weight);
           that.db.items.push(tempdata);
         }
-      });
+      }).catch((e)=>{
+        console.log('get activity error',e)
+      })
       }
       
     },
