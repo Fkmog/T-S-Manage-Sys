@@ -1,7 +1,7 @@
 <template>
   <div v-show="!closeShow">
     <HeaderSearch
-      msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+      :msg=(keyword)?keyword:defaultMsg
       @SearchValue="getSearchValue"
       ref="headsearch"
     >
@@ -760,6 +760,9 @@ export default {
       hasVersion:false,
       hasNoVersion:false,
 
+
+      defaultMsg: "搜索课程名称、任课教师(姓名、工号)、课程号、开课号",
+
       hasDetail: "全部",
       hasDetailSeletion: [
         { label: "全部", value: null },
@@ -973,7 +976,8 @@ export default {
     },
     getSearchValue(data) {
       this.keyword = data;
-      sessionStorage.setItem('basecourseSearchValue',this.keyword);
+      this.$store.commit("course/setbaseCourseKeyword", data);
+      // sessionStorage.setItem('basecourseSearchValue',this.keyword);
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     async getDict() {
@@ -1742,7 +1746,6 @@ export default {
           versionName = element["label"];
         }
       }
-
         this.$store.commit("course/setbaseCourseVersionName", versionName);
         this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
         this.$store.commit(
@@ -1887,6 +1890,14 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
+
+      this.keyword = this.$store.state.course.baseCourseKeyword;
+
+      // this.$nextTick(function(){
+      //   console.log('$nextTick 被调用了',this.$refs.headsearch)
+      //   this.$refs.headsearch.inputBlur()
+      // })
+      
 
       if (this.identity == "课程负责人") {
         this.userId = this.$store.state.userInfo.userId;
