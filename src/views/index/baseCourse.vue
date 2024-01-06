@@ -3,6 +3,7 @@
     <HeaderSearch
       msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
       @SearchValue="getSearchValue"
+      ref="headsearch"
     >
       <template #rightTime>
         <div class="selectionBar">

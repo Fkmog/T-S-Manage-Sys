@@ -313,6 +313,7 @@ export default {
     };
   },
   mounted() {
+	  sessionStorage.setItem("classSearchFlag", true);
     this.identity = this.$store.state.currentInfo.identity;
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     if (this.identity == "学院管理员") {

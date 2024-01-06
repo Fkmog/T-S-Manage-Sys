@@ -36,13 +36,11 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  props: {
-    msg: String,
-    required: true,
-  },
+  props: ['msg','searchInput'],
   components: {
     Search,
   },
+
   data() {
     return {
       searchInput: "",
@@ -50,6 +48,8 @@ export default {
       active: false,
     };
   },
+  watch: {
+},
   methods: {
     sendMessage() {
       this.$emit("SearchValue", this.searchInput);
@@ -104,7 +104,7 @@ export default {
   flex-direction: row;
 }
 .activeInput {
-  width:370px;
+  width: 370px;
   transition: all 0.3s;
   border-top-width: 0px;
   border-left-width: 0px;

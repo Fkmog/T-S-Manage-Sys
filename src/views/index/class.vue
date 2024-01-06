@@ -3,6 +3,7 @@
   <HeaderSearch
     msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
     @SearchValue="getSearchValue"
+    :searchInput='keyword'
   >
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
@@ -676,6 +677,12 @@ export default {
     this.identity = this.$store.state.currentInfo.identity;
     console.log("this.identity", this.identity);
     this.getDictionary();
+    if (sessionStorage.getItem("classSearchFlag")) {
+      this.keyword = sessionStorage.getItem("searchForm");
+      this.getSearchValue(this.keyword)
+    } else {
+      sessionStorage.removeItem("searchForm");
+    }
   },
   computed: {
     currentChange() {
@@ -735,6 +742,7 @@ export default {
       },
     },
   },
+ 
   methods: {
     //跳转到审核页面
     goCheck(row, column) {
@@ -750,6 +758,8 @@ export default {
         } else {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
         }
+        sessionStorage.setItem("searchForm",this.keyword);
+        sessionStorage.removeItem("classSearchFlag");
         this.$router.push({ name: "TeacherClass" });
       }
     },
@@ -759,6 +769,8 @@ export default {
     },
     // 搜索栏查询
     getSearchValue(data) {
+      this.$refs.multipleTable.clearSelection()
+      sessionStorage.removeItem("classSearchFlag");
       this.keyword = data;
       console.log("keyword", this.keyword, this.currentInfo.schoolId);
       this.getClassList();
