@@ -48,24 +48,7 @@
             </el-button>
             </el-tooltip>
 
-            <!-- <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="添加成绩项"
-              placement="bottom"
-              :hide-after="0"
-            >
-              <el-icon
-                class="icon"
-                size="22px"
-                color="rgb(137, 137, 137)"
-                style="margin-left: 20px"
-                
-              > -->
-              <!-- @click="addActivities" -->
-                <!-- <CirclePlus />
-              </el-icon>
-            </el-tooltip> -->
+            
 
           </el-row>
       </div>
@@ -326,237 +309,235 @@ activate(){
         console.log('this.departmentId',this.departmentId,'this.schoolId',this.schoolId,'this.programId',this.programId,'this.classInfo',this.classInfo);
         this.activateHotcolumn();
             },
-activateHotcolumn(){
-    let self = this;
-        let that = this;
-        this.getActivities().then(function(){
-       
+        activateHotcolumn(){
+            let self = this;
+                let that = this;
+                this.getActivities().then(function(){
+                let container = document.querySelector("#courseHot");
+                let hotRegisterer = new Handsontable(container,{
+                    data: self.db.items[0],
+                    licenseKey: 'non-commercial-and-evaluation',
+                    colHeaders: function(index) { // false
+                        // return index === 0 ? '学号' : '成绩项';
+                        if (index === 0) {
+                        return '学号';
+                        }
+                        else if (index === 1) {
+                        return '姓名';
+                        } else if (index === 2) {
+                        return '考试情况';
+                        } else {
+                        return '成绩项';
+                        }
+                        },
+                    rowHeaders: function(index) { // true
+                        if (index === 0) {
+                        return '名称';
+                        } else if (index === 1) {
+                        return '分值';
+                        // } else if (index === 2) {
+                        //   return '平均分';
+                        // } else if (index === 2) {
+                        //   return '指标点';
+                        } else if (index === 2) {
+                        return '设置';
+                        } else {
+                        return index - self.NUM_AUX_ROW + 1;
+                        }
+                        // return index === 0 ? '成绩项' : index;
+                    },
+                    
+                    fixedRowsTop: 3,
+                    fixedColumnsLeft: 2,
+                    minSpareRows: 0,
+                    minSpareCols: 0,
+                    preventOverflow: 'horizontal',
+                    manualColumnMove: false,
+                    copyPaste: true,
+                    colWidths: 120,
+                    
+                    contextMenu: {
+                      items:{
+                          'row_above': {
+                              name: '在上方插入行'
+                          },
+                          'row_below': {
+                              name: '在下方插入行'
+                          },
+                          'remove_row': {
+                              name: '删除行'
+                          }
+                      }
+                    },
+                    beforeCreateRow(index,amount,source){
+                      if (source === 'loadData') { 
+                        // console.log('same');
+                        return;
+                      }
+                      else{
+                        console.log('add extare row',index,amount,source)
+                        if(index<=2){
+                          // console.log('this row should not created!')
+                          return false;
+                        }
+                      }
+                    },
+                    beforeRemoveRow(index,amount,physicalRows,source){
+                      if (source === 'loadData') { 
+                        // console.log('same');
+                        return;
+                      }
+                      else{
+                        
+                        if(index<=2){
+                          // console.log('this row should not created!')
+                          return false;
+                        }
+                      }
+                    },
+
+                    afterChange(changes, source) {
+                      if (source === 'loadData') { 
+                        // console.log('same');
+                        return;
+                      } else { 
+                        self.isValid();
+                        if(self.count==0){
+                          self.dirty=false;
+                          console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
+                        }
+                        else{
+                          self.dirty=true;
+                          self.firstActivities = false;
+                          console.log("console:", self.count,
+                          "dirty", self.dirty,
+                          'items:',self.db.items,
+                          'firstActivities:',self.firstActivities);
+                        }
+                        self.count++;
+                        console.log('console:',self.count);
+                        }
+                    }
+                });
+                that.hotInstance = hotRegisterer;
+                that.hotInstance.updateSettings({
+                  columns:that.columnList[0],
+                  data:that.db.items[0],
+                  cells: that.getHotCellsFunction(),  
+                      });
+                });
+        },
+        getHotCellsFunction() {
+                      let that = this;
+                    return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+                        var cellProperties = {};
+                        
+                        if (col === 0) {  // studentNo column
+                          
+                        cellProperties.readOnly = true;
+                        cellProperties.className = 'cell-disallow';
+                        }
+                        if (row < 3  && col < 3 && col!=0) {
+                        // left-top zone
+                        cellProperties.readOnly = false;
+                        // cellProperties.type = 'string';
+                        cellProperties.className = 'cell-disallow';
+                        }
+                        if (row != 0 && row != 2 && col >= 3) { 
+                        // for 2nd row(分值), also validScore
+                        cellProperties.type = 'numeric';  // by default: 'string'
+                        //   cellProperties.validator = that.validScore();
+                        cellProperties.format = '0[.]0';  // http://numeraljs.com/
+                        } else {
+                        //   cellProperties.validator =  that.validString();
+                        }
+
+
+                        // if(col === 1 ){
+                          
+                        //   cellProperties.type = 'numeric';
+                        // }
+                        // if(col === 2 ){
+                        //   cellProperties.type = 'text';
+                        // }
+
+                    
+
+                        if (col === 0) {
+                        cellProperties.width = 100;
+                        if(row >2){
+                            cellProperties.readOnly = false;
+                        }
+                        }
+                        if(col >=0 && col <= 2){
+                          if(row >= 0 && row <= 2){
+                            cellProperties.readOnly = true;
+                            
+                            
+                          }
+                        }
+
+                        // if (col > 2 && row === 2) {
+                        // cellProperties.type = 'dropdown';
+                        // cellProperties.source = [' ','总评','期末'];
+                        // cellProperties.allowEmpty = true;
+                        // cellProperties.className = 'ht-s-size';
+                        // //   cellProperties.validator = that.validScoreSetting();
+                        // }
+                        if(col === 2 && row > 2){
+                          console.log('updating cell rules current currenteditableTabsValue:',that.currenteditableTabsValue);
+                          if(that.currenteditableTabsValue - 1 == 0||that.currenteditableTabsValue == 0){
+                            cellProperties.type = 'dropdown';
+                            cellProperties.source = [' ','缺考','缓考','不及格','取消考试资格'];
+                            cellProperties.allowEmpty = true;
+                          }
+                          else{
+                            cellProperties.readOnly = true;
+                            
+                          }
+                          
+                        }
+                        if(row <= 2){
+                          cellProperties.readOnly = true;
+                        
+                          
+                        }
+
+                        return cellProperties;
+                    };
+            },
+        validStudentNumber(value) {
         
-        let container = document.querySelector("#courseHot");
-        let hotRegisterer = new Handsontable(container,{
-             data: self.db.items[0],
-            licenseKey: 'non-commercial-and-evaluation',
-            colHeaders: function(index) { // false
-                // return index === 0 ? '学号' : '成绩项';
-                if (index === 0) {
-                return '学号';
-                }
-                else if (index === 1) {
-                return '姓名';
-                } else if (index === 2) {
-                return '考试情况';
-                } else {
-                return '成绩项';
-                }
-                },
-            rowHeaders: function(index) { // true
-                if (index === 0) {
-                return '名称';
-                } else if (index === 1) {
-                return '分值';
-                // } else if (index === 2) {
-                //   return '平均分';
-                // } else if (index === 2) {
-                //   return '指标点';
-                } else if (index === 2) {
-                return '设置';
-                } else {
-                return index - self.NUM_AUX_ROW + 1;
-                }
-                // return index === 0 ? '成绩项' : index;
-            },
-            
-            fixedRowsTop: 3,
-            fixedColumnsLeft: 2,
-            minSpareRows: 0,
-            minSpareCols: 0,
-            preventOverflow: 'horizontal',
-            manualColumnMove: false,
-            copyPaste: true,
-            colWidths: 120,
-            
-            contextMenu: {
-              items:{
-                  'row_above': {
-                      name: '在上方插入行'
-                  },
-                  'row_below': {
-                      name: '在下方插入行'
-                  },
-                  'remove_row': {
-                      name: '删除行'
-                  }
-              }
-            },
-            beforeCreateRow(index,amount,source){
-              if (source === 'loadData') { 
-                // console.log('same');
-                return;
-              }
-              else{
-                console.log('add extare row',index,amount,source)
-                if(index<=2){
-                  // console.log('this row should not created!')
-                  return false;
-                }
-              }
-            },
-            beforeRemoveRow(index,amount,physicalRows,source){
-              if (source === 'loadData') { 
-                // console.log('same');
-                return;
-              }
-              else{
-                
-                if(index<=2){
-                  // console.log('this row should not created!')
-                  return false;
-                }
-              }
-            },
-
-            afterChange(changes, source) {
-              if (source === 'loadData') { 
-                // console.log('same');
-                return;
-              } else { 
-                self.isValid();
-                if(self.count==0){
-                  self.dirty=false;
-                  console.log("console:", self.count,"dirty", self.dirty,'items:',self.db.items);
-                }
-                else{
-                  self.dirty=true;
-                  self.firstActivities = false;
-                  console.log("console:", self.count,
-                  "dirty", self.dirty,
-                  'items:',self.db.items,
-                  'firstActivities:',self.firstActivities);
-                }
-                self.count++;
-                console.log('console:',self.count);
-                }
-            }
-        });
-        that.hotInstance = hotRegisterer;
-        that.hotInstance.updateSettings({
-          columns:that.columnList[0],
-          data:that.db.items[0],
-          cells: that.getHotCellsFunction(),  
-              });
-        });
-},
-getHotCellsFunction() {
-              let that = this;
-            return function (row, col, prop) {  // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
-                var cellProperties = {};
-                
-                if (col === 0) {  // studentNo column
-                   
-                cellProperties.readOnly = true;
-                cellProperties.className = 'cell-disallow';
-                }
-                if (row < 3  && col < 3 && col!=0) {
-                 // left-top zone
-                cellProperties.readOnly = false;
-                // cellProperties.type = 'string';
-                cellProperties.className = 'cell-disallow';
-                }
-                if (row != 0 && row != 2 && col >= 3) { 
-                // for 2nd row(分值), also validScore
-                cellProperties.type = 'numeric';  // by default: 'string'
-                //   cellProperties.validator = that.validScore();
-                cellProperties.format = '0[.]0';  // http://numeraljs.com/
-                } else {
-                //   cellProperties.validator =  that.validString();
-                }
-
-
-                // if(col === 1 ){
-                  
-                //   cellProperties.type = 'numeric';
-                // }
-                // if(col === 2 ){
-                //   cellProperties.type = 'text';
-                // }
-
-            
-
-                if (col === 0) {
-                cellProperties.width = 100;
-                if(row >2){
-                    cellProperties.readOnly = false;
-                }
-                }
-                if(col >=0 && col <= 2){
-                  if(row >= 0 && row <= 2){
-                    cellProperties.readOnly = true;
-                    
-                    
-                  }
-                }
-
-                // if (col > 2 && row === 2) {
-                // cellProperties.type = 'dropdown';
-                // cellProperties.source = [' ','总评','期末'];
-                // cellProperties.allowEmpty = true;
-                // cellProperties.className = 'ht-s-size';
-                // //   cellProperties.validator = that.validScoreSetting();
-                // }
-                if(col === 2 && row > 2){
-                  console.log('updating cell rules current currenteditableTabsValue:',that.currenteditableTabsValue);
-                  if(that.currenteditableTabsValue - 1 == 0||that.currenteditableTabsValue == 0){
-                    cellProperties.type = 'dropdown';
-                    cellProperties.source = [' ','缺考','缓考','不及格','取消考试资格'];
-                    cellProperties.allowEmpty = true;
-                  }
-                  else{
-                    cellProperties.readOnly = true;
-                    
-                  }
-                  
-                }
-                if(row <= 2){
-                  cellProperties.readOnly = true;
-                 
-                  
-                }
-
-                return cellProperties;
-            };
-    },
-    validStudentNumber(value) {
-     
-      console.log('validStudentNumber',value);
-      if (/^\d+$/.test(value)) { // 测试是否为纯数字
-        return true;
-      } else {
-        return false;
-      }
-    },
-    validStudentName(value) {
-      
-      console.log('validStudentName',value);
-      if (/^[\u4e00-\u9fa5]+$/.test(value)) { // 测试是否为纯中文
-        return true;
-      } else {
-        return false;
-      }
-    },
-    validString(value, callback) {
-      if (value && value.length > 0) {
-        callback(true);
-      } else {
-        callback(false);
-      }
-    },
-    validScoreSetting(value, callback) {
-      if (this.scoreSettingOptions.indexOf(value) >= 0) {
-        callback(true);
-      } else {
-        callback(false);
-      }
-    },
+          console.log('validStudentNumber',value);
+          if (/^\d+$/.test(value)) { // 测试是否为纯数字
+            return true;
+          } else {
+            return false;
+          }
+        },
+        validStudentName(value) {
+          
+          console.log('validStudentName',value);
+          if (/^[\u4e00-\u9fa5]+$/.test(value)) { // 测试是否为纯中文
+            return true;
+          } else {
+            return false;
+          }
+        },
+        validString(value, callback) {
+          if (value && value.length > 0) {
+            callback(true);
+          } else {
+            callback(false);
+          }
+        },
+        validScoreSetting(value, callback) {
+          if (this.scoreSettingOptions.indexOf(value) >= 0) {
+            callback(true);
+          } else {
+            callback(false);
+          }
+        },
 
 
 
@@ -1150,8 +1131,12 @@ async getActivities(){
           console.log('postData.scores', that.postData.scores);
         }).catch(e=>{
           console.log('e:',e);
-          
-          console.log('postData.scores', that.postData.scores);
+          ElMessage({
+                  type: 'error',
+                  message: e.code,
+                  duration:1500,
+                });
+          // console.log('postData.scores', that.postData.scores);
         })
     }
     

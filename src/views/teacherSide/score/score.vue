@@ -2,6 +2,7 @@
   <!-- 顶部导航栏 -->
   <div class="block">
     <el-row class="block-row">
+      <!-- 返回 -->
       <el-tooltip
         class="box-item"
         effect="dark"
@@ -21,6 +22,7 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+      <!-- 成绩项 -->
       <el-tooltip
         class="box-item"
         effect="dark"
@@ -28,23 +30,46 @@
         
         :hide-after="0"
       >
-      <template #content>
-        <span v-show="hasDetail">
-          成绩项
-        </span>
-        <span v-show="hasNoDetail">
-          请先关联课程大纲
-        </span>
-      </template>
-      <el-icon 
-      v-show="this.identity == '教师'||this.identity == '学院管理员'"
+        <template #content>
+          <span v-show="hasDetail">
+            成绩项
+          </span>
+          <span v-show="hasNoDetail">
+            请先关联课程大纲
+          </span>
+        </template>
+
+        <el-icon v-show="this.identity == '教师'||this.identity == '学院管理员'"
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            @click="goActivity"
+            ><Histogram />
+        </el-icon>
+        
+      </el-tooltip>
+<!-- 试卷分析 -->
+      <el-tooltip
+          v-show="this.identity == '教师'"
+          class="box-item"
+          effect="dark"
+          content="试卷分析"
+          placement="bottom"
+          :hide-after="0"
+      >
+        <el-icon
           class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
-          @click="goActivity"
-          ><Histogram /></el-icon>
-          </el-tooltip>
+          style="margin-left: 20px"
+          @click="goPaperAnalysis()"
+        >
+          <DataAnalysis />
+        </el-icon>
+      </el-tooltip>
+          
       <el-divider class="divider" v-show="this.identity == '教师'||this.identity == '学院管理员'" direction="vertical" />
+
       <el-tooltip
             class="box-item"
             effect="dark"
@@ -165,7 +190,7 @@
 </template>
 
 <script>
-import { Back,Histogram } from "@element-plus/icons-vue";
+import { Back,Histogram,DataAnalysis } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElMessageBox, ElSwitch,ElMessage} from "element-plus";
 import  reviewDrawer  from '@/components/teacherClass/reviewDrawer.vue'
@@ -174,7 +199,7 @@ import request from "@/utils/request/request";
 export default {
   name: "Score",
   components: {
-    Back,addBtn,request,ElSwitch,reviewDrawer,Histogram,ElMessage
+    Back,addBtn,request,ElSwitch,reviewDrawer,Histogram,ElMessage,DataAnalysis
   },
   data() {
     return {
@@ -342,6 +367,9 @@ export default {
     },
     backClass() {
       this.$router.push("/teacherClass");
+    },
+    goPaperAnalysis(){
+      this.$router.push("/examAnalysis");
     },
     async getActivities(){
       let that = this;

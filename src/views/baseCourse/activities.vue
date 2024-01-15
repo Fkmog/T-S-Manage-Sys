@@ -20,7 +20,7 @@
           <Back />
         </el-icon>
       </el-tooltip>
-      <div class="title">课程信息</div>
+      <div class="title">分析表信息</div>
       <el-divider class="divider" direction="vertical" />
       
 
@@ -58,7 +58,7 @@
 
 
   <!-- @tab-add="this.handleTabsEdit('','add')"   -->
-  <el-tabs v-model="editableTabsValue" type="card" class="activity-tab" editable 
+  <el-tabs v-show="showActivities" v-model="editableTabsValue" type="card" class="activity-tab" editable 
   @tab-click="editableTabsValueChange"
   @edit="handleTabsEdit"
   id="drag-tab"
@@ -87,19 +87,19 @@
         </span>
         
         <el-input v-else-if="!!item.inputFlag" :ref="`myInput${item.name}`"
-            v-model="newActivityTitle" type="text" 
-            style="width: 250px;margin-left: 10px;"
-            clearable
-            @clear="item.inputFlag = false;item.title = originActivityTitle"
-            >
-            <template #append>
-              
-                <el-icon size="22px" style="cursor: pointer;" @click="item.inputFlag = false;item.title = newActivityTitle">
-                  <Checked />
-                </el-icon>
-              
-            </template>
-    </el-input>
+              v-model="newActivityTitle" type="text" 
+              style="width: 250px;margin-left: 10px;"
+              clearable
+              @clear="item.inputFlag = false;item.title = originActivityTitle"
+              >
+              <template #append>
+                
+                  <el-icon size="22px" style="cursor: pointer;" @click="item.inputFlag = false;item.title = newActivityTitle">
+                    <Checked />
+                  </el-icon>
+                
+              </template>
+        </el-input>
             <!--  item.title = originActivityTitle;item.inputFlag = false; -->
             
         <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
@@ -130,8 +130,32 @@
     
   </el-tabs>
   
-  <div class="card-container">
-    <div class="hot-table-container" id="courseHot"></div>  
+  <div class="card-container" :style="(from == 'paperAnalysis')?style_paperanalysis:''">
+    <el-tooltip
+    v-if="!showActivities"
+          class="box-item"
+          style="display:flex"
+          effect="dark"
+          content="添加成绩项"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-button 
+            @click="addActivities" 
+            link 
+            :disabled="!over21"
+            style="padding: 10px;"
+          >
+            <el-icon
+              size="22px"
+              color="rgb(137, 137, 137)"
+            >
+              <CirclePlus />
+            </el-icon>
+          </el-button>
+      </el-tooltip>
+    <div v-if="!showActivities" class="hot-table-container" id="courseHot"></div> 
+    <div v-if="showActivities" class="hot-table-container" id="courseHot"></div>   
   </div>
     </div>
   
@@ -151,6 +175,7 @@
   import { Back ,CloseBold,Checked, EditPen,FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,CirclePlus,DocumentChecked} from '@element-plus/icons-vue'
   import Handsontable from 'handsontable';
   import request from '@/utils/request/request'
+  import { getObjectives,submitPaperAnalysis,getDetailedPaperAnalysis,editPaperAnalysis } from "@/api/basecourse";
  
   
   
@@ -159,7 +184,6 @@
   
   
   import 'handsontable/dist/handsontable.full.css'
-import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/src/props/shared';
   
   
   
@@ -168,6 +192,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     data(){
       let that = this;
       return{
+        paperAnalysisId:"",
+
+        columnSummaryList:[],
+
+        showActivities:true,
+        
+        hasObjectives:false,
+        objectivesName:["题号","分值"],
+
         activityTitleConfirm:true,
         originActivityTitle:'',
         newActivityTitle:'',
@@ -189,7 +222,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         editableTabs: [],
         tabIndex: 0,
         
-
+        style_paperanalysis:{
+        marginTop:'100px'
+        },
 
 
 
@@ -213,9 +248,15 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           item:[],
           value:[],
           remark:[]
+        },
+        objectives:{
+          object:[],
+          title:[],
+          sum:[],
+          value:[]
         }
           },
-        db: { items: [] },
+        db: { items: [] ,objectives:[]},
         departmentId:0,
         fromCourseBatchAdd:false,
 
@@ -227,6 +268,24 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,Action
       ,CirclePlus,DocumentChecked,Sortable,EditPen,Checked,CloseBold
     },
+    // watch:{
+    //   count:{
+    //     handler(){
+    //       for(let i=1;i<this.db.objectives.length;i++){
+    //           this.db.objectives[i][0] = 0;
+    //             // console.log('this.db.objectives[i]',this.db.objectives[i])
+    //             for(let j=1;j<this.db.objectives[i].length;j++){
+    //               this.db.objectives[i][0] =this.db.objectives[i][0] + Number(this.db.objectives[i][j]);
+    //             }
+    //           }
+    //         if(this.hotInstance){
+    //           this.hotInstance.updateSettings({
+    //             data:this.db.objectives,
+    //           });
+    //         }
+    //     }
+    //   }
+    // },
     
     methods:{
       blurDelay(){
@@ -493,7 +552,8 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       }
     },
     addActivities() {
-      console.log('currenteditableTabsValue',this.currenteditableTabsValue);
+      if(this.from != 'paperAnalysis'){
+        console.log('currenteditableTabsValue',this.currenteditableTabsValue);
       // this.iscolover21();
       if(this.currenteditableTabsValue == 0){
         this.colNum = this.db.items[this.currenteditableTabsValue][0].length;
@@ -528,89 +588,188 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         // this.dictTolist(this.db.items);
         
         }
+      }
+      else{
+        console.log('this.db.objectives',this.db.objectives)
+        
+        this.db.objectives.forEach((objective)=>{
+          objective.push('')
+        })
+        // for(let i=0;i<this.objectivesName.length;i++){
+         
+        //   this.db.objectives[i].push('');
+        // }
+       
+        this.hotInstance.updateSettings({
+            data: this.db.objectives,
+            
+          });
+          
+      }
+      
         
        
       },
     activateHotcolumn(){
       let self = this;
       let that = this;
-      this.getActivities().then(function () {
-        let container = document.querySelector("#courseHot");
-        // let container = this.$refs.courseHot;
-        let hotRegisterer = new Handsontable(container, {
-          data: self.db.items[0],
-          licenseKey: "non-commercial-and-evaluation",
-          colHeaders: false,
-          dragToScroll: true,
-          rowHeaders: ["成绩项", "分值", "设置", "权重"],
-          copyPaste: true,
-          colWidths: 70,
-          allowRemoveColumn: true,
 
-          contextMenu: {
-            items: {
-              col_left: {
-                name: "在左侧插入列",
-              },
-              col_right: {
-                name: "在右侧插入列",
-              },
-              remove_col: {
-                name: "删除列",
-              },
+      console.log('getting getActivities')
+      
+      let container = document.querySelector("#courseHot");
+      // let container = this.$refs.courseHot;
+      if(that.from !='paperAnalysis'){
+        let hotRegisterer = new Handsontable(container, {
+        data: self.db.items[0],
+        licenseKey: "non-commercial-and-evaluation",
+        colHeaders: false,
+        dragToScroll: true,
+        rowHeaders: ["题号", "分值", "设置", "权重"],
+        copyPaste: true,
+        colWidths: 70,
+        allowRemoveColumn: true,
+
+        contextMenu: {
+          items: {
+            col_left: {
+              name: "在左侧插入列",
+            },
+            col_right: {
+              name: "在右侧插入列",
+            },
+            remove_col: {
+              name: "删除列",
             },
           },
-          afterChange(changes, source) {
-            if (source === "loadData") {
-              console.log("same");
-              return;
+        },
+        afterChange(changes, source) {
+          if (source === "loadData") {
+            // console.log("same");
+            return;
+          } else {
+            self.isValid();
+            if (self.count == 0) {
+              self.dirty = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.items
+              // );
             } else {
-              self.isValid();
-              if (self.count == 0) {
-                self.dirty = false;
-                console.log(
-                  "console:",
-                  self.count,
-                  "dirty",
-                  self.dirty,
-                  "items:",
-                  self.db.items
-                );
-              } else {
-                self.dirty = true;
-                self.firstActivities = false;
-                console.log(
-                  "console:",
-                  self.count,
-                  "dirty",
-                  self.dirty,
-                  "items:",
-                  self.db.items,
-                  "firstActivities",
-                  self.firstActivities
-                );
-              }
-              self.count++;
-              console.log("console:", self.count);
+              self.dirty = true;
+              self.firstActivities = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.items,
+              //   "firstActivities",
+              //   self.firstActivities
+              // );
             }
-          },
-          afterRemoveCol(changes, source) {
-            self.firstActivities = false;
-          },
-        });
+            self.count++;
+            // console.log("console:", self.count);
+          }
+        },
+        afterRemoveCol(changes, source) {
+          self.firstActivities = false;
+        },
+      });
 
-        that.hotInstance = hotRegisterer;
-        that.hotInstance.updateSettings({
-          data: that.db.items[0],
-          cells: that.getHotCellsFunction(),
-        });
-      }).catch((e)=>{
-        console.log(e)
-      })
+      that.hotInstance = hotRegisterer;
+      that.hotInstance.updateSettings({
+        data: that.db.items[0],
+        cells: that.getHotCellsFunction(),
+      });
+      }
+      else{
+        console.log('Handsontable init')
+        let hotRegisterer = new Handsontable(container, {
+        data: self.db.objectives,
+        licenseKey: "non-commercial-and-evaluation",
+        colHeaders: false,
+        dragToScroll: true,
+        rowHeaders: self.objectivesName,
+        rowHeaderWidth: 100,
+        copyPaste: true,
+        allowRemoveColumn: true,
+        colWidths: 100,
+        
+        
+        contextMenu: {
+          items: {
+            col_left: {
+              name: "在左侧插入列",
+            },
+            col_right: {
+              name: "在右侧插入列",
+            },
+            remove_col: {
+              name: "删除列",
+            },
+          },
+        },
+
+        
+        afterChange(changes, source) {
+          // console.log('afterChange',changes)
+          
+          if (source === "loadData") {
+            // console.log("same");
+            return;
+          } else {
+            self.isValid();
+            if (self.count == 0) {
+              self.dirty = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.objectives
+              // );
+            } else {
+              self.dirty = true;
+              self.firstActivities = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.objectives,
+              //   "firstActivities",
+              //   self.firstActivities
+              // );
+            }
+            self.count++;
+            // console.log("console:", self.count);
+          }
+        },
+        afterRemoveCol(changes, source) {
+          self.firstActivities = false;
+        },
+      });
+      
+      that.hotInstance = hotRegisterer;
+      that.hotInstance.updateSettings({
+        data:that.db.objectives,
+        cells: that.getHotCellsFunction(),
+        
+      });
+      }
+
     },
     getHotCellsFunction() {
       let that = this;
-      return function (row, col, prop) {
+      if(this.from != 'paperAnalysis'){
+        return function (row, col, prop) {
         // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
         var cellProperties = {};
         if (row === 2) {
@@ -643,8 +802,22 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
         return cellProperties;
       };
+      }
+      else{
+        return function (row, col, prop) {
+        // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+        var cellProperties = {};
+        
+        if(row == 0){
+          cellProperties.allowEmpty = false;
+
+        }
+        return cellProperties;
+      };
+      }
+      
     },
-    async getActivities() {
+   getActivities() {
       let that = this;
       if(this.from == 'Score'){
         console.log('this is the activity from class');
@@ -697,6 +870,48 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       });
       }
       else{
+        if(this.from == 'paperAnalysis' && this.paperAnalysisId){
+           getDetailedPaperAnalysis(this.paperAnalysisId).then((res)=>{
+            console.log('getDetailedPaperAnalysis',res)
+            let setting = res.data.setting;
+            setting.object.forEach((objectname)=>{
+              this.objectivesName.push(objectname)
+            })
+            
+
+            if(setting.sum){
+              
+            // this.objectivesName.concat(setting.object);
+            
+            let sum = ['合计']
+            this.db.objectives.push(sum.concat(setting.title));
+            for(let i=0;i<setting.sum.length;i++){
+              let templist = []
+              templist.push(setting.sum[i])
+              
+              for(let j=0;j<setting.value[i].length;j++){
+                templist.push(setting.value[i][j])
+              }
+              
+              
+              this.db.objectives.push(templist)
+            }
+            for(let i=setting.sum.length+1;i<this.objectivesName.length;i++){
+                this.db.objectives.push([''])
+            }
+            console.log('this.db.objectives',this.db.objectives)
+            }
+            else{
+              setting.object.forEach(()=>{
+                this.db.objectives.push([''])
+            })
+            }
+            
+            this.activateHotcolumn();
+          })
+          
+        }
+        else{
         console.log('this is the activity from detail',this.detailId);
         return request({
         url: "/detail/" + this.detailId,
@@ -748,21 +963,31 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           tempdata.push(weight);
           that.db.items.push(tempdata);
         }
+
+
+        that.activateHotcolumn();
       }).catch((e)=>{
         console.log('get activity error',e)
       })
-      }
+    }
+  }
+        
+      
       
     },
     isValid() {
-      if (this.firstActivities) {
+     
+        if (this.firstActivities) {
         console.log("isValid:this.firstActivities:", this.firstActivities);
         return false;
       } else {
         var result = this.toPostData();
-
+        // console.log('result',result);
         return !!result;
       }
+      
+      
+      
     },
     isNotDirty() {
       this.dirty = false;
@@ -771,11 +996,19 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       let that = this;
       this.saving = true;
       this.dirty = false;
+      this.postData.objectives = {
+          object:[],
+          title:[],
+          sum:[],
+          value:[]
+        }
       var result = this.isValid();
       if (!result) {
         this.saving = false;
         return;
       }
+      if(this.from != 'paperAnalysis'){
+      
       let keyNum = [];
       let keyName = [];
       for (let i = 0; i < Object.keys(this.editableTabs).length; i++) {
@@ -927,55 +1160,139 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         }
        
       }
+      }
+      else{
+
+        console.log('this.db.objectives:',this.db.objectives)
+        this.db.objectives[0].slice(1,this.db.objectives[0].length).forEach((title)=>{
+          if(typeof(title) === 'string'){
+            this.postData.objectives.title.push(title.trim());
+          }
+          else{
+            this.postData.objectives.title.push(title);
+          }
+        })
+        this.postData.objectives.object = this.objectivesName.slice(2,this.objectivesName.length);
+        
+        for(let i=1;i<this.db.objectives.length;i++){
+            // console.log('this.db.objectives[i][0]',typeof(this.db.objectives[i][0]))
+            
+              if(typeof(this.db.objectives[i][0]) === 'string'){
+                this.postData.objectives.sum.push(parseFloat(this.db.objectives[i][0].trim()));
+              }
+              else{
+                this.postData.objectives.sum.push(parseFloat(this.db.objectives[i][0]));
+              }
+            
+            
+            
+            let templist = []
+            for(let j=1;j<this.db.objectives[i].length;j++){
+              if(typeof(this.db.objectives[i][j]) === 'string'){
+                 templist.push(Number(this.db.objectives[i][j].trim())) 
+              }
+              else{
+                templist.push(Number(this.db.objectives[i][j]))
+              }
+              // console.log('this.db.objectives[i][j]',typeof(this.db.objectives[i][j]))
+            //  templist.push(this.db.objectives[i][j].replace(/(\r\n)|(\n)/g,'')) 
+             
+            }
+            this.postData.objectives.value.push(templist)
+          
+          
+        }
+        for(let j=0;j<this.postData.objectives.value.length;j++){
+          for(let i=0;i<this.postData.objectives.value[j].length;i++){
+            // console.log(' this.postData.objectives[j][i]', this.postData.objectives.value[j][i])
+            if(!this.postData.objectives.value[j][i]){
+              this.postData.objectives.value[j][i] = null
+            }
+          }
+        }
+          
+        delete this.postData.objectives['length']
+
+        console.log('paperAnalysis postdata:',this.postData.objectives)
+
+        editPaperAnalysis({'setting':this.postData.objectives,'detailId':this.detailId,"id":this.paperAnalysisId}).then((res)=>{
+          console.log('paperAnalysis submit res',res);
+          if(res.code == 'SUCCESS'){
+            ElMessage({
+              type: "success",
+              message: "更新成功",
+              duration: 1500,
+            });
+          }
+          
+
+        }).catch((e)=>{
+          ElMessage({
+              type: "error",
+              message: e.msg,
+              duration: 1500,
+            });
+        
+        })
+
+      }
+      
       
   },
     toPostData(){
-      
-      this.postData.activities.length = 0; // clean array
-
-      var valid = true;
-
-      if (!this.currenteditableTabsValue) {
-        let length = this.db.items[this.currenteditableTabsValue][0].length;
-      } else {
-        let length = this.db.items[this.currenteditableTabsValue - 1][0].length;
-      }
-
-      // let count=0;
-      // let hasremark=false;
-      // for(let i=0;i<length;i++){
-      //   if(this.db.item[2][i.toString()]){
-      //     count++;
-      //   }
-      // }
-      // if(count){
-      //   hasremark=true;
-      // }
-      for (let i = 0; i < length; i++) {
-        if (
-          !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
-          !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
-          !this.db.items[this.currenteditableTabsValue - 1][i][3]
-        ) {
-          valid = false;
-          break;
+      if(this.from != 'paperAnalysis'){
+        this.postData.activities.length = 0; // clean array
+        let valid = true;
+        if (!this.currenteditableTabsValue) {
+          let length = this.db.items[this.currenteditableTabsValue][0].length;
+        } else {
+          let length = this.db.items[this.currenteditableTabsValue - 1][0].length;
         }
+        for (let i = 0; i < length; i++) {
+          if (
+            !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
+            !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
+            !this.db.items[this.currenteditableTabsValue - 1][i][3]
+          ) {
+            valid = false;
+            break;
+          }
       }
-
       return valid;
+      }
+      else{
+        this.postData.objectives.length = 0;
+        let valid = true;
+        if(this.db.objectives[0]){
+          for(let i=0;i<this.db.objectives[0].length;i++){
+          if(!this.db.objectives[0][i]){
+            valid = false;
+            break;
+          }
+        }
+        }
+        else{
+          valid = false;
+        }
+        
+        
+          
+        
+        return valid;
+      }
+      
+
+      
     },
   goBackandClean(){
     this.db.items = [];
     this.postData.activities = [];
-    
     console.log('datas:', this.db.items,this.postData.activities);
     this.reload();
     
   },
   gobaseCourseDetail(){
     console.log('gobaseCourseDetail:'+this.saving+this.dirty);
-    
-    
     if(this.dirty == true || this.saving== false&&this.dirty == true ){
       ElMessageBox.confirm(
       '数据还未保存，是否仍然关闭？',
@@ -992,6 +1309,9 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
           console.log('go score');
           this.$router.push({ name: "Score",});
         }
+        else if(this.from == 'paperAnalysis'){
+        this.$router.push({ path:'/paperAnalysis'});
+      }
         else{
           this.$router.push({ path:'/baseCourseDetail'});
         }
@@ -1007,9 +1327,12 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
         console.log('go score');
           this.$router.push({ name: "Score",});
         }
-        else{
-          this.$router.push({ path:'/baseCourseDetail'});
-        }
+      else if(this.from == 'paperAnalysis'){
+        this.$router.push({ path:'/paperAnalysis'});
+      }
+      else{
+        this.$router.push({ path:'/baseCourseDetail'});
+      }
     
     }
   },
@@ -1020,6 +1343,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       this.courseId = this.$store.state.course.baseCourseCourseId;
       this.identity = this.$store.state.currentInfo.identity;
       this.detailId = this.$store.state.course.detailId;
+      this.paperAnalysisId = this.$store.state.course.basecoursePaperAnalysisId;
       if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -1037,11 +1361,17 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
       if( this.$route.query['parentName'] == 'Score'){
           this.from = this.$route.query['parentName'];
       }
+      else if( this.$route.query['parentName'] == 'paperAnalysis'){
+        this.from = this.$route.query['parentName'];
+        this.showActivities = false;
+        this.showPaperAnalysis = true;
+      }
       else{
         this.from = '';
       }
       console.log('from',this.from);
-      this.activateHotcolumn();
+      this.getActivities();
+     
       
      
       
@@ -1054,6 +1384,7 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
     margin:10px;
   }
   .card-container{
+    /* margin-top: 100px; */
     margin-left: 10%;
     width: 80%;
     height: 150px;
@@ -1077,9 +1408,10 @@ import { disabledTimeListsProps } from 'element-plus/es/components/time-picker/s
   padding: 0 0 50px 20px;
 }
 .hot-table-container {
-  float: left;
+  /* float: left; */
+  display: flex;
   height: 100px;
-  margin-top: 10px;
+  /* margin-top: 10px; */
   margin-left: 10px;
 }
 .divider {
