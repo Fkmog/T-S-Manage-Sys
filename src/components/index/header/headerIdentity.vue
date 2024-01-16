@@ -42,7 +42,7 @@
       </el-row>
       <el-row v-show="identity.roleName == '课程负责人'">
         <el-col :span="18">
-            {{ identity.departmentName }}
+          {{ identity.departmentName }}
         </el-col>
         <el-col :span="6">
           <el-tag effect="plain">
@@ -101,6 +101,7 @@
 
 <script>
 import Cookies from "js-cookie";
+import { logout } from "@/api/login/login.js";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { CaretBottom, CaretTop } from "@element-plus/icons-vue";
 import { updateUserPwd } from "@/api/userInfo/getUserInfo";
@@ -158,14 +159,25 @@ export default {
         type: "warning",
       })
         .then(() => {
-          ElMessage({
-            type: "success",
-            message: "已退出登录",
-            duration: 1500,
+          logout().then(() => {
+            if (res.code === "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: "已退出登录",
+                duration: 1500,
+              });
+              Cookies.remove("Admin-Token");
+              Cookies.remove("first-Login");
+              this.$router.push("/login");
+            }
+            else{
+                ElMessage({
+                type: "error",
+                message: "退出登录失败",
+                duration: 1500,
+              });
+            }
           });
-          Cookies.remove("Admin-Token");
-          Cookies.remove("first-Login");
-          this.$router.push("/login");
         })
         .catch(() => {});
     },
@@ -183,13 +195,13 @@ export default {
                   duration: 1500,
                 });
               }
-              if(res.code==="ERROR"){
-                if(res.msg=='新密码不能与旧密码相同')
-                ElMessage({
-                  type: "error",
-                  message: res.msg,
-                  duration: 1500,
-                });
+              if (res.code === "ERROR") {
+                if (res.msg == "新密码不能与旧密码相同")
+                  ElMessage({
+                    type: "error",
+                    message: res.msg,
+                    duration: 1500,
+                  });
               }
             }
           );

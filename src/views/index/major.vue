@@ -219,8 +219,8 @@ export default {
 .cardList {
   display: flex;
   flex-direction: row;
-  width: 88%;
-  margin-left: 6%;
+  width: 1200px;
+  margin: 0 auto;
   flex-wrap: wrap;
   margin-top: 55px;
 }
@@ -256,9 +256,10 @@ export default {
 }
 /* 定义底层盒子样式 */
 .card {
-  margin-left: 50px;
-  margin-right: 50px;
-  margin-top: 50px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 35px;
+  margin-top: 20px;
   position: relative;
   width: 350px;
   height: 250px;

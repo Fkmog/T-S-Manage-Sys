@@ -3,7 +3,7 @@
   <HeaderSearch
     msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
     @SearchValue="getSearchValue"
-    :searchInput='keyword'
+    :searchInput="keyword"
   >
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
@@ -331,19 +331,21 @@
       :show-close="false"
       :align-center="true"
     >
-      <el-select
+      <el-cascader
         v-model="assignedDetail"
+        :options="detailList"
         style="width: 250px; margin-left: 20px"
         placeholder="选择课程大纲版本"
+        class="custom-cascader"
       >
-        <el-option
-          v-for="(datail, index) in detailList"
-          :key="index"
-          :label="datail.versionInfo"
-          :value="datail.detailId"
-        >
-        </el-option>
-      </el-select>
+        <template  #default="{ node, data }">
+          <span v-if="data.children">{{ node.label }}</span>
+          <el-tooltip v-else  :hide-after="0" :content="data.description" effect="dark" placement="top">
+            <span>{{ node.label }}</span>
+          </el-tooltip>
+        </template>
+      </el-cascader>
+
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="isAssign = false">取消</el-button>
@@ -541,6 +543,7 @@ import {
   associateCourses,
 } from "@/api/class";
 import { checkTeachers } from "@/api/teacher";
+import { getExamList } from "@/api/exam";
 import { getDictionary } from "@/api/dictionary";
 import addBtn from "@/components/general/addBtn.vue";
 import {
@@ -569,6 +572,11 @@ export default {
   },
   data() {
     return {
+      // cascaderProps: {
+      //   value:'examId',
+      //   label:'label',
+      //   children:'children'
+      // },
       multIsRespondent: "",
       hasClass: false,
       noClass: false,
@@ -579,7 +587,7 @@ export default {
       showAdd: false,
       keyword: "",
       detailList: [],
-      assignedDetail: "",
+      assignedDetail: [],
       multipleSelection: [],
       selectedCourseId: "",
       canSelectAll: true,
@@ -679,7 +687,7 @@ export default {
     this.getDictionary();
     if (sessionStorage.getItem("classSearchFlag")) {
       this.keyword = sessionStorage.getItem("searchForm");
-      this.getSearchValue(this.keyword)
+      this.getSearchValue(this.keyword);
     } else {
       sessionStorage.removeItem("searchForm");
     }
@@ -732,17 +740,17 @@ export default {
       deep: true,
       handler(value) {
         if (value.length > 0) {
-          this.assignedDetail = "";
+          this.assignedDetail = [];
           this.getDetailList();
           this.showAdd = true;
         } else {
-          this.assignedDetail = "";
+          this.assignedDetail = [];
           this.showAdd = false;
         }
       },
     },
   },
- 
+
   methods: {
     //跳转到审核页面
     goCheck(row, column) {
@@ -758,7 +766,7 @@ export default {
         } else {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
         }
-        sessionStorage.setItem("searchForm",this.keyword);
+        sessionStorage.setItem("searchForm", this.keyword);
         sessionStorage.removeItem("classSearchFlag");
         this.$router.push({ name: "TeacherClass" });
       }
@@ -769,7 +777,7 @@ export default {
     },
     // 搜索栏查询
     getSearchValue(data) {
-      this.$refs.multipleTable.clearSelection()
+      this.$refs.multipleTable.clearSelection();
       sessionStorage.removeItem("classSearchFlag");
       this.keyword = data;
       console.log("keyword", this.keyword, this.currentInfo.schoolId);
@@ -1016,7 +1024,7 @@ export default {
         this.currentInfo.departmentId,
         this.currentInfo.schoolId
       ).then((res) => {
-        console.log("getDetailList", res);
+        console.log("getDetailList1", res);
         this.detailList = res.rows;
       });
       // console.log("@#",this.onlyAcademicYear);
@@ -1208,8 +1216,24 @@ export default {
       ).then((res) => {
         console.log("getDetailList", res);
         this.detailList = res.rows;
+
         this.detailList.forEach((item) => {
           item.versionInfo = item.courseName + "-" + item.versionName;
+          item.value = item.detailId;
+          item.label = item.versionInfo;
+          getExamList(
+            item.detailId,
+            this.currentInfo.schoolId,
+            this.currentInfo.departmentId
+          ).then((res) => {
+            // console.log("@@", res);
+            item.children = res.rows;
+            res.rows.forEach((item) => {
+              item.value = item.id;
+              item.label = item.name;
+            });
+            // console.log("!", item);
+          });
         });
       });
     },
@@ -1217,11 +1241,14 @@ export default {
     assignDetail() {
       // console.log("123", this.multipleSelection);
       this.isAssign = true;
+      console.log("list", this.detailList);
     },
     //确定分配课程大纲
     confirmAssign() {
+      console.log("!", this.assignedDetail);
       this.multipleSelection.forEach((item) => {
-        item.detailId = this.assignedDetail;
+        item.detailId = this.assignedDetail[0];
+        item.examId = this.assignedDetail[1];
       });
       assign(this.multipleSelection).then((res) => {
         // console.log("assign",res);

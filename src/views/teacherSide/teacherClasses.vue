@@ -1,5 +1,54 @@
 <template>
-  <HeaderSearch msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号" @SearchValue="getSearchValue"></HeaderSearch>
+  <HeaderSearch
+    msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+    @SearchValue="getSearchValue"
+  >
+    <template #rightTime>
+      <div class="rightSlot" v-show="!showAdd">
+        <div class="selects">
+          <el-select
+            v-model="chosenYear"
+            placeholder="全部学年"
+            class="selecter"
+            @change="getClassesList()"
+          >
+            <el-option
+              v-for="item in academicYear"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+          <el-select
+            v-model="chosenSemester"
+            placeholder="全部学期"
+            class="selecter"
+            @change="getClassesList()"
+          >
+            <el-option
+              v-for="item in semester"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+          <el-select
+            v-model="chosenStatus"
+            placeholder="提交状态"
+            class="status"
+            @change="getClassesList()"
+          >
+            <el-option
+              v-for="item in status"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </div>
+      </div>
+    </template>
+  </HeaderSearch>
   <div class="classes-list">
     <div
       class="card"
@@ -26,6 +75,8 @@ import HeaderSearch from "@/components/general/headerSearch.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Search, DeleteFilled, Tools } from "@element-plus/icons-vue";
 import { checkClasses } from "@/api/teacherSide";
+import { getDictionary } from "@/api/dictionary";
+
 export default {
   name: "TeacherClasses",
   components: {
@@ -37,19 +88,71 @@ export default {
   data() {
     return {
       classesList: {},
-      keyword:"",
+      keyword: "",
+      chosenYear: "",
+      chosenSemester: "",
+      chosenStatus: "",
+       academicYear: [],
+      semester: [],
+      status: [
+        {
+          value: null,
+          label: "全部",
+        },
+        {
+          value: 1,
+          label: "未提交",
+        },
+        {
+          value: 2,
+          label: "已提交",
+        },
+        {
+          value: 3,
+          label: "已审核",
+        },
+        {
+          value: 4,
+          label: "已退回",
+        },
+      ],
     };
   },
   mounted() {
-    this.getClassesList();
+    this.getDictionary()
+    
   },
   methods: {
+    //获取数据字典
+    getDictionary() {
+      getDictionary().then((res) => {
+        console.log("getDictionary", res);
+        this.academicYear = res.academic_year;
+        this.semester = res.semester;
+        //修改，新增教学班时使用
+        this.onlyAcademicYear = JSON.parse(JSON.stringify(res.academic_year));
+        this.onlySemester = JSON.parse(JSON.stringify(res.semester));
+        //头部栏筛选使用
+        let year = {};
+        year.dictLabel = "全部学年";
+        year.dictValue = null;
+        this.academicYear.unshift(year);
+        let semester = {};
+        semester.dictLabel = "全部学期";
+        semester.dictValue = null;
+        this.semester.unshift(semester);
+       this.getClassesList();
+      });
+    },
     //获取课程列表
     getClassesList() {
       checkClasses(
         this.$store.state.currentInfo.schoolId,
         this.$store.state.currentInfo.departmentId,
-        this.keyword
+        this.keyword,
+        this.chosenYear,
+        this.chosenSemester,
+        this.chosenStatus
       ).then((res) => {
         this.classesList = res.rows;
         console.log("getClassesList", this.classesList);
@@ -62,9 +165,9 @@ export default {
       this.$router.push({ name: "TeacherClass" });
     },
     // 搜索栏查询
-     getSearchValue(data) {
+    getSearchValue(data) {
       this.keyword = data;
-      console.log("keyword", this.keyword, );
+      console.log("keyword", this.keyword);
       this.getClassesList();
     },
   },
@@ -72,14 +175,46 @@ export default {
 </script>
 
 <style scoped>
+.rightSlot {
+  position: absolute;
+  right: 10%;
+  width: 440px;
+  margin-top: 10px;
+}
+.selects {
+  display: flex;
+  flex-direction: row;
+}
+.selecter {
+  margin-left: 15px;
+  width: 120px;
+}
+.status {
+  margin-left: 15px;
+  width: 120px;
+}
+:deep().el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow: 0 0 0 0px;
+  border-radius: 0;
+}
+.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
+  box-shadow: 0 0 0 0px;
+}
 /* 盒子群样式 */
 .classes-list {
   display: flex;
   flex-direction: row;
-  width: 88%;
-  margin-left: 6%;
+  /* justify-content: space-between; */
+  width: 1200px;
+  margin: 0 auto;
   flex-wrap: wrap;
   margin-top: 55px;
+  margin-bottom: 45px;
 }
 /* 卡片盒子顶层icon */
 .deleteIcon {
@@ -113,9 +248,10 @@ export default {
 }
 /* 定义底层盒子样式 */
 .card {
-  margin-left: 50px;
-  margin-right: 50px;
-  margin-top: 50px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 35px;
+  margin-top: 20px;
   position: relative;
   width: 350px;
   height: 250px;

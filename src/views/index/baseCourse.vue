@@ -2,6 +2,7 @@
   <div v-show="!closeShow">
     <HeaderSearch
       :msg=(keyword)?keyword:defaultMsg
+      :msg=(keyword)?keyword:defaultMsg
       @SearchValue="getSearchValue"
       ref="headsearch"
     >
@@ -202,6 +203,7 @@
             <el-col :span="8" v-show="scope.row.versionId">
                 <el-tag
                   class="noBaseCourseDetail"
+                 
                  
                   >{{ currentVersionName }}
                 </el-tag>
