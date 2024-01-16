@@ -159,7 +159,7 @@ export default {
         type: "warning",
       })
         .then(() => {
-          logout().then(() => {
+          logout().then((res) => {
             if (res.code === "SUCCESS") {
               ElMessage({
                 type: "success",

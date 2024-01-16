@@ -223,7 +223,8 @@
         tabIndex: 0,
         
         style_paperanalysis:{
-        marginTop:'100px'
+        marginTop:'100px',
+        
         },
 
 
@@ -1387,7 +1388,7 @@
     /* margin-top: 100px; */
     margin-left: 10%;
     width: 80%;
-    height: 150px;
+    /* height: 150px; */
     background-color: white;
     box-shadow: 0px 1px 3px rgb(164, 163, 163);
   }
@@ -1410,7 +1411,7 @@
 .hot-table-container {
   /* float: left; */
   display: flex;
-  height: 100px;
+  /* height: 100px; */
   /* margin-top: 10px; */
   margin-left: 10px;
 }

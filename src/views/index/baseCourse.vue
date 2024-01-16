@@ -2,7 +2,6 @@
   <div v-show="!closeShow">
     <HeaderSearch
       :msg=(keyword)?keyword:defaultMsg
-      :msg=(keyword)?keyword:defaultMsg
       @SearchValue="getSearchValue"
       ref="headsearch"
     >

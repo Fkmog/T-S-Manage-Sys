@@ -1,5 +1,5 @@
 <template>
-    <div layout="column" flex class="ng-scope layout-column flex" v-if="isRouterAlive">
+    <div  flex v-show="isRouterAlive">
       <div class="block">
           <el-row class="block-row">
             <el-tooltip
@@ -53,13 +53,11 @@
           </el-row>
       </div>
 
-   
+    </div>
 
-      <div class="card-container"  >
+    <div class="card-container"  >
           <div class="hot-table-container" id="courseHot"></div>  
       </div>
-   
-    </div>
 </template>
     
     <script >
@@ -668,13 +666,15 @@
     
     <style  scoped>
     .card-container{
-    margin-left: 10%;
+    display: flex;
+    margin:auto;
+    margin-left: 100px;
     margin-top: 100px;
-    width: 80%;
-    height: 600px;
-    background-color: white;
-    box-shadow: 0px 1px 3px rgb(164, 163, 163);
-    overflow: auto; 
+    /* width: 80%; */
+    /* height: 600px; */
+    /* background-color: white; */
+    /* box-shadow: 0px 1px 3px rgb(164, 163, 163); */
+    /* overflow: auto;  */
     /* 这里用auto而不是hidden，应为hidden会直接把多出的部分删除，而auto则会保留多出来的部分，形成页面滑动scroll */
   }
     .activity-tab{
@@ -702,20 +702,13 @@
   border-bottom: 1px solid rgb(189, 189, 189);
   width: 100%;
 }
-    .hot-table-container{
-      
-      height: 100px;
-  }
     .hotTable{
       box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
     }
     .md-padding{
       margin-top: 120px;
     }
-    .ng-scope layout-column flex{
-    display: flex;
-    flex-direction: column;
-    }
+  
    
    
     
