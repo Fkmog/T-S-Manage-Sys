@@ -10,7 +10,7 @@ export function getExamList(detailId,schoolId,departmentId) {
         departmentId,
     },
   });
-}import request from "@/utils/request/request";
+}
 
 
 //查看试卷分析

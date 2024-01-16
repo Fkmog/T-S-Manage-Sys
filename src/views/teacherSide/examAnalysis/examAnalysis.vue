@@ -507,7 +507,6 @@
         this.postData.averageScore.averageScoreOnObject = tempaverageScoreOnObject;
         this.postData.averageScore.scoreRateOnObject = tempscoreRateOnObject;
 
-        
             for(let j = 1;j<this.db.objectives['0'].length-2;j++){
                 if(typeof(this.db.objectives[this.objectivesName.length-2][j])==='string'){
                     this.postData.averageScore.averageScoreOnTitle.push(parseFloat(this.db.objectives[this.objectivesName.length-2][j].trim()))
@@ -515,7 +514,6 @@
                 else{
                     this.postData.averageScore.averageScoreOnTitle.push(parseFloat(this.db.objectives[this.objectivesName.length-2][j]))
                 }
-
                 if(typeof(this.db.objectives[this.objectivesName.length-1][j])==='string'){
                     this.postData.averageScore.scoreRateOnTitle.push(parseFloat(this.db.objectives[this.objectivesName.length-1][j].trim()))
                 }
