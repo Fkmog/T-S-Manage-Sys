@@ -388,9 +388,36 @@ activateHotcolumn(){
                   }
               }
             },
+            beforeCreateRow(index,amount,source){
+              if (source === 'loadData') { 
+                // console.log('same');
+                return;
+              }
+              else{
+                console.log('add extare row',index,amount,source)
+                if(index<=2){
+                  // console.log('this row should not created!')
+                  return false;
+                }
+              }
+            },
+            beforeRemoveRow(index,amount,physicalRows,source){
+              if (source === 'loadData') { 
+                // console.log('same');
+                return;
+              }
+              else{
+                
+                if(index<=2){
+                  // console.log('this row should not created!')
+                  return false;
+                }
+              }
+            },
+
             afterChange(changes, source) {
               if (source === 'loadData') { 
-                console.log('same');
+                // console.log('same');
                 return;
               } else { 
                 self.isValid();
@@ -465,6 +492,7 @@ getHotCellsFunction() {
                   if(row >= 0 && row <= 2){
                     cellProperties.readOnly = true;
                     
+                    
                   }
                 }
 
@@ -484,11 +512,13 @@ getHotCellsFunction() {
                   }
                   else{
                     cellProperties.readOnly = true;
+                    
                   }
                   
                 }
                 if(row <= 2){
                   cellProperties.readOnly = true;
+                 
                   
                 }
 

@@ -148,6 +148,7 @@ export default createStore({
         baseCourseCourseYear: "",
         baseCourseRemark: "",
         baseCourseDetailId: "",
+        baseCourseKeyword: "",
       },
       getters: {},
       mutations: {
@@ -196,6 +197,9 @@ export default createStore({
         setbaseCourseRemark(state, newVal) {
           state.baseCourseRemark = newVal;
         },
+        setbaseCourseKeyword(state, newVal){
+          state.baseCourseKeyword = newVal;
+        }
       },
       actions: {},
       modules: {},

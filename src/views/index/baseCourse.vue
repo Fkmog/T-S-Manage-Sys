@@ -1,7 +1,7 @@
 <template>
   <div v-show="!closeShow">
     <HeaderSearch
-      msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+      :msg=(keyword)?keyword:defaultMsg
       @SearchValue="getSearchValue"
       ref="headsearch"
     >
@@ -116,12 +116,7 @@
       请先点击右上角圆形按钮添加课程
     </div>
 
-    <div
-      layout="row"
-      flex
-      class="md-padding"
-      v-show="identity == '学院管理员' && hasBaseCourse"
-    >
+    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员' && hasBaseCourse">
       <addBtn @click="dialogFormVisible = true"></addBtn>
 
     <el-table
@@ -207,7 +202,7 @@
             <el-col :span="8" v-show="scope.row.versionId">
                 <el-tag
                   class="noBaseCourseDetail"
-                  type="prime"
+                 
                   >{{ currentVersionName }}
                 </el-tag>
             </el-col>
@@ -325,7 +320,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="工作手册" width="200">
+      <el-table-column label="工作手册" width="150">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span v-show="scope.row.workbookName">{{
@@ -335,8 +330,62 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="课程大纲" width="150">
+        <template #default="scope">
+          <el-row>
+            <el-col :span="8" v-show="scope.row.versionId">
+                <el-tag
+                  class="noBaseCourseDetail"
+                  
+                  >{{ currentVersionName }}
+                </el-tag>
+            </el-col>
+            <el-col :span="8" v-show="!scope.row.versionId">
+              <el-tooltip content="添加课程大纲">
+                <el-tag
+                  class="noBaseCourseDetail"
+                  type="danger"
+                  @click.stop="addBaseCourseDetail(scope.row)"
+                  >无课程大纲</el-tag
+                >
+              </el-tooltip>
+            </el-col>
+          </el-row>
+          
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="150">
+        <template #default="scope">
+          <el-row v-show="showToolIcon">
+            <el-col :span="8">
+              <el-tooltip content="删除课程">
+                <el-button
+                  @click.stop="
+                    deleteBaseCourse(scope.$index, scope.row.courseId)
+                  "
+                  class="deleteButton"
+                  link
+                  style="color: #3f51b5"
+                  ><el-icon><Delete /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="8">
+              <el-tooltip content="修改课程信息">
+                <el-button
+                  @click.stop="editTrigger(scope.row)"
+                  class="deleteButton"
+                  link
+                  style="color: #3f51b5"
+                  ><el-icon><Document /></el-icon
+                ></el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+        </template>
+      </el-table-column>
 
-      <el-table-column label="操作" width="250">
+      <!-- <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-row v-show="showToolIcon">
             <el-col :span="4" v-show="scope.row.versionId">
@@ -362,7 +411,7 @@
             </el-col>
           </el-row>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
   </div>
   </div>
@@ -711,6 +760,9 @@ export default {
       hasVersion:false,
       hasNoVersion:false,
 
+
+      defaultMsg: "搜索课程名称、任课教师(姓名、工号)、课程号、开课号",
+
       hasDetail: "全部",
       hasDetailSeletion: [
         { label: "全部", value: null },
@@ -924,6 +976,8 @@ export default {
     },
     getSearchValue(data) {
       this.keyword = data;
+      this.$store.commit("course/setbaseCourseKeyword", data);
+      // sessionStorage.setItem('basecourseSearchValue',this.keyword);
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     async getDict() {
@@ -1458,6 +1512,7 @@ export default {
           departmentId: this.departmentId,
           schoolId: this.schoolId,
           selectKeyWord: this.keyword,
+          // this.keyword?this.key:sessionStorage.getItem('basecourseSearchValue'),
         };
       }
       if (identity == "课程负责人") {
@@ -1691,7 +1746,6 @@ export default {
           versionName = element["label"];
         }
       }
-
         this.$store.commit("course/setbaseCourseVersionName", versionName);
         this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
         this.$store.commit(
@@ -1837,6 +1891,14 @@ export default {
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
 
+      this.keyword = this.$store.state.course.baseCourseKeyword;
+
+      // this.$nextTick(function(){
+      //   console.log('$nextTick 被调用了',this.$refs.headsearch)
+      //   this.$refs.headsearch.inputBlur()
+      // })
+      
+
       if (this.identity == "课程负责人") {
         this.userId = this.$store.state.userInfo.userId;
       }
@@ -1856,6 +1918,13 @@ export default {
       this.getBaseCourse(this.pageSize, this.pageNum);
     });
   },
+  watch(){
+
+  },
+  beforeDestroy(){
+    console.log('basecourse is destroyed');
+    sessionStorage.removeItem('basecourseSearchValue');
+  }
 };
 </script>
 
