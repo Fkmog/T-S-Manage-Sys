@@ -20,7 +20,9 @@
           <Back />
         </el-icon>
       </el-tooltip>
-      <div class="title">分析表信息</div>
+      <div class="title" v-show="from==='Score'">成绩项</div>
+      <div class="title" v-show="from==='paperAnalysis'">分析表信息</div>
+      <div class="title" v-show="from!=='Score'&&from!=='paperAnalysis'">课程信息</div>
       <el-divider class="divider" direction="vertical" />
       
 
@@ -154,8 +156,8 @@
             </el-icon>
           </el-button>
       </el-tooltip>
-    <div v-if="!showActivities" class="hot-table-container" id="courseHot"></div> 
-    <div v-if="showActivities" class="hot-table-container" id="courseHot"></div>   
+    <div  class="hot-table-container" id="courseHot"></div> 
+       
   </div>
     </div>
   
@@ -868,6 +870,9 @@
           tempdata.push(weight);
           that.db.items.push(tempdata);
           }
+
+
+      that.activateHotcolumn();
       });
       }
       else{
