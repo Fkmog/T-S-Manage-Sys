@@ -23,6 +23,9 @@
       <div class="title" v-show="from==='Score'">成绩项</div>
       <div class="title" v-show="from==='paperAnalysis'">分析表信息</div>
       <div class="title" v-show="from!=='Score'&&from!=='paperAnalysis'">课程信息</div>
+      <div class="title" v-show="from==='Score'">成绩项</div>
+      <div class="title" v-show="from==='paperAnalysis'">分析表信息</div>
+      <div class="title" v-show="from!=='Score'&&from!=='paperAnalysis'">课程信息</div>
       <el-divider class="divider" direction="vertical" />
       
 
