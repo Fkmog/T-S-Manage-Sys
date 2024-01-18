@@ -1366,7 +1366,13 @@ export default {
 
     getCourseByYear(value) {
       if (value) {
-        this.currentVersionId = value;
+        if(value == '全部'){
+          this.currentVersionId = null;
+        }
+        else{
+          this.currentVersionId = value;
+        }
+        
         this.$store.commit(
           "course/setbaseCourseVersionId",
           this.currentVersionId

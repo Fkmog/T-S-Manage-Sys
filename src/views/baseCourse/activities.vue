@@ -908,6 +908,8 @@
             console.log('this.db.objectives',this.db.objectives)
             }
             else{
+              this.db.objectives.push(['合计']);
+              this.db.objectives.push(['']);
               setting.object.forEach(()=>{
                 this.db.objectives.push([''])
             })
