@@ -596,7 +596,7 @@
         console.log('this.db.objectives',this.db.objectives)
         
         this.db.objectives.forEach((objective)=>{
-          objective.push('')
+          objective.push(null)
         })
         // for(let i=0;i<this.objectivesName.length;i++){
          
@@ -1193,7 +1193,8 @@
             
             
             let templist = []
-            for(let j=1;j<this.db.objectives[i].length;j++){
+            let valueLength = this.db.objectives[0].length
+            for(let j=1;j<valueLength;j++){
               if(typeof(this.db.objectives[i][j]) === 'string'){
                  templist.push(Number(this.db.objectives[i][j].trim())) 
               }

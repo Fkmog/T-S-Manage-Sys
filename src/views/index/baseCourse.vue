@@ -27,6 +27,7 @@
               <el-select
                 v-model="currentVersionId"
                 class="selecter"
+                placeholder="全部"
                 @change="getCourseByYear(currentVersionId)"
               >
                 <el-option
