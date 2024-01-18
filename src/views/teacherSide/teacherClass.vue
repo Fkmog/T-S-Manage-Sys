@@ -73,7 +73,7 @@
             <Management />
           </el-icon>
         </el-tooltip>
-        <el-tooltip
+        <!-- <el-tooltip
           class="box-item"
           effect="dark"
           content="下载报告"
@@ -89,7 +89,7 @@
           >
             <Download />
           </el-icon>
-        </el-tooltip>
+        </el-tooltip> -->
 
         <el-divider class="divider" direction="vertical" />
         <div v-show="status == '未提交' && identity == '教师'">

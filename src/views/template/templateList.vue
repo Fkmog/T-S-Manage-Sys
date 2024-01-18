@@ -21,9 +21,9 @@
       highlight-current-row
       @row-click="goEdit"
     >
-      <el-table-column prop="name" label="模板名称" width="200" />
+      <el-table-column prop="name" label="名称" width="200" />
       <el-table-column prop="updateTime" label="更新时间" width="250" />
-      <el-table-column prop="report" label="报告模板" width="200">
+      <el-table-column prop="report" label="模板文件" width="200">
         <template #default="scope">
           <el-row v-show="scope.row.templateFile === null">
             <el-col>

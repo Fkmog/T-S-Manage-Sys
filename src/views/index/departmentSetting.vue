@@ -3,10 +3,12 @@
     <!-- 顶部导航栏 -->
     <div class="block">
       <el-row class="block-row">
+        <div class="title">{{NavMsg}}</div>
+        <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
           effect="dark"
-          content="版本"
+          content="课程大纲版本"
           placement="bottom"
           :hide-after="0"
         >
@@ -14,13 +16,12 @@
             class="icon"
             size="22px"
             color="rgb(137, 137, 137)"
-            style="margin-left: 50px"
+            style="margin-left: 10px"
             @click="toVersion()"
           >
             <List />
           </el-icon>
         </el-tooltip>
-        <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -32,7 +33,7 @@
             class="icon"
             size="22px"
             color="rgb(137, 137, 137)"
-            style="margin-left: 15px"
+            style="margin-left: 30px"
             @click="toTemplate()"
           >
             <Management />
@@ -53,7 +54,9 @@ export default {
     Management,
   },
   data() {
-    return {};
+    return {
+      NavMsg:'课程大纲版本'
+    };
   },
   computed: {},
   watch: {},
@@ -67,10 +70,13 @@ export default {
   methods: {
     toVersion() {
       // console.log(this.$route);
+      this.NavMsg = '课程大纲版本'
+
       this.$router.push({ name: "Version" });
     },
     //跳转到模板编辑页面
     toTemplate() {
+      this.NavMsg = '工作手册模板'
       this.$router.push({ name: "TemplateList" });
     },
   },
@@ -78,6 +84,10 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  margin-left: 40px;
+  font-size: 16px;
+}
 /* .content {
   height: 100vh;
   background-color: #f2f2f2;

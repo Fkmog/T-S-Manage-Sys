@@ -1366,7 +1366,13 @@ export default {
 
     getCourseByYear(value) {
       if (value) {
-        this.currentVersionId = value;
+        if(value == '全部'){
+          this.currentVersionId = null;
+        }
+        else{
+          this.currentVersionId = value;
+        }
+        
         this.$store.commit(
           "course/setbaseCourseVersionId",
           this.currentVersionId
@@ -1988,7 +1994,7 @@ export default {
 .columnstyle {
   height: 50px;
 }
-:deep().searchBlock .el-icon {
+/* :deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
 }
@@ -2003,7 +2009,7 @@ export default {
 :deep().el-icon {
   height: 18px;
   width: 18px;
-}
+} */
 
 .selectionBar {
   position: absolute;

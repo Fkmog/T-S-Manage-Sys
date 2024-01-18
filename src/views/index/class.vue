@@ -3,8 +3,9 @@
   <HeaderSearch
     msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
     @SearchValue="getSearchValue"
-    :searchInput="keyword"
+    :value="keyword"
   >
+  <!-- v-model:searchInput="keyword" -->
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
         <div class="selects">
@@ -61,7 +62,7 @@
                 关联课程库课程
               </el-dropdown-item>
               <el-dropdown-item @click="openAssess()">
-                修改考核方式设置
+                设置特色教学班
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -358,7 +359,7 @@
   <div class="assessmentDialog">
     <el-dialog
       v-model="isAssessment"
-      title="修改考核方式设置"
+      title="设置特色教学班"
       width="350px"
       :show-close="false"
       :align-center="true"
@@ -367,7 +368,7 @@
         <el-col
           :span="18"
           style="margin-top: 5px; margin-left: 20px; font-size: 17px"
-          >允许任课教师修改考核方式</el-col
+          >是否为特色教学班</el-col
         >
         <el-col :span="4">
           <el-switch
@@ -381,6 +382,16 @@
         </el-col>
       </el-row>
       <el-row
+        v-show="multIsRespondent === '2'"
+        style="
+          margin-top: 15px;
+          margin-left: 20px;
+          font-size: 14px;
+          color: grey;
+        "
+        >任课教师可修改课程目标的考核方式</el-row
+      >
+      <el-row
         v-show="multIsRespondent === '0'"
         style="
           margin-top: 15px;
@@ -388,7 +399,7 @@
           font-size: 14px;
           color: grey;
         "
-        >任课教师仍可以修改成绩小项</el-row
+        >课程目标采取课程组统一的考核方式，但任课教师仍可以修改成绩小项</el-row
       >
       <template #footer>
         <span class="dialog-footer">
@@ -687,6 +698,7 @@ export default {
     this.getDictionary();
     if (sessionStorage.getItem("classSearchFlag")) {
       this.keyword = sessionStorage.getItem("searchForm");
+      console.log("#",this.keyword);
       this.getSearchValue(this.keyword);
     } else {
       sessionStorage.removeItem("searchForm");
@@ -1413,22 +1425,23 @@ export default {
 :deep().el-pagination button:disabled {
   cursor: default;
 }
-:deep() .el-icon {
+ :deep() .el-icon {
   height: 18px;
   width: 18px;
 }
 :deep() .el-icon svg {
   height: 18px;
   width: 18px;
-}
+}/*
 :deep().searchBlock .el-icon {
-  height: 24px;
+  height:24px;
   width: 24px;
 }
-:deep().searchBlock .el-icon svg {
+:deep().searchBlock  .el-icon svg {
   height: 24px;
   width: 24px;
-}
+} */
+
 :deep().el-checkbox__input.is-disabled .el-checkbox__inner {
   cursor: default;
 }

@@ -26,7 +26,7 @@
       }"
       style="width: 800px"
     >
-      <el-table-column label="版本大纲名称" width="200">
+      <el-table-column label="名称" width="200">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span>{{ scope.row.label }}</span>
