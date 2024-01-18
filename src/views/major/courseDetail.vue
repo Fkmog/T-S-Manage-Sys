@@ -166,7 +166,7 @@
         :show-close="true"
         @close = 'closeDrawer'
       >
-        <template #header="{ close,titleId, titleClass }">
+        <template #header="{ titleId, titleClass }">
           <el-row :id="titleId" :class="titleClass">
             <el-row style="width: 100%">
               <el-col :span="17">
@@ -1246,6 +1246,7 @@
       },
     },
     mounted: function () {
+      sessionStorage.setItem("classSearchFlag", true);
       let that = this;
       this.checkProgram();
   

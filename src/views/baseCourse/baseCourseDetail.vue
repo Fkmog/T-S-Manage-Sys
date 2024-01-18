@@ -405,7 +405,10 @@ export default {
     };
   },
   mounted() {
+    
     this.getRouter();
+
+    // sessionStorage.setItem("baseCourseSearchForm", this.form.courseName);
     this.$store.commit("course/setCourseName", this.form.courseName);
     this.$store.commit("course/setCourseId", this.courseId);
 
