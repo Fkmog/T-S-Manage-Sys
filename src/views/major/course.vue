@@ -1604,14 +1604,7 @@ export default {
 .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
 }
-:deep().searchBlock .el-icon {
-  height: 24px;
-  width: 24px;
-}
-:deep().searchBlock .el-icon svg {
-  height: 24px;
-  width: 24px;
-}
+
 
 
 .row-style {

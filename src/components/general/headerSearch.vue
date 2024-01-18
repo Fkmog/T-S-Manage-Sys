@@ -9,6 +9,7 @@
         <div class="searchLine">
           <el-input
             class="searchInput"
+            ref="searchInput"
             :class="active ? 'activeInput' : ''"
             v-model="searchInput"
             :placeholder="msg"
@@ -45,11 +46,10 @@ export default {
     return {
       searchInput: "",
       // isActive:true,
+      searchValue:"",
       active: false,
     };
   },
-  watch: {
-},
   methods: {
     sendMessage() {
       this.$emit("SearchValue", this.searchInput);
@@ -65,6 +65,14 @@ export default {
       this.searchInput = "";
       this.inputBlur();
     },
+    focusInput(value){
+      if(value){
+        // this.searchInput = value;
+        console.log('s1111111111earchinput',this.$refs.searchInput)
+        this.searchValue = value;
+      }
+      this.$refs.searchInput.focus();
+    }
   },
 };
 </script>
@@ -135,4 +143,6 @@ export default {
   box-shadow: 0 0 0 0px;
   background-color: inherit;
 }
+
+
 </style>

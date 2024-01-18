@@ -1,8 +1,9 @@
 <template>
   <div v-show="!closeShow">
     <HeaderSearch
-      :msg=(keyword)?keyword:defaultMsg
+      :msg=defaultMsg
       @SearchValue="getSearchValue"
+      :value="keyword"
       ref="headsearch"
     >
       <template #rightTime>
@@ -980,8 +981,8 @@ export default {
     },
     getSearchValue(data) {
       this.keyword = data;
-      this.$store.commit("course/setbaseCourseKeyword", data);
-      // sessionStorage.setItem('basecourseSearchValue',this.keyword);
+      sessionStorage.removeItem("baseCourseSearchForm");
+      
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     async getDict() {
@@ -1522,7 +1523,7 @@ export default {
           departmentId: this.departmentId,
           schoolId: this.schoolId,
           selectKeyWord: this.keyword,
-          // this.keyword?this.key:sessionStorage.getItem('basecourseSearchValue'),
+          
         };
       }
       if (identity == "课程负责人") {
@@ -1748,6 +1749,9 @@ export default {
     },
     goBaseCourseDetail(row,column) {
       // console.log("goBaseCourseDetail", row.bcDetails.length);
+
+      sessionStorage.setItem("baseCourseSearchForm", this.keyword);
+      // sessionStorage.removeItem("baseCourseSearchFlag");
       if (column.columnKey === undefined){
         if(row.bcDetails.length){
       let versionName = "";
@@ -1901,7 +1905,21 @@ export default {
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
 
-      this.keyword = this.$store.state.course.baseCourseKeyword;
+      // this.keyword = this.$store.state.course.baseCourseKeyword;
+      // console.log('baseCourseSearchFlag',sessionStorage.getItem("baseCourseSearchFlag"))
+      if (sessionStorage.getItem("baseCourseSearchForm")) {
+      this.keyword = sessionStorage.getItem("baseCourseSearchForm");
+      console.log('baseCourseSearchForm',this.keyword)
+      this.getSearchValue(this.keyword);
+
+      this.$nextTick(()=>{
+        this.$refs.headsearch.focusInput(this.keyword)
+        // console.log('this.$refs.headsearch',this.$refs.headsearch.focusInput(this.keyword));
+        
+      })
+    } else {
+      sessionStorage.removeItem("baseCourseSearchForm");
+    }
 
       // this.$nextTick(function(){
       //   console.log('$nextTick 被调用了',this.$refs.headsearch)
@@ -1931,10 +1949,7 @@ export default {
   watch(){
 
   },
-  beforeDestroy(){
-    console.log('basecourse is destroyed');
-    sessionStorage.removeItem('basecourseSearchValue');
-  }
+  
 };
 </script>
 
@@ -1993,22 +2008,6 @@ export default {
 
 .columnstyle {
   height: 50px;
-}
-:deep().searchBlock .el-icon {
-  height: 24px;
-  width: 24px;
-}
-:deep().searchBlock .el-icon svg {
-  height: 24px;
-  width: 24px;
-}
-:deep().el-icon svg {
-  height: 18px;
-  width: 18px;
-}
-:deep().el-icon {
-  height: 18px;
-  width: 18px;
 }
 
 .selectionBar {
