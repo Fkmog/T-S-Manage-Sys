@@ -169,9 +169,8 @@ export default {
               Cookies.remove("Admin-Token");
               Cookies.remove("first-Login");
               this.$router.push("/login");
-            }
-            else{
-                ElMessage({
+            } else {
+              ElMessage({
                 type: "error",
                 message: "退出登录失败",
                 duration: 1500,
@@ -196,12 +195,19 @@ export default {
                 });
               }
               if (res.code === "ERROR") {
-                if (res.msg == "新密码不能与旧密码相同")
+                if (res.msg == "新密码不能与旧密码相同") {
                   ElMessage({
                     type: "error",
                     message: res.msg,
                     duration: 1500,
                   });
+                } else if (res.msg == "修改密码失败，旧密码错误") {
+                  ElMessage({
+                    type: "error",
+                    message: res.msg,
+                    duration: 1500,
+                  });
+                }
               }
             }
           );

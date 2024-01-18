@@ -2009,6 +2009,22 @@ export default {
 .columnstyle {
   height: 50px;
 }
+/* :deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
+}
+:deep().el-icon svg {
+  height: 18px;
+  width: 18px;
+}
+:deep().el-icon {
+  height: 18px;
+  width: 18px;
+} */
 
 .selectionBar {
   position: absolute;

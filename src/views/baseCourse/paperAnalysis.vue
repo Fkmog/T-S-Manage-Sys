@@ -19,6 +19,9 @@
           <Back />
         </el-icon>
       </el-tooltip>
+      <div class="title">课程分析表</div>
+
+      <el-divider class="divider" direction="vertical" />
     </el-row>
   </div>
 
@@ -89,8 +92,8 @@
         :reserve-selection="true"
       />
       <!-- <el-table-column property="id" label="分析表" width="120" /> -->
-      <el-table-column property="name" label="分析表名称" width="180" />
-      <el-table-column property="description" label="描述" width="400" />
+      <el-table-column property="name" label="名称" width="230" />
+      <el-table-column property="description" label="描述" width="350" />
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-row>
@@ -133,21 +136,23 @@
     </el-row>
   </div>
 
-  <el-dialog v-model="dialogFormVisible" title="添加考试分析表" width="580">
+  <el-dialog
+    v-model="dialogFormVisible"
+    title="添加分析表"
+    width="380px"
+    :show-close="false"
+    :align-center="true"
+  >
     <el-form :model="analysisForm" ref="ruleForm">
-      <el-form-item
-        label="分析表名称"
-        :label-width="formLabelWidth"
-        prop="courseName"
-      >
+      <el-form-item label="名称" prop="courseName">
         <el-input v-model="analysisForm.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        label="分析表描述"
-        :label-width="formLabelWidth"
-        prop="courseCode"
-      >
-        <el-input v-model="analysisForm.description" autocomplete="off" />
+      <el-form-item label="描述" prop="courseCode">
+        <el-input
+          type="textarea"
+          v-model="analysisForm.description"
+          autocomplete="off"
+        />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -186,17 +191,15 @@
       ref="examEditForm"
       label-position="top"
     >
-      <el-form-item
-        label="分析表名称"
-        prop="name"
-      >
+      <el-form-item label="名称" prop="name">
         <el-input v-model="examEdit.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        label="描述"
-        prop="description"
-      >
-        <el-input type="textarea" v-model="examEdit.description" autocomplete="off" />
+      <el-form-item label="描述" prop="description">
+        <el-input
+          type="textarea"
+          v-model="examEdit.description"
+          autocomplete="off"
+        />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -254,7 +257,7 @@ registerAllModules();
 export default {
   data() {
     return {
-      examEdit:{},
+      examEdit: {},
       editDialog: false,
       analysisForm: {
         name: "",
@@ -495,32 +498,38 @@ export default {
     },
     deleteAnalysys(row) {
       let a = [row.id];
-      deleteExam(a).then((res) => {
-        if (res === 204) {
-          ElMessage({
-            type: "success",
-            message: `删除成功`,
-            duration: 1500,
-          });
-          this.getTeacherList();
-        }
+      ElMessageBox.confirm("是否确认删除？", "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        deleteExam(a).then((res) => {
+          if (res === 204) {
+            ElMessage({
+              type: "success",
+              message: `删除成功`,
+              duration: 1500,
+            });
+            this.getTeacherList();
+          }
+        });
       });
     },
     editAnalysys(row) {
       this.editDialog = true;
-      this.examEdit = row
+      this.examEdit = row;
       console.log(row);
     },
-    confirmEditDialog(){
-      editExam(this.examEdit).then((res)=>{
+    confirmEditDialog() {
+      editExam(this.examEdit).then((res) => {
         console.log(res);
-        if(res.code==="SUCCESS"){
-          this.examEdit={}
-          this.editDialog =false
-          this.getTeacherList()
+        if (res.code === "SUCCESS") {
+          this.examEdit = {};
+          this.editDialog = false;
+          this.getTeacherList();
         }
-      })
-    }
+      });
+    },
   },
   mounted: function () {
     let that = this;
@@ -737,5 +746,9 @@ export default {
   margin-top: 30px;
   font-size: 13px;
   color: #828d96;
+}
+.title {
+  margin-left: 15px;
+  font-size: 16px;
 }
 </style>

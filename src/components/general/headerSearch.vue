@@ -8,10 +8,11 @@
         </el-icon>
         <div class="searchLine">
           <el-input
+            ref="searchInput"
             class="searchInput"
             ref="searchInput"
             :class="active ? 'activeInput' : ''"
-            v-model="searchInput"
+            v-model="keyword"
             :placeholder="msg"
             @change="sendMessage"
             @focus="active = true"
@@ -37,32 +38,58 @@ import { Search } from "@element-plus/icons-vue";
 
 export default {
   name: "HeaderSearch",
-  props: ['msg','searchInput'],
+  props: {
+    msg: String,
+    value: {
+      type: String,
+      default: "",
+    },
+  },
   components: {
     Search,
   },
-
   data() {
     return {
-      searchInput: "",
-      // isActive:true,
-      searchValue:"",
+      keyword: this.value,
       active: false,
     };
   },
+  watch: {
+    keyword(newVal) {
+      // 监听搜索关键词的变化，并将其传递给父组件
+      this.$emit("SearchValue", newVal);
+    },
+    value(newVal) {
+      // 监听父组件传递的搜索关键词的变化
+      this.keyword = newVal;
+      if (this.keyword !== "") {
+        this.$nextTick(() => {
+          this.$refs.searchInput.focus();
+        });
+      }
+    },
+  },
+  mounted() {
+    console.log(this.keyword, this.keyword === "");
+    if (this.keyword !== "") {
+      this.$nextTick(() => {
+        this.$refs.searchInput.focus();
+      });
+    }
+  },
   methods: {
     sendMessage() {
-      this.$emit("SearchValue", this.searchInput);
+      this.$emit("SearchValue", this.keyword);
     },
     inputBlur() {
-      if (this.searchInput === "") {
+      if (this.keyword === "") {
         this.active = false;
       } else {
         this.active = true;
       }
     },
     clearInput() {
-      this.searchInput = "";
+      this.keyword = "";
       this.inputBlur();
     },
     focusInput(value){

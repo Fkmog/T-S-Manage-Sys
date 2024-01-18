@@ -267,7 +267,7 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
 </script>
 
 <style scoped>
-:deep().searchBlock .el-icon {
+/* :deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
 }
@@ -282,7 +282,7 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
 :deep().el-icon {
   height: 18px;
   width: 18px;
-}
+} */
 .submenudeleteButton{
     float:right;
     margin-top:16px;
