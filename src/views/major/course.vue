@@ -1640,7 +1640,14 @@ export default {
 .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
 }
-
+:deep() .el-icon {
+  height: 18px;
+  width: 18px;
+}
+:deep() .el-icon svg {
+  height: 18px;
+  width: 18px;
+}
 
 
 .row-style {
