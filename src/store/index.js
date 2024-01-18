@@ -149,6 +149,7 @@ export default createStore({
         baseCourseRemark: "",
         baseCourseDetailId: "",
         baseCourseKeyword: "",
+        basecoursePaperAnalysisId:"",
       },
       getters: {},
       mutations: {
@@ -199,6 +200,9 @@ export default createStore({
         },
         setbaseCourseKeyword(state, newVal){
           state.baseCourseKeyword = newVal;
+        },
+        setbasecoursePaperAnalysisId(state,newVal){
+          state.basecoursePaperAnalysisId = newVal;
         }
       },
       actions: {},

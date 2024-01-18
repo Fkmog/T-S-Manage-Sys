@@ -23,6 +23,7 @@
         <div class="title">全部课程</div>
         <el-divider class="divider" direction="vertical" />
         <div class="title">{{ versionName }}</div>
+        <!-- 成绩项 -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -40,6 +41,25 @@
             <Histogram />
           </el-icon>
         </el-tooltip>
+         <!-- 试卷分析 -->
+         <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="试卷分析"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toPaperAnalysis()"
+          >
+            <DataAnalysis />
+          </el-icon>
+        </el-tooltip>
+        <!-- 课程目标 -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -57,6 +77,7 @@
             <Checked />
           </el-icon>
         </el-tooltip>
+        <!-- 毕业要求指标点 -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -74,6 +95,7 @@
             <List />
           </el-icon>
         </el-tooltip>
+        <!-- 工作手册 -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -91,6 +113,7 @@
             <Management />
           </el-icon>
         </el-tooltip>
+        <!-- 从其他大纲复制 -->
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -207,31 +230,6 @@
                   </el-table-column>
                 </el-table>
               </el-col>
-              <!-- <el-col :span="6" v-show="hasFile" class="fileName">
-                <el-row>
-                  <el-col :span="20" @click="downloadFile">
-                    <el-tooltip
-                      class="box-item"
-                      effect="dark"
-                      content="点击下载"
-                      placement="bottom"
-                      :hide-after="0"
-                    >
-                      {{ object.fileName }}
-                    </el-tooltip>
-                  </el-col>
-                  <el-col :span="4" @click="beforeRemove" class="fileCloseIcon">
-                    <el-tooltip
-                      class="box-item"
-                      effect="dark"
-                      content="点击移除"
-                      placement="bottom"
-                      :hide-after="0"
-                    >
-                      <el-icon><CircleClose /></el-icon> </el-tooltip
-                  ></el-col>
-                </el-row>
-              </el-col> -->
             </el-row>
           </el-col>
         </el-col>
@@ -318,7 +316,9 @@ import {
   Checked,
   CircleClose,
   CopyDocument,
-  Management,Download
+  Management,
+  Download,
+  DataAnalysis
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import {
@@ -347,7 +347,9 @@ export default {
     List,
     Checked,
     CircleClose,
-    Management,Download
+    Management,
+    Download,
+    DataAnalysis
   },
   data() {
     return {
@@ -505,6 +507,9 @@ export default {
     },
     toActivities() {
       this.$router.push("/baseCourseActivities");
+    },
+    toPaperAnalysis(){
+      this.$router.push("/paperAnalysis");
     },
     toIndicators() {
       this.$router.push("/baseCourseIndicators");

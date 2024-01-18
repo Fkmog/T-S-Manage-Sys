@@ -31,6 +31,7 @@ import baseCourseIndicators from "@/views/baseCourse/indicators.vue";
 import baseCourseIndicatorsEdit from "@/views/baseCourse/indicators-edit.vue";
 import baseCourseObjectivesEdit from "@/views/baseCourse/objectives-edit.vue";
 import templateManage from "@/views/baseCourse/templateManage.vue";
+import paperAnalysis from "@/views/baseCourse/paperAnalysis.vue"
 
 //登录组件
 import userLogin from "@/components/userLogin/index.vue";
@@ -50,6 +51,7 @@ import AddScore from "@/views/teacherSide/score/addScore.vue";
 import Score from "@/views/teacherSide/score/score.vue";
 import Objectives from "@/views/teacherSide/objectives/objectives.vue";
 import objectivesEdit from "@/views/teacherSide/objectives/objectives-edit.vue";
+import examAnalysis from "@/views/teacherSide/examAnalysis/examAnalysis.vue";
 
 //课程管理人端组件
 import PrincipalIndex from "@/views/principalSide/principalIndex.vue";
@@ -128,11 +130,13 @@ const router = createRouter({
             },
           ],
         },
+        //教师页面路由
         {
           path: "/addTeacher",
           component: AddTeacher,
           meta: { isMajor: false },
         },
+        //  基础课程下的路由
         {
           path: "/batchCourseAdd",
           component: BatchCourseAdd,
@@ -177,6 +181,12 @@ const router = createRouter({
           path: "/baseCourseActivities",
           name:'baseCourseActivities',
           component: baseCourseActivities,
+          meta: { isMajor: false },
+        },
+        {
+          path: "/paperAnalysis",
+          name:'paperAnalysis',
+          component: paperAnalysis,
           meta: { isMajor: false },
         },
         //专业视图下路由
@@ -298,6 +308,11 @@ const router = createRouter({
           path: "/objectivesEdit",
           component: objectivesEdit,
         },
+        {
+          name: "examAnalysis",
+          path: "/examAnalysis",
+          component: examAnalysis,
+        }
       ],
     },
     {

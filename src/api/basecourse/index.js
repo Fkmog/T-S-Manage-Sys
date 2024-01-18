@@ -167,3 +167,42 @@ export function copyProgram(Array) {
     data: Array,
   });
 }
+//提交考试分析表
+export function submitPaperAnalysis(dict) {
+  return request({
+    url: "/analysis",
+    method: "POST",
+    data: dict,
+  });
+}
+//修改考试分析表
+export function editPaperAnalysis(dict) {
+  return request({
+    url: "/analysis",
+    method: "PUT",
+    data: dict,
+  });
+}
+//删除考试分析表
+export function deletePaperAnalysis(array) {
+  return request({
+    url: "/analysis",
+    method: "DELETE",
+    data: array,
+  });
+}
+//获取所有考试分析表
+export function getPaperAnalysisList(detailId) {
+  return request({
+    url: "/analysis/list/?detailId="+detailId,
+    method: "get",
+    
+  });
+}
+//获取详细考试分析表
+export function getDetailedPaperAnalysis(paperAnalysisId) {
+  return request({
+    url: "/analysis/"+paperAnalysisId,
+    method: "get",
+  });
+}
