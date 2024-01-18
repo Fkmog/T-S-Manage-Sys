@@ -1306,7 +1306,7 @@
   
   <style scoped>
   .SearchBar{
-    margin-left: 100px;
+    margin-left: 50px;
   }
   .backIcon{
     display: flex;
@@ -1363,14 +1363,23 @@
   .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
     box-shadow: 0 0 0 0px;
   }
-  :deep().searchBlock .el-icon {
+
+  :deep() .el-icon {
+  height: 18px;
+  width: 18px;
+}
+:deep() .el-icon svg {
+  height: 18px;
+  width: 18px;
+} 
+  /* :deep().searchBlock .el-icon {
     height: 24px;
     width: 24px;
   }
   :deep().searchBlock .el-icon svg {
     height: 24px;
     width: 24px;
-  }
+  } */
   
  
   

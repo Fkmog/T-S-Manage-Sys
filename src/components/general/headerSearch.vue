@@ -10,7 +10,6 @@
           <el-input
             ref="searchInput"
             class="searchInput"
-            ref="searchInput"
             :class="active ? 'activeInput' : ''"
             v-model="keyword"
             :placeholder="msg"
