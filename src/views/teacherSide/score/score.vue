@@ -53,10 +53,18 @@
           v-show="this.identity == '教师'"
           class="box-item"
           effect="dark"
-          content="试卷分析"
+          
           placement="bottom"
           :hide-after="0"
       >
+      <template #content>
+          <span v-show="hasDetail">
+            试卷分析
+          </span>
+          <span v-show="hasNoDetail">
+            请先关联课程大纲
+          </span>
+        </template>
         <el-icon
           class="icon"
           size="24px"
@@ -369,7 +377,16 @@ export default {
       this.$router.push("/teacherClass");
     },
     goPaperAnalysis(){
-      this.$router.push("/examAnalysis");
+      if(this.hasDetail){
+        this.$router.push("/examAnalysis");
+      }
+      else{
+        ElMessage({
+                    type: 'error',
+                    message: `请先关联课程大纲`,
+                    duration:1500,
+                  });
+      }
     },
     async getActivities(){
       let that = this;
