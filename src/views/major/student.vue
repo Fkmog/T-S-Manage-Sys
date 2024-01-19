@@ -274,7 +274,7 @@ ElMessageBox.confirm("是否确认删除学生信息", "", {
 :deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
-} */
+} 
 :deep().el-icon svg {
   height: 18px;
   width: 18px;

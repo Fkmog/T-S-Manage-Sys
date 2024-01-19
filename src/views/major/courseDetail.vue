@@ -1381,7 +1381,7 @@
   :deep().searchBlock .el-icon svg {
     height: 24px;
     width: 24px;
-  } */
+  } 
   
  
   
