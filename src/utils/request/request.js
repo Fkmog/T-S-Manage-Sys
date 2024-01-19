@@ -50,7 +50,11 @@ service.interceptors.request.use(
     const isRepeatSubmit = (config.headers || {}).repeatSubmit === false;
     const hasToken = getToken() === undefined ? false : true;
     // console.log("^^^",Cookies.get("first-Login"));
-    const firstLogin=(Cookies.get("first-Login")===undefined||Cookies.get("first-Login")===false)?true:false
+    const firstLogin =
+      Cookies.get("first-Login") === undefined ||
+      Cookies.get("first-Login") === false
+        ? true
+        : false;
     // 非首次登陆时，login请求不携带header
     if (config.url === "/login" && !firstLogin) {
       return config;
@@ -175,15 +179,28 @@ service.interceptors.response.use(
       } else {
         ElMessage({
           type: "error",
-          message: "账号错误",
+          message: error.response.data.msg,
           duration: 1500,
         });
       }
-    } else if (error.response.status === 404|| error.response.status === 422) {
+    } else if (error.response.status === 404 || error.response.status === 422) {
       return Promise.reject(error.response.data);
-    }
-    else{
-      return Promise.reject(error);
+    } else if (error.response.status === 400) {
+      if (error.response.data.msg == "用户不存在/密码错误") {
+        ElMessage({
+          type: "error",
+          message: "密码错误",
+          duration: 1500,
+        });
+        return Promise.reject(error.response.data);
+      } else {
+        ElMessage({
+          type: "error",
+          message: error.response.data.msg,
+          duration: 1500,
+        });
+        return Promise.reject(error);
+      }
     }
   }
 );

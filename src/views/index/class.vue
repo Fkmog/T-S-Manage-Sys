@@ -5,7 +5,6 @@
     @SearchValue="getSearchValue"
     :value="keyword"
   >
-  <!-- v-model:searchInput="keyword" -->
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
         <div class="selects">
@@ -42,10 +41,10 @@
             @change="getClassList()"
           >
             <el-option
-              v-for="item in status"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in classStatus"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
             />
           </el-select>
         </div>
@@ -339,9 +338,15 @@
         placeholder="选择课程大纲版本"
         class="custom-cascader"
       >
-        <template  #default="{ node, data }">
+        <template #default="{ node, data }">
           <span v-if="data.children">{{ node.label }}</span>
-          <el-tooltip v-else  :hide-after="0" :content="data.description" effect="dark" placement="top">
+          <el-tooltip
+            v-else
+            :hide-after="0"
+            :content="data.description"
+            effect="dark"
+            placement="top"
+          >
             <span>{{ node.label }}</span>
           </el-tooltip>
         </template>
@@ -565,7 +570,7 @@ import {
   Warning,
   MoreFilled,
 } from "@element-plus/icons-vue";
-import { ElMessageBox, ElMessage } from "element-plus";
+import { ElMessageBox, ElMessage, ElStep } from "element-plus";
 import { getDetails, assign } from "@/api/basecourse";
 import { getPrincipalClassList } from "@/api/principal";
 
@@ -608,6 +613,7 @@ export default {
       classTable: [],
       academicYear: [],
       semester: [],
+      classStatus: [],
       status: [
         {
           value: null,
@@ -696,6 +702,7 @@ export default {
     this.identity = this.$store.state.currentInfo.identity;
     console.log("this.identity", this.identity);
     this.getDictionary();
+    // 搜索栏状态保持
     if (sessionStorage.getItem("classSearchFlag")) {
       this.keyword = sessionStorage.getItem("searchForm");
       this.getSearchValue(this.keyword);
@@ -761,7 +768,14 @@ export default {
       },
     },
   },
-
+  beforeRouteLeave(to, from, next) {
+    if (from.path === "/class" && to.path !== "/teacherClass") {
+      sessionStorage.removeItem("classChosenYear");
+      sessionStorage.removeItem("classChosenSemester");
+      sessionStorage.removeItem("classChosenStatus");
+    }
+    next();
+  },
   methods: {
     //跳转到审核页面
     goCheck(row, column) {
@@ -777,8 +791,19 @@ export default {
         } else {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", row);
         }
+        // 搜索栏状态保持
         sessionStorage.setItem("searchForm", this.keyword);
         sessionStorage.removeItem("classSearchFlag");
+        // 下拉筛选状态保持
+        if (
+          this.chosenYear !== "" ||
+          this.chosenSemester !== "" ||
+          this.chosenStatus !== ""
+        ) {
+          sessionStorage.setItem("classChosenYear", this.chosenYear);
+          sessionStorage.setItem("classChosenSemester", this.chosenSemester);
+          sessionStorage.setItem("classChosenStatus", this.chosenStatus);
+        }
         this.$router.push({ name: "TeacherClass" });
       }
     },
@@ -799,6 +824,7 @@ export default {
         console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
+        this.classStatus = res.class_status;
         //修改，新增教学班时使用
         this.onlyAcademicYear = JSON.parse(JSON.stringify(res.academic_year));
         this.onlySemester = JSON.parse(JSON.stringify(res.semester));
@@ -811,6 +837,34 @@ export default {
         semester.dictLabel = "全部学期";
         semester.dictValue = null;
         this.semester.unshift(semester);
+        let status = {
+          dictLabel: "全部",
+          dictValue: null,
+        };
+        this.classStatus.unshift(status);
+        // 下拉筛选状态保持
+        let savedYear = sessionStorage.getItem("classChosenYear");
+        let savedSemester = sessionStorage.getItem("classChosenSemester");
+        let savedStatus = sessionStorage.getItem("classChosenStatus");
+        if (savedYear || savedSemester || savedStatus) {
+          {
+            if (savedYear === "null") {
+              this.chosenYear = null;
+            } else {
+              this.chosenYear = savedYear;
+            }
+            if (savedSemester === "null") {
+              this.chosenSemester = null;
+            } else {
+              this.chosenSemester = savedSemester;
+            }
+            if (savedStatus === "null") {
+              this.chosenStatus = null;
+            } else {
+              this.chosenStatus = savedStatus;
+            }
+          }
+        }
         this.getClassList();
       });
     },
@@ -1423,7 +1477,7 @@ export default {
 :deep().el-pagination button:disabled {
   cursor: default;
 }
- :deep() .el-icon {
+:deep() .el-icon {
   height: 18px;
   width: 18px;
 }
@@ -1433,12 +1487,12 @@ export default {
 }
 
 :deep().searchBlock .el-icon {
-  height:24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
 }
-:deep().searchBlock  .el-icon svg {
-  height: 24px;
-  width: 24px;
+:deep().searchBlock .el-icon svg {
+  height: 20px;
+  width: 20px;
 }
 
 :deep().el-checkbox__input.is-disabled .el-checkbox__inner {

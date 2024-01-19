@@ -364,12 +364,12 @@ export default {
 } 
 
 :deep().searchBlock .el-icon {
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
 }
 :deep().searchBlock .el-icon svg {
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
 }
 .no-major {
   padding-top: 120px;
