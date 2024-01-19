@@ -1,43 +1,45 @@
 <template>
   <div v-show="hasProgram">
     <div v-show="hasCourse">
-      <HeaderSearch
-        msg="搜索课程名称"
-        v-show="!closeShow"
-        @SearchValue="getSearchValueformProgram"
-        :value="keyword"
-      >
-        <template #rightTime>
-          <div  class="rightSlot">
-            <div class="selectionBar">
-              <el-select
-                v-model="option1.value"
-                class="selecter"
-                placeholder="更新时间⬇"
-                @change="selectionOption1"
-              >
-                <el-option
-                  v-for="item in option1"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-              /></el-select>
-              <el-select
-                v-model="option2.value"
-                class="selecter"
-                placeholder="全部"
-                @change="selectionOption2"
-              >
-                <el-option
-                  v-for="item in option2"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-              /></el-select>
+      <div v-show="!closeShow">
+          <HeaderSearch
+          msg="搜索课程名称"
+          @SearchValue="getSearchValueformProgram"
+          :value="keywordforProgrameCourse"
+        >
+          <template #rightTime>
+            <div  class="rightSlot">
+              <div class="selectionBar">
+                <el-select
+                  v-model="option1.value"
+                  class="selecter"
+                  placeholder="更新时间⬇"
+                  @change="selectionOption1"
+                >
+                  <el-option
+                    v-for="item in option1"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                /></el-select>
+                <el-select
+                  v-model="option2.value"
+                  class="selecter"
+                  placeholder="全部"
+                  @change="selectionOption2"
+                >
+                  <el-option
+                    v-for="item in option2"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                /></el-select>
+              </div>
             </div>
-          </div>
-        </template>
-      </HeaderSearch>
+          </template>
+        </HeaderSearch>
+      </div>
+      
 
       <div v-show="closeShow" class="submenu">
         <el-row class="rowStyle">
@@ -158,12 +160,11 @@
       </el-dialog>
     </div>
     <div v-show="!hasCourse" class="no-program">
-      <HeaderSearch
+      <!-- <HeaderSearch
         v-show="!closeShow"
         @SearchValue="getSearchValueformProgram"
         :value="keyword"
-
-      ></HeaderSearch>
+      ></HeaderSearch> -->
 
       <div layout="row" flex class="md-padding">
         <addBtn @click="this.drawerShow()"></addBtn>
@@ -206,6 +207,7 @@
                   class="searchIndrawer"
                   msg="搜索课程名称"
                   @SearchValue="getSearchValue"
+                  :value="keyward"
                 ></HeaderSearch>
               </el-row>
             </el-col>
@@ -601,6 +603,8 @@ export default {
     getSearchValueformProgram(data) {
       console.log("searching for class");
       this.keywordforProgrameCourse = data;
+      sessionStorage.removeItem("courseSearchForm");
+
       this.getProgramCourse();
     },
     async getDict() {
@@ -773,6 +777,10 @@ export default {
     },
     //跳转到详细页面
     goBaseCourseDetail(row, column) {
+
+
+      sessionStorage.setItem("courseSearchForm", this.keywordforProgrameCourse);
+      // sessionStorage.removeItem("courseSearchFlag");
       console.log(
         "row",
         row,
@@ -791,8 +799,7 @@ export default {
         "baseCourseDetailProgram/setmajorcourseCode",
         row.courseCode
       );
-      sessionStorage.setItem("courseSearchForm", this.keyword);
-      sessionStorage.removeItem("courseSearchFlag");
+      
       this.$router.push("/courseDetail");
     },
     //是否有program
@@ -1571,9 +1578,9 @@ export default {
       this.activate();
     }
     if (sessionStorage.getItem("courseSearchFlag")) {
-      this.keyword = sessionStorage.getItem("courseSearchForm");
-      console.log("#", this.keyword);
-      this.getSearchValueformProgram(this.keyword);
+      this.keywordforProgrameCourse = sessionStorage.getItem("courseSearchForm");
+      console.log("this.keywordforProgrameCourse", this.keywordforProgrameCourse);
+      this.getSearchValueformProgram(this.keywordforProgrameCourse);
     } else {
       sessionStorage.removeItem("courseSearchForm");
     }

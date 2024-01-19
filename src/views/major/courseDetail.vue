@@ -1246,7 +1246,8 @@
       },
     },
     mounted: function () {
-      sessionStorage.setItem("classSearchFlag", true);
+      sessionStorage.setItem("courseSearchFlag", true);
+
       let that = this;
       this.checkProgram();
   
@@ -1307,7 +1308,7 @@
   
   <style scoped>
   .SearchBar{
-    margin-left: 50px;
+    margin-left: 60px;
   }
   .backIcon{
     display: flex;
@@ -1373,14 +1374,14 @@
   height: 18px;
   width: 18px;
 } 
-  /* :deep().searchBlock .el-icon {
-    height: 24px;
-    width: 24px;
+  :deep().searchBlock .el-icon {
+    height: 20px;
+    width: 20px;
   }
   :deep().searchBlock .el-icon svg {
-    height: 24px;
-    width: 24px;
-  } */
+    height: 20px;
+    width: 20px;
+  } 
   
  
   

@@ -40,10 +40,10 @@
             @change="getClassesList()"
           >
             <el-option
-              v-for="item in status"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in classStatus"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
             />
           </el-select>
         </div>
@@ -95,6 +95,7 @@ export default {
       chosenStatus: "",
       academicYear: [],
       semester: [],
+      classStatus: [],
       status: [
         {
           value: null,
@@ -128,6 +129,14 @@ export default {
       sessionStorage.removeItem("teacherSearchForm");
     }
   },
+  beforeRouteLeave(to, from, next) {
+    if (from.path === "/teacherClasses" && to.path !== "/teacherClass") {
+      sessionStorage.removeItem("teacherChosenYear");
+      sessionStorage.removeItem("teacherChosenSemester");
+      sessionStorage.removeItem("teacherChosenStatus");
+    }
+    next();
+  },
   methods: {
     //获取数据字典
     getDictionary() {
@@ -135,6 +144,7 @@ export default {
         console.log("getDictionary", res);
         this.academicYear = res.academic_year;
         this.semester = res.semester;
+        this.classStatus = res.class_status;
         //修改，新增教学班时使用
         this.onlyAcademicYear = JSON.parse(JSON.stringify(res.academic_year));
         this.onlySemester = JSON.parse(JSON.stringify(res.semester));
@@ -147,6 +157,34 @@ export default {
         semester.dictLabel = "全部学期";
         semester.dictValue = null;
         this.semester.unshift(semester);
+        let status = {
+          dictLabel: "全部",
+          dictValue: null,
+        };
+        this.classStatus.unshift(status);
+        // 下拉筛选状态保持
+        let savedYear = sessionStorage.getItem("teacherChosenYear");
+        let savedSemester = sessionStorage.getItem("teacherChosenSemester");
+        let savedStatus = sessionStorage.getItem("teacherChosenStatus");
+        if (savedYear || savedSemester || savedStatus) {
+          {
+            if (savedYear === "null") {
+              this.chosenYear = null;
+            } else {
+              this.chosenYear = savedYear;
+            }
+            if (savedSemester === "null") {
+              this.chosenSemester = null;
+            } else {
+              this.chosenSemester = savedSemester;
+            }
+            if (savedStatus === "null") {
+              this.chosenStatus = null;
+            } else {
+              this.chosenStatus = savedStatus;
+            }
+          }
+        }
         this.getClassesList();
       });
     },
@@ -170,7 +208,15 @@ export default {
       this.$store.commit("currentInfo/setOpenDrawer", false);
       sessionStorage.setItem("teacherSearchForm", this.keyword);
       sessionStorage.removeItem("classTeacherSearchFlag");
-
+      if (
+        this.chosenYear !== "" ||
+        this.chosenSemester !== "" ||
+        this.chosenStatus !== ""
+      ) {
+        sessionStorage.setItem("teacherChosenYear", this.chosenYear);
+        sessionStorage.setItem("teacherChosenSemester", this.chosenSemester);
+        sessionStorage.setItem("teacherChosenStatus", this.chosenStatus);
+      }
       this.$router.push({ name: "TeacherClass" });
     },
     // 搜索栏查询
@@ -360,6 +406,14 @@ export default {
   opacity: 1;
   font-size: 14px;
   color: #828eae;
+}
+:deep().searchBlock .el-icon {
+  height: 20px;
+  width: 20px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 20px;
+  width: 20px;
 }
 .cardText span {
   display: block;

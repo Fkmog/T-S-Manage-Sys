@@ -1,10 +1,10 @@
 <template>
   <div v-show="!closeShow">
     <HeaderSearch
-      :msg=defaultMsg
+      msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
       @SearchValue="getSearchValue"
       :value="keyword"
-      ref="headsearch"
+      
     >
       <template #rightTime>
         <div class="selectionBar">
@@ -71,11 +71,11 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="this.addPrincipal()">
                 <el-icon><User /></el-icon>
-                &nbsp;添加课程负责人
+                &nbsp;设置课程负责人
               </el-dropdown-item>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp;分配手册模版
+                &nbsp;设置手册模版
               </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
@@ -246,7 +246,7 @@
                   class="deleteButton"
                   link
                   style="color: #3f51b5"
-                  ><el-icon><Document /></el-icon
+                  ><el-icon><Edit /></el-icon
                 ></el-button>
               </el-tooltip>
             </el-col>
@@ -982,6 +982,7 @@ export default {
     getSearchValue(data) {
       this.keyword = data;
       sessionStorage.removeItem("baseCourseSearchForm");
+      console.log('searching------------------')
       
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
@@ -1748,7 +1749,7 @@ export default {
         });
     },
     goBaseCourseDetail(row,column) {
-      // console.log("goBaseCourseDetail", row.bcDetails.length);
+      console.log("goBaseCourseDetail", row.bcDetails.length);
 
       sessionStorage.setItem("baseCourseSearchForm", this.keyword);
       // sessionStorage.removeItem("baseCourseSearchFlag");
@@ -1905,26 +1906,18 @@ export default {
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
 
-      // this.keyword = this.$store.state.course.baseCourseKeyword;
-      // console.log('baseCourseSearchFlag',sessionStorage.getItem("baseCourseSearchFlag"))
+      
       if (sessionStorage.getItem("baseCourseSearchForm")) {
       this.keyword = sessionStorage.getItem("baseCourseSearchForm");
       console.log('baseCourseSearchForm',this.keyword)
       this.getSearchValue(this.keyword);
 
-      this.$nextTick(()=>{
-        this.$refs.headsearch.focusInput(this.keyword)
-        // console.log('this.$refs.headsearch',this.$refs.headsearch.focusInput(this.keyword));
-        
-      })
+      
     } else {
       sessionStorage.removeItem("baseCourseSearchForm");
     }
 
-      // this.$nextTick(function(){
-      //   console.log('$nextTick 被调用了',this.$refs.headsearch)
-      //   this.$refs.headsearch.inputBlur()
-      // })
+    
       
 
       if (this.identity == "课程负责人") {
@@ -2009,14 +2002,16 @@ export default {
 .columnstyle {
   height: 50px;
 }
-/* :deep().searchBlock .el-icon {
-  height: 24px;
-  width: 24px;
+
+:deep().searchBlock .el-icon {
+  height: 20px;
+  width: 20px;
 }
+
 :deep().searchBlock .el-icon svg {
-  height: 24px;
-  width: 24px;
-} */
+  height: 20px;
+  width: 20px;
+} 
 :deep().el-icon svg {
   height: 18px;
   width: 18px;

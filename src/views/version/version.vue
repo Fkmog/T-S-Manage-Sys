@@ -76,7 +76,7 @@
                     this.nameFlag = true;
                     this.selectVersion(scope.row);
                     this.showEditVersionDailogFlag = true;">
-            <el-icon><Document /></el-icon>
+            <el-icon><Edit /></el-icon>
            </el-button>
               
           </el-tooltip>

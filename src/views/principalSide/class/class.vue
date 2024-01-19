@@ -406,14 +406,14 @@ export default {
   height: 18px;
   width: 18px;
 }
-/* :deep().searchBlock .el-icon {
-  height: 24px;
-  width: 24px;
+:deep().searchBlock .el-icon {
+  height: 20px;
+  width: 20px;
 }
 :deep().searchBlock .el-icon svg {
-  height: 24px;
-  width: 24px;
-} */
+  height: 20px;
+  width: 20px;
+}
 :deep().el-dialog__title {
   color: #808080;
   display: flex;
