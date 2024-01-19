@@ -2,6 +2,7 @@
   <HeaderSearch
     msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
     @SearchValue="getSearchValue"
+    :value="keyword"
   >
     <template #rightTime>
       <div class="rightSlot" v-show="!showAdd">
@@ -92,7 +93,7 @@ export default {
       chosenYear: "",
       chosenSemester: "",
       chosenStatus: "",
-       academicYear: [],
+      academicYear: [],
       semester: [],
       status: [
         {
@@ -119,8 +120,13 @@ export default {
     };
   },
   mounted() {
-    this.getDictionary()
-    
+    this.getDictionary();
+    if (sessionStorage.getItem("classTeacherSearchFlag")) {
+      this.keyword = sessionStorage.getItem("teacherSearchForm");
+      this.getSearchValue(this.keyword);
+    } else {
+      sessionStorage.removeItem("teacherSearchForm");
+    }
   },
   methods: {
     //获取数据字典
@@ -141,7 +147,7 @@ export default {
         semester.dictLabel = "全部学期";
         semester.dictValue = null;
         this.semester.unshift(semester);
-       this.getClassesList();
+        this.getClassesList();
       });
     },
     //获取课程列表
@@ -162,11 +168,15 @@ export default {
     toClass(Class) {
       this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
       this.$store.commit("currentInfo/setOpenDrawer", false);
+      sessionStorage.setItem("teacherSearchForm", this.keyword);
+      sessionStorage.removeItem("classTeacherSearchFlag");
+
       this.$router.push({ name: "TeacherClass" });
     },
     // 搜索栏查询
     getSearchValue(data) {
       this.keyword = data;
+      sessionStorage.removeItem("classTeacherSearchFlag");
       console.log("keyword", this.keyword);
       this.getClassesList();
     },

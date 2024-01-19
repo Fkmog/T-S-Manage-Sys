@@ -698,7 +698,6 @@ export default {
     this.getDictionary();
     if (sessionStorage.getItem("classSearchFlag")) {
       this.keyword = sessionStorage.getItem("searchForm");
-      console.log("#",this.keyword);
       this.getSearchValue(this.keyword);
     } else {
       sessionStorage.removeItem("searchForm");
@@ -792,7 +791,6 @@ export default {
       this.$refs.multipleTable.clearSelection();
       sessionStorage.removeItem("classSearchFlag");
       this.keyword = data;
-      console.log("keyword", this.keyword, this.currentInfo.schoolId);
       this.getClassList();
     },
     //获取数据字典
