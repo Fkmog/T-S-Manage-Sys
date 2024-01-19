@@ -1,5 +1,5 @@
 <template>
-    <div  flex v-show="isRouterAlive">
+    <div  flex >
       <div class="block">
           <el-row class="block-row">
             <el-tooltip
@@ -36,6 +36,7 @@
             <el-button 
             @click="save" 
             link
+            v-show="hasExamAnalysis"
             :disabled="!isValid()" >
               <el-icon
                 size="24px"
@@ -55,9 +56,17 @@
 
     </div>
 
-    <div class="card-container"  >
+    <div class="card-container"  v-show="hasExamAnalysis">
           <div class="hot-table-container" id="courseHot"></div>  
-      </div>
+    </div>
+
+    <div v-show="!hasExamAnalysis" class="no-class">
+      没有试卷分析表
+    </div>
+     <div class="no-major-detail" v-show="!hasExamAnalysis">
+    请先添加试卷分析表
+    </div>
+
 </template>
     
     <script >
@@ -89,6 +98,8 @@
       data(){
         let self = this;
         return{
+
+          hasExamAnalysis:true,
 
 
           objectivesName:['题号','分值'],
@@ -356,13 +367,14 @@
       let that = this;
       getExamAnalysis(this.classInfo.classId).then((res)=>{
         console.log('getExamAnalysis',res);
-        let setting = res.data.setting;
-        let averageScore = res.data.averageScore;
-        setting.object.forEach((objectname)=>{
-              this.objectivesName.push(objectname)
-            })
-        
-        this.objectivesName.push('平均得分')
+        if(res.setting){
+          let setting = res.data.setting;
+          let averageScore = res.data.averageScore;
+          setting.object.forEach((objectname)=>{
+                this.objectivesName.push(objectname)
+              })
+
+              this.objectivesName.push('平均得分')
         this.objectivesName.push('得分率')
         console.log('objectivesName',this.objectivesName)
         if(setting.sum){
@@ -415,13 +427,20 @@
             
             
             }
-            else{
-            setting.object.forEach(()=>{
-                this.db.objectives.push([''])
-            })
-            }
-            console.log('this.db.objectives',this.db.objectives)
-            this.activateHotcolumn();
+        else{
+        setting.object.forEach(()=>{
+            this.db.objectives.push([''])
+        })
+        }
+        console.log('this.db.objectives',this.db.objectives)
+        this.activateHotcolumn();
+        }
+        else{
+          this.hasExamAnalysis = false;
+        }
+        
+        
+        
           
       })
     },
@@ -665,6 +684,19 @@
     </script>
     
     <style  scoped>
+.no-class {
+  margin-top: 120px;
+  display: flex;
+  justify-content: center;
+  font-size: 22px;
+}
+.no-major-detail {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: #828d96;
+}
     .card-container{
     display: flex;
     margin:auto;
