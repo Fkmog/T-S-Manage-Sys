@@ -86,23 +86,24 @@
                 <el-row
                   v-for="coreBaseCourse in detail.coreBaseCourses"
                   :key="coreBaseCourse.id"
+                  style="margin-top:20px"
                 >
-                  <el-col :span="8" class="method-weight"
-                    >{{ coreBaseCourse.courseName }}
-                  </el-col>
-                  <el-tooltip
-                    effect="dark"
-                    content="权重"
-                    placement="bottom"
-                    :hide-after="0"
-                  >
-                    <el-col
-                      :span="5"
-                      class="method-desc"
-                      style="margin-left: 80px"
-                      >（ {{ coreBaseCourse.weight }}% ）</el-col
+                    <el-col :span="8" class="method-weight"
+                      >{{ coreBaseCourse.courseName }}
+                    </el-col>
+                    <el-tooltip
+                      effect="dark"
+                      content="权重"
+                      placement="bottom"
+                      :hide-after="0"
                     >
-                  </el-tooltip>
+                      <el-col
+                        :span="8"
+                        class="method-desc"
+                        style="margin-left: 80px"
+                        >（ {{ coreBaseCourse.weight }}% ）</el-col
+                      >
+                    </el-tooltip>
                 </el-row>
               </div>
             </div>
@@ -152,8 +153,8 @@
         </el-row>
         <el-row style="margin-bottom: 20px">
           <el-col :span="6" style="font-weight: bold; font-size: 16px"
-            >指标点{{ dialogDetail.programIndicators[0].serialNum }}：{{
-              dialogDetail.programIndicators[0].name
+            >指标点{{ dialogDetail.programIndicators[index2].serialNum }}：{{
+              dialogDetail.programIndicators[index2].name
             }}</el-col
           >
           <el-col :span="17">{{
@@ -366,20 +367,29 @@ export default {
       this.dialogFormVisible = true;
       this.index1 = index1;
       this.index2 = index2;
+      console.log("index1", this.index1);
+      console.log("index2", this.index2);
       console.log("attribute", attribute);
       this.dialogDetail = JSON.parse(JSON.stringify(attribute));
-      let temporary = this.dialogDetail.programIndicators[index2];
-      this.dialogDetail.programIndicators = [];
-      this.dialogDetail.programIndicators.push(temporary);
-      this.programIndicatorId = this.dialogDetail.programIndicators[0].id;
-      if (this.dialogDetail.programIndicators[0].coreBaseCourses === null) {
-        this.dialogDetail.programIndicators[0].coreBaseCourses = [];
+      let a = JSON.parse(JSON.stringify(attribute.programIndicators));
+      this.dialogDetail.programIndicators = a;
+      // let a = JSON.parse(JSON.stringify(detail));
+      console.log("a", a);
+
+      console.log("1dialogDetail", this.dialogDetail);
+
+      let temporary = JSON.parse(JSON.stringify(detail));
+      // this.dialogDetail.programIndicators = [];
+      // this.dialogDetail.programIndicators.push(temporary);
+      this.programIndicatorId = this.dialogDetail.programIndicators[index2].id;
+      if (
+        this.dialogDetail.programIndicators[index2].coreBaseCourses === null
+      ) {
+        this.dialogDetail.programIndicators[index2].coreBaseCourses = [];
       }
       this.getCoreBaseCourseList();
       console.log("dialogDetail", this.dialogDetail);
-      this.temp = JSON.parse(
-        JSON.stringify(this.dialogDetail.programIndicators[index2])
-      );
+      this.temp = JSON.parse(JSON.stringify(temporary));
       console.log("temp", this.temp);
     },
     //查询有无培养计划
@@ -485,10 +495,10 @@ export default {
 
         // 需要根据courseName去对比allCoreBaseCourse，拿到对应的courseId，bcdmId
         let index = this.allCoreBaseCourse.findIndex(
-          (itemObject) => itemObject.courseName ===   newCoreBaseCourse.courseName
+          (itemObject) => itemObject.courseName === newCoreBaseCourse.courseName
         );
-        newCoreBaseCourse.courseId=this.allCoreBaseCourse[index].courseId
-        newCoreBaseCourse.bcdmId=this.allCoreBaseCourse[index].bcdmId
+        newCoreBaseCourse.courseId = this.allCoreBaseCourse[index].courseId;
+        newCoreBaseCourse.bcdmId = this.allCoreBaseCourse[index].bcdmId;
         // console.log("@!",index);
         newCoreBaseCourse.id = Number;
         this.allCoreBaseCourse.forEach((item) => {
@@ -518,7 +528,7 @@ export default {
         // this.requirements[index1].programIndicators[
         //   index2
         // ].coreBaseCourses.push(newCoreBaseCourse);
-        this.dialogDetail.programIndicators[0].coreBaseCourses.push(
+        this.dialogDetail.programIndicators[index2].coreBaseCourses.push(
           newCoreBaseCourse
         );
         //不存在coreBasecourse属性，则直接创建

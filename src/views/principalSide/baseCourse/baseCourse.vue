@@ -774,14 +774,14 @@ export default {
     height:50px;
     
   }
-:deep().searchBlock .el-icon {
+/* :deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
 }
 :deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
-}
+} */
 :deep().el-icon svg {
   height: 18px;
   width: 18px;

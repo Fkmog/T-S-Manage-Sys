@@ -13,7 +13,6 @@
             :class="active ? 'activeInput' : ''"
             v-model="keyword"
             :placeholder="msg"
-            @change="sendMessage"
             @focus="active = true"
             @blur="inputBlur()"
             clearable
