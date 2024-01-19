@@ -362,7 +362,7 @@ export default {
   height: 18px;
   width: 18px;
 } 
-/*
+
 :deep().searchBlock .el-icon {
   height: 24px;
   width: 24px;
@@ -370,7 +370,7 @@ export default {
 :deep().searchBlock .el-icon svg {
   height: 24px;
   width: 24px;
-} */
+}
 .no-major {
   padding-top: 120px;
   display: flex;

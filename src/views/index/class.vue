@@ -1432,7 +1432,8 @@ export default {
 :deep() .el-icon svg {
   height: 18px;
   width: 18px;
-}/*
+}
+
 :deep().searchBlock .el-icon {
   height:24px;
   width: 24px;
@@ -1440,7 +1441,7 @@ export default {
 :deep().searchBlock  .el-icon svg {
   height: 24px;
   width: 24px;
-} */
+}
 
 :deep().el-checkbox__input.is-disabled .el-checkbox__inner {
   cursor: default;

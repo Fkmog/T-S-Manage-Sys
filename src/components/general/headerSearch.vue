@@ -91,14 +91,6 @@ export default {
       this.keyword = "";
       this.inputBlur();
     },
-    focusInput(value){
-      if(value){
-        // this.searchInput = value;
-        console.log('s1111111111earchinput',this.$refs.searchInput)
-        this.searchValue = value;
-      }
-      this.$refs.searchInput.focus();
-    }
   },
 };
 </script>

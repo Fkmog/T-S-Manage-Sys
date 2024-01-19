@@ -45,7 +45,7 @@
     <div v-show="hasNoBaseCourse" class="no-class">
       没有教师
     </div>
-     <div class="no-major-detail" v-show="!hasBaseCourse">
+     <div class="no-major-detail" v-show="hasNoBaseCourse&&!hasBaseCourse">
     请先点击右上角圆形按钮添加教师
   </div>
       <addBtn @click="goAddTeacher"></addBtn>
@@ -341,6 +341,14 @@ export default {
 </script>
 
 <style scoped>
+:deep().searchBlock .el-icon {
+  height: 24px;
+  width: 24px;
+}
+:deep().searchBlock .el-icon svg {
+  height: 24px;
+  width: 24px;
+}
  .dropdownstyle{
    float: right;
    margin-right: 70px;
