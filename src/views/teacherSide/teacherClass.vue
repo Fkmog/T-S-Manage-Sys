@@ -175,6 +175,7 @@
           <el-switch
             v-model="openDrawer"
             class="switchstyle"
+            ref="switch"
             @change="openDrawerChange"
           />
         </el-tooltip>
@@ -317,6 +318,13 @@ export default {
 	  sessionStorage.setItem("classTeacherSearchFlag", true);
     this.identity = this.$store.state.currentInfo.identity;
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
+    // if(sessionStorage.getItem("teacherClassOpenDrawer")){
+    //   this.openDrawer = sessionStorage.getItem("teacherClassOpenDrawer");
+    //   // this.$refs.switch['checked']=true;
+    //   // console.log('this.$refs.switch',this.$refs.switch['checked']);
+    //   // this.$refs.switch
+    // }
+    
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -408,7 +416,11 @@ export default {
       }
     },
     openDrawerChange() {
+      console.log('setting opendrawer');
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+      console.log("currentInfo/setOpenDrawer",this.$store.state.currentInfo.opendrawer);
+      // sessionStorage.setItem("teacherClassOpenDrawer",this.openDrawer);
+
     },
     getdata(val) {
       this.openDrawer = val;

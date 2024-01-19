@@ -40,8 +40,8 @@
               <DocumentChecked />
             </el-icon>
           </el-tooltip>
-          <el-divider class="divider" direction="vertical" />
         </div>
+        <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
           effect="dark"
@@ -49,7 +49,7 @@
           placement="bottom"
           :hide-after="0"
         >
-          <el-switch v-model="openDrawer" class="switchstyle" />
+          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
         </el-tooltip>
       </el-row>
     </div>
@@ -174,6 +174,9 @@ export default {
     },
   },
   methods: {
+    openDrawerChange(){
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     async getPre() {
       await this.create();
       this.courseId = this.classInfo.courseId;

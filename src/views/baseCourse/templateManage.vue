@@ -79,7 +79,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="分配手册模板"
+            content="设置手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -160,7 +160,7 @@
     <!-- 新增关联模板 -->
     <el-dialog
       v-model="addWorkbook"
-      title="分配手册模板"
+      title="设置手册模板"
       width="330px"
       :show-close="false"
       :align-center="true"
