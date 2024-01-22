@@ -75,7 +75,7 @@
               </el-dropdown-item>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp;设置手册模版
+                &nbsp;设置手册模板
               </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
@@ -100,7 +100,7 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp;分配手册模版
+                &nbsp;设置手册模板
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -580,7 +580,7 @@
 
   <el-dialog
     v-model="showAddWorkbook"
-    title="设置手册模版"
+    title="设置手册模板"
     width="330px"
     :show-close="false"
     :align-center="true"
@@ -588,7 +588,7 @@
     <el-select
       v-model="workBookId"
       style="width: 250px; margin-left: 20px"
-      placeholder="选择手册模版"
+      placeholder="选择手册模板"
     >
       <el-option
         v-for="datail in workBookDetail"

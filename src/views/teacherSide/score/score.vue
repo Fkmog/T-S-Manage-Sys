@@ -76,7 +76,7 @@
         </el-icon>
       </el-tooltip>
           
-      <el-divider class="divider" v-show="this.identity == '教师'||this.identity == '学院管理员'" direction="vertical" />
+      <el-divider class="divider" direction="vertical" />
 
       <el-tooltip
             class="box-item"

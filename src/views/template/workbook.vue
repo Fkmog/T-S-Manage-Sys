@@ -49,7 +49,11 @@
           placement="bottom"
           :hide-after="0"
         >
-          <el-switch v-model="openDrawer" class="switchstyle" @change="openDrawerChange"/>
+          <el-switch
+            v-model="openDrawer"
+            class="switchstyle"
+            @change="openDrawerChange"
+          />
         </el-tooltip>
       </el-row>
     </div>
@@ -71,7 +75,7 @@
           font-size: 22px;
         "
       >
-        暂未分配工作手册模板
+        暂未设置工作手册模板
       </div>
       <div
         style="
@@ -82,7 +86,7 @@
           margin-top: 30px;
         "
       >
-        请联系管理员分配工作手册模板
+        请联系管理员设置工作手册模板
       </div>
     </div>
   </div>
@@ -127,6 +131,7 @@ export default {
       fApi: {},
       //表单数据
       value: {},
+      // watchValue:{}
     };
   },
   mounted() {
@@ -174,11 +179,12 @@ export default {
     },
   },
   methods: {
-    openDrawerChange(){
+    openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
     async getPre() {
       await this.create();
+      console.log("classInfo", this.classInfo);
       this.courseId = this.classInfo.courseId;
       this.detailId = this.classInfo.detailId;
       this.getPresent();
@@ -186,7 +192,6 @@ export default {
     async create() {
       await this.createValue();
       await editByTeacher(this.classInfo.classId, this.value).then((res) => {
-        console.log("789");
         if (res.code === "SUCCESS") {
           this.getClassInfo();
         }
@@ -279,6 +284,11 @@ export default {
       });
       // console.log("abled后", this.workbook);
     },
+    // 暂存至localStorage
+    saveToLocal(value, classId) {
+      localStorage.setItem("classId", JSON.stringify(classId));
+      localStorage.setItem("workbook", JSON.stringify(value));
+    },
     // 保存
     save() {
       this.fApi.submit((formData, fApi) => {
@@ -290,6 +300,8 @@ export default {
               message: `保存成功`,
               duration: 1500,
             });
+            localStorage.removeItem("classId");
+            localStorage.removeItem("workbook");
             this.getClassInfo();
           }
         });
@@ -403,22 +415,47 @@ export default {
     },
     // 查询预设信息
     getPresent() {
-      getPresent(this.detailId).then((res) => {
-        console.log(res);
-        this.formPresent = res.data.preset.formPreset;
-        this.formPresent.forEach((i) => {
-          if (i.value[0] == "[") {
-            i.value = i.value.match(/\d+/g);
-            // console.log("!", i.value);
-          }
+      // TODO:detailId可能为null 还没有处理
+      if (this.detailId) {
+        console.log("34");
+        getPresent(this.detailId).then((res) => {
+          console.log(res);
+          this.formPresent = res.data.preset.formPreset;
+          this.formPresent.forEach((i) => {
+            if (i.value[0] == "[") {
+              i.value = i.value.match(/\d+/g);
+              // console.log("!", i.value);
+            }
+          });
+          console.log("getPresent", this.formPresent);
+          // this.showPresent(this.json);
         });
-        console.log("getPresent", this.formPresent);
-
-        this.showPresent(this.json);
+      }
+      this.getLocalValue();
+    },
+    async getLocalValue() {
+      await this.showPresent(this.json);
+      console.log("22");
+      if (localStorage.getItem("workbook")) {
+        console.log("11");
+        if (localStorage.getItem("classId") == this.classInfo.classId) {
+          let temp = JSON.parse(localStorage.getItem("workbook"));
+          this.value = temp;
+          console.log("#", this.value);
+        } else {
+          console.log("yichu");
+          localStorage.removeItem("classId");
+          localStorage.removeItem("workbook");
+        }
+      }
+      this.$watch("value", (newValue) => {
+        // 在元素值变化时执行特定的操作
+        console.log("元素的值已经变化：", newValue);
+        this.saveToLocal(newValue, this.classInfo.classId);
       });
     },
     // 回显预设信息
-    showPresent(forms) {
+    async showPresent(forms) {
       forms.forEach((form) => {
         if (Array.isArray(form.children) && form.children.length > 0) {
           this.showPresent(form.children);
