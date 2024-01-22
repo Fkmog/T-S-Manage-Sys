@@ -82,6 +82,7 @@
               color="rgb(137, 137, 137)"
               style="float: left;top: 4px;cursor: pointer;"
               @click="tabsContent(item,item.name)" 
+              
               >
               <EditPen />
             </el-icon>
@@ -105,18 +106,19 @@
             <!--  item.title = originActivityTitle;item.inputFlag = false; -->
             
         <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
-        
-        <el-tooltip
+        <div v-show="this.currenteditableTabsValue !== 1&&this.currenteditableTabsValue !== 0" style="width: 100px;display: inline-block;">
+          <el-tooltip
           class="box-item"
           effect="dark"
           content="添加成绩项"
           placement="bottom"
           :hide-after="0"
+          
         >
           <el-button 
             @click="addActivities" 
             link 
-            :disabled="!over21"
+            :disabled="!over21||this.currenteditableTabsValue === 1||this.currenteditableTabsValue === 0"
             style="padding: 10px;"
           >
             <el-icon
@@ -127,6 +129,8 @@
             </el-icon>
           </el-button>
           </el-tooltip>
+        </div>
+        
       </template>
   </el-tab-pane>
     
@@ -557,13 +561,22 @@
     addActivities() {
       if(this.from != 'paperAnalysis'){
         console.log('currenteditableTabsValue',this.currenteditableTabsValue);
-      // this.iscolover21();
-      if(this.currenteditableTabsValue == 0){
+        if(this.currenteditableTabsValue == 1){
+          ElMessage({
+              type: "error",
+              message: "更新失败，没有权限",
+              duration: 1500,
+            });
+        }
+        else{
+          if(this.currenteditableTabsValue == 0){
         this.colNum = this.db.items[this.currenteditableTabsValue][0].length;
       }
       else{
         this.colNum = this.db.items[this.currenteditableTabsValue - 1][0].length;
       }
+
+      console.log('this.colNum',this.colNum);
       
       // console.log('colNum:',this.colNum);
       if (this.colNum < 21) {
@@ -590,6 +603,7 @@
         // this.colNum = this.colNum+1;
         // this.dictTolist(this.db.items);
         
+        }
         }
       }
       else{
@@ -644,6 +658,26 @@
               name: "删除列",
             },
           },
+        },
+        beforeCreateCol(index,amount,source){
+        console.log('beforeRemoveCol',self.currenteditableTabsValue)
+          if (self.currenteditableTabsValue === 1||self.currenteditableTabsValue === 0) { 
+            // console.log('same');
+            return false;
+          }
+          else{
+            return;
+          }
+        },
+        beforeRemoveCol(index,amount,physicalRows,source){
+          console.log('beforeRemoveCol',self.currenteditableTabsValue)
+          if (self.currenteditableTabsValue === 1||self.currenteditableTabsValue === 0) { 
+            // console.log('same');
+            return false;
+          }
+          else{
+            return;
+          }
         },
         afterChange(changes, source) {
           if (source === "loadData") {
@@ -717,8 +751,7 @@
             },
           },
         },
-
-        
+      
         afterChange(changes, source) {
           // console.log('afterChange',changes)
           

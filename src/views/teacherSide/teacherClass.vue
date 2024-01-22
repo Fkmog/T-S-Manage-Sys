@@ -496,6 +496,7 @@ export default {
     },
     //查看课程大纲文件列表
     checkFileList() {
+      // TODO:detailId可能为null 还没处理
       getFilesList(this.classInfo.detailId).then((res) => {
         this.filesList = res.data;
         if (this.filesList.length == 0) {
