@@ -367,7 +367,7 @@
       let that = this;
       getExamAnalysis(this.classInfo.classId).then((res)=>{
         console.log('getExamAnalysis',res);
-        if(res.setting){
+        if(res.data.setting){
           let setting = res.data.setting;
           let averageScore = res.data.averageScore;
           setting.object.forEach((objectname)=>{

@@ -75,7 +75,7 @@
               </el-dropdown-item>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp;设置手册模版
+                &nbsp;设置手册模板
               </el-dropdown-item>
               <el-dropdown-item @click="this.deleteRespondent()">
                 <el-icon><CircleClose /></el-icon>
@@ -100,7 +100,7 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="this.addWorkbook()">
                 <el-icon><Collection /></el-icon>
-                &nbsp;分配手册模版
+                &nbsp;设置手册模板
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -580,7 +580,7 @@
 
   <el-dialog
     v-model="showAddWorkbook"
-    title="设置手册模版"
+    title="设置手册模板"
     width="330px"
     :show-close="false"
     :align-center="true"
@@ -588,7 +588,7 @@
     <el-select
       v-model="workBookId"
       style="width: 250px; margin-left: 20px"
-      placeholder="选择手册模版"
+      placeholder="选择手册模板"
     >
       <el-option
         v-for="datail in workBookDetail"
@@ -768,9 +768,9 @@ export default {
 
       defaultMsg: "搜索课程名称、任课教师(姓名、工号)、课程号、开课号",
 
-      hasDetail: "全部",
+      hasDetail: "",
       hasDetailSeletion: [
-        { label: "全部", value: null },
+        { label: "全部", value: "" },
         { label: "有课程大纲", value: "1" },
         { label: "无课程大纲", value: "0" },
       ],
@@ -952,10 +952,19 @@ export default {
       result: {},
     };
   },
+  watch:{
+    // hasDetail:{
+    //   handler(){
+    //     console.log('handler 的值改变了',);
+    //     sessionStorage.setItem("baseCourseHasDetail",);
+    //   }
+    // }
+  },
   methods: {
-    getSelectedBaseCourse(hasDeatil) {
-      this.hasDeatil = hasDeatil;
-      console.log("hasDeatil:", this.hasDeatil);
+    getSelectedBaseCourse(hasDetail) {
+      this.hasDetail = hasDetail;
+      console.log("hasDetail:", this.hasDetail);
+      sessionStorage.setItem("baseCourseHasDetail",this.hasDetail);
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     cancelVersionForm() {
@@ -1520,7 +1529,7 @@ export default {
           pageSize: pageSize,
           pageNum: pageNum,
           versionId: this.currentVersionId,
-          hasDetail: this.hasDeatil,
+          hasDetail: this.hasDetail,
           departmentId: this.departmentId,
           schoolId: this.schoolId,
           selectKeyWord: this.keyword,
@@ -1534,7 +1543,7 @@ export default {
           pageNum: pageNum,
           versionId: this.currentVersionId,
           userId: this.userId,
-          hasDetail: this.hasDeatil,
+          hasDetail: this.hasDetail,
           departmentId: this.departmentId,
           schoolId: this.schoolId,
           selectKeyWord: this.keyword,
@@ -1906,6 +1915,11 @@ export default {
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
 
+      if(sessionStorage.getItem("baseCourseHasDetail")===null||sessionStorage.getItem("baseCourseHasDetail")){
+        this.hasDetail = sessionStorage.getItem("baseCourseHasDetail");
+        // this.getBaseCourse(this.pageSize, this.pageNum);
+      }
+
       
       if (sessionStorage.getItem("baseCourseSearchForm")) {
       this.keyword = sessionStorage.getItem("baseCourseSearchForm");
@@ -1938,9 +1952,6 @@ export default {
       }
       this.getBaseCourse(this.pageSize, this.pageNum);
     });
-  },
-  watch(){
-
   },
   
 };
