@@ -181,7 +181,7 @@
         let that = this;
         this.currenteditableTabsValue = Number(pane.props.name);
         this.hotInstance.updateSettings({
-                columns:that.columnList[that.currenteditableTabsValue-1],
+                columns:that.db.items[that.currenteditableTabsValue-1][0],
                 data:that.db.items[that.currenteditableTabsValue-1],
                 cells: that.getHotCellsFunction(), 
               });
@@ -313,6 +313,7 @@ activate(){
             let self = this;
                 let that = this;
                 this.getActivities().then(function(){
+                  console.log('Handsontable init..........')
                 let container = document.querySelector("#courseHot");
                 let hotRegisterer = new Handsontable(container,{
                     data: self.db.items[0],
@@ -421,7 +422,7 @@ activate(){
                 });
                 that.hotInstance = hotRegisterer;
                 that.hotInstance.updateSettings({
-                  columns:that.columnList[0],
+                  columns:that.db.items[0][0],
                   data:that.db.items[0],
                   cells: that.getHotCellsFunction(),  
                       });
@@ -579,59 +580,57 @@ async getActivities(){
             // that.db.items[i]={};
             tempList[i]={};
           }
-          let tempcolumnList = [{
-                data:'studentNumber',
-            },
-            {
-                data:'studentName',
-            },
-            {
-                data:'pass',
-            },];
+           tempList[0] = {
+                0:'',
+                1:'',
+                2:'',
+            }
          for(let i=0;i<activityNumber;i++){
-        //   itemDict[i.toString()] = course.activities.item[i];
-        var columnDist = {};
-          // that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
-          tempList[0][activity['item'][i]] = activity['item'][i];
-          // that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
-          tempList[1][activity['item'][i]] = activity['value'][i];
-          // that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
-          tempList[2][activity['item'][i]] = activity['remark'][i];
-          columnDist={
-            data:activity['item'][i],
-          }
-          tempcolumnList.push(columnDist);
-        //   valueDict[i.toString()] = course.activities.value[i];
+          
+          
+          // let columnDist = {};
+          
+          tempList[0][i+3] = activity['item'][i];
+          
+          tempList[1][i+3] = activity['value'][i];
+          
+          tempList[2][i+3] = activity['remark'][i];
+          // columnDist={
+          //   data:activity['item'][i],
+          // }
+          // tempcolumnList.push(columnDist);
+          
          }
-         console.log('tempcolumnList:',tempcolumnList);
+         
+         console.log('tempList',tempList);
+          
+        //  console.log('tempcolumnList:',tempcolumnList);
           for(let i=0;i<studentNum;i++){
-            // console.log('number:',3+i);
-            // that.db.items[3+i]['studentNumber']= course.scores[i]['info'][0];
-            tempList[3+i]['studentNumber'] = course.scores[i]['info'][0];
-            // that.db.items[3+i]['studentName']=course.scores[i]['info'][1];
-            tempList[3+i]['studentName'] = course.scores[i]['info'][1];
-            // that.db.items[3+i]['pass']=(course.scores[i]['info'][2]=='')? '':'F';
             
-            tempList[3+i]['pass'] = course.scores[i]['status'][currentactivitCount];
-            if(count+1 >course.scores[i]['grade'].length){
+            tempList[3+i][0] = course.scores[i]['info'][0];
+            
+            tempList[3+i][1] = course.scores[i]['info'][1];
+            
+            
+            tempList[3+i][2] = course.scores[i]['status'][currentactivitCount];
+            
+            if(count+1 > course.scores[i]['grade'].length){
               // console.log('该成绩项下，并未添加学生成绩')
               
               for(let j=0;j<activityNumber;j++){
-                tempList[3+i][activity['item'][j]] = null;
+                tempList[3+i][j+3] = null;
               }
               
             }
             else{
             for(let j=0;j<activityNumber;j++){
               if(!course.scores[i]['grade'][count][j]){
-                //[count++]
-                // that.db.items[3+i][course.activities[0]['item'][j]] = 0;
-                tempList[3+i][activity['item'][j]] = null;
+                
+                tempList[3+i][j+3] = null;
               }
               else{
-                // that.db.items[3+i][course.activities[0]['item'][j]] = course.scores[i]['grade'][j];
-                // tempList[3+i][activity['item'][j]] =  course.scores[i]['grade'][count++][j];
-                tempList[3+i][activity['item'][j]] =  course.scores[i]['grade'][count][j];
+                
+                tempList[3+i][j+3] =  course.scores[i]['grade'][count][j];
               }
                 
             }
@@ -639,7 +638,7 @@ async getActivities(){
             }
             
           };
-          that.columnList.push(tempcolumnList);
+          // that.columnList.push(tempcolumnList);
           that.db.items.push(tempList);
           count++;
           currentactivitCount++;
@@ -676,34 +675,30 @@ async getActivities(){
             // that.db.items[i]={};
             tempList[i]={};
           }
-         let tempcolumnList = [{
-                data:'studentNumber',
-            },
-            {
-                data:'studentName',
-            },
-            {
-                data:'pass',
-            },];
+          tempList[0] = {
+              0:'',
+              1:'',
+              2:'',
+            }
          for(let i=0;i<activityNumber;i++){
         //   itemDict[i.toString()] = course.activities.item[i];
         var columnDist = {};
           // that.db.items[0][course.activities[0]['item'][i]]= course.activities[0]['item'][i];
-          tempList[0][activity['item'][i]] = activity['item'][i];
+          tempList[0][i+3] = activity['item'][i];
           // that.db.items[1][course.activities[0]['item'][i]]= course.activities[0]['value'][i];
-          tempList[1][activity['item'][i]] = activity['value'][i];
+          tempList[1][i+3] = activity['value'][i];
           // that.db.items[2][course.activities[0]['item'][i]]= course.activities[0]['remark'][i];
-          tempList[2][activity['item'][i]] = activity['remark'][i];
-          columnDist={
-            data:activity['item'][i],
-          }
-          tempcolumnList.push(columnDist);
+          tempList[2][i+3] = activity['remark'][i];
+          // columnDist={
+          //   data:activity['item'][i],
+          // }
+          // tempcolumnList.push(columnDist);
           
           
          
         //   valueDict[i.toString()] = course.activities.value[i];
          }
-          that.columnList.push(tempcolumnList);
+          // that.columnList.push(tempcolumnList);
           that.db.items.push(tempList);
             });
           that.originData = JSON.parse(JSON.stringify(that.db.items));
@@ -725,9 +720,9 @@ async getActivities(){
       }
       },
       compareArrays(arr1, arr2) {
-        console.log('arr1',arr1,'arr2',arr2);
+        // console.log('arr1',arr1,'arr2',arr2);
   // 检查数组长度是否相等
-  console.log('length:',arr1.length,arr2.length);
+  // console.log('length:',arr1.length,arr2.length);
   if (arr1.length !== arr2.length) {
     return false;
   }
@@ -774,12 +769,12 @@ async getActivities(){
             }
             for(let i=0;i<studentList.length;i++){
                 // console.log('studentInfo:',studentList[i]);
-                if(studentList[i]['studentNumber']!=undefined){
-                  allStudentsNumber.push(studentList[i]['studentNumber']);
+                if(studentList[i][0]!=undefined){
+                  allStudentsNumber.push(studentList[i][0]);
                 }
             }
             let count=0;
-            console.log('allStudentsNumber:',allStudentsNumber,'studentList.length',studentList.length);
+            // console.log('allStudentsNumber:',allStudentsNumber,'studentList.length',studentList.length);
             allStudentsNumber.forEach((studentNumber)=>{
               
               let infoList = [];
@@ -794,26 +789,25 @@ async getActivities(){
                 };
                 
                 for(let i=0;i<studentList.length;i++){
-                  console.log("student[i]",student[i]);
+                  // console.log("student[i]",student[i]);
                   if(student[i]){
-                  console.log("student[i]['studentNumber']",student[i]['studentNumber'],);
-                  if(student[i]['studentNumber']==studentNumber){
-                    console.log('socres:',student[i])
+                  // console.log("student[i]['studentNumber']",student[i][0],);
+                  if(student[i][0]==studentNumber){
+                    // console.log('socres:',student[i])
                     let tempDict = {
                       studentNumber:'',
                       studentName:'',
-                      
                     }
                     for(var key in student[i]){
-                      console.log('key',key,'student[key]',student[i][key])
-                      if(key == 'studentNumber'){
+                      // console.log('key',key,'student[key]',student[i][key])
+                      if(key == 0){
                         tempDict['studentNumber'] = student[i][key];
                       }
-                      else if(key == 'studentName'){
+                      else if(key == 1){
                         tempDict['studentName'] = student[i][key];
                        
                       }
-                      else if(key == 'pass'){
+                      else if(key == 2){
                         passList=student[i][key];
                         
                       }
@@ -826,7 +820,7 @@ async getActivities(){
                   }
                   }
                   else{
-                    console.log('this activity do not add scores');
+                    // console.log('this activity do not add scores');
                   }
                   
                   
@@ -834,17 +828,17 @@ async getActivities(){
             finalGrade.push(gradList);
             finalPass.push(passList);
               })
-              console.log('info:',infoList,'grade:',finalGrade);
+              // console.log('info:',infoList,'grade:',finalGrade);
               var scoreDist = {
                 'info':[infoList[0]['studentNumber'],infoList[0]['studentName']],
                 'status':finalPass,
                 'grade':finalGrade,
               }
               
-              console.log('scoreDist',scoreDist,count++);
+              // console.log('scoreDist',scoreDist,count++);
               that.postData.scores.push(scoreDist);
             });
-            console.log('postData.scores',that.postData.scores);
+            // console.log('postData.scores',that.postData.scores);
             that.addScores(that.postData.scores); 
       
     },
@@ -949,7 +943,12 @@ async getActivities(){
             }
       });
       let activityNumber = 0;
-      this.columnList.forEach((column)=>{
+      let columns =[]
+      for(let i =0;i<this.db.item.length;i++){
+        columns.push(this.db.item[i][0])
+      }
+      
+      columns.forEach((column)=>{
         activityNumber = activityNumber+column.length-3;
       })
       console.log('trueFlagNum:',trueFlagNum);
