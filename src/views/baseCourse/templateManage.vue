@@ -26,7 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="设置关联模板"
+            content="设置手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -60,7 +60,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="删除关联模板"
+            content="删除手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -129,10 +129,10 @@
         请先分配工作手册模板
       </div>
     </div>
-    <!-- 修改关联模板 -->
+    <!-- 修改手册模板 -->
     <el-dialog
       v-model="changeWorkbook"
-      title="修改关联模板"
+      title="修改手册模板"
       width="330px"
       :show-close="false"
       :align-center="true"
@@ -157,7 +157,7 @@
         </span>
       </template>
     </el-dialog>
-    <!-- 新增关联模板 -->
+    <!-- 设置手册模板 -->
     <el-dialog
       v-model="addWorkbook"
       title="设置手册模板"
@@ -297,9 +297,9 @@ export default {
         }
       });
     },
-    // 删除关联模板
+    // 删除手册模板
     Delete() {
-      ElMessageBox.confirm("是否确认删除关联的工作手册模板？", "", {
+      ElMessageBox.confirm("是否确认删除手册模板？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",

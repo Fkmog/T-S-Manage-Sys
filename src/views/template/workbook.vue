@@ -40,8 +40,8 @@
               <DocumentChecked />
             </el-icon>
           </el-tooltip>
-          <el-divider class="divider" direction="vertical" />
         </div>
+        <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
           effect="dark"
