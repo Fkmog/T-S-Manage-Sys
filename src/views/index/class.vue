@@ -322,24 +322,26 @@
       </template>
     </el-dialog>
   </div>
-  <!-- 弹出分配课程大纲 -->
+  <!-- 弹出设置课程大纲 -->
   <div class="assignDialog">
     <el-dialog
       v-model="isAssign"
       title="设置课程大纲"
-      width="330px"
+      width="400px"
       :show-close="false"
       :align-center="true"
     >
       <el-cascader
         v-model="assignedDetail"
         :options="detailList"
-        style="width: 250px; margin-left: 20px"
+        style="width: 330px; margin-left: 20px"
         placeholder="选择课程大纲版本"
         class="custom-cascader"
       >
         <template #default="{ node, data }">
-          <span v-if="data.children">{{ node.label }}</span>
+          <span v-if="data.children || !data.description">{{
+            node.label
+          }}</span>
           <el-tooltip
             v-else
             :hide-after="0"
@@ -703,7 +705,7 @@ export default {
     console.log("this.identity", this.identity);
     this.getDictionary();
     // 搜索栏状态保持
-    if (sessionStorage.getItem("classSearchFlag")) {
+    if (sessionStorage.getItem("classSearchFlag")&&sessionStorage.getItem("searchForm")!=='null') {
       this.keyword = sessionStorage.getItem("searchForm");
       this.getSearchValue(this.keyword);
     } else {
@@ -1282,7 +1284,8 @@ export default {
         this.detailList = res.rows;
 
         this.detailList.forEach((item) => {
-          item.versionInfo = item.courseName + "-" + item.versionName;
+          item.versionInfo =
+            item.courseName + "| " + item.courseCode + "| " + item.versionName;
           item.value = item.detailId;
           item.label = item.versionInfo;
           getExamList(
@@ -1501,7 +1504,7 @@ export default {
 .el-table :deep().DisableSelection .cell .el-checkbox__inner {
   display: none;
 }
-:deep().el-input__wrapper {
+:deep().rightSlot .el-input__wrapper{
   border-bottom: 1px solid #d5d5d5;
   background-color: transparent;
   border-top: 0;
@@ -1510,6 +1513,15 @@ export default {
   box-shadow: 0 0 0 0px;
   border-radius: 0;
 }
+/* :deep().searchBlock .el-input__wrapper {
+  border-bottom: 1px solid #d5d5d5;
+  background-color: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  box-shadow: 0 0 0 0px;
+  border-radius: 0;
+} */
 .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
 }

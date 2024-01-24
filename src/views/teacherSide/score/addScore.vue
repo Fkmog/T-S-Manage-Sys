@@ -619,6 +619,7 @@ async getActivities(){
               
               for(let j=0;j<activityNumber;j++){
                 tempList[3+i][j+3] = null;
+                tempList[3+i][j+3] = null;
               }
               
             }
