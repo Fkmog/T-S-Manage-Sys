@@ -248,7 +248,7 @@ import {
   Finished,
   Management,
 } from "@element-plus/icons-vue";
-import { submit, getClassInfo,downloadReport } from "@/api/class";
+import { submit, getClassInfo, downloadReport } from "@/api/class";
 import { getDictionary } from "@/api/dictionary";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 import { getFilesList } from "@/api/basecourse";
@@ -314,8 +314,8 @@ export default {
     };
   },
   mounted() {
-	  sessionStorage.setItem("classSearchFlag", true);
-	  sessionStorage.setItem("classTeacherSearchFlag", true);
+    sessionStorage.setItem("classSearchFlag", true);
+    sessionStorage.setItem("classTeacherSearchFlag", true);
     this.identity = this.$store.state.currentInfo.identity;
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     // if(sessionStorage.getItem("teacherClassOpenDrawer")){
@@ -324,7 +324,7 @@ export default {
     //   // console.log('this.$refs.switch',this.$refs.switch['checked']);
     //   // this.$refs.switch
     // }
-    
+
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -416,11 +416,13 @@ export default {
       }
     },
     openDrawerChange() {
-      console.log('setting opendrawer');
+      console.log("setting opendrawer");
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
-      console.log("currentInfo/setOpenDrawer",this.$store.state.currentInfo.opendrawer);
+      console.log(
+        "currentInfo/setOpenDrawer",
+        this.$store.state.currentInfo.opendrawer
+      );
       // sessionStorage.setItem("teacherClassOpenDrawer",this.openDrawer);
-
     },
     getdata(val) {
       this.openDrawer = val;
@@ -497,14 +499,16 @@ export default {
     //查看课程大纲文件列表
     checkFileList() {
       // TODO:detailId可能为null 还没处理
-      getFilesList(this.classInfo.detailId).then((res) => {
-        this.filesList = res.data;
-        if (this.filesList.length == 0) {
-          this.hasFile = false;
-        } else {
-          this.hasFile = true;
-        }
-      });
+      if (this.classInfo.detailId) {
+        getFilesList(this.classInfo.detailId).then((res) => {
+          this.filesList = res.data;
+          if (this.filesList.length == 0) {
+            this.hasFile = false;
+          } else {
+            this.hasFile = true;
+          }
+        });
+      }
     },
     //下载课程大纲文件
     downloadFile(row) {
@@ -541,23 +545,23 @@ export default {
       // console.log("this.status", this.status);
     },
     // 下载报告
-    downloadReport(){
-      downloadReport(this.classInfo.classId).then((res)=>{
-        console.log("下载报告",res);
-          // console.log("downloadFile", res);
+    downloadReport() {
+      downloadReport(this.classInfo.classId).then((res) => {
+        console.log("下载报告", res);
+        // console.log("downloadFile", res);
         const blob = new Blob([res]);
         // console.log("blob", blob);
         // saveAs(blob, this.objectInfo.fileName)
         const link = document.createElement("a");
-        link.download = decodeURI('报告.doc');
+        link.download = decodeURI("报告.doc");
         link.style.display = "none";
         link.href = URL.createObjectURL(blob);
         document.body.appendChild(link);
         link.click();
         URL.revokeObjectURL(link.href);
         document.body.removeChild(link);
-      })
-    }
+      });
+    },
   },
 };
 </script>

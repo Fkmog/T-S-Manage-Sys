@@ -1993,7 +1993,7 @@ export default {
   font-size: 13px;
   color: #828d96;
 }
-:deep().el-input__wrapper {
+:deep().selectionBar .el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;
   background-color: transparent;
   border-top: 0;
@@ -2158,14 +2158,5 @@ export default {
   background: transparent;
   transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-:deep().el-input__wrapper {
-  border-bottom: 1px solid #d5d5d5;
-  background-color: transparent;
-  border-top: 0;
-  border-right: 0;
-  border-left: 0;
-  box-shadow: 0 0 0 0px;
-  border-radius: 0;
 }
 </style>

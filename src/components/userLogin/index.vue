@@ -4,7 +4,7 @@
     <div class="loginContainer">
       <div class="card">
         <div class="loginCard">
-          <h2 style=" margin-top:-40px; text-align: center;">教学过程质量监控管理平台</h2>
+          <h2 style="  text-align: center;">教学过程质量监控管理平台</h2>
           <el-form
             :rules="rules"
             ref="loginForm"

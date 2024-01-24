@@ -641,7 +641,7 @@
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: false,
         dragToScroll: true,
-        rowHeaders: ["题号", "分值", "设置", "权重"],
+        rowHeaders: ["考核项", "分值", "设置", "权重"],
         copyPaste: true,
         colWidths: 70,
         allowRemoveColumn: true,
