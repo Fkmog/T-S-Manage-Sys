@@ -133,8 +133,8 @@
             <span>{{item}}</span>
           </el-row>
           <el-row>
-            <span class="subtabletitle">({{currentactivityScores[i]}})/</span>
-            <span>{{currentactivityweight[i]}}%</span>
+            <span class="subtabletitle">({{currentactivityScores[i]}})</span>
+            <span v-show="currentactivityweight[i]">/{{currentactivityweight[i]}}%</span>
           </el-row>
         </el-col>
         

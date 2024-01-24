@@ -50,7 +50,7 @@
       </template>
     </HeaderSearch>
   </div>
-  <addBtn @click="dialogFormVisible = true"></addBtn>
+  <addBtn @click="dialogFormVisible = true" v-show="identity == '学院管理员'"></addBtn>
 
   <div v-show="closeShow" class="submenu">
     <el-row>
@@ -361,7 +361,7 @@
         <el-table-column label="操作" width="150">
           <template #default="scope">
             <el-row v-show="showToolIcon">
-              <el-col :span="8">
+              <!-- <el-col :span="8">
                 <el-tooltip content="删除课程">
                   <el-button
                     @click.stop="
@@ -373,7 +373,7 @@
                     ><el-icon><Delete /></el-icon
                   ></el-button>
                 </el-tooltip>
-              </el-col>
+              </el-col> -->
               <el-col :span="8">
                 <el-tooltip content="修改课程信息">
                   <el-button
