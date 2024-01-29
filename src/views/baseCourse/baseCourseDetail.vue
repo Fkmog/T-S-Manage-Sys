@@ -41,8 +41,8 @@
             <Histogram />
           </el-icon>
         </el-tooltip>
-         <!-- 试卷分析 -->
-         <el-tooltip
+        <!-- 试卷分析 -->
+        <el-tooltip
           class="box-item"
           effect="dark"
           content="试卷分析"
@@ -293,7 +293,6 @@
         <el-checkbox label="成绩项"></el-checkbox>
         <el-checkbox label="课程目标"></el-checkbox>
         <el-checkbox label="预设手册模板"></el-checkbox>
-        
       </el-checkbox-group>
       <template #footer>
         <span class="dialog-footer">
@@ -318,7 +317,7 @@ import {
   CopyDocument,
   Management,
   Download,
-  DataAnalysis
+  DataAnalysis,
 } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import {
@@ -349,13 +348,13 @@ export default {
     CircleClose,
     Management,
     Download,
-    DataAnalysis
+    DataAnalysis,
   },
   data() {
     return {
       from: "",
       filesList: [],
-      checkList: ["成绩项", "课程目标",'预设手册模板'],
+      checkList: ["成绩项", "课程目标", "预设手册模板"],
       currentRow: {},
       copyCourseList: [],
       keyword: "",
@@ -405,7 +404,6 @@ export default {
     };
   },
   mounted() {
-    
     this.getRouter();
 
     // sessionStorage.setItem("baseCourseSearchForm", this.form.courseName);
@@ -511,7 +509,7 @@ export default {
     toActivities() {
       this.$router.push("/baseCourseActivities");
     },
-    toPaperAnalysis(){
+    toPaperAnalysis() {
       this.$router.push("/paperAnalysis");
     },
     toIndicators() {

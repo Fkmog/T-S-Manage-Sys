@@ -273,8 +273,8 @@ export default {
     // 获取样式规则
     getOption() {
       this.option = this.$refs.designer.getOption();
-      this.option.form.formCreateResetBtn= this.option.resetBtn.show
-      this.option.form.formCreateSubmitBtn= this.option.submitBtn.show
+      this.option.form.formCreateResetBtn = this.option.resetBtn.show;
+      this.option.form.formCreateSubmitBtn = this.option.submitBtn.show;
       console.log("getOption", this.option);
     },
     // 回显样式规则
@@ -306,7 +306,7 @@ export default {
         }
         console.log("option", this.option);
         // this.option.form.formCreateResetBtn = false;
-        // this.option.form.formCreateSubmitBtn = true; 
+        // this.option.form.formCreateSubmitBtn = true;
         this.setJson();
         this.setOption();
       });

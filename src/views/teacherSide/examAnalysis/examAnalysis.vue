@@ -98,6 +98,8 @@ export default {
   data() {
     let self = this;
     return {
+      canedit: false,
+
       hasExamAnalysis: true,
 
       objectivesName: ["题号", "分值"],
@@ -302,6 +304,11 @@ export default {
         console.log("identity:", this.identity);
       }
 
+      if (this.classInfo.status == "1" || this.classInfo.status == "4") {
+        this.canedit = true;
+      }
+      console.log("this.canedit:", this.canedit);
+
       console.log(
         "this.departmentId",
         this.departmentId,
@@ -330,19 +337,7 @@ export default {
         allowRemoveColumn: true,
         colWidths: 100,
 
-        contextMenu: {
-          items: {
-            col_left: {
-              name: "在左侧插入列",
-            },
-            col_right: {
-              name: "在右侧插入列",
-            },
-            remove_col: {
-              name: "删除列",
-            },
-          },
-        },
+        contextMenu: false,
         formulas: {
           engine: HyperFormula,
         },
@@ -380,30 +375,36 @@ export default {
       return function (row, col, prop) {
         // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
         var cellProperties = {};
-        if (
-          (row >= that.objectivesName.length - 2 &&
-            col < that.db.objectives["0"].length - 2) ||
-          (row < that.objectivesName.length - 2 &&
-            col >= that.db.objectives["0"].length - 2)
-        ) {
-          cellProperties.readOnly = false;
-        } else {
-          cellProperties.readOnly = true;
-        }
-
-        if (
-          row === that.objectivesName.length - 1 ||
-          col === that.db.objectives["0"].length - 1
-        ) {
-          cellProperties.readOnly = true;
-        }
-        if (!that.hotInstance.getDataAtCell(row, 0)) {
-          if (col === that.db.objectives["0"].length - 2) {
+        if (!that.canedit) {
+          if (col >= 0) {
             cellProperties.readOnly = true;
           }
-        }
-        if (col == 0) {
-          cellProperties.readOnly = true;
+        } else {
+          if (
+            (row >= that.objectivesName.length - 2 &&
+              col < that.db.objectives["0"].length - 2) ||
+            (row < that.objectivesName.length - 2 &&
+              col >= that.db.objectives["0"].length - 2)
+          ) {
+            cellProperties.readOnly = false;
+          } else {
+            cellProperties.readOnly = true;
+          }
+
+          if (
+            row === that.objectivesName.length - 1 ||
+            col === that.db.objectives["0"].length - 1
+          ) {
+            cellProperties.readOnly = true;
+          }
+          if (!that.hotInstance.getDataAtCell(row, 0)) {
+            if (col === that.db.objectives["0"].length - 2) {
+              cellProperties.readOnly = true;
+            }
+          }
+          if (col == 0) {
+            cellProperties.readOnly = true;
+          }
         }
 
         return cellProperties;
@@ -439,55 +440,85 @@ export default {
               for (let j = 0; j < setting.value[i].length; j++) {
                 templist.push(setting.value[i][j]);
               }
-              templist.push(averageScore.averageScoreOnObject[i]);
-              if (averageScore.scoreRateOnObject[i]) {
+              if (averageScore) {
+                templist.push(averageScore.averageScoreOnObject[i]);
+              } else {
+                templist.push(null);
+              }
+
+              if (averageScore) {
                 templist.push(averageScore.scoreRateOnObject[i] + "%");
               } else {
-                templist.push(averageScore.scoreRateOnObject[i]);
+                templist.push(null);
               }
 
               console.log("templist", templist);
-              if (templist[templist.length - 2]) {
-                templist[templist.length - 1] =
-                  "=" +
-                  "TEXT(" +
-                  String.fromCharCode(63 + templist.length) +
-                  (2 + i) +
-                  "/" +
-                  String.fromCharCode(65) +
-                  (2 + i) +
-                  "*100" +
-                  ',"0.00%")';
-              }
+
+              templist[templist.length - 1] =
+                "=" +
+                "TEXT(" +
+                String.fromCharCode(63 + templist.length) +
+                (2 + i) +
+                "/" +
+                String.fromCharCode(65) +
+                (2 + i) +
+                "*100" +
+                ',"0.00%")';
+
               this.db.objectives.push(templist);
             }
 
-            let templistaverageScoreOnTitle = [""];
-            averageScore.averageScoreOnTitle.forEach((averageScoreOnTitle) => {
-              templistaverageScoreOnTitle.push(averageScoreOnTitle);
-            });
+            let templistaverageScoreOnTitle;
+            if (averageScore) {
+              templistaverageScoreOnTitle = [""];
+              averageScore.averageScoreOnTitle.forEach(
+                (averageScoreOnTitle) => {
+                  templistaverageScoreOnTitle.push(averageScoreOnTitle);
+                }
+              );
+            } else {
+              templistaverageScoreOnTitle = [];
+              for (let i = 0; i < setting.title.length + 1; i++) {
+                templistaverageScoreOnTitle.push(null);
+              }
+            }
+
             this.db.objectives.push(templistaverageScoreOnTitle);
-            let templistscoreRateOnTitle = [""];
-            averageScore.scoreRateOnTitle.forEach((scoreRateOnTitle) => {
-              if (scoreRateOnTitle) {
-                templistscoreRateOnTitle.push(scoreRateOnTitle + "%");
-              } else {
-                templistscoreRateOnTitle.push(scoreRateOnTitle);
+
+            let templistscoreRateOnTitle;
+            if (averageScore) {
+              templistscoreRateOnTitle = [""];
+              averageScore.scoreRateOnTitle.forEach((scoreRateOnTitle) => {
+                if (scoreRateOnTitle) {
+                  templistscoreRateOnTitle.push(scoreRateOnTitle + "%");
+                } else {
+                  templistscoreRateOnTitle.push(scoreRateOnTitle);
+                }
+              });
+            } else {
+              templistscoreRateOnTitle = [];
+              for (let i = 0; i < setting.title.length + 1; i++) {
+                templistscoreRateOnTitle.push(null);
               }
-            });
+            }
+
             for (let i = 1; i < templistscoreRateOnTitle.length; i++) {
-              if (templistaverageScoreOnTitle[i]) {
-                templistscoreRateOnTitle[i] =
-                  "=" +
-                  "TEXT(" +
-                  String.fromCharCode(65 + i) +
-                  (this.objectivesName.length - 1) +
-                  "/" +
-                  String.fromCharCode(65 + i) +
-                  2 +
-                  "*100" +
-                  ',"0.00%")';
+              let sum = "";
+              for (let j = 0; j < setting.sum.length; j++) {
+                let tempNum = 2 + j;
+                sum = String.fromCharCode(65 + i) + tempNum + "+" + sum;
               }
+              console.log("sum:", sum.slice(0, -1));
+              templistscoreRateOnTitle[i] =
+                "=" +
+                "TEXT(" +
+                String.fromCharCode(65 + i) +
+                (this.objectivesName.length - 1) +
+                "/" +
+                "SUM(" +
+                sum.slice(0, -1) +
+                ")*100" +
+                ',"0.00%")';
             }
 
             this.db.objectives.push(templistscoreRateOnTitle);
@@ -559,131 +590,142 @@ export default {
         this.saving = false;
         return;
       }
-      console.log("this.db.objectives", this.db.objectives);
-      let tempaverageScoreOnObject = [];
-      let tempscoreRateOnObject = [];
-      this.db.objectives.forEach((row) => {
-        if (
-          row[this.db.objectives["0"].length - 2] !== "平均得分" &&
-          row[0] !== ""
-        ) {
-          console.log("row", typeof row[this.db.objectives["0"].length - 2]);
-          if (typeof row[this.db.objectives["0"].length - 2] === "string") {
-            tempaverageScoreOnObject.push(
-              parseFloat(row[this.db.objectives["0"].length - 2].trim())
-            );
-          } else {
-            if (row[this.db.objectives["0"].length - 2]) {
+
+      if (!this.canedit) {
+        ElMessage({
+          type: "error",
+          message: `课程已审核或提交，不可以修改成绩项`,
+          duration: 1500,
+        });
+      } else {
+        console.log("this.db.objectives", this.db.objectives);
+        let tempaverageScoreOnObject = [];
+        let tempscoreRateOnObject = [];
+        this.db.objectives.forEach((row) => {
+          if (
+            row[this.db.objectives["0"].length - 2] !== "平均得分" &&
+            row[0] !== ""
+          ) {
+            console.log("row", typeof row[this.db.objectives["0"].length - 2]);
+            if (typeof row[this.db.objectives["0"].length - 2] === "string") {
               tempaverageScoreOnObject.push(
-                parseFloat(row[this.db.objectives["0"].length - 2])
+                parseFloat(row[this.db.objectives["0"].length - 2].trim())
               );
             } else {
-              tempaverageScoreOnObject.push(null);
+              if (row[this.db.objectives["0"].length - 2]) {
+                tempaverageScoreOnObject.push(
+                  parseFloat(row[this.db.objectives["0"].length - 2])
+                );
+              } else {
+                tempaverageScoreOnObject.push(null);
+              }
+            }
+
+            // if (typeof row[this.db.objectives["0"].length - 1] === "string") {
+            //   tempscoreRateOnObject.push(
+            //     parseFloat(row[this.db.objectives["0"].length - 1].trim())
+            //   );
+            // } else {
+            //   tempaverageScoreOnObject.push(
+            //     parseFloat(row[this.db.objectives["0"].length - 1])
+            //   );
+            // }
+          }
+        });
+        for (let i = 0; i < this.objectivesName.length - 3; i++) {
+          let tempRate = this.hotInstance.getDataAtCell(
+            i + 1,
+            this.db.objectives[0].length - 1
+          );
+          console.log("tempRate", tempRate);
+          if (tempRate) {
+            tempscoreRateOnObject.push(parseFloat(tempRate));
+          } else {
+            tempscoreRateOnObject.push(null);
+          }
+        }
+
+        this.postData.averageScore.averageScoreOnObject =
+          tempaverageScoreOnObject;
+        this.postData.averageScore.scoreRateOnObject = tempscoreRateOnObject;
+
+        for (let j = 1; j < this.db.objectives["0"].length - 2; j++) {
+          if (
+            typeof this.db.objectives[this.objectivesName.length - 2][j] ===
+            "string"
+          ) {
+            this.postData.averageScore.averageScoreOnTitle.push(
+              parseFloat(
+                this.db.objectives[this.objectivesName.length - 2][j].trim()
+              )
+            );
+          } else {
+            if (this.db.objectives[this.objectivesName.length - 2][j]) {
+              this.postData.averageScore.averageScoreOnTitle.push(
+                parseFloat(
+                  this.db.objectives[this.objectivesName.length - 2][j]
+                )
+              );
+            } else {
+              this.postData.averageScore.averageScoreOnTitle.push(null);
             }
           }
-
-          // if (typeof row[this.db.objectives["0"].length - 1] === "string") {
-          //   tempscoreRateOnObject.push(
-          //     parseFloat(row[this.db.objectives["0"].length - 1].trim())
+          // if (
+          //   typeof this.db.objectives[this.objectivesName.length - 1][j] ===
+          //   "string"
+          // ) {
+          //   this.postData.averageScore.scoreRateOnTitle.push(
+          //     parseFloat(
+          //       this.db.objectives[this.objectivesName.length - 1][j].trim()
+          //     )
           //   );
           // } else {
-          //   tempaverageScoreOnObject.push(
-          //     parseFloat(row[this.db.objectives["0"].length - 1])
+          //   this.postData.averageScore.averageScoreOnTitle.push(
+          //     parseFloat(this.db.objectives[this.objectivesName.length - 1][j])
           //   );
           // }
         }
-      });
-      for (let i = 0; i < this.objectivesName.length - 3; i++) {
-        let tempRate = this.hotInstance.getDataAtCell(
-          i + 1,
-          this.db.objectives[0].length - 1
-        );
-        console.log("tempRate", tempRate);
-        if (tempRate) {
-          tempscoreRateOnObject.push(parseFloat(tempRate));
-        } else {
-          tempscoreRateOnObject.push(null);
-        }
-      }
 
-      this.postData.averageScore.averageScoreOnObject =
-        tempaverageScoreOnObject;
-      this.postData.averageScore.scoreRateOnObject = tempscoreRateOnObject;
-
-      for (let j = 1; j < this.db.objectives["0"].length - 2; j++) {
-        if (
-          typeof this.db.objectives[this.objectivesName.length - 2][j] ===
-          "string"
-        ) {
-          this.postData.averageScore.averageScoreOnTitle.push(
-            parseFloat(
-              this.db.objectives[this.objectivesName.length - 2][j].trim()
-            )
+        for (let i = 0; i < this.db.objectives[0].length - 3; i++) {
+          let tempRate = this.hotInstance.getDataAtCell(
+            this.objectivesName.length - 1,
+            i + 1
           );
-        } else {
-          if (this.db.objectives[this.objectivesName.length - 2][j]) {
-            this.postData.averageScore.averageScoreOnTitle.push(
-              parseFloat(this.db.objectives[this.objectivesName.length - 2][j])
+          console.log("tempRate", tempRate);
+          if (tempRate) {
+            this.postData.averageScore.scoreRateOnTitle.push(
+              parseFloat(tempRate)
             );
           } else {
-            this.postData.averageScore.averageScoreOnTitle.push(null);
+            this.postData.averageScore.scoreRateOnTitle.push(null);
           }
         }
-        // if (
-        //   typeof this.db.objectives[this.objectivesName.length - 1][j] ===
-        //   "string"
-        // ) {
-        //   this.postData.averageScore.scoreRateOnTitle.push(
-        //     parseFloat(
-        //       this.db.objectives[this.objectivesName.length - 1][j].trim()
-        //     )
-        //   );
-        // } else {
-        //   this.postData.averageScore.averageScoreOnTitle.push(
-        //     parseFloat(this.db.objectives[this.objectivesName.length - 1][j])
-        //   );
-        // }
-      }
 
-      for (let i = 0; i < this.db.objectives[0].length - 3; i++) {
-        let tempRate = this.hotInstance.getDataAtCell(
-          this.objectivesName.length - 1,
-          i + 1
-        );
-        console.log("tempRate", tempRate);
-        if (tempRate) {
-          this.postData.averageScore.scoreRateOnTitle.push(
-            parseFloat(tempRate)
-          );
-        } else {
-          this.postData.averageScore.scoreRateOnTitle.push(null);
-        }
-      }
+        delete this.postData.averageScore["length"];
+        console.log("this.postData.averageScore", this.postData.averageScore);
 
-      delete this.postData.averageScore["length"];
-      console.log("this.postData.averageScore", this.postData.averageScore);
-
-      editExamAnalysis({
-        averageScore: this.postData.averageScore,
-        classId: this.classInfo.classId,
-      })
-        .then((res) => {
-          console.log("editExamAnalysis:", res);
-          if (res.code == "SUCCESS") {
+        editExamAnalysis({
+          averageScore: this.postData.averageScore,
+          classId: this.classInfo.classId,
+        })
+          .then((res) => {
+            console.log("editExamAnalysis:", res);
+            if (res.code == "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: "更新成功",
+                duration: 1500,
+              });
+            }
+          })
+          .catch((e) => {
             ElMessage({
-              type: "success",
-              message: "更新成功",
+              type: "error",
+              message: e.msg,
               duration: 1500,
             });
-          }
-        })
-        .catch((e) => {
-          ElMessage({
-            type: "error",
-            message: e.msg,
-            duration: 1500,
           });
-        });
+      }
     },
     toPostData() {
       this.postData.averageScore.length = 0;

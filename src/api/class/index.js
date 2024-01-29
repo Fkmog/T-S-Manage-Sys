@@ -92,13 +92,14 @@ export function submitFeedback(classId,status){
   })
 }
 //新增课程审核内容
-export function createReview(classId,checkFeedback){
+export function createReview(classId,checkFeedback,resultStatus){
   return request({
     url:'/review',
     method:'POST',
     data:{
       'classId':classId,
       'remark':checkFeedback.message,
+      'resultStatus':resultStatus
       // 'reviewerName':checkFeedback.reviewerName
     },
   })

@@ -29,12 +29,12 @@
       <div v-show="hasMajor">
         <el-tabs
           class="major-tab"
-          style="width:750px"
+          style="width: 750px"
           @tab-change="tabChange()"
           v-model="chosenMajor"
         >
           <el-tab-pane
-            v-for="(major,index1) in majorList"
+            v-for="(major, index1) in majorList"
             :key="major.majorId"
             :label="major.programVersion"
           >
@@ -154,7 +154,7 @@ export default {
       this.$router.push("/baseCourseDetail");
     },
     goEdit(index1) {
-     // console.log("!",index1,typeof(index1));
+      // console.log("!",index1,typeof(index1));
       this.$store.commit(
         "baseCourseDetailProgram/setmajorNum",
         index1.toString()
@@ -180,10 +180,7 @@ export default {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
             this.majorList[i].programVersion =
-              this.majorList[i].majorName +
-              "-" +
-              this.majorList[i].enrollyear 
-              ;
+              this.majorList[i].majorName + "-" + this.majorList[i].enrollyear;
             console.log("!", typeof this.majorList[i].indicators);
             this.programIdList[i] = this.majorList[i].programId;
           });

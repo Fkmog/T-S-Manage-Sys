@@ -27,6 +27,7 @@ import BatchClassAdd from "@/components/class/batchAddClass.vue";
 import BaseCourseDetail from "@/views/baseCourse/baseCourseDetail.vue";
 import baseCourseObjectives from "@/views/baseCourse/objectives.vue";
 import baseCourseActivities from "@/views/baseCourse/activities.vue";
+import baseCourseAnalysis from "@/views/baseCourse/analysis.vue";
 import baseCourseIndicators from "@/views/baseCourse/indicators.vue";
 import baseCourseIndicatorsEdit from "@/views/baseCourse/indicators-edit.vue";
 import baseCourseObjectivesEdit from "@/views/baseCourse/objectives-edit.vue";
@@ -181,6 +182,12 @@ const router = createRouter({
           path: "/baseCourseActivities",
           name:'baseCourseActivities',
           component: baseCourseActivities,
+          meta: { isMajor: false },
+        },
+        {
+          path:'/baseCourseAnalysis',
+          name:"baseCourseAnalysis",
+          component:baseCourseAnalysis,
           meta: { isMajor: false },
         },
         {
