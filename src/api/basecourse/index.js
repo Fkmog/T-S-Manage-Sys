@@ -64,6 +64,14 @@ export function saveObjectives(Array) {
     data: Array,
   });
 }
+//具体到某个班的课程目标保存 
+export function saveObjectivesForClass(Array) {
+  return request({
+    url: "/classes/editAssessmentMethod",
+    method: "POST",
+    data: Array,
+  });
+}
 //指标点保存
 export function saveIndicators(Array) {
   return request({

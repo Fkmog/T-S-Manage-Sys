@@ -607,17 +607,18 @@ async getActivities(){
         //  console.log('tempcolumnList:',tempcolumnList);
           for(let i=0;i<studentNum;i++){
             
-            tempList[3+i][0] = course.scores[i]['info'][0];
+            tempList[3+i][0] = course.scores[i]['info'][0].trim();
             
-            tempList[3+i][1] = course.scores[i]['info'][1];
+            tempList[3+i][1] = course.scores[i]['info'][1].trim();
             
             
-            tempList[3+i][2] = course.scores[i]['status'][currentactivitCount];
+            tempList[3+i][2] = course.scores[i]['status'][currentactivitCount].trim();
             
             if(count+1 > course.scores[i]['grade'].length){
               // console.log('该成绩项下，并未添加学生成绩')
               
               for(let j=0;j<activityNumber;j++){
+                tempList[3+i][j+3] = null;
                 tempList[3+i][j+3] = null;
               }
               
@@ -625,8 +626,13 @@ async getActivities(){
             else{
             for(let j=0;j<activityNumber;j++){
               if(!course.scores[i]['grade'][count][j]){
+                if(course.scores[i]['grade'][count][j]==0){
+                  tempList[3+i][j+3] = 0;
+                }
+                else{
+                  tempList[3+i][j+3] = null;
+                }
                 
-                tempList[3+i][j+3] = null;
               }
               else{
                 
@@ -812,6 +818,7 @@ async getActivities(){
                         
                       }
                       else{
+
                         gradList.push(student[i][key]);
                         
                       }

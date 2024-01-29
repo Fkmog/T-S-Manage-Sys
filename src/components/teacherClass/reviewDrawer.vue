@@ -9,37 +9,38 @@
         <div class="reviewCard" v-for="(review, index) in reviewInfo">
           <div
             class="reviewCardStatus"
-            :style="status === '已提交' ? statusPass : statusNotPass"
+            :style="
+              status === '已提交' || status === '已审核'
+                ? statusPass
+                : statusNotPass
+            "
           >
-            <span style="color: white;">{{ status }}</span>
+            <span style="color: white">{{ status }}</span>
           </div>
           <div class="reviewCardInfo">
-            <el-row style="padding-top: 5px; padding-left: 5px">
-              <span style="color: gray">
-                {{
-                  "审核时间：" +
-                  review.createTime +
-                  "-----审核人：" +
-                  review.reviewerName
-                }}
+            <el-row style="padding: 5px 5px 0px 5px">
+              <span style="color: gray; margin-right: auto; font-size: 12px">
+                {{ review.reviewerName }}
+              </span>
+              <span style="color: gray; margin-left: auto; font-size: 12px">
+                {{ review.createTime }}
               </span>
             </el-row>
             <el-row style="padding-top: 5px; padding-left: 5px">
-              <div>审核意见：{{ review.remark }}</div>
+              <div style="width: 90%;text-overflow:ellipsis;overflow: hidden;word-wrap:break-word;">审核意见：{{ review.remark }}</div>
             </el-row>
           </div>
 
-          <div class="reviewCardStatus" style="background-color: rgb(247, 92, 92);cursor: pointer;" @click="deleteReview(review.reviewId)">
-            <el-icon
-              style="padding-top: 35px;"
-              size="24px"
-              color="white"
-            >
+          <div
+            class="reviewCardDelete"
+            v-show="identity != '教师'"
+            style="background-color: rgb(247, 92, 92); cursor: pointer"
+            @click="deleteReview(review.reviewId)"
+          >
+            <el-icon size="24px" color="white">
               <Delete />
             </el-icon>
           </div>
-
-          <!-- v-show="identity != '教师'" -->
         </div>
 
         <div
@@ -76,6 +77,8 @@
                 v-model="checkFeedback.message"
                 autocomplete="off"
                 :rows="10"
+                maxlength="500"
+                show-word-limit
                 type="textarea"
               />
             </el-form-item>
@@ -381,7 +384,7 @@ export default {
     //查询课程审核信息
     getReviewInfo() {
       getReview(this.classInfo.classId).then((res) => {
-        // console.log('getReviewInfo',res);
+        console.log("getReviewInfo", res);
 
         if (res.total != 0) {
           this.hasNoReviewInfo = false;
@@ -480,8 +483,8 @@ export default {
 .reviewCard {
   display: flex;
   justify-content: center;
-  height: 100px;
-
+  width: 500px;
+  margin: 10px;
   border: 1px solid rgb(189, 189, 189);
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   border-radius: 5px;
@@ -491,17 +494,18 @@ export default {
   text-align: center;
   writing-mode: vertical-rl;
   letter-spacing: 6px;
-  padding: 0px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  -webkit-display: flex;
-  
   width: 40px;
-  height: 100px;
+}
+.reviewCardDelete {
+  display: flex;
+  align-items: center;
 }
 .reviewCardInfo {
-  width: 490px;
+  width: 425px;
 }
 #drawerbox .el-overlay {
   position: satic;
