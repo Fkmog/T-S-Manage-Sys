@@ -257,7 +257,7 @@ export default {
                 object.hasAchieve = false;
               }
               object.assessmentMethods.forEach((assess) => {
-                if (assess.achievement === null) {
+                if (assess.achievement === null||assess.achievement === undefined) {
                   assess.achievementTwo = "";
                 } else {
                   assess.achievementTwo = assess.achievement.toFixed(3) ;

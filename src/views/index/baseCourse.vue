@@ -2004,9 +2004,9 @@ export default {
   box-shadow: 0 0 0 0px;
   border-radius: 0;
 }
-.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
+/* .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
-}
+} */
 .submenudeleteButton {
   float: right;
   margin-top: 16px;

@@ -1288,7 +1288,7 @@ export default {
 
         this.detailList.forEach((item) => {
           item.versionInfo =
-            item.courseName + "| " + item.courseCode + "| " + item.versionName;
+            item.courseName + "| " + item.courseCode + " | " + item.versionName;
           item.value = item.detailId;
           item.label = item.versionInfo;
           getExamList(
@@ -1525,9 +1525,9 @@ export default {
   box-shadow: 0 0 0 0px;
   border-radius: 0;
 } */
-.el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
+/* .el-select:hover:not(.el-select--disabled) :deep().el-input__wrapper {
   box-shadow: 0 0 0 0px;
-}
+} */
 .no-class {
   padding-top: 120px;
   display: flex;

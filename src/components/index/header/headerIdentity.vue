@@ -77,8 +77,16 @@
           type="password"
           placeholder="请输入新密码"
           show-password
+          @change="checkPassword"
         />
       </el-form-item>
+      <el-progress
+        class="progress"
+        v-show="passwordStrength"
+        :percentage="passwordStrength"
+        :format="format"
+        :color="customColorMethod"
+      />
       <el-form-item
         label="确认密码"
         prop="confirmPassword"
@@ -108,6 +116,29 @@ import { updateUserPwd } from "@/api/userInfo/getUserInfo";
 export default {
   name: "HeaderIdentity",
   data() {
+    const passwordStr = (rule, value, callback) => {
+      const lowercaseRegex = /[a-z]/; // 小写字母正则表达式
+      const uppercaseRegex = /[A-Z]/; // 大写字母正则表达式
+      const digitRegex = /[0-9]/; // 数字正则表达式
+      const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/; // 特殊字符正则表达式
+      let hasLowercase = lowercaseRegex.test(value);
+      let hasUppercase = uppercaseRegex.test(value);
+      let hasDigit = digitRegex.test(value);
+      let hasSpecialChar = specialCharRegex.test(value);
+      let strength =
+        (hasLowercase ? 1 : 0) +
+        (hasUppercase ? 1 : 0) +
+        (hasDigit ? 1 : 0) +
+        (hasSpecialChar ? 1 : 0);
+
+      if (value.length < 8 || value.length20) {
+        callback(new Error("密码长度应为8至20位"));
+      } else if (strength<3) {
+        callback(new Error("应包含数字,大写字母,小写字母,特殊字符中的三项"));
+      } else {
+        callback();
+      }
+    };
     const equalToPassword = (rule, value, callback) => {
       if (this.user.newPassword !== value) {
         callback(new Error("两次输入的密码不一致"));
@@ -121,9 +152,9 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: "80px",
       user: {
-        oldPassword: undefined,
-        newPassword: undefined,
-        confirmPassword: undefined,
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       },
       // 表单校验
       rules: {
@@ -132,12 +163,14 @@ export default {
         ],
         newPassword: [
           { required: true, message: "新密码不能为空", trigger: "blur" },
+          { required: true, validator: passwordStr, trigger: "blur" },
         ],
         confirmPassword: [
           { required: true, message: "确认密码不能为空", trigger: "blur" },
           { required: true, validator: equalToPassword, trigger: "blur" },
         ],
       },
+      passwordStrength: "",
     };
   },
   components: {
@@ -180,47 +213,97 @@ export default {
         })
         .catch(() => {});
     },
+    // 检查密码强度
+    checkPassword() {
+      const lowercaseRegex = /[a-z]/; // 小写字母正则表达式
+      const uppercaseRegex = /[A-Z]/; // 大写字母正则表达式
+      const digitRegex = /[0-9]/; // 数字正则表达式
+      const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/; // 特殊字符正则表达式
+      const hasLowercase = lowercaseRegex.test(this.user.newPassword);
+      const hasUppercase = uppercaseRegex.test(this.user.newPassword);
+      const hasDigit = digitRegex.test(this.user.newPassword);
+      const hasSpecialChar = specialCharRegex.test(this.user.newPassword);
+      const strength =
+        (hasLowercase ? 1 : 0) +
+        (hasUppercase ? 1 : 0) +
+        (hasDigit ? 1 : 0) +
+        (hasSpecialChar ? 1 : 0);
+
+      if (this.user.newPassword.length < 8) {
+        this.passwordStrength = '';
+      } else if (strength >= 3) {
+        this.passwordStrength = 100;
+      } else if (strength === 2) {
+        this.passwordStrength = 60;
+      } else if (strength === 1) {
+        this.passwordStrength = 30;
+      } else {
+        this.passwordStrength = '';
+      }
+    },
+    format(percentage) {
+      if (percentage === 100) {
+        return "强";
+      } else if (percentage === 60) {
+        return "中";
+      } else if (percentage === 30) {
+        return "弱";
+      } else {
+        return "";
+      }
+    },
+    customColorMethod(percentage) {
+      if (percentage === 30) {
+        return "#f41e1e";
+      } else if (percentage === 60) {
+        return "#e6a23c";
+      } else if (percentage === 100) {
+        return "#67c23a";
+      } else {
+        return "#67c23a";
+      }
+    },
     // 修改密码
     changePwd() {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          updateUserPwd(this.user.oldPassword, this.user.newPassword).then(
-            (res) => {
-              if (res.code === "SUCCESS") {
-                this.dialogFormVisible = false;
-                ElMessage({
-                  type: "success",
-                  message: `更新成功`,
-                  duration: 1500,
-                });
-              }
-              if (res.code === "ERROR") {
-                if (res.msg == "新密码不能与旧密码相同") {
+        this.$refs["form"].validate((valid) => {
+          if (valid) {
+            updateUserPwd(this.user.oldPassword, this.user.newPassword).then(
+              (res) => {
+                if (res.code === "SUCCESS") {
+                  this.dialogFormVisible = false;
                   ElMessage({
-                    type: "error",
-                    message: res.msg,
-                    duration: 1500,
-                  });
-                } else if (res.msg == "修改密码失败，旧密码错误") {
-                  ElMessage({
-                    type: "error",
-                    message: res.msg,
+                    type: "success",
+                    message: `更新成功`,
                     duration: 1500,
                   });
                 }
+                if (res.code === "ERROR") {
+                  if (res.msg == "新密码不能与旧密码相同") {
+                    ElMessage({
+                      type: "error",
+                      message: res.msg,
+                      duration: 1500,
+                    });
+                  } else if (res.msg == "修改密码失败，旧密码错误") {
+                    ElMessage({
+                      type: "error",
+                      message: res.msg,
+                      duration: 1500,
+                    });
+                  }
+                }
               }
-            }
-          );
-        }
-      });
+            );
+          }
+        })
     },
     // 取消修改
     cancel() {
       this.dialogFormVisible = false;
       this.user = {
-        oldPassword: undefined,
-        newPassword: undefined,
-        confirmPassword: undefined,
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       };
     },
     //修改当前专业/学院等信息
@@ -238,21 +321,25 @@ export default {
         this.$store.state.userInfo.identity[index]
       );
       this.$store.getters["currentInfo/changeIsTeacher"];
-      if (identity.roleName == "学院管理员") {
+      if (identity.roleName === "学院管理员") {
         this.$router.replace("/major");
       }
-      if (identity.roleName == "教师") {
+      if (identity.roleName === "教师") {
         this.$router.replace("teacherClasses");
       }
-      if (identity.roleName == "课程负责人") {
+      if (identity.roleName === "课程负责人") {
         this.$router.replace("BaseCourse");
       }
-    },
-  },
+    },}
 };
 </script>
 
 <style scoped>
+.progress{
+  margin-left: 80px;
+  margin-bottom: 10px;
+  width:310px;
+}
 .info {
   color: white;
   font-size: 14px;

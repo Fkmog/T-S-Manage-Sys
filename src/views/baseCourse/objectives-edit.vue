@@ -139,13 +139,6 @@
                       </el-col>
                     </el-row>
                   </el-col>
-                  <!-- <el-col :span="1" class="penIcon">
-                    <el-icon
-                      class="pen-icon"
-                      @click="editAssessments(objective, idx)"
-                      ><EditPen
-                    /></el-icon>
-                  </el-col> -->
                 </el-row>
                 <el-row
                   class="noAssessment"
@@ -310,7 +303,11 @@ import {
   Close,
   Edit,
 } from "@element-plus/icons-vue";
-import { getObjectives, saveObjectives } from "@/api/basecourse";
+import {
+  getObjectives,
+  saveObjectives,
+  saveObjectivesForClass,
+} from "@/api/basecourse";
 import { ElMessageBox, ElMessage } from "element-plus";
 
 export default {
@@ -426,26 +423,53 @@ export default {
       }
     },
     save() {
-      saveObjectives(this.list).then((res) => {
-        console.log("保存的内容", this.list);
-        console.log("save", res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `更新成功`,
-            duration: 1500,
-          });
-          // 更新副本
-          this.listCopy = JSON.parse(JSON.stringify(this.list));
-          this.backObjectives();
-        } else {
-          ElMessage({
-            type: "error",
-            message: `更新失败`,
-            duration: 1500,
-          });
-        }
-      });
+      // bug：上来会直接保存两次 但又测不出来，先留着
+      console.log(this.$store.state.currentInfo.identity);
+      if (this.$store.state.currentInfo.identity === "教师") {
+        this.list.classId =
+          this.$store.state.currentInfo.teacherSideClassInfo.classId;
+        saveObjectivesForClass(this.list).then((res) => {
+          console.log("保存的内容", this.list);
+          console.log("save", res);
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            // 更新副本
+            this.listCopy = JSON.parse(JSON.stringify(this.list));
+            this.backObjectives();
+          } else {
+            ElMessage({
+              type: "error",
+              message: `更新失败`,
+              duration: 1500,
+            });
+          }
+        });
+      } else {
+        saveObjectives(this.list).then((res) => {
+          console.log("保存的内容", this.list);
+          console.log("save", res);
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            // 更新副本
+            this.listCopy = JSON.parse(JSON.stringify(this.list));
+            this.backObjectives();
+          } else {
+            ElMessage({
+              type: "error",
+              message: `更新失败`,
+              duration: 1500,
+            });
+          }
+        });
+      }
     },
     //获取课程目标
     checkObjectives() {
@@ -459,11 +483,14 @@ export default {
         this.allActivities = this.list.activities;
         // console.log("初始list", this.list);
         console.log("初始allActivities", this.list.activities);
-        this.allActivities.itemObject = this.allActivities[0].item.map(
-          (item) => ({
-            value: item,
-          })
-        );
+        if (this.allActivities.length > 0) {
+          this.allActivities.itemObject = this.allActivities[0].item.map(
+            (item) => ({
+              value: item,
+            })
+          );
+        }
+
         // console.log("格式化后的list", this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
