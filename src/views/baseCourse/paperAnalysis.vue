@@ -532,6 +532,11 @@ export default {
       editExam(this.examEdit).then((res) => {
         console.log(res);
         if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `更新成功`,
+            duration: 1500,
+          });
           this.examEdit = {};
           this.editDialog = false;
           this.getTeacherList();
