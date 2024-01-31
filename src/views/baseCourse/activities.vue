@@ -564,10 +564,10 @@ export default {
       let that = this;
       console.log("action", action, targetName);
       if (action === "add" && targetName == undefined) {
-        let item = [null, null];
-        let value = [null, null];
-        let remark = [null, null];
-        let weight = [null, null];
+        let item = [null];
+        let value = [null];
+        let remark = [null];
+        let weight = [null];
         let tempdata = [];
 
         tempdata.push(item);
