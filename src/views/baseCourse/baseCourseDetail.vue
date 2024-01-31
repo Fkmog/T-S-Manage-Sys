@@ -41,24 +41,6 @@
             <Histogram />
           </el-icon>
         </el-tooltip>
-        <!-- 试卷分析 -->
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="试卷分析"
-          placement="bottom"
-          :hide-after="0"
-        >
-          <el-icon
-            class="icon"
-            size="22px"
-            color="rgb(137, 137, 137)"
-            style="margin-left: 20px"
-            @click="toPaperAnalysis()"
-          >
-            <DataAnalysis />
-          </el-icon>
-        </el-tooltip>
         <!-- 课程目标 -->
         <el-tooltip
           class="box-item"
@@ -75,6 +57,24 @@
             @click="toObjectives()"
           >
             <Checked />
+          </el-icon>
+        </el-tooltip>
+        <!-- 试卷分析 -->
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="试卷分析"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-icon
+            class="icon"
+            size="22px"
+            color="rgb(137, 137, 137)"
+            style="margin-left: 20px"
+            @click="toPaperAnalysis()"
+          >
+            <DataAnalysis />
           </el-icon>
         </el-tooltip>
         <!-- 毕业要求指标点 -->

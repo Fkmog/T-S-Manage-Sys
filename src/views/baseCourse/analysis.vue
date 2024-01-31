@@ -21,7 +21,7 @@
           </el-icon>
         </el-tooltip>
 
-        <div class="title">分析表信息</div>
+        <div class="title">试卷分析表</div>
 
         <el-divider class="divider" direction="vertical" />
 
@@ -198,10 +198,8 @@
       <div class="hot-table-container" id="courseHot"></div>
     </div>
 
-    <div v-show="!hasObjectives" class="no-class">没有试卷分析表</div>
-    <div class="no-major-detail" v-show="!hasObjectives">
-      请先添加试卷分析表
-    </div>
+    <div v-show="!hasObjectives" class="no-class">尚未设置课程目标</div>
+    <div class="no-major-detail" v-show="!hasObjectives">请先设置课程目标</div>
   </div>
 </template>
 
@@ -236,6 +234,7 @@ import {
   DocumentChecked,
 } from "@element-plus/icons-vue";
 import Handsontable from "handsontable";
+import { HyperFormula } from "hyperformula";
 import request from "@/utils/request/request";
 import {
   getObjectives,
@@ -254,6 +253,7 @@ export default {
   data() {
     let that = this;
     return {
+      columnChange: 0,
       unsave: false,
 
       paperAnalysisId: "",
@@ -348,6 +348,45 @@ export default {
     EditPen,
     Checked,
     CloseBold,
+  },
+  watch: {
+    columnChange: {
+      deep: true,
+      handler(value) {
+        for (let i = 1; i < this.db.objectives.length; i++) {
+          let tempLine = "";
+          for (let k = 0; k < this.db.objectives[i].length - 1; k++) {
+            tempLine = String.fromCharCode(66 + k) + (i + 1) + "+" + tempLine;
+          }
+          // console.log("tempLine", tempLine.slice(0, -1));
+
+          let tempString = "=" + "SUM(" + tempLine.slice(0, -1) + ")";
+          this.db.objectives[i][0] = tempString;
+
+          // console.log(this.db.objectives[i][0]);
+        }
+        // this.db.objectives.forEach((array) => {
+        //   if (array[0] != "合计") {
+        //     let tempLine = "";
+        //     for (let k = 0; k < array.length - 1; k++) {
+        //       tempLine =
+        //         String.fromCharCode(66 + k) + (count + 2) + "+" + tempLine;
+        //     }
+        //     console.log("tempLine", tempLine.slice(0, -1));
+
+        //     let tempString = "=" + "SUM(" + tempLine.slice(0, -1) + ")";
+        //     array[0] = tempString;
+        //   }
+        //   console.log(array[0]);
+
+        //   count++;
+        // });
+        // console.log(this.db.objectives);
+        this.hotInstance.updateSettings({
+          data: this.db.objectives,
+        });
+      },
+    },
   },
 
   methods: {
@@ -642,6 +681,8 @@ export default {
       //   this.db.objectives[i].push('');
       // }
 
+      this.columnChange++;
+
       this.hotInstance.updateSettings({
         data: this.db.objectives,
       });
@@ -666,8 +707,16 @@ export default {
         copyPaste: true,
         allowRemoveColumn: true,
         colWidths: 100,
+        formulas: {
+          engine: HyperFormula,
+        },
 
         contextMenu: {
+          callback(key, selection, clickEvent) {
+            // Common callback for all options
+            self.columnChange++;
+            console.log(key, selection, clickEvent);
+          },
           items: {
             col_left: {
               name: "在左侧插入列",
@@ -682,13 +731,14 @@ export default {
         },
 
         afterChange(changes, source) {
-          // console.log('afterChange',changes)
+          // console.log("afterChange", changes);
 
           if (source === "loadData") {
             // console.log("same");
             return;
           } else {
             self.isValid();
+
             if (self.count == 0) {
               self.dirty = false;
               // console.log(
@@ -761,7 +811,16 @@ export default {
             this.db.objectives.push(sum.concat(setting.title));
             for (let i = 0; i < setting.sum.length; i++) {
               let templist = [];
-              templist.push(setting.sum[i]);
+              let tempLine = "";
+              for (let k = 0; k < setting.value[i].length; k++) {
+                tempLine =
+                  String.fromCharCode(66 + k) + (i + 2) + "+" + tempLine;
+              }
+              console.log("tempLine", tempLine.slice(0, -1));
+
+              let tempString = "=" + "SUM(" + tempLine.slice(0, -1) + ")";
+
+              templist.push(tempString);
 
               for (let j = 0; j < setting.value[i].length; j++) {
                 templist.push(setting.value[i][j]);
