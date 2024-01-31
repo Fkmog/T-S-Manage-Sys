@@ -896,15 +896,15 @@ export default {
 
       for (let i = 1; i < this.db.objectives.length; i++) {
         // console.log('this.db.objectives[i][0]',typeof(this.db.objectives[i][0]))
-
-        if (typeof this.db.objectives[i][0] === "string") {
-          this.postData.objectives.sum.push(
-            parseFloat(this.db.objectives[i][0].trim())
-          );
+        let tempdata = this.hotInstance.getDataAtCell(i, 0);
+        // console.log(
+        //   "this.hotInstance.getDataAtCell(i,0)",
+        //   this.hotInstance.getDataAtCell(i, 0)
+        // );
+        if (typeof tempdata === "string") {
+          this.postData.objectives.sum.push(parseFloat(tempdata.trim()));
         } else {
-          this.postData.objectives.sum.push(
-            parseFloat(this.db.objectives[i][0])
-          );
+          this.postData.objectives.sum.push(parseFloat(tempdata));
         }
 
         let templist = [];
