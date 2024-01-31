@@ -3,7 +3,7 @@
     <!-- 顶部导航栏 -->
     <div class="block">
       <el-row class="block-row">
-        <div class="title">{{NavMsg}}</div>
+        <div class="title">{{ NavMsg }}</div>
         <el-divider class="divider" direction="vertical" />
         <el-tooltip
           class="box-item"
@@ -55,7 +55,7 @@ export default {
   },
   data() {
     return {
-      NavMsg:'课程大纲版本'
+      NavMsg: "课程大纲版本",
     };
   },
   computed: {},
@@ -70,13 +70,13 @@ export default {
   methods: {
     toVersion() {
       // console.log(this.$route);
-      this.NavMsg = '课程大纲版本'
+      this.NavMsg = "课程大纲版本";
 
       this.$router.push({ name: "Version" });
     },
     //跳转到模板编辑页面
     toTemplate() {
-      this.NavMsg = '工作手册模板'
+      this.NavMsg = "工作手册模板";
       this.$router.push({ name: "TemplateList" });
     },
   },

@@ -21,13 +21,8 @@
           </el-icon>
         </el-tooltip>
         <div class="title" v-show="from === 'Score'">成绩项</div>
-        <div class="title" v-show="from === 'paperAnalysis'">分析表信息</div>
-        <div
-          class="title"
-          v-show="from !== 'Score' && from !== 'paperAnalysis'"
-        >
-          课程信息
-        </div>
+
+        <div class="title" v-show="from !== 'Score'">课程信息</div>
         <el-divider class="divider" direction="vertical" />
 
         <el-tooltip
@@ -58,13 +53,13 @@
       v-model="editableTabsValue"
       type="card"
       class="activity-tab"
-      editable
+      :editable="canedit ? true : false"
       @tab-click="editableTabsValueChange"
       @edit="handleTabsEdit"
       id="drag-tab"
     >
       <el-tab-pane
-        v-for="(item, index) in editableTabs"
+        v-for="(item) in editableTabs"
         :key="item.name"
         :label="item.title"
         :name="item.name"
@@ -83,13 +78,13 @@
               size="22px"
               color="rgb(137, 137, 137)"
               style="float: left; top: 4px; cursor: pointer"
+              v-show="canedit"
               @click="tabsContent(item, item.name)"
             >
               <EditPen />
             </el-icon>
             {{ item.title }}
           </span>
-
           <el-input
             v-else-if="!!item.inputFlag"
             :ref="`myInput${item.name}`"
@@ -109,17 +104,21 @@
                 @click="
                   item.inputFlag = false;
                   item.title = newActivityTitle;
+                  item.description = newActivitydescription;
+                  unsave = false;
                 "
               >
                 <Checked />
               </el-icon>
             </template>
           </el-input>
-          <!--  item.title = originActivityTitle;item.inputFlag = false; -->
 
-          <!-- <el-input type="text" name="hiddenText" style="display: none;" /> -->
           <div
-            v-show="!(this.identity === '教师' && this.currenteditableTabsValue==1)"
+            v-show="
+              !(
+                this.identity === '教师' && this.currenteditableTabsValue == 1
+              ) && this.canedit
+            "
             style="width: 100px; display: inline-block"
           >
             <el-tooltip
@@ -141,14 +140,43 @@
               </el-button>
             </el-tooltip>
           </div>
+
+          <div class="descriptionCard" v-if="!item.inputFlag">
+            <span
+              style="
+                width: 90%;
+                padding-left: 20px;
+                font-size: 14px;
+                color: gray;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                word-wrap: break-word;
+              "
+            >
+              {{ item.description }}
+            </span>
+          </div>
+          <div
+            v-else-if="!!item.inputFlag"
+            style="width: 400px; height: 100px; padding: 1px 11px"
+          >
+            <el-input
+              :ref="`myInput${item.name}`"
+              v-model="newActivitydescription"
+              type="textarea"
+              clearable
+              @clear="
+                item.inputFlag = false;
+                item.description = originActivitydescription;
+              "
+            >
+            </el-input>
+          </div>
         </template>
       </el-tab-pane>
     </el-tabs>
 
-    <div
-      class="card-container"
-      :style="from == 'paperAnalysis' ? style_paperanalysis : ''"
-    >
+    <div class="card-container">
       <el-tooltip
         v-if="!showActivities"
         class="box-item"
@@ -223,7 +251,9 @@ export default {
   data() {
     let that = this;
     return {
-      paperAnalysisId: "",
+      canedit: false,
+
+      unsave: false,
 
       columnSummaryList: [],
 
@@ -235,6 +265,8 @@ export default {
       activityTitleConfirm: true,
       originActivityTitle: "",
       newActivityTitle: "",
+      newActivitydescription: "",
+      originActivitydescription: "",
       from: "", //路由来自哪里
       classInfo: [], //当前课程数据
 
@@ -252,10 +284,6 @@ export default {
       maxeditableTabsValue: 0,
       editableTabs: [],
       tabIndex: 0,
-
-      style_paperanalysis: {
-        marginTop: "100px",
-      },
 
       colNum: 1,
       over21: Boolean,
@@ -318,31 +346,8 @@ export default {
     Checked,
     CloseBold,
   },
-  // watch:{
-  //   count:{
-  //     handler(){
-  //       for(let i=1;i<this.db.objectives.length;i++){
-  //           this.db.objectives[i][0] = 0;
-  //             // console.log('this.db.objectives[i]',this.db.objectives[i])
-  //             for(let j=1;j<this.db.objectives[i].length;j++){
-  //               this.db.objectives[i][0] =this.db.objectives[i][0] + Number(this.db.objectives[i][j]);
-  //             }
-  //           }
-  //         if(this.hotInstance){
-  //           this.hotInstance.updateSettings({
-  //             data:this.db.objectives,
-  //           });
-  //         }
-  //     }
-  //   }
-  // },
 
   methods: {
-    blurDelay() {
-      setTimeout(() => {
-        return this.originActivityTitle;
-      }, 300);
-    },
     confirmSave(newval, oldVal) {
       this.activityTitleConfirm = true;
       ElMessageBox.confirm("是否保存更改后的成绩项名称？", "", {
@@ -373,6 +378,7 @@ export default {
           that.oldtempEditabel = JSON.parse(JSON.stringify(that.tempEditabel));
           let currTab = templist[oldIndex];
           console.log("OnChoose currTab:", currTab);
+
           if (currTab["name"] == "1") {
             that.sortable.option("sort", false);
           } else {
@@ -393,6 +399,7 @@ export default {
           console.log("editableTabs:", that.editableTabs);
 
           that.currenteditableTabsValue = Number(that.editableTabsValue);
+
           that.hotInstance.updateSettings({
             data: that.db.items[that.currenteditableTabsValue - 1],
           });
@@ -402,74 +409,38 @@ export default {
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
       console.log(val, index, "双击编辑tabs");
-
+      this.unsave = true;
       if (index == "1" && this.identity == "教师") {
         val.inputFlag = false;
         ElMessage({
           type: "error",
-          message: "更新失败，没有权限",
+          message: "该成绩项为课程组统一，不可修改",
           duration: 1500,
         });
       } else {
         this.originActivityTitle = val.title;
         this.newActivityTitle = val.title;
+        this.originActivitydescription = val.description;
+        this.newActivitydescription = val.description;
         val.inputFlag = true;
       }
     },
     editableTabsValueChange(pane) {
       let that = this;
       this.currenteditableTabsValue = Number(pane.props.name);
+
       if (this.identity == "学院管理员" || this.identity == "课程负责人") {
         console.log("the teacher can edit the first tab content");
+
         this.hotInstance.updateSettings({
           data: that.db.items[that.currenteditableTabsValue - 1],
           cells(row, col) {
             var cellProperties = {};
-            if (row === 2) {
-              cellProperties.type = "dropdown";
-              cellProperties.source = [" ", "总评", "期末"];
-              cellProperties.allowEmpty = true;
-              cellProperties.className = "ht-s-size";
-              //   cellProperties.validator = that.validScoreSetting();
-            }
-            if (row === 3) {
-              cellProperties.allowEmpty = false;
-            }
-            if (row < 4 && col >= 0) {
-              cellProperties.readOnly = false;
-            }
-            return cellProperties;
-          },
-        });
-      } else {
-        if (this.isRespondent != "2" && Number(pane.props.name) == 1) {
-          console.log("the teacher can not edit the first tab content");
-          this.hotInstance.updateSettings({
-            data: that.db.items[that.currenteditableTabsValue - 1],
-            cells(row, col) {
-              var cellProperties = {};
-              if (row === 2) {
-                cellProperties.type = "dropdown";
-                cellProperties.source = [" ", "总评", "期末"];
-                cellProperties.allowEmpty = true;
-                cellProperties.className = "ht-s-size";
-                //   cellProperties.validator = that.validScoreSetting();
-              }
-              if (row === 3) {
-                cellProperties.allowEmpty = false;
-              }
-              if (row < 4 && col >= 0) {
+            if (!that.canedit) {
+              if (row >= 0) {
                 cellProperties.readOnly = true;
               }
-              return cellProperties;
-            },
-          });
-        } else {
-          console.log("the teacher can edit the first tab content");
-          this.hotInstance.updateSettings({
-            data: that.db.items[that.currenteditableTabsValue - 1],
-            cells(row, col) {
-              var cellProperties = {};
+            } else {
               if (row === 2) {
                 cellProperties.type = "dropdown";
                 cellProperties.source = [" ", "总评", "期末"];
@@ -483,15 +454,108 @@ export default {
               if (row < 4 && col >= 0) {
                 cellProperties.readOnly = false;
               }
+            }
+
+            return cellProperties;
+          },
+        });
+        if (!this.canedit) {
+          this.hotInstance.updateSettings({
+            contextMenu: false,
+          });
+        }
+      } else {
+        if (this.isRespondent != "2" && Number(pane.props.name) == 1) {
+          console.log("the teacher can not edit the first tab content");
+
+          this.hotInstance.updateSettings({
+            data: that.db.items[that.currenteditableTabsValue - 1],
+            contextMenu: false,
+            cells(row, col) {
+              var cellProperties = {};
+              if (!that.canedit) {
+                if (row >= 0) {
+                  cellProperties.readOnly = true;
+                }
+              } else {
+                if (row === 2) {
+                  cellProperties.type = "dropdown";
+                  cellProperties.source = [" ", "总评", "期末"];
+                  cellProperties.allowEmpty = true;
+                  cellProperties.className = "ht-s-size";
+                  //   cellProperties.validator = that.validScoreSetting();
+                }
+                if (row === 3) {
+                  cellProperties.allowEmpty = false;
+                }
+                if (col >= 0) {
+                  cellProperties.readOnly = true;
+                }
+              }
+
               return cellProperties;
             },
           });
+          if (!this.canedit) {
+            this.hotInstance.updateSettings({
+              contextMenu: false,
+            });
+          }
+        } else {
+          console.log("the teacher can edit the first tab content");
+
+          this.hotInstance.updateSettings({
+            data: that.db.items[that.currenteditableTabsValue - 1],
+            contextMenu: {
+              items: {
+                col_left: {
+                  name: "在左侧插入列",
+                },
+                col_right: {
+                  name: "在右侧插入列",
+                },
+                remove_col: {
+                  name: "删除列",
+                },
+              },
+            },
+            cells(row, col) {
+              var cellProperties = {};
+              if (!that.canedit) {
+                if (row >= 0) {
+                  cellProperties.readOnly = true;
+                }
+              } else {
+                if (row === 2) {
+                  cellProperties.type = "dropdown";
+                  cellProperties.source = [" ", "总评", "期末"];
+                  cellProperties.allowEmpty = true;
+                  cellProperties.className = "ht-s-size";
+                  //   cellProperties.validator = that.validScoreSetting();
+                }
+                if (row === 3) {
+                  cellProperties.allowEmpty = false;
+                }
+                if (row < 4 && col >= 0) {
+                  cellProperties.readOnly = false;
+                }
+              }
+
+              return cellProperties;
+            },
+          });
+
+          if (!this.canedit) {
+            this.hotInstance.updateSettings({
+              contextMenu: false,
+            });
+          }
         }
       }
 
       return console.log("currenteditableTabsValue:", Number(pane.props.name));
     },
-    handleTabsEdit(targetName, action, activityName) {
+    handleTabsEdit(targetName, action, activityName, activityDescription) {
       let that = this;
       console.log("action", action, targetName);
       if (action === "add" && targetName == undefined) {
@@ -500,6 +564,7 @@ export default {
         let remark = [""];
         let weight = [""];
         let tempdata = [];
+
         tempdata.push(item);
         tempdata.push(value);
         tempdata.push(remark);
@@ -515,6 +580,7 @@ export default {
           value: newTabName,
           inputFlag: false,
           input: "成绩项" + " " + newTabName,
+          description: "",
         });
         this.editableTabsValue = newTabName.toString();
         console.log("editableTabs after add ", this.editableTabs);
@@ -540,6 +606,7 @@ export default {
           value: newTabName,
           inputFlag: false,
           input: activityName ? activityName : "成绩项" + " " + newTabName,
+          description: activityDescription,
         });
         console.log("editableTabs after add ", this.editableTabs);
         this.editableTabsValue = newTabName.toString();
@@ -572,6 +639,8 @@ export default {
               this.hotInstance.updateSettings({
                 data: that.db.items[Number(activeName - 1)],
               });
+              let pane = { props: { name: Number(activeName) } };
+              this.editableTabsValueChange(pane);
 
               this.editableTabsValue = activeName;
               this.editableTabs = tabs.filter((tab) => tab.name !== targetName);
@@ -591,65 +660,48 @@ export default {
       }
     },
     addActivities() {
-      if (this.from != "paperAnalysis") {
-        console.log("currenteditableTabsValue", this.currenteditableTabsValue);
-        if (this.currenteditableTabsValue == 1 && this.identity === "教师") {
-          ElMessage({
-            type: "error",
-            message: "更新失败，没有权限",
-            duration: 1500,
-          });
-        } else {
-          if (this.currenteditableTabsValue == 0) {
-            this.colNum =
-              this.db.items[this.currenteditableTabsValue][0].length;
-          } else {
-            this.colNum =
-              this.db.items[this.currenteditableTabsValue - 1][0].length;
-          }
-
-          console.log("this.colNum", this.colNum);
-
-          // console.log('colNum:',this.colNum);
-          if (this.colNum < 21) {
-            this.firstActivities = false;
-
-            if (!this.currenteditableTabsValue) {
-              this.db.items[this.currenteditableTabsValue][0].push("");
-              this.db.items[this.currenteditableTabsValue][1].push(null);
-              this.db.items[this.currenteditableTabsValue][2].push("");
-              this.db.items[this.currenteditableTabsValue][3].push("");
-              this.hotInstance.updateSettings({
-                data: this.db.items[this.currenteditableTabsValue],
-              });
-            } else {
-              this.db.items[this.currenteditableTabsValue - 1][0].push("");
-              this.db.items[this.currenteditableTabsValue - 1][1].push(null);
-              this.db.items[this.currenteditableTabsValue - 1][2].push("");
-              this.db.items[this.currenteditableTabsValue - 1][3].push("");
-              this.hotInstance.updateSettings({
-                data: this.db.items[this.currenteditableTabsValue - 1],
-              });
-            }
-
-            // this.colNum = this.colNum+1;
-            // this.dictTolist(this.db.items);
-          }
-        }
+      console.log("currenteditableTabsValue", this.currenteditableTabsValue);
+      if (this.currenteditableTabsValue == 1 && this.identity === "教师") {
+        ElMessage({
+          type: "error",
+          message: "该成绩项为课程组统一，不可修改",
+          duration: 1500,
+        });
       } else {
-        console.log("this.db.objectives", this.db.objectives);
+        if (this.currenteditableTabsValue == 0) {
+          this.colNum = this.db.items[this.currenteditableTabsValue][0].length;
+        } else {
+          this.colNum =
+            this.db.items[this.currenteditableTabsValue - 1][0].length;
+        }
 
-        this.db.objectives.forEach((objective) => {
-          objective.push(null);
-        });
-        // for(let i=0;i<this.objectivesName.length;i++){
+        console.log("this.colNum", this.colNum);
 
-        //   this.db.objectives[i].push('');
-        // }
+        // console.log('colNum:',this.colNum);
+        if (this.colNum < 21) {
+          this.firstActivities = false;
 
-        this.hotInstance.updateSettings({
-          data: this.db.objectives,
-        });
+          if (!this.currenteditableTabsValue) {
+            this.db.items[this.currenteditableTabsValue][0].push("");
+            this.db.items[this.currenteditableTabsValue][1].push(null);
+            this.db.items[this.currenteditableTabsValue][2].push("");
+            this.db.items[this.currenteditableTabsValue][3].push("");
+            this.hotInstance.updateSettings({
+              data: this.db.items[this.currenteditableTabsValue],
+            });
+          } else {
+            this.db.items[this.currenteditableTabsValue - 1][0].push("");
+            this.db.items[this.currenteditableTabsValue - 1][1].push(null);
+            this.db.items[this.currenteditableTabsValue - 1][2].push("");
+            this.db.items[this.currenteditableTabsValue - 1][3].push("");
+            this.hotInstance.updateSettings({
+              data: this.db.items[this.currenteditableTabsValue - 1],
+            });
+          }
+
+          // this.colNum = this.colNum+1;
+          // this.dictTolist(this.db.items);
+        }
       }
     },
     activateHotcolumn() {
@@ -660,179 +712,124 @@ export default {
 
       let container = document.querySelector("#courseHot");
       // let container = this.$refs.courseHot;
-      if (that.from != "paperAnalysis") {
-        let hotRegisterer = new Handsontable(container, {
-          data: self.db.items[0],
-          licenseKey: "non-commercial-and-evaluation",
-          colHeaders: false,
-          dragToScroll: true,
-          rowHeaders: ["考核项", "分值", "设置", "权重"],
-          copyPaste: true,
-          colWidths: 70,
-          allowRemoveColumn: true,
 
-          contextMenu: {
-            items: {
-              col_left: {
-                name: "在左侧插入列",
-              },
-              col_right: {
-                name: "在右侧插入列",
-              },
-              remove_col: {
-                name: "删除列",
-              },
+      let hotRegisterer = new Handsontable(container, {
+        data: self.db.items[0],
+        licenseKey: "non-commercial-and-evaluation",
+        colHeaders: false,
+        dragToScroll: true,
+        rowHeaders: ["考核项", "分值", "设置", "权重"],
+        copyPaste: true,
+        colWidths: 70,
+        allowRemoveColumn: true,
+
+        contextMenu: {
+          items: {
+            col_left: {
+              name: "在左侧插入列",
+            },
+            col_right: {
+              name: "在右侧插入列",
+            },
+            remove_col: {
+              name: "删除列",
             },
           },
-          beforeCreateCol(index, amount, source) {
-            console.log("beforeRemoveCol", self.currenteditableTabsValue);
-            if (
-              self.currenteditableTabsValue === 1 ||
-              self.currenteditableTabsValue === 0
-            ) {
-              // console.log('same');
-              return false;
+        },
+        beforeCreateCol(index, amount, source) {
+          console.log("beforeRemoveCol", self.currenteditableTabsValue);
+          if (
+            (self.currenteditableTabsValue === 1 ||
+              self.currenteditableTabsValue === 0) &&
+            self.identity == "教师" &&
+            self.isRespondent != "2"
+          ) {
+            // console.log('same');
+            console("since ");
+            return false;
+          } else {
+            return;
+          }
+        },
+        beforeRemoveCol(index, amount, physicalRows, source) {
+          console.log("beforeRemoveCol", self.currenteditableTabsValue);
+          if (
+            (self.currenteditableTabsValue === 1 ||
+              self.currenteditableTabsValue === 0) &&
+            self.identity == "教师" &&
+            self.isRespondent != "2"
+          ) {
+            // console.log('same');
+            return false;
+          } else {
+            return;
+          }
+        },
+        afterChange(changes, source) {
+          if (source === "loadData") {
+            // console.log("same");
+            return;
+          } else {
+            self.isValid();
+            if (self.count == 0) {
+              self.dirty = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.items
+              // );
             } else {
-              return;
+              self.dirty = true;
+              self.firstActivities = false;
+              // console.log(
+              //   "console:",
+              //   self.count,
+              //   "dirty",
+              //   self.dirty,
+              //   "items:",
+              //   self.db.items,
+              //   "firstActivities",
+              //   self.firstActivities
+              // );
             }
-          },
-          beforeRemoveCol(index, amount, physicalRows, source) {
-            console.log("beforeRemoveCol", self.currenteditableTabsValue);
-            if (
-              self.currenteditableTabsValue === 1 ||
-              self.currenteditableTabsValue === 0
-            ) {
-              // console.log('same');
-              return false;
-            } else {
-              return;
-            }
-          },
-          afterChange(changes, source) {
-            if (source === "loadData") {
-              // console.log("same");
-              return;
-            } else {
-              self.isValid();
-              if (self.count == 0) {
-                self.dirty = false;
-                // console.log(
-                //   "console:",
-                //   self.count,
-                //   "dirty",
-                //   self.dirty,
-                //   "items:",
-                //   self.db.items
-                // );
-              } else {
-                self.dirty = true;
-                self.firstActivities = false;
-                // console.log(
-                //   "console:",
-                //   self.count,
-                //   "dirty",
-                //   self.dirty,
-                //   "items:",
-                //   self.db.items,
-                //   "firstActivities",
-                //   self.firstActivities
-                // );
-              }
-              self.count++;
-              // console.log("console:", self.count);
-            }
-          },
-          afterRemoveCol(changes, source) {
-            self.firstActivities = false;
-          },
-        });
+            self.count++;
+            // console.log("console:", self.count);
+          }
+        },
+        afterRemoveCol(changes, source) {
+          self.firstActivities = false;
+        },
+      });
 
-        that.hotInstance = hotRegisterer;
-        that.hotInstance.updateSettings({
-          data: that.db.items[0],
-          cells: that.getHotCellsFunction(),
-        });
-      } else {
-        console.log("Handsontable init");
-        let hotRegisterer = new Handsontable(container, {
-          data: self.db.objectives,
-          licenseKey: "non-commercial-and-evaluation",
-          colHeaders: false,
-          dragToScroll: true,
-          rowHeaders: self.objectivesName,
-          rowHeaderWidth: 100,
-          copyPaste: true,
-          allowRemoveColumn: true,
-          colWidths: 100,
-
-          contextMenu: {
-            items: {
-              col_left: {
-                name: "在左侧插入列",
-              },
-              col_right: {
-                name: "在右侧插入列",
-              },
-              remove_col: {
-                name: "删除列",
-              },
-            },
-          },
-
-          afterChange(changes, source) {
-            // console.log('afterChange',changes)
-
-            if (source === "loadData") {
-              // console.log("same");
-              return;
-            } else {
-              self.isValid();
-              if (self.count == 0) {
-                self.dirty = false;
-                // console.log(
-                //   "console:",
-                //   self.count,
-                //   "dirty",
-                //   self.dirty,
-                //   "items:",
-                //   self.db.objectives
-                // );
-              } else {
-                self.dirty = true;
-                self.firstActivities = false;
-                // console.log(
-                //   "console:",
-                //   self.count,
-                //   "dirty",
-                //   self.dirty,
-                //   "items:",
-                //   self.db.objectives,
-                //   "firstActivities",
-                //   self.firstActivities
-                // );
-              }
-              self.count++;
-              // console.log("console:", self.count);
-            }
-          },
-          afterRemoveCol(changes, source) {
-            self.firstActivities = false;
-          },
-        });
-
-        that.hotInstance = hotRegisterer;
-        that.hotInstance.updateSettings({
-          data: that.db.objectives,
-          cells: that.getHotCellsFunction(),
+      this.hotInstance = hotRegisterer;
+      if (
+        (this.identity == "教师" && this.isRespondent != "2") ||
+        !this.canedit
+      ) {
+        this.hotInstance.updateSettings({
+          contextMenu: false,
         });
       }
+
+      this.hotInstance.updateSettings({
+        data: this.db.items[0],
+        cells: this.getHotCellsFunction(),
+      });
     },
     getHotCellsFunction() {
       let that = this;
-      if (this.from != "paperAnalysis") {
-        return function (row, col, prop) {
-          // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
-          var cellProperties = {};
+
+      return function (row, col, prop) {
+        // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
+        var cellProperties = {};
+        if (!that.canedit) {
+          if (row >= 0) {
+            cellProperties.readOnly = true;
+          }
+        } else {
           if (row === 2) {
             cellProperties.type = "dropdown";
             cellProperties.source = [" ", "总评", "期末"];
@@ -854,19 +851,10 @@ export default {
               }
             }
           }
-          return cellProperties;
-        };
-      } else {
-        return function (row, col, prop) {
-          // http://docs.handsontable.com/0.16.0/tutorial-cell-types.html
-          var cellProperties = {};
+        }
 
-          if (row == 0) {
-            cellProperties.allowEmpty = false;
-          }
-          return cellProperties;
-        };
-      }
+        return cellProperties;
+      };
     },
     getActivities() {
       let that = this;
@@ -883,7 +871,12 @@ export default {
 
           if (course.activities) {
             course.activities.forEach((activity) => {
-              that.handleTabsEdit(1, "add", activity.name);
+              that.handleTabsEdit(
+                1,
+                "add",
+                activity.name,
+                activity.description
+              );
               let tempdata = [];
               tempdata.push(activity.item);
               tempdata.push(activity.value);
@@ -921,107 +914,69 @@ export default {
           that.activateHotcolumn();
         });
       } else {
-        if (this.from == "paperAnalysis" && this.paperAnalysisId) {
-          getDetailedPaperAnalysis(this.paperAnalysisId).then((res) => {
-            console.log("getDetailedPaperAnalysis", res);
-            let setting = res.data.setting;
-            setting.object.forEach((objectname) => {
-              this.objectivesName.push(objectname);
-            });
+        console.log("this is the activity from detail", this.detailId);
+        return request({
+          url: "/detail/" + this.detailId,
+          method: "get",
+        })
+          .then(function (res) {
+            console.log("activities", res);
 
-            if (setting.sum) {
-              // this.objectivesName.concat(setting.object);
+            let course = res.data;
+            if (course.activities.length) {
+              // that.tabIndex = course.activities.length;
 
-              let sum = ["合计"];
-              this.db.objectives.push(sum.concat(setting.title));
-              for (let i = 0; i < setting.sum.length; i++) {
-                let templist = [];
-                templist.push(setting.sum[i]);
-
-                for (let j = 0; j < setting.value[i].length; j++) {
-                  templist.push(setting.value[i][j]);
+              course.activities.forEach((activity) => {
+                that.handleTabsEdit(
+                  1,
+                  "add",
+                  activity.name,
+                  activity.description
+                );
+                let tempdata = [];
+                tempdata.push(activity.item);
+                tempdata.push(activity.value);
+                tempdata.push(activity.remark);
+                if (!activity.weight) {
+                  let templist = [];
+                  for (let i = 0; i < activity.item.length; i++) {
+                    templist.push("");
+                  }
+                  tempdata.push(templist);
+                } else {
+                  tempdata.push(activity.weight);
                 }
-
-                this.db.objectives.push(templist);
-              }
-              for (
-                let i = setting.sum.length + 1;
-                i < this.objectivesName.length;
-                i++
-              ) {
-                this.db.objectives.push([""]);
-              }
-              console.log("this.db.objectives", this.db.objectives);
-            } else {
-              this.db.objectives.push(["合计"]);
-              this.db.objectives.push([""]);
-              setting.object.forEach(() => {
-                this.db.objectives.push([""]);
+                that.db.items.push(tempdata);
               });
+
+              // that.db.items.push(course.activities.item);
+              // that.db.items.push(course.activities.value);
+              // that.db.items.push(course.activities.remark);
+              that.editableTabsValue = "1";
+              that.currenteditableTabsValue = 1;
+              console.log("res has activities:", that.db.items);
+
+              that.dragTab();
+            } else {
+              console.log("res has no activities");
+              that.handleTabsEdit(1, "add");
+              let item = [""];
+              let value = [""];
+              let remark = [""];
+              let weight = [""];
+              let tempdata = [];
+              tempdata.push(item);
+              tempdata.push(value);
+              tempdata.push(remark);
+              tempdata.push(weight);
+              that.db.items.push(tempdata);
             }
 
-            this.activateHotcolumn();
-          });
-        } else {
-          console.log("this is the activity from detail", this.detailId);
-          return request({
-            url: "/detail/" + this.detailId,
-            method: "get",
+            that.activateHotcolumn();
           })
-            .then(function (res) {
-              console.log("activities", res);
-
-              let course = res.data;
-              if (course.activities.length) {
-                // that.tabIndex = course.activities.length;
-
-                course.activities.forEach((activity) => {
-                  that.handleTabsEdit(1, "add", activity.name);
-                  let tempdata = [];
-                  tempdata.push(activity.item);
-                  tempdata.push(activity.value);
-                  tempdata.push(activity.remark);
-                  if (!activity.weight) {
-                    let templist = [];
-                    for (let i = 0; i < activity.item.length; i++) {
-                      templist.push("");
-                    }
-                    tempdata.push(templist);
-                  } else {
-                    tempdata.push(activity.weight);
-                  }
-                  that.db.items.push(tempdata);
-                });
-
-                // that.db.items.push(course.activities.item);
-                // that.db.items.push(course.activities.value);
-                // that.db.items.push(course.activities.remark);
-                that.editableTabsValue = "1";
-                that.currenteditableTabsValue = 1;
-                console.log("res has activities:", that.db.items);
-
-                that.dragTab();
-              } else {
-                console.log("res has no activities");
-                that.handleTabsEdit(1, "add");
-                let item = [""];
-                let value = [""];
-                let remark = [""];
-                let weight = [""];
-                let tempdata = [];
-                tempdata.push(item);
-                tempdata.push(value);
-                tempdata.push(remark);
-                tempdata.push(weight);
-                that.db.items.push(tempdata);
-              }
-
-              that.activateHotcolumn();
-            })
-            .catch((e) => {
-              console.log("get activity error", e);
-            });
-        }
+          .catch((e) => {
+            console.log("get activity error", e);
+          });
       }
     },
     isValid() {
@@ -1052,12 +1007,21 @@ export default {
         this.saving = false;
         return;
       }
-      if (this.from != "paperAnalysis") {
+
+      if (!this.canedit) {
+        ElMessage({
+          type: "error",
+          message: `课程已审核或提交，不可以修改成绩项`,
+          duration: 1500,
+        });
+      } else {
         let keyNum = [];
         let keyName = [];
+        let keydescription = [];
         for (let i = 0; i < Object.keys(this.editableTabs).length; i++) {
           keyNum.push(Number(this.editableTabs[i]["name"]) - 1);
           keyName.push(this.editableTabs[i]["title"]);
+          keydescription.push(this.editableTabs[i]["description"]);
         }
 
         let activities = [];
@@ -1070,8 +1034,10 @@ export default {
           let tempvalue = [];
           let tempremark = [];
           let tempweight = [];
+          let tempdescription = keydescription[i];
           let tempname = keyName[i];
           console.log("keyNum[i]:", keyNum[i]);
+          console.log(this.db.items);
           for (let j = 0; j < this.db.items[keyNum[i]][0].length; j++) {
             if (!this.db.items[keyNum[i]][0][j]) {
               this.itemOrValueisEmpty = true;
@@ -1092,6 +1058,7 @@ export default {
             remark: tempremark,
             weight: tempweight,
             name: tempname,
+            description: tempdescription,
           };
           activities.push(dict);
         }
@@ -1207,122 +1174,27 @@ export default {
               });
           }
         }
-      } else {
-        console.log("this.db.objectives:", this.db.objectives);
-        this.db.objectives[0]
-          .slice(1, this.db.objectives[0].length)
-          .forEach((title) => {
-            if (typeof title === "string") {
-              this.postData.objectives.title.push(title.trim());
-            } else {
-              this.postData.objectives.title.push(title);
-            }
-          });
-        this.postData.objectives.object = this.objectivesName.slice(
-          2,
-          this.objectivesName.length
-        );
-
-        for (let i = 1; i < this.db.objectives.length; i++) {
-          // console.log('this.db.objectives[i][0]',typeof(this.db.objectives[i][0]))
-
-          if (typeof this.db.objectives[i][0] === "string") {
-            this.postData.objectives.sum.push(
-              parseFloat(this.db.objectives[i][0].trim())
-            );
-          } else {
-            this.postData.objectives.sum.push(
-              parseFloat(this.db.objectives[i][0])
-            );
-          }
-
-          let templist = [];
-          let valueLength = this.db.objectives[0].length;
-          for (let j = 1; j < valueLength; j++) {
-            if (typeof this.db.objectives[i][j] === "string") {
-              templist.push(Number(this.db.objectives[i][j].trim()));
-            } else {
-              templist.push(Number(this.db.objectives[i][j]));
-            }
-            // console.log('this.db.objectives[i][j]',typeof(this.db.objectives[i][j]))
-            //  templist.push(this.db.objectives[i][j].replace(/(\r\n)|(\n)/g,''))
-          }
-          this.postData.objectives.value.push(templist);
-        }
-        for (let j = 0; j < this.postData.objectives.value.length; j++) {
-          for (let i = 0; i < this.postData.objectives.value[j].length; i++) {
-            // console.log(' this.postData.objectives[j][i]', this.postData.objectives.value[j][i])
-            if (!this.postData.objectives.value[j][i]) {
-              this.postData.objectives.value[j][i] = null;
-            }
-          }
-        }
-
-        delete this.postData.objectives["length"];
-
-        console.log("paperAnalysis postdata:", this.postData.objectives);
-
-        editPaperAnalysis({
-          setting: this.postData.objectives,
-          detailId: this.detailId,
-          id: this.paperAnalysisId,
-        })
-          .then((res) => {
-            console.log("paperAnalysis submit res", res);
-            if (res.code == "SUCCESS") {
-              ElMessage({
-                type: "success",
-                message: "更新成功",
-                duration: 1500,
-              });
-            }
-          })
-          .catch((e) => {
-            ElMessage({
-              type: "error",
-              message: e.msg,
-              duration: 1500,
-            });
-          });
       }
     },
     toPostData() {
-      if (this.from != "paperAnalysis") {
-        this.postData.activities.length = 0; // clean array
-        let valid = true;
-        if (!this.currenteditableTabsValue) {
-          let length = this.db.items[this.currenteditableTabsValue][0].length;
-        } else {
-          let length =
-            this.db.items[this.currenteditableTabsValue - 1][0].length;
-        }
-        for (let i = 0; i < length; i++) {
-          if (
-            !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
-            !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
-            !this.db.items[this.currenteditableTabsValue - 1][i][3]
-          ) {
-            valid = false;
-            break;
-          }
-        }
-        return valid;
+      this.postData.activities.length = 0; // clean array
+      let valid = true;
+      if (!this.currenteditableTabsValue) {
+        let length = this.db.items[this.currenteditableTabsValue][0].length;
       } else {
-        this.postData.objectives.length = 0;
-        let valid = true;
-        if (this.db.objectives[0]) {
-          for (let i = 0; i < this.db.objectives[0].length; i++) {
-            if (!this.db.objectives[0][i]) {
-              valid = false;
-              break;
-            }
-          }
-        } else {
-          valid = false;
-        }
-
-        return valid;
+        let length = this.db.items[this.currenteditableTabsValue - 1][0].length;
       }
+      for (let i = 0; i < length; i++) {
+        if (
+          !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
+          !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
+          !this.db.items[this.currenteditableTabsValue - 1][i][3]
+        ) {
+          valid = false;
+          break;
+        }
+      }
+      return valid;
     },
     goBackandClean() {
       this.db.items = [];
@@ -1343,8 +1215,6 @@ export default {
             if (this.from == "Score") {
               console.log("go score");
               this.$router.push({ name: "Score" });
-            } else if (this.from == "paperAnalysis") {
-              this.$router.push({ path: "/paperAnalysis" });
             } else {
               this.$router.push({ path: "/baseCourseDetail" });
             }
@@ -1355,8 +1225,6 @@ export default {
         if (this.from == "Score") {
           console.log("go score");
           this.$router.push({ name: "Score" });
-        } else if (this.from == "paperAnalysis") {
-          this.$router.push({ path: "/paperAnalysis" });
         } else {
           this.$router.push({ path: "/baseCourseDetail" });
         }
@@ -1369,7 +1237,7 @@ export default {
     this.courseId = this.$store.state.course.baseCourseCourseId;
     this.identity = this.$store.state.currentInfo.identity;
     this.detailId = this.$store.state.course.detailId;
-    this.paperAnalysisId = this.$store.state.course.basecoursePaperAnalysisId;
+
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
       console.log("identity:", this.identity);
@@ -1380,15 +1248,21 @@ export default {
       this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
       console.log("identity:", this.identity);
     }
+    console.log("this.classInfo:", this.classInfo);
+    if (
+      (this.classInfo.status == "1" || this.classInfo.status == "4") &&
+      this.classInfo
+    ) {
+      this.canedit = true;
+    } else {
+      this.canedit = true;
+    }
+    console.log("this.canedit:", this.canedit);
 
     console.log("db items:", this.db.items);
     console.log("router", this.$route.query["parentName"]);
     if (this.$route.query["parentName"] == "Score") {
       this.from = this.$route.query["parentName"];
-    } else if (this.$route.query["parentName"] == "paperAnalysis") {
-      this.from = this.$route.query["parentName"];
-      this.showActivities = false;
-      this.showPaperAnalysis = true;
     } else {
       this.from = "";
     }
@@ -1399,6 +1273,10 @@ export default {
 </script>
 
 <style scoped>
+.descriptionCard {
+  width: 400px;
+  height: 50px;
+}
 :deep().el-tabs__new-tab {
   margin: 10px;
 }
@@ -1411,6 +1289,7 @@ export default {
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
 }
 .activity-tab {
+  height: 200px;
   margin-top: 68px;
   background: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);

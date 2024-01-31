@@ -1,10 +1,9 @@
 <template>
   <div v-show="!closeShow">
     <HeaderSearch
-      msg="搜索课程名称、任课教师(姓名、工号)、课程号、开课号"
+      msg="搜索课程名、课程负责人(姓名、工号)、课程号"
       @SearchValue="getSearchValue"
       :value="keyword"
-      
     >
       <template #rightTime>
         <div class="selectionBar">
@@ -50,7 +49,10 @@
       </template>
     </HeaderSearch>
   </div>
-  <addBtn @click="dialogFormVisible = true" v-show="identity == '学院管理员'"></addBtn>
+  <addBtn
+    @click="dialogFormVisible = true"
+    v-show="identity == '学院管理员'"
+  ></addBtn>
 
   <div v-show="closeShow" class="submenu">
     <el-row>
@@ -118,146 +120,155 @@
       请先点击右上角圆形按钮添加课程
     </div>
 
-    <div layout="row" flex class="md-padding" v-show="identity == '学院管理员' && hasBaseCourse">
+    <div
+      layout="row"
+      flex
+      class="md-padding"
+      v-show="identity == '学院管理员' && hasBaseCourse"
+    >
       <addBtn @click="dialogFormVisible = true"></addBtn>
 
-    <el-table
-      :data="tableData"
-      v-loading="isloading"
-      
-      ref="multipleTable1"
-      @selection-change="handleSelectionChange"
-      @row-click="goBaseCourseDetail"
-      class="el-table-container"
-      style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
-      :header-cell-style="{
-        'padding-left': '20px',
-        'font-size': '14.4px',
-        height: '48px',
-        'font-weight': 'bold',
-        color: 'black',
-      }"
-      :cell-style="{
-        'padding-left': '20px',
-        'font-size': '16px',
-        height: '60px',
-      }"
-      :row-key="rowKey"
-    >
-      <el-table-column width="55" column-key="select" type="selection" :reserve-selection="true">
-      </el-table-column>
-      <el-table-column label="课程名" width="250" label-class-name="textbold">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseName }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程号" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseCode }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程类型" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseType }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程性质" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.courseNature }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="学分" width="80">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.credit }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="负责人" width="120">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="工作手册" width="150">
-        <template #default="scope">
-          <div style="display: flex; align-items: center">
-            <span v-show="scope.row.workbookName">{{
-              scope.row.workbookName
-            }}</span>
-            <span v-show="!scope.row.workbookName"></span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程大纲" width="150">
-        <template #default="scope">
-          <el-row>
-            <el-col :span="8" v-show="scope.row.versionId">
-                <el-tag
-                  class="noBaseCourseDetail"
-                 
-                 
+      <el-table
+        :data="tableData"
+        v-loading="isloading"
+        ref="multipleTable1"
+        @selection-change="handleSelectionChange"
+        @row-click="goBaseCourseDetail"
+        class="el-table-container"
+        style="width: 1375px; text-overflow: ellipsis; white-space: nowrap"
+        :header-cell-style="{
+          'padding-left': '20px',
+          'font-size': '14.4px',
+          height: '48px',
+          'font-weight': 'bold',
+          color: 'black',
+        }"
+        :cell-style="{
+          'padding-left': '20px',
+          'font-size': '16px',
+          height: '60px',
+        }"
+        :row-key="rowKey"
+      >
+        <el-table-column
+          width="55"
+          column-key="select"
+          type="selection"
+          :reserve-selection="true"
+        >
+        </el-table-column>
+        <el-table-column label="课程名" width="250" label-class-name="textbold">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseName }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程号" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseCode }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程类型" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseType }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程性质" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.courseNature }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="学分" width="80">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.credit }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="负责人" width="120">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span>{{ scope.row.respondentName }}&nbsp;&nbsp;</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="工作手册" width="150">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span v-show="scope.row.workbookName">{{
+                scope.row.workbookName
+              }}</span>
+              <span v-show="!scope.row.workbookName"></span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课程大纲" width="150">
+          <template #default="scope">
+            <el-row>
+              <el-col :span="8" v-show="scope.row.versionId">
+                <el-tag class="noBaseCourseDetail"
                   >{{ currentVersionName }}
                 </el-tag>
-            </el-col>
-            <el-col :span="8" v-show="!scope.row.versionId">
-              <el-tooltip content="添加课程大纲">
-                <el-tag
-                  class="noBaseCourseDetail"
-                  type="danger"
-                  @click.stop="addBaseCourseDetail(scope.row)"
-                  >无课程大纲</el-tag
-                >
-              </el-tooltip>
-            </el-col>
-          </el-row>
-          
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="150">
-        <template #default="scope">
-          <el-row v-show="showToolIcon">
-            <el-col :span="8">
-              <el-tooltip content="删除课程">
-                <el-button
-                  @click.stop="
-                    deleteBaseCourse(scope.$index, scope.row.courseId)
-                  "
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Delete /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-            <el-col :span="8">
-              <el-tooltip content="修改课程信息">
-                <el-button
-                  @click.stop="editTrigger(scope.row)"
-                  class="deleteButton"
-                  link
-                  style="color: #3f51b5"
-                  ><el-icon><Edit /></el-icon
-                ></el-button>
-              </el-tooltip>
-            </el-col>
-          </el-row>
-        </template>
-      </el-table-column>
-      
-    </el-table>
+              </el-col>
+              <el-col :span="8" v-show="!scope.row.versionId">
+                <el-tooltip content="添加课程大纲">
+                  <el-tag
+                    class="noBaseCourseDetail"
+                    type="danger"
+                    @click.stop="addBaseCourseDetail(scope.row)"
+                    >无课程大纲</el-tag
+                  >
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150">
+          <template #default="scope">
+            <el-row v-show="showToolIcon">
+              <el-col :span="8">
+                <el-tooltip content="删除课程">
+                  <el-button
+                    @click.stop="
+                      deleteBaseCourse(scope.$index, scope.row.courseId)
+                    "
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Delete /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+              <el-col :span="8">
+                <el-tooltip content="修改课程信息">
+                  <el-button
+                    @click.stop="editTrigger(scope.row)"
+                    class="deleteButton"
+                    link
+                    style="color: #3f51b5"
+                    ><el-icon><Edit /></el-icon
+                  ></el-button>
+                </el-tooltip>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
 
-    <div class="md-padding" layout="row" flex v-show="identity == '课程负责人' && hasBaseCourse">
+    <div
+      class="md-padding"
+      layout="row"
+      flex
+      v-show="identity == '课程负责人' && hasBaseCourse"
+    >
       <el-table
         :data="tableData"
         v-loading="isloading"
@@ -280,7 +291,12 @@
         }"
         :row-key="rowKey"
       >
-        <el-table-column width="55" column-key="select" type="selection" :reserve-selection="true">
+        <el-table-column
+          width="55"
+          column-key="select"
+          type="selection"
+          :reserve-selection="true"
+        >
         </el-table-column>
         <el-table-column label="课程名" width="250">
           <template #default="scope">
@@ -338,11 +354,9 @@
           <template #default="scope">
             <el-row>
               <el-col :span="8" v-show="scope.row.versionId">
-                  <el-tag
-                    class="noBaseCourseDetail"
-                    
-                    >{{ currentVersionName }}
-                  </el-tag>
+                <el-tag class="noBaseCourseDetail"
+                  >{{ currentVersionName }}
+                </el-tag>
               </el-col>
               <el-col :span="8" v-show="!scope.row.versionId">
                 <el-tooltip content="添加课程大纲">
@@ -355,7 +369,6 @@
                 </el-tooltip>
               </el-col>
             </el-row>
-            
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150">
@@ -418,9 +431,8 @@
         </el-table-column> -->
       </el-table>
     </div>
-
   </div>
-  <el-dialog v-model="dialogFormVisible"  title="添加基础课程" width="580">
+  <el-dialog v-model="dialogFormVisible" title="添加基础课程" width="580">
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item
         label="课程名称"
@@ -481,13 +493,13 @@
             dialogFormVisible = false;
             resetForm('ruleForm');
           "
-          >取消</el-button>
+          >取消</el-button
+        >
 
         <el-button type="primary" @click="submitForm('ruleForm')">
           确认
         </el-button>
         <!-- <el-button @click="resetForm('ruleForm')"> 重置 </el-button> -->
-        
       </span>
     </template>
   </el-dialog>
@@ -761,10 +773,8 @@ export default {
     };
 
     return {
-
-      hasVersion:false,
-      hasNoVersion:false,
-
+      hasVersion: false,
+      hasNoVersion: false,
 
       defaultMsg: "搜索课程名称、任课教师(姓名、工号)、课程号、开课号",
 
@@ -815,7 +825,7 @@ export default {
       Respondentkeyword: "",
       isloading: true,
       hasBaseCourse: false,
-      hasNoBaseCourse:false,
+      hasNoBaseCourse: false,
       courseTypeSource: [],
       courseNatureSource: [],
       //showSetDetailPage:false,
@@ -888,7 +898,7 @@ export default {
       //select
       currentVersion: "",
       currentVersionName: "",
-      currentVersionId: '',
+      currentVersionId: "",
       loading: ref(false),
       options: [],
       versionLabel: [],
@@ -952,7 +962,7 @@ export default {
       result: {},
     };
   },
-  watch:{
+  watch: {
     // hasDetail:{
     //   handler(){
     //     console.log('handler 的值改变了',);
@@ -964,7 +974,7 @@ export default {
     getSelectedBaseCourse(hasDetail) {
       this.hasDetail = hasDetail;
       console.log("hasDetail:", this.hasDetail);
-      sessionStorage.setItem("baseCourseHasDetail",this.hasDetail);
+      sessionStorage.setItem("baseCourseHasDetail", this.hasDetail);
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     cancelVersionForm() {
@@ -991,8 +1001,8 @@ export default {
     getSearchValue(data) {
       this.keyword = data;
       sessionStorage.removeItem("baseCourseSearchForm");
-      console.log('searching------------------')
-      
+      console.log("searching------------------");
+
       this.getBaseCourse(this.pageSize, this.pageNum);
     },
     async getDict() {
@@ -1377,22 +1387,21 @@ export default {
 
     getCourseByYear(value) {
       if (value) {
-        if(value == '全部'){
+        if (value == "全部") {
           this.currentVersionId = null;
-        }
-        else{
+        } else {
           this.currentVersionId = value;
         }
-        
+
         this.$store.commit(
           "course/setbaseCourseVersionId",
           this.currentVersionId
         );
         for (const element of this.versions) {
-        if (element["versionId"] == this.currentVersionId) {
-          this.currentVersionName = element["label"];
+          if (element["versionId"] == this.currentVersionId) {
+            this.currentVersionName = element["label"];
+          }
         }
-      }
         this.getBaseCourse(this.pageSize, this.pageNum);
       } else {
         console.log("没有选择版本大纲", value);
@@ -1533,7 +1542,6 @@ export default {
           departmentId: this.departmentId,
           schoolId: this.schoolId,
           selectKeyWord: this.keyword,
-          
         };
       }
       if (identity == "课程负责人") {
@@ -1587,7 +1595,8 @@ export default {
               course.courseName = course.courseName;
               course.courseCode = course.courseCode;
               course.courseType = that.courseTypeSource[course.courseType];
-              course.courseNature = that.courseNatureSource[course.courseNature];
+              course.courseNature =
+                that.courseNatureSource[course.courseNature];
               course.credit = course.credit;
               if (course.bcDetails.length) {
                 for (const element of course.bcDetails) {
@@ -1757,47 +1766,44 @@ export default {
           console.log("e", e);
         });
     },
-    goBaseCourseDetail(row,column) {
+    goBaseCourseDetail(row, column) {
       console.log("goBaseCourseDetail", row.bcDetails.length);
 
       sessionStorage.setItem("baseCourseSearchForm", this.keyword);
       // sessionStorage.removeItem("baseCourseSearchFlag");
-      if (column.columnKey === undefined){
-        if(row.bcDetails.length){
-      let versionName = "";
-      for (const element of this.versions) {
-        if (element["versionId"] == this.currentVersionId) {
-          versionName = element["label"];
+      if (column.columnKey === undefined) {
+        if (row.bcDetails.length) {
+          let versionName = "";
+          for (const element of this.versions) {
+            if (element["versionId"] == this.currentVersionId) {
+              versionName = element["label"];
+            }
+          }
+          this.$store.commit("course/setbaseCourseVersionName", versionName);
+          this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
+          this.$store.commit(
+            "course/setbaseCourseVersionId",
+            this.currentVersionId
+          );
+          this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+          this.$store.commit("course/setbaseCourseCourseName", row.courseName);
+          this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
+          this.$store.commit("course/setbaseCourseCourseType", row.courseType);
+          this.$store.commit(
+            "course/setbaseCourseCourseNature",
+            row.courseNature
+          );
+          this.$store.commit("course/setbaseCourseCredit", row.credit);
+          this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
+          this.$store.commit("course/setbaseCourseRemark", row.remark);
+
+          this.$router.push({
+            path: "/baseCourseDetail",
+          });
+        } else {
+          this.addBaseCourseDetail(row);
         }
       }
-        this.$store.commit("course/setbaseCourseVersionName", versionName);
-        this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-        this.$store.commit(
-          "course/setbaseCourseVersionId",
-          this.currentVersionId
-        );
-        this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-        this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-        this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-        this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-        this.$store.commit(
-          "course/setbaseCourseCourseNature",
-          row.courseNature
-        );
-        this.$store.commit("course/setbaseCourseCredit", row.credit);
-        this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-        this.$store.commit("course/setbaseCourseRemark", row.remark);
-
-      this.$router.push({
-        path: "/baseCourseDetail",
-      });
-      }
-      else{
-        this.addBaseCourseDetail(row)
-      }
-      }
-      
-      
     },
     editTrigger(val) {
       console.log("选中的信息：", val.courseId);
@@ -1915,24 +1921,21 @@ export default {
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
 
-      if(sessionStorage.getItem("baseCourseHasDetail")===null||sessionStorage.getItem("baseCourseHasDetail")){
+      if (
+        sessionStorage.getItem("baseCourseHasDetail") === null ||
+        sessionStorage.getItem("baseCourseHasDetail")
+      ) {
         this.hasDetail = sessionStorage.getItem("baseCourseHasDetail");
         // this.getBaseCourse(this.pageSize, this.pageNum);
       }
 
-      
       if (sessionStorage.getItem("baseCourseSearchForm")) {
-      this.keyword = sessionStorage.getItem("baseCourseSearchForm");
-      console.log('baseCourseSearchForm',this.keyword)
-      this.getSearchValue(this.keyword);
-
-      
-    } else {
-      sessionStorage.removeItem("baseCourseSearchForm");
-    }
-
-    
-      
+        this.keyword = sessionStorage.getItem("baseCourseSearchForm");
+        console.log("baseCourseSearchForm", this.keyword);
+        this.getSearchValue(this.keyword);
+      } else {
+        sessionStorage.removeItem("baseCourseSearchForm");
+      }
 
       if (this.identity == "课程负责人") {
         this.userId = this.$store.state.userInfo.userId;
@@ -1953,7 +1956,6 @@ export default {
       this.getBaseCourse(this.pageSize, this.pageNum);
     });
   },
-  
 };
 </script>
 
@@ -2022,7 +2024,7 @@ export default {
 :deep().searchBlock .el-icon svg {
   height: 20px;
   width: 20px;
-} 
+}
 :deep().el-icon svg {
   height: 18px;
   width: 18px;

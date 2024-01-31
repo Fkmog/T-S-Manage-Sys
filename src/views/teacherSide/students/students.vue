@@ -26,22 +26,29 @@
 
   <div layout="row" flex class="md-padding">
     <!-- <addBtn @click="goAddStudent"></addBtn> -->
-<!-- 学生信息列表 -->
+    <!-- 学生信息列表 -->
     <el-table
-    class="studentsTable"
-    :data="studentsTable"
-    style="width: 40%"
-    :header-cell-style="{  'padding-left':'40px','font-size': '14.4px','height':'48px','font-weight': 'bold','color':'black'}"
-    :cell-style="{ 'padding-left':'40px','font-size': '16px','height':'60px' }"
-    highlight-current-row
-  >
-    <el-table-column prop="studentId" label="学号"  width="200px"/>
-    <el-table-column prop="studentName" label="姓名" />
-  </el-table>
+      class="studentsTable"
+      :data="studentsTable"
+      style="width: 40%"
+      :header-cell-style="{
+        'padding-left': '40px',
+        'font-size': '14.4px',
+        height: '48px',
+        'font-weight': 'bold',
+        color: 'black',
+      }"
+      :cell-style="{
+        'padding-left': '40px',
+        'font-size': '16px',
+        height: '60px',
+      }"
+      highlight-current-row
+    >
+      <el-table-column prop="studentId" label="学号" width="200px" />
+      <el-table-column prop="studentName" label="姓名" />
+    </el-table>
   </div>
-
-  
-  
 </template>
 
 <script>
@@ -51,21 +58,25 @@ import request from "@/utils/request/request";
 export default {
   name: "Students",
   components: {
-    Back,addBtn,request,
+    Back,
+    addBtn,
+    request,
   },
   data() {
     return {
-      programId:'',
+      programId: "",
       classInfo: [],
       // 临时
-      studentsTable:[{
-        studentId:222050200,
-        studentName:'张三',
-      },
-      {
-        studentId:222050211,
-        studentName:'李四',
-      }]
+      studentsTable: [
+        {
+          studentId: 222050200,
+          studentName: "张三",
+        },
+        {
+          studentId: 222050211,
+          studentName: "李四",
+        },
+      ],
     };
   },
   mounted() {
@@ -79,17 +90,17 @@ export default {
     //   console.log('go add student');
     //   this.$router.push("/addStudents");
     // },
-    backClass(){
+    backClass() {
       this.$router.push("/teacherClass");
     },
-    getStudents(){
+    getStudents() {
       return request({
-        url:'/student/listByProgram'+'/'+this.programId,
-        method:'get'
-      }).then(function(res){
+        url: "/student/listByProgram" + "/" + this.programId,
+        method: "get",
+      }).then(function (res) {
         console.log(res);
-      })
-    }
+      });
+    },
   },
 };
 </script>
@@ -120,7 +131,7 @@ export default {
   margin-left: 20px;
   height: 24px;
 }
-.studentsTable{
+.studentsTable {
   margin: 0 auto;
   margin-top: 85px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);

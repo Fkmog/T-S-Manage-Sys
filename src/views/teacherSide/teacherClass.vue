@@ -528,6 +528,7 @@ export default {
     },
     //确定提交状态
     classStatus() {
+      console.log("this.classInfo.status", this.classInfo.status);
       switch (this.classInfo.status) {
         case "1":
           this.status = "未提交";
@@ -542,7 +543,7 @@ export default {
           this.status = "已退回";
           break;
       }
-      // console.log("this.status", this.status);
+      console.log("this.status", this.status);
     },
     // 下载报告
     downloadReport() {

@@ -705,7 +705,10 @@ export default {
     console.log("this.identity", this.identity);
     this.getDictionary();
     // 搜索栏状态保持
-    if (sessionStorage.getItem("classSearchFlag")&&sessionStorage.getItem("searchForm")!=='null') {
+    if (
+      sessionStorage.getItem("classSearchFlag") &&
+      sessionStorage.getItem("searchForm") !== "null"
+    ) {
       this.keyword = sessionStorage.getItem("searchForm");
       this.getSearchValue(this.keyword);
     } else {
@@ -1504,7 +1507,7 @@ export default {
 .el-table :deep().DisableSelection .cell .el-checkbox__inner {
   display: none;
 }
-:deep().rightSlot .el-input__wrapper{
+:deep().rightSlot .el-input__wrapper {
   border-bottom: 1px solid #d5d5d5;
   background-color: transparent;
   border-top: 0;

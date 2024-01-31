@@ -122,7 +122,10 @@ export default {
   },
   mounted() {
     this.getDictionary();
-    if (sessionStorage.getItem("classTeacherSearchFlag")&&sessionStorage.getItem("teacherSearchForm")!=='null') {
+    if (
+      sessionStorage.getItem("classTeacherSearchFlag") &&
+      sessionStorage.getItem("teacherSearchForm") !== "null"
+    ) {
       this.keyword = sessionStorage.getItem("teacherSearchForm");
       this.getSearchValue(this.keyword);
     } else {
@@ -136,7 +139,6 @@ export default {
       sessionStorage.removeItem("teacherChosenStatus");
       sessionStorage.removeItem("teacherSearchForm");
       sessionStorage.removeItem("classTeacherSearchFlag");
-
     }
     next();
   },

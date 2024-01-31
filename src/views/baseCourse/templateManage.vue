@@ -241,7 +241,7 @@ export default {
     getWorkbookInfo() {
       WorkbookByCourseId(this.courseId)
         .then((res) => {
-          if ((res.code = "SUCCESS")){
+          if ((res.code = "SUCCESS")) {
             this.hasWorkbook = true;
             this.workbookInfo = res.data;
             console.log("workbookInfo", this.workbookInfo);

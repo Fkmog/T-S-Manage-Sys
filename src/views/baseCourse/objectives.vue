@@ -34,20 +34,16 @@
             placement="bottom"
             :hide-after="0"
           >
-            <el-icon
-              class="edit-pen"
-              @click="goEdit()"
-              ><EditPen
-            /></el-icon>
+            <el-icon class="edit-pen" @click="goEdit()"><EditPen /></el-icon>
           </el-tooltip>
         </el-row>
         <div v-for="(info, index) in this.info" :key="index">
           <el-alert
-            :title='info'
+            :title="info"
             type="error"
             :closable="false"
             show-icon
-            style="width: 300px;margin-top:5px"
+            style="width: 300px; margin-top: 5px"
           />
         </div>
 
@@ -243,7 +239,7 @@ export default {
               if (assess.achievement === null) {
                 assess.achievementTwo = "";
               } else {
-                assess.achievementTwo = assess.achievement.toFixed(3) ;
+                assess.achievementTwo = assess.achievement.toFixed(3);
               }
             });
           });
@@ -323,7 +319,7 @@ export default {
   cursor: pointer;
   color: grey;
   margin-left: 710px;
-  margin-top: -10px
+  margin-top: -10px;
 }
 .no-info {
   padding-top: 120px;

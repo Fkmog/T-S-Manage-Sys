@@ -49,39 +49,41 @@
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-row >
-        <el-col :span="6">
-          <el-tooltip content="删除">
-            <el-button 
-            class="deleteButton"
-            link
-            style="color: #3f51b5"
-            @click.stop="this.deleteVersion(scope.row);">
-              <el-icon>
-                  <Delete />
-            </el-icon>
-            </el-button>
-            
-          </el-tooltip>
-        </el-col>
-        <el-col :span="6">
-          <el-tooltip content="修改版本信息">
-           <el-button 
-            class="deleteButton"
-            link
-            style="color: #3f51b5"
-           @click="this.editFlag = true;
+          <el-row>
+            <el-col :span="6">
+              <el-tooltip content="删除">
+                <el-button
+                  class="deleteButton"
+                  link
+                  style="color: #3f51b5"
+                  @click.stop="this.deleteVersion(scope.row)"
+                >
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip content="修改版本信息">
+                <el-button
+                  class="deleteButton"
+                  link
+                  style="color: #3f51b5"
+                  @click="
+                    this.editFlag = true;
                     this.deleteFlag = false;
                     this.addFlag = false;
                     this.nameFlag = true;
                     this.selectVersion(scope.row);
-                    this.showEditVersionDailogFlag = true;">
-            <el-icon><Edit /></el-icon>
-           </el-button>
-              
-          </el-tooltip>
-        </el-col>
-      </el-row>
+                    this.showEditVersionDailogFlag = true;
+                  "
+                >
+                  <el-icon><Edit /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </el-col>
+          </el-row>
         </template>
       </el-table-column>
     </el-table>
@@ -110,7 +112,7 @@
         :error="C_ErrorMsg_editVersion_name"
         prop="name"
       >
-        <el-input v-model="versionForm.name"  autocomplete="off" />
+        <el-input v-model="versionForm.name" autocomplete="off" />
       </el-form-item>
       <el-form-item
         label="面向年级"
@@ -147,12 +149,7 @@
         >
           确认
         </el-button>
-        <el-button
-          v-show="editFlag"
-          type="primary"
-          
-          @click="editVersion()"
-        >
+        <el-button v-show="editFlag" type="primary" @click="editVersion()">
           确认
         </el-button>
         <el-button
@@ -204,8 +201,6 @@ import {
   User,
   CircleClose,
   Collection,
-  
-  
 } from "@element-plus/icons-vue";
 import { getDictionary } from "@/api/dictionary";
 import { setWorkbook, checkWorkbook } from "@/api/workbook";
@@ -350,7 +345,7 @@ export default {
     this.getDictionary();
   },
   methods: {
-    goEdit(row){
+    goEdit(row) {
       this.editFlag = true;
       this.deleteFlag = false;
       this.addFlag = false;
@@ -437,7 +432,7 @@ export default {
     },
     deleteVersion(row) {
       let that = this;
-      console.log('row',row)
+      console.log("row", row);
       ElMessageBox.confirm("是否确认删除课程大纲版本？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",

@@ -1,18 +1,14 @@
 <template>
-    <LuckySheet />
+  <LuckySheet />
 </template>
 
 <script>
+import LuckySheet from "@/components/teacher/LuckySheet.vue";
 
-import LuckySheet from '@/components/teacher/LuckySheet.vue'
-
-export default{
-    setup(){
-
-    },
-    components:{
-        LuckySheet
-    }
-}
-
+export default {
+  setup() {},
+  components: {
+    LuckySheet,
+  },
+};
 </script>

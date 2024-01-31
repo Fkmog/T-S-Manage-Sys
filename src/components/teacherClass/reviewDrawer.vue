@@ -6,16 +6,14 @@
       </template>
 
       <template #default>
-        <div class="reviewCard" v-for="(review, index) in reviewInfo">
+        <div class="reviewCard" v-for="(review,index) in reviewInfo" :key="index">
           <div
             class="reviewCardStatus"
-            :style="
-              status === '已提交' || status === '已审核'
-                ? statusPass
-                : statusNotPass
-            "
+            :style="review.resultStatus === '3' ? statusPass : statusNotPass"
           >
-            <span style="color: white">{{ status }}</span>
+            <span style="color: white">{{
+              review.resultStatus == "3" ? "已审核" : "已退回"
+            }}</span>
           </div>
           <div class="reviewCardInfo">
             <el-row style="padding: 5px 5px 0px 5px">
@@ -27,7 +25,16 @@
               </span>
             </el-row>
             <el-row style="padding-top: 5px; padding-left: 5px">
-              <div style="width: 90%;text-overflow:ellipsis;overflow: hidden;word-wrap:break-word;">审核意见：{{ review.remark }}</div>
+              <div
+                style="
+                  width: 90%;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  word-wrap: break-word;
+                "
+              >
+                {{ review.remark }}
+              </div>
             </el-row>
           </div>
 
@@ -309,50 +316,42 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          // console.log('this.checkFeedback.checkState',this.checkFeedback.checkState);
-          submitFeedback(this.classInfo.classId, this.checkFeedback.checkState)
+          createReview(
+            this.classInfo.classId,
+            this.checkFeedback,
+            this.checkFeedback.checkState
+          )
             .then((res) => {
-              // console.log('feedback res',res);
+              // console.log('creating review res',res);
               if (res.code == "SUCCESS") {
-                this.showCheckDialogFlag = false;
                 ElMessage({
                   type: "success",
                   message: `新建成功`,
                   duration: 1500,
                 });
+                let keysArray = Object.keys(this.checkStates);
+                for (const key of keysArray) {
+                  console.log(
+                    this.checkStates[key],
+                    this.checkFeedback.checkState
+                  );
+                  if (
+                    this.checkStates[key]["value"] ==
+                    this.checkFeedback.checkState
+                  ) {
+                    this.status = this.checkStates[key]["label"];
+                    console.log("status:", this.status);
+                    break;
+                  }
+                }
+
                 this.getClassInfo();
                 this.getReviewInfo();
               }
             })
             .catch((e) => {
-              this.showCheckDialogFlag = false;
               // console.log('e',e);
-              ElMessage({
-                type: "error",
-                message: `新建失败`,
-                duration: 1500,
-              });
             });
-          if (this.checkFeedback.checkState == "4") {
-            // console.log('creating review',this.checkFeedback);
-            createReview(this.classInfo.classId, this.checkFeedback)
-              .then((res) => {
-                // console.log('creating review res',res);
-                if (res.code == "SUCCESS") {
-                  // ElMessage({
-                  //   type: "success",
-                  //   message: `新建成功`,
-                  //   duration: 1500,
-                  // });
-                  this.status = "已退回";
-                  this.getClassInfo();
-                  this.getReviewInfo();
-                }
-              })
-              .catch((e) => {
-                // console.log('e',e);
-              });
-          }
         } else {
           ElMessage({
             type: "error",
@@ -483,7 +482,6 @@ export default {
 .reviewCard {
   display: flex;
   justify-content: center;
-  width: 500px;
   margin: 10px;
   border: 1px solid rgb(189, 189, 189);
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
@@ -505,7 +503,7 @@ export default {
   align-items: center;
 }
 .reviewCardInfo {
-  width: 425px;
+  width: 100%;
 }
 #drawerbox .el-overlay {
   position: satic;

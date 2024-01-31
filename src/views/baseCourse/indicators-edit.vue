@@ -222,7 +222,10 @@
           <el-col :span="4" v-show="support.isEditWeight" class="editWeight">
             <el-row>
               <el-col :span="12">
-                <el-input v-model="support.weight"  @keyup.enter="saveWeight(support)"></el-input>
+                <el-input
+                  v-model="support.weight"
+                  @keyup.enter="saveWeight(support)"
+                ></el-input>
               </el-col>
               <el-col :span="12">
                 <el-icon @click="saveWeight(support)"
@@ -531,9 +534,7 @@ export default {
           getMajorInfo(this.majorList[i].majorId).then((res) => {
             this.majorList[i].majorName = res.data.majorName;
             this.majorList[i].programVersion =
-              this.majorList[i].majorName +
-              "-" +
-              this.majorList[i].enrollyear 
+              this.majorList[i].majorName + "-" + this.majorList[i].enrollyear;
             this.programIdList[i] = this.majorList[i].programId;
           });
         }
@@ -720,7 +721,8 @@ export default {
           }
           if (Number(i[1]) > 9) {
             newIndicator.id = newIndicator.id + i[1];
-          } else {chosenMajor
+          } else {
+            chosenMajor;
             newIndicator.id = newIndicator.id + "0" + i[1];
           }
           this.majorList[index1].indicators.push(newIndicator);

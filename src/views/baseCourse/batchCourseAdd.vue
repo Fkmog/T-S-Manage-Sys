@@ -1,18 +1,14 @@
 <template>
-    <MultiAddBaseCourse></MultiAddBaseCourse>
+  <MultiAddBaseCourse></MultiAddBaseCourse>
 </template>
 
 <script>
+import MultiAddBaseCourse from "@/components/baseCourse/multiAddBaseCourse.vue";
 
-import MultiAddBaseCourse from '@/components/baseCourse/multiAddBaseCourse.vue'
-
-export default{
-    setup(){
-
-    },
-    components:{
-        MultiAddBaseCourse
-    }
-}
-
+export default {
+  setup() {},
+  components: {
+    MultiAddBaseCourse,
+  },
+};
 </script>

@@ -1,20 +1,17 @@
 <template>
-    <MainHeader></MainHeader>
-    <router-view />
+  <MainHeader></MainHeader>
+  <router-view />
 </template>
 
 <script>
-import MainHeader from '@/components/index/header/header.vue'
+import MainHeader from "@/components/index/header/header.vue";
 
 export default {
-  name: 'TeacherIndex',
+  name: "TeacherIndex",
   components: {
     MainHeader,
   },
-  
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
