@@ -1,32 +1,30 @@
 <template>
   <div layout="column" flex class="ng-scope layout-column flex">
-    <div
-      class="submenu"
-    >
-    <el-row class="toolbar">
-      <el-tooltip content="返回" >
-        
-          <el-icon :size="22" style="cursor: pointer;" class="button-back" @click="goBaseCourse"><Back /></el-icon>
-        
-      </el-tooltip>
-      <el-divider class="divider" direction="vertical" />
-      <el-tooltip content="保存">
-        <el-button
-          
-          aria-label="保存"
-          @click="save"
-          link
-          :disabled="!isValid()"
-        >
-          <el-icon :size="22"><DocumentChecked /></el-icon>
-        </el-button>
-      </el-tooltip>
-      
-    </el-row>
-      
+    <div class="submenu">
+      <el-row class="toolbar">
+        <el-tooltip content="返回">
+          <el-icon
+            :size="22"
+            style="cursor: pointer"
+            class="button-back"
+            @click="goBaseCourse"
+            ><Back
+          /></el-icon>
+        </el-tooltip>
+        <el-divider class="divider" direction="vertical" />
+        <el-tooltip content="保存" :disabled="!isValid()">
+          <el-button
+            aria-label="保存"
+            @click="save"
+            link
+            :disabled="!isValid()"
+          >
+            <el-icon :size="22"><DocumentChecked /></el-icon>
+          </el-button>
+        </el-tooltip>
+      </el-row>
     </div>
     <div layout="row" flex class="md-padding">
-
       <div
         class="hot-table-container"
         layout="column"
@@ -37,8 +35,8 @@
     </div>
   </div>
 </template>
-    
-    <script >
+
+<script>
 import { ref, onMounted, reactive } from "vue";
 import { HotTable, HotColumn } from "@handsontable/vue3";
 import { registerAllModules } from "handsontable/registry";
@@ -50,7 +48,6 @@ import {
   ElMessageBox,
 } from "element-plus";
 
-
 import {
   Back,
   FolderChecked,
@@ -59,7 +56,7 @@ import {
   Download,
   UploadFilled,
   DocumentAdd,
-  DocumentChecked
+  DocumentChecked,
 } from "@element-plus/icons-vue";
 import Handsontable from "handsontable";
 import request from "@/utils/request/request";
@@ -88,7 +85,7 @@ export default {
       courseTypeSource: [], //课程类型
       courseNatureSource: [], //课程性质
 
-      firstActivities:true,
+      firstActivities: true,
 
       count: 0,
       localres: {},
@@ -98,8 +95,6 @@ export default {
 
       fromCourseBatchAdd: false,
       hotInstance: undefined,
-
-      
     };
   },
   components: {
@@ -122,8 +117,7 @@ export default {
     DocumentAdd,
     ElMessage,
     ElMessageBox,
-    DocumentChecked
-
+    DocumentChecked,
   },
   methods: {
     activate() {
@@ -137,7 +131,6 @@ export default {
       // let hotRegisterer = new Handsontable();
       // let hotInstance = hotRegisterer.getInstance(courseHot);
 
-      
       let container = document.querySelector("#courseHot");
       let hotRegisterer = new Handsontable(container, {
         data: this.db.items,
@@ -187,7 +180,7 @@ export default {
             source: this.courseTypeSource,
             allowEmpty: true,
           },
-          { 
+          {
             data: "courseNature",
             title: "课程性质",
             width: 120,
@@ -208,16 +201,16 @@ export default {
         afterChange(changes, source) {
           if (source === "loadData") {
             console.log("same");
-            console.log('db.items',self.db.items);
+            console.log("db.items", self.db.items);
           } else {
             if (self.count == 0) {
               self.dirty = false;
-              console.log('db.items',self.db.items);
+              console.log("db.items", self.db.items);
               console.log("console:", self.count);
               console.log("different", self.dirty);
             } else {
               self.dirty = true;
-              console.log('db.items',self.db.items);
+              console.log("db.items", self.db.items);
               self.firstActivities = false;
               console.log("console:", self.count);
               console.log("different", self.dirty);
@@ -226,35 +219,32 @@ export default {
             console.log("console:", self.count);
           }
         },
-        afterRemoveRow(index, amount, physicalRows, source){
-          that.dirty=true;
+        afterRemoveRow(index, amount, physicalRows, source) {
+          that.dirty = true;
           that.firstActivities = false;
-          
         },
       });
       this.hotInstance = hotRegisterer;
     },
-    getDict(){
+    getDict() {
       let that = this;
-      getDictionary().then((res)=>{
+      getDictionary().then((res) => {
         console.log(res);
-        res.course_nature.forEach((nature)=>{
+        res.course_nature.forEach((nature) => {
           that.courseNatureSource.push(nature.dictLabel);
-        })
-        res.course_type.forEach((type)=>{
+        });
+        res.course_type.forEach((type) => {
           that.courseTypeSource.push(type.dictLabel);
-        })
+        });
         // that.courseTypeSource = res.
-      })
+      });
     },
     isValid() {
-
-      if(this.firstActivities){
+      if (this.firstActivities) {
         return false;
-      }
-      else{
+      } else {
         let result = this.toPostData();
-          return !(!result);
+        return !!result;
       }
     },
     isNotDirty() {
@@ -269,61 +259,86 @@ export default {
       }
       let that = this;
 
-      this.postData.courses.forEach(function(course){
+      this.postData.courses.forEach(function (course) {
         course.courseType = that.courseTypeSource.indexOf(course.courseType);
-        course.courseNature = that.courseNatureSource.indexOf(course.courseNature);
+        course.courseNature = that.courseNatureSource.indexOf(
+          course.courseNature
+        );
       });
 
       this.addBaseCourses(this.postData.courses).then(function (res) {
         console.log("res:", res);
-        that.firstActivities = true;    
+        that.firstActivities = true;
         if (res.code == "SUCCESS") {
           ElMessage({
-                type: "success",
-                message: `新建成功`,
-                duration: 1500,
-              });
+            type: "success",
+            message: `新建成功`,
+            duration: 1500,
+          });
 
           that.goBackandClean();
           that.isNotDirty();
         } else {
-          if(res.code == 'E_CODE_EXIST'){
-            res.data.forEach(function(teacher){
-              
-              
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],3,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],4,{validator:/.+@.+/});
+          if (res.code == "E_CODE_EXIST") {
+            res.data.forEach(function (teacher) {
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                validator: /.+gmail@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 3, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 4, {
+                validator: /.+@.+/,
+              });
             });
-            that.hotInstance.setCellMetaObject(that.postData.courses.length,0,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.courses.length,1,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.courses.length,2,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.courses.length,3,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.courses.length,4,{validator:undefined});
-            that.hotInstance.validateCells((valid) =>{
-              if(valid){
-                
+            that.hotInstance.setCellMetaObject(
+              that.postData.courses.length,
+              0,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.courses.length,
+              1,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.courses.length,
+              2,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.courses.length,
+              3,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.courses.length,
+              4,
+              { validator: undefined }
+            );
+            that.hotInstance.validateCells((valid) => {
+              if (valid) {
               }
             });
             ElMessage({
-                type: 'error',
-                message: `新建失败,标红课程已存在`,
-                duration:1500,
-              })
-
-          }
-          else{
+              type: "error",
+              message: `新建失败,标红课程已存在`,
+              duration: 1500,
+            });
+          } else {
             ElMessage({
-                type: "error",
-                message: `新建失败`,
-                duration: 1500,
-              });
+              type: "error",
+              message: `新建失败`,
+              duration: 1500,
+            });
           }
 
-          
-          
           // that.goBackandClean();
           that.isNotDirty();
         }
@@ -336,25 +351,24 @@ export default {
       let res = this.postData.courses;
       let valid = true;
       this.db.items.forEach(function (course) {
-        course.courseCode =course.courseCode;
+        course.courseCode = course.courseCode;
         course.courseName = course.courseName;
         course.courseType = course.courseType; //that.courseTypeSource.map(item => item).indexOf(course.courseType)
         course.courseNature = course.courseNature;
-        if(course.credit){
+        if (course.credit) {
           course.credit = parseInt(course.credit);
         }
-        
 
         if (
-          !course.courseCode||
-          !course.courseName||
+          !course.courseCode ||
+          !course.courseName ||
           // !course.courseType||
           // !course.courseNature||
           !course.credit
         ) {
           if (
             !course.courseCode &&
-            !course.courseName&&
+            !course.courseName &&
             // !course.courseType&&
             // !course.courseNature&&
             !course.credit
@@ -407,7 +421,7 @@ export default {
       });
       this.$router.push({ path: "/baseCourse" });
     },
-    
+
     goBaseCourse() {
       //如果dirty是true 或者saving是false并且dirty是true需要询问
       console.log("gobasecourse:" + this.saving + this.dirty);
@@ -438,28 +452,28 @@ export default {
         url: "/baseCourse/addCourses",
         method: "post",
         data: courseList,
-      }).then(function (res) {
-        localres = res;
-        console.log("localres", localres);
-        return localres;
-      }).catch(e =>{
-        if(e.response){
-            return e.response.data;
-          }
-        else{
-          return e;
-        }
-        
       })
+        .then(function (res) {
+          localres = res;
+          console.log("localres", localres);
+          return localres;
+        })
+        .catch((e) => {
+          if (e.response) {
+            return e.response.data;
+          } else {
+            return e;
+          }
+        });
     },
-    async handleEvent(event){
+    async handleEvent(event) {
       switch (event.keyCode) {
         case 86:
-          console.log('ctrl + v');
+          console.log("ctrl + v");
           this.firstActivities = false;
           break;
       }
-    }
+    },
     // getCourseTypeDict() {
     //   return request({
     //     url: "/dict/data/school/type",
@@ -473,18 +487,18 @@ export default {
   },
   mounted() {
     this.activate();
-    window.addEventListener('keydown', this.handleEvent)
+    window.addEventListener("keydown", this.handleEvent);
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleEvent) // 在页面销毁的时候记得解除
-},
+    window.removeEventListener("keydown", this.handleEvent); // 在页面销毁的时候记得解除
+  },
 };
 </script>
-    
-<style  scoped>
-.toolbar{
+
+<style scoped>
+.toolbar {
   display: flex;
-  align-items: center
+  align-items: center;
 }
 .divider {
   margin-left: 20px;
@@ -492,7 +506,7 @@ export default {
   display: flex;
   justify-content: center;
 }
-.button-back{
+.button-back {
   margin-left: 50px;
 }
 .md-padding {
@@ -501,14 +515,11 @@ export default {
   justify-content: center;
 }
 
-
 .hot-table-container {
- 
   width: 910px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .submenu {
-  
   height: 56px;
   position: relative;
   display: flex;
@@ -557,4 +568,3 @@ export default {
   display: flex;
 }
 </style>
-    

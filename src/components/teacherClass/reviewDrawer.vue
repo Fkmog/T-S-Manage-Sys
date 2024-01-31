@@ -482,7 +482,7 @@ export default {
 .reviewCard {
   display: flex;
   justify-content: center;
-  width: 500px;
+
   margin: 10px;
   border: 1px solid rgb(189, 189, 189);
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
@@ -504,7 +504,7 @@ export default {
   align-items: center;
 }
 .reviewCardInfo {
-  width: 425px;
+  width: 100%;
 }
 #drawerbox .el-overlay {
   position: satic;

@@ -1,122 +1,141 @@
 <template>
-
-
-<div layout="column" flex class="ng-scope layout-column flex" >
+  <div layout="column" flex class="ng-scope layout-column flex">
     <div class="submenu">
       <el-row class="toolbar">
-        <el-tooltip content="返回" >
-        
-        <el-icon :size="22" style="cursor: pointer;" class="button-back" @click="goTeacher"><Back /></el-icon>
-     
-      </el-tooltip>
-      <el-divider class="divider" direction="vertical" />
-      <el-tooltip content="保存">
-        <el-button aria-label="保存" @click="save" link :disabled="!isValid()">
-          <el-icon :size="22"><DocumentChecked /></el-icon>
-        </el-button>  
-      </el-tooltip>
-      <!--  -->
-       
-      
+        <el-tooltip content="返回">
+          <el-icon
+            :size="22"
+            style="cursor: pointer"
+            class="button-back"
+            @click="goTeacher"
+            ><Back
+          /></el-icon>
+        </el-tooltip>
+        <el-divider class="divider" direction="vertical" />
+        <el-tooltip content="保存" :disabled="!isValid()">
+          <el-button
+            aria-label="保存"
+            @click="save"
+            link
+            :disabled="!isValid()"
+          >
+            <el-icon :size="22"><DocumentChecked /></el-icon>
+          </el-button>
+        </el-tooltip>
+        <!--  -->
+
         <el-icon :size="22" class="button-back"><InfoFilled /></el-icon>
-        
-        <div class="displayCenter">可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师</div>
 
+        <div class="displayCenter">
+          可直接从excel拷贝；可拖动列的顺序；学院最多可添加500个教师
+        </div>
       </el-row>
-      
-      
-
-      
-      
-     
     </div>
 
-    <div layout="row" flex class="md-padding" >
-     
-     
-     
-      <div class="hot-table-container" 
-      layout="column" 
-      flex 
-      layout-align="start center"
-      id="courseHot" >
-        
-          <!-- <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
+    <div layout="row" flex class="md-padding">
+      <div
+        class="hot-table-container"
+        layout="column"
+        flex
+        layout-align="start center"
+        id="courseHot"
+      >
+        <!-- <hot-table :settings="hotSettings" v-model:data="db.items" width="650" style="line-height: 100px;text-align: center;margin:auto" class="hotTable">
             <hot-column  data="teacherNumber" title="工号" width="200" height="20" ></hot-column>
             <hot-column  data="teacherName" title="姓名" width="200" height="20" ></hot-column>
             <hot-column  data="email" title="邮箱" width="200" height="20" validator="emailcheck" ></hot-column>
           </hot-table> -->
-       
       </div>
     </div>
-
-    
-    
   </div>
-
-  
 </template>
 
-<script >
-import { ref, onMounted,reactive} from 'vue'
+<script>
+import { ref, onMounted, reactive } from "vue";
 
-import { HotTable,HotColumn } from '@handsontable/vue3';
-import { registerAllModules } from 'handsontable/registry';
-import { ElTooltip,ElIcon,ElInput,ElMessage, ElMessageBox } from 'element-plus'
-import { Back , FolderChecked, InfoFilled, Loading, Download, UploadFilled, DocumentAdd,DocumentChecked} from '@element-plus/icons-vue'
-import Handsontable from 'handsontable';
-import request from '@/utils/request/request'
-import '@/components/teacher/addTeacher.js'
-import 'element-plus/dist/index.css'
-import 'handsontable/dist/handsontable.full.css'
+import { HotTable, HotColumn } from "@handsontable/vue3";
+import { registerAllModules } from "handsontable/registry";
+import {
+  ElTooltip,
+  ElIcon,
+  ElInput,
+  ElMessage,
+  ElMessageBox,
+} from "element-plus";
+import {
+  Back,
+  FolderChecked,
+  InfoFilled,
+  Loading,
+  Download,
+  UploadFilled,
+  DocumentAdd,
+  DocumentChecked,
+} from "@element-plus/icons-vue";
+import Handsontable from "handsontable";
+import request from "@/utils/request/request";
+import "@/components/teacher/addTeacher.js";
+import "element-plus/dist/index.css";
+import "handsontable/dist/handsontable.full.css";
 
-
-
-export default{
-  name:'addTeacher',
-  provide(){
-      return{
-        reload:this.reload
-      }
-    },
-  data(){
+export default {
+  name: "addTeacher",
+  provide() {
+    return {
+      reload: this.reload,
+    };
+  },
+  data() {
     let self = this;
-    return{
-      departmentId:'',
-      schoolId:'',
+    return {
+      departmentId: "",
+      schoolId: "",
 
-      firstActivities:true,
-      hotInstance:undefined,
-      
+      firstActivities: true,
+      hotInstance: undefined,
 
-      
-      dirty:false,
-      saving:false,
-      count:0,
-      localres:{},
+      dirty: false,
+      saving: false,
+      count: 0,
+      localres: {},
       postData: { teachers: [] },
       db: { items: [] },
-      
-      fromCourseBatchAdd:false,
-      
 
-    }
+      fromCourseBatchAdd: false,
+    };
   },
-  components:{
-    ref, onMounted,reactive,HotTable,HotColumn,registerAllModules,ElTooltip,
-    ElIcon,ElInput,Handsontable,Back , FolderChecked, InfoFilled, Loading, 
-    Download, UploadFilled, DocumentAdd,ElMessage, ElMessageBox,DocumentChecked
+  components: {
+    ref,
+    onMounted,
+    reactive,
+    HotTable,
+    HotColumn,
+    registerAllModules,
+    ElTooltip,
+    ElIcon,
+    ElInput,
+    Handsontable,
+    Back,
+    FolderChecked,
+    InfoFilled,
+    Loading,
+    Download,
+    UploadFilled,
+    DocumentAdd,
+    ElMessage,
+    ElMessageBox,
+    DocumentChecked,
   },
-  methods:{
-    activate(){
-            this.departmentId = this.$store.state.currentInfo.departmentId;
-            this.schoolId = this.$store.state.currentInfo.schoolId;
-            this.hottableInit();
-        },
-  hottableInit(){
-    let container = document.querySelector("#courseHot");
-    let that = this;
-    let hotRegisterer = new Handsontable(container, {
+  methods: {
+    activate() {
+      this.departmentId = this.$store.state.currentInfo.departmentId;
+      this.schoolId = this.$store.state.currentInfo.schoolId;
+      this.hottableInit();
+    },
+    hottableInit() {
+      let container = document.querySelector("#courseHot");
+      let that = this;
+      let hotRegisterer = new Handsontable(container, {
         data: this.db.items,
         licenseKey: "non-commercial-and-evaluation",
         colHeaders: true,
@@ -157,295 +176,324 @@ export default{
             title: "邮箱",
             width: 200,
             height: 20,
-            validator:/.+@.+/,
+            validator: /.+@.+/,
             allowEmpty: false,
           },
-          
         ],
         afterChange(changes, source) {
-          if (source === 'loadData') { 
-            console.log('same');
-          } else { 
-            if(that.count==0){
-              that.dirty=false;
-              console.log('console:',that.count);
-              console.log('different',that.dirty);
-            }
-            else{
-              that.dirty=true;
+          if (source === "loadData") {
+            console.log("same");
+          } else {
+            if (that.count == 0) {
+              that.dirty = false;
+              console.log("console:", that.count);
+              console.log("different", that.dirty);
+            } else {
+              that.dirty = true;
               that.firstActivities = false;
-              console.log('console:',that.count,'different',that.dirty);
-              console.log('different',that.dirty);
+              console.log("console:", that.count, "different", that.dirty);
+              console.log("different", that.dirty);
             }
             that.count++;
-            console.log('console:',that.count);
-            
-            }
+            console.log("console:", that.count);
+          }
         },
-        afterRemoveRow(index, amount, physicalRows, source){
-          that.dirty=true;
+        afterRemoveRow(index, amount, physicalRows, source) {
+          that.dirty = true;
           that.firstActivities = false;
-          
         },
-        
       });
-    this.hotInstance = hotRegisterer;
-  },
-  isValid(){
-    if(this.firstActivities){
+      this.hotInstance = hotRegisterer;
+    },
+    isValid() {
+      if (this.firstActivities) {
         return false;
-      }
-      else{
-       
+      } else {
         let result = this.toPostData();
-          return !(!result);
+        return !!result;
       }
-  },
-  isNotDirty(){
-    this.dirty=false;
-  },
-  save() {
-    this.saving = true;
-    let result = this.isValid();
+    },
+    isNotDirty() {
+      this.dirty = false;
+    },
+    save() {
+      this.saving = true;
+      let result = this.isValid();
       if (!result) {
         this.saving = false;
         return;
       }
-        let teacherList = [];
-        this.postData.teachers.forEach(function(teacher){
-          teacherList.push(teacher);
-        });
-        console.log('teacherList:',teacherList);
-        let that =this;
-        
-        this.addTeacher(teacherList).then(function(res){
-          console.log('res:',res);
+      let teacherList = [];
+      this.postData.teachers.forEach(function (teacher) {
+        teacherList.push(teacher);
+      });
+      console.log("teacherList:", teacherList);
+      let that = this;
+
+      this.addTeacher(teacherList)
+        .then(function (res) {
+          console.log("res:", res);
           that.firstActivities = true;
-          if(res.code == 'SUCCESS'){                                                                
+          if (res.code == "SUCCESS") {
             ElMessage({
-                type: 'success',
-                message: `新建成功`,
-                duration:1500,
-              })
+              type: "success",
+              message: `新建成功`,
+              duration: 1500,
+            });
             that.isNotDirty();
             that.goBackandClean();
-          }
-         else{
-          if(res.code == 'E_TEACHER_EXIST'){
-            
-            res.data.forEach(function(teacher){
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
-            });
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
+          } else {
+            if (res.code == "E_TEACHER_EXIST") {
+              res.data.forEach(function (teacher) {
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                  validator: /.+gmail@.+/,
+                });
+              });
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                0,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                1,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                2,
+                { validator: undefined }
+              );
 
-            that.hotInstance.validateCells((valid) =>{
-              if(valid){
-              }
-            });
+              that.hotInstance.validateCells((valid) => {
+                if (valid) {
+                }
+              });
 
-            ElMessage({
-                type: 'error',
+              ElMessage({
+                type: "error",
                 message: `新建失败,标红教师已存在`,
-                duration:1500,
-              })
-            
+                duration: 1500,
+              });
+            } else if (res.code == "E_TEACHER_DUPLICATE") {
+              res.data.forEach(function (teacher) {
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                  validator: /.+gmail@.+/,
+                });
+              });
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                0,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                1,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                2,
+                { validator: undefined }
+              );
 
-          }
-          else if(res.code == 'E_TEACHER_DUPLICATE'){
-            res.data.forEach(function(teacher){
-              
-             
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
-            });
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
+              that.hotInstance.validateCells((valid) => {
+                if (valid) {
+                }
+              });
 
-            that.hotInstance.validateCells((valid) =>{
-              if(valid){
-              }
-            });
-
-            ElMessage({
-                type: 'error',
+              ElMessage({
+                type: "error",
                 message: `新建失败,标红教师重复`,
-                duration:1500,
-              })
-          }
-          else if(res.code == 'DATA_DUPLICATED'){
-            res.data.forEach(function(teacher){
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],0,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],1,{validator:/.+@.+/});
-              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0],2,{validator:/.+gmail@.+/});
-            });
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,0,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,1,{validator:undefined});
-            that.hotInstance.setCellMetaObject(that.postData.teachers.length,2,{validator:undefined});
+                duration: 1500,
+              });
+            } else if (res.code == "DATA_DUPLICATED") {
+              res.data.forEach(function (teacher) {
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                  validator: /.+@.+/,
+                });
+                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                  validator: /.+gmail@.+/,
+                });
+              });
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                0,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                1,
+                { validator: undefined }
+              );
+              that.hotInstance.setCellMetaObject(
+                that.postData.teachers.length,
+                2,
+                { validator: undefined }
+              );
 
-            that.hotInstance.validateCells((valid) =>{
-              if(valid){
-              }
-            });
+              that.hotInstance.validateCells((valid) => {
+                if (valid) {
+                }
+              });
 
-            ElMessage({
-                type: 'error',
+              ElMessage({
+                type: "error",
                 message: `新建失败,标红数据重复`,
-                duration:1500,
-              })
-          }
-          else{
-            ElMessage({
-                type: 'error',
+                duration: 1500,
+              });
+            } else {
+              ElMessage({
+                type: "error",
                 message: `新建失败`,
-                duration:1500,
-              })
-          }
-          
+                duration: 1500,
+              });
+            }
+
             that.count = 0;
-    }
-        }).catch((e)=>{
-          console.log('e',e);
+          }
         })
-},
-  toPostData(){
-    let that = this;
-    this.postData.teachers.length = 0; // clean array
-    let res = this.postData.teachers;
-    let valid = true;
-    
+        .catch((e) => {
+          console.log("e", e);
+        });
+    },
+    toPostData() {
+      let that = this;
+      this.postData.teachers.length = 0; // clean array
+      let res = this.postData.teachers;
+      let valid = true;
+
       this.db.items.forEach(function (teacher) {
         teacher.teacherNumber = teacher.teacherNumber;
         teacher.teacherName = teacher.teacherName;
         teacher.email = teacher.email;
-        
+
         if (!teacher.teacherNumber || !teacher.teacherName || !teacher.email) {
-          if (!teacher.teacherNumber && !teacher.teacherName && !teacher.email) {
+          if (
+            !teacher.teacherNumber &&
+            !teacher.teacherName &&
+            !teacher.email
+          ) {
             return;
-          } else {  // either name OR teacherNo is empty, but not both
+          } else {
+            // either name OR teacherNo is empty, but not both
             valid = false;
             return;
           }
-        } else {  // both are not empty: post
+        } else {
+          // both are not empty: post
           let distTeacher = {
-            'teacherNumber':teacher.teacherNumber,
-            'email':teacher.email,
-            'teacherName':teacher.teacherName,
-            'departmentId':that.departmentId,
-            'schoolId':that.schoolId
-          }
+            teacherNumber: teacher.teacherNumber,
+            email: teacher.email,
+            teacherName: teacher.teacherName,
+            departmentId: that.departmentId,
+            schoolId: that.schoolId,
+          };
           res.push(distTeacher);
         }
       });
-     
+
       return valid;
-  },
-getHotCellsFunction(existTeacher){
-  console.log('updating hotcolumn');
-  return function(row,col,prop){
-    console.log('return function...')
-    var cellProperties = {};
-    let that = this;
-    if(row>1 && col >1){
-      cellProperties.className = 'cell-disallow';
-    }
-    // existTeacher.forEach(function(teacherRow){
-    //   if(row==teacherRow+1 && col>0){
-    //     cellProperties.className = 'cell-exist';
-    //   }
-    // })
-    return cellProperties;
-  }
-  
-},
-goBackandClean(){
-  this.db.items = [];
-  this.postData.teachers = [];
-  this.count = 0;
-  this.hotInstance.updateSettings({
-      data:this.db.items
-  });
-  this.$router.push({ path:'/teacher'});
-  // console.log('datas:', this.db.items,this.postData.teachers);
-},
-goTeacher(){
-  console.log('goteacher:'+this.saving+this.dirty);
-  
-  
-  if(this.dirty == true || this.saving== false&&this.dirty == true ){
-    ElMessageBox.confirm(
-    '数据还未保存，是否仍然关闭？',
-    '',
-    {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      this.$router.push({ path:'/teacher'});
-    })
-    .catch(() => {
-      
-    })
-  }
-  else{
-    this.$router.push({ path:'/teacher'});
-  }
-},
-addTeacher(postData){
-  let localres;
-  console.log('postData:',postData);
-  return request({
-            url:'/teacher/addTeachers',
-            method:'post',
-            data:postData
-        }).then(function(res){
+    },
+    getHotCellsFunction(existTeacher) {
+      console.log("updating hotcolumn");
+      return function (row, col, prop) {
+        console.log("return function...");
+        var cellProperties = {};
+        let that = this;
+        if (row > 1 && col > 1) {
+          cellProperties.className = "cell-disallow";
+        }
+        // existTeacher.forEach(function(teacherRow){
+        //   if(row==teacherRow+1 && col>0){
+        //     cellProperties.className = 'cell-exist';
+        //   }
+        // })
+        return cellProperties;
+      };
+    },
+    goBackandClean() {
+      this.db.items = [];
+      this.postData.teachers = [];
+      this.count = 0;
+      this.hotInstance.updateSettings({
+        data: this.db.items,
+      });
+      this.$router.push({ path: "/teacher" });
+      // console.log('datas:', this.db.items,this.postData.teachers);
+    },
+    goTeacher() {
+      console.log("goteacher:" + this.saving + this.dirty);
+
+      if (this.dirty == true || (this.saving == false && this.dirty == true)) {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push({ path: "/teacher" });
+          })
+          .catch(() => {});
+      } else {
+        this.$router.push({ path: "/teacher" });
+      }
+    },
+    addTeacher(postData) {
+      let localres;
+      console.log("postData:", postData);
+      return request({
+        url: "/teacher/addTeachers",
+        method: "post",
+        data: postData,
+      })
+        .then(function (res) {
           localres = res;
-          console.log('localres',localres);
+          console.log("localres", localres);
           return localres;
-        }).catch(e=>{
+        })
+        .catch((e) => {
           return e.response.data;
         });
-},
-async handleEvent(event){
+    },
+    async handleEvent(event) {
       switch (event.keyCode) {
         case 86:
-          console.log('ctrl + v');
+          console.log("ctrl + v");
           this.firstActivities = false;
           break;
       }
-    }
-
+    },
   },
-  mounted:function(){
+  mounted: function () {
     this.activate();
-    window.addEventListener('keydown', this.handleEvent)
+    window.addEventListener("keydown", this.handleEvent);
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleEvent) // 在页面销毁的时候记得解除
-},
- 
-
-  
-  
-
-
-}
-
-
- 
+    window.removeEventListener("keydown", this.handleEvent); // 在页面销毁的时候记得解除
+  },
+};
 </script>
 
-<style  scoped>
-.toolbar{
+<style scoped>
+.toolbar {
   display: flex;
-  align-items: center
+  align-items: center;
 }
 .divider {
   margin-left: 20px;
@@ -453,49 +501,46 @@ async handleEvent(event){
   display: flex;
   justify-content: center;
 }
-.displayCenter{
+.displayCenter {
   color: #3f51b5;
   margin-left: 5px;
-  font-size:14px;
+  font-size: 14px;
   display: inline-flex;
   justify-content: center;
 }
-.cell-exist{
+.cell-exist {
   background-color: red;
 }
 .hot-table-container {
- 
- box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
-}
-.hotTable{
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
-.md-padding{
+.hotTable {
+  box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
+}
+.md-padding {
   margin-top: 10px;
   display: flex;
   justify-content: center;
 }
 
-.submenu{
-  
+.submenu {
   height: 56px;
   position: relative;
   display: flex;
   border-bottom: 1px solid #d0d0d0;
   background-color: transparent;
 }
-.md-icon-button{
+.md-icon-button {
   padding: 20px;
-  
 }
-.button-back{
+.button-back {
   margin-left: 50px;
 }
 
 #luckysheet {
   margin: 0px;
   padding: 0px;
-  border:1px aquamarine;
+  border: 1px aquamarine;
   /* position: absolute; */
   width: 100%;
   height: 750px;
@@ -508,6 +553,4 @@ async handleEvent(event){
 #uploadBtn {
   font-size: 16px;
 }
-
-
 </style>

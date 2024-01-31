@@ -31,14 +31,16 @@
           content="保存成绩项"
           placement="bottom"
           :hide-after="0"
+          :disabled="!isValid()"
         >
           <el-button
             @click="save"
             link
-            style="padding-left: 20px"
+            class="saveBtn"
+            :style="!isValid() ? saveStyle : null"
             :disabled="!isValid()"
           >
-            <el-icon size="22px" color="rgb(137, 137, 137)" style="top: -1px">
+            <el-icon size="22px" color="rgb(137, 137, 137)">
               <!-- :disabled="!isValid()" -->
               <DocumentChecked />
             </el-icon>
@@ -251,6 +253,9 @@ export default {
   data() {
     let that = this;
     return {
+      saveStyle: {
+        cursor: "not-allowed",
+      },
       canedit: false,
 
       unsave: false,
@@ -559,10 +564,10 @@ export default {
       let that = this;
       console.log("action", action, targetName);
       if (action === "add" && targetName == undefined) {
-        let item = [""];
-        let value = [""];
-        let remark = [""];
-        let weight = [""];
+        let item = [null, null];
+        let value = [null, null];
+        let remark = [null, null];
+        let weight = [null, null];
         let tempdata = [];
 
         tempdata.push(item);
@@ -570,7 +575,7 @@ export default {
         tempdata.push(remark);
         tempdata.push(weight);
         this.db.items.push(tempdata);
-
+        console.log("this.db.items", this.db.items);
         let newTabName = ++this.tabIndex + "";
         this.currenteditableTabsValue = this.tabIndex;
         this.maxeditableTabsValue = this.tabIndex;
@@ -664,7 +669,7 @@ export default {
       if (this.currenteditableTabsValue == 1 && this.identity === "教师") {
         ElMessage({
           type: "error",
-          message: "更新失败，没有权限",
+          message: "该成绩项为课程组统一，不可修改",
           duration: 1500,
         });
       } else {
@@ -737,7 +742,13 @@ export default {
           },
         },
         beforeCreateCol(index, amount, source) {
-          console.log("beforeRemoveCol", self.currenteditableTabsValue);
+          console.log(
+            "beforeCreateCol",
+            self.currenteditableTabsValue,
+            index,
+            amount,
+            source
+          );
           if (
             (self.currenteditableTabsValue === 1 ||
               self.currenteditableTabsValue === 0) &&
@@ -745,9 +756,10 @@ export default {
             self.isRespondent != "2"
           ) {
             // console.log('same');
-            console("since ");
+            console.log("return false;");
             return false;
           } else {
+            console.log("return;", self.db.items);
             return;
           }
         },
@@ -1251,7 +1263,8 @@ export default {
     console.log("this.classInfo:", this.classInfo);
     if (
       (this.classInfo.status == "1" || this.classInfo.status == "4") &&
-      this.classInfo
+      this.classInfo &&
+      this.identity == "教师"
     ) {
       this.canedit = true;
     } else {
@@ -1273,6 +1286,9 @@ export default {
 </script>
 
 <style scoped>
+.saveBtn {
+  padding-left: 20px;
+}
 .descriptionCard {
   width: 400px;
   height: 50px;

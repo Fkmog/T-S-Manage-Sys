@@ -19,7 +19,7 @@
           <Back />
         </el-icon>
       </el-tooltip>
-      <div class="title">课程分析表</div>
+      <div class="title">试卷分析表</div>
 
       <el-divider class="divider" direction="vertical" />
     </el-row>
@@ -61,7 +61,7 @@
     请先点击右上角圆形按钮添加分析表
   </div>
 
-  <addBtn @click="goAddTeacher" v-show="canedit"></addBtn>
+  <addBtn @click="goAddTeacher"></addBtn>
   <div v-show="hasBaseCourse">
     <el-table
       ref="multipleTable"
@@ -102,7 +102,6 @@
                 <el-button
                   link
                   style="color: #3f51b5"
-                  :disabled="!canedit"
                   @click.stop="deleteAnalysys(scope.row)"
                   ><el-icon><Delete /></el-icon
                 ></el-button>
@@ -113,7 +112,6 @@
                 <el-button
                   link
                   style="color: #3f51b5"
-                  :disabled="!canedit"
                   @click.stop="editAnalysys(scope.row)"
                   ><el-icon><Edit /></el-icon
                 ></el-button>
@@ -259,8 +257,6 @@ registerAllModules();
 export default {
   data() {
     return {
-      canedit: false,
-
       examEdit: {},
       editDialog: false,
       analysisForm: {
@@ -498,11 +494,6 @@ export default {
         this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
         console.log("identity:", this.identity);
       }
-
-      if (this.classInfo.status == "1" || this.classInfo.status == "4") {
-        this.canedit = true;
-      }
-      console.log("this.canedit:", this.canedit);
     },
     deleteAnalysys(row) {
       let a = [row.id];
