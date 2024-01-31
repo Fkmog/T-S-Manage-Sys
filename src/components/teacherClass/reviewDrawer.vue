@@ -6,7 +6,11 @@
       </template>
 
       <template #default>
-        <div class="reviewCard" v-for="(review, index) in reviewInfo">
+        <div
+          class="reviewCard"
+          v-for="(review, index) in reviewInfo"
+          :key="index"
+        >
           <div
             class="reviewCardStatus"
             :style="review.resultStatus === '3' ? statusPass : statusNotPass"

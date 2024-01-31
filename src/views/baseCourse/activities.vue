@@ -61,7 +61,7 @@
       id="drag-tab"
     >
       <el-tab-pane
-        v-for="(item, index) in editableTabs"
+        v-for="item in editableTabs"
         :key="item.name"
         :label="item.title"
         :name="item.name"
@@ -419,7 +419,7 @@ export default {
         val.inputFlag = false;
         ElMessage({
           type: "error",
-          message: "更新失败，没有权限",
+          message: "该成绩项为课程组统一，不可修改",
           duration: 1500,
         });
       } else {
