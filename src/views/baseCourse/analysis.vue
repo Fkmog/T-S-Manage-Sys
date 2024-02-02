@@ -715,7 +715,7 @@ export default {
           callback(key, selection, clickEvent) {
             // Common callback for all options
             self.columnChange++;
-            console.log(key, selection, clickEvent);
+            // console.log(key, selection, clickEvent);
           },
           items: {
             col_left: {
@@ -729,7 +729,14 @@ export default {
             },
           },
         },
-
+        beforeRemoveCol(index, amount, physicalColumns) {
+          console.log(index, amount, physicalColumns);
+          if (index == 0) {
+            return false;
+          } else {
+            return;
+          }
+        },
         afterChange(changes, source) {
           // console.log("afterChange", changes);
 
@@ -788,6 +795,9 @@ export default {
         if (row == 0) {
           cellProperties.allowEmpty = false;
         }
+        if (col == 0) {
+          cellProperties.readOnly = true;
+        }
 
         return cellProperties;
       };
@@ -837,14 +847,15 @@ export default {
             }
             console.log("this.db.objectives", this.db.objectives);
           } else {
-            this.db.objectives.push(["合计"]);
-            this.db.objectives.push([""]);
+            this.db.objectives.push(["合计", ""]);
+            this.db.objectives.push(["", ""]);
             setting.object.forEach(() => {
-              this.db.objectives.push([""]);
+              this.db.objectives.push(["", ""]);
             });
           }
 
           this.activateHotcolumn();
+          this.columnChange++;
         } else {
           this.hasObjectives = false;
         }

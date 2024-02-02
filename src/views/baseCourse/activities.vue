@@ -414,6 +414,9 @@ export default {
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
       console.log(val, index, "双击编辑tabs");
+      this.dirty = true;
+      this.firstActivities = false;
+      this.isValid();
       this.unsave = true;
       if (index == "1" && this.identity == "教师") {
         val.inputFlag = false;
@@ -997,7 +1000,7 @@ export default {
         return false;
       } else {
         var result = this.toPostData();
-        // console.log('result',result);
+        console.log("result", result);
         return !!result;
       }
     },
