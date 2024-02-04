@@ -1121,7 +1121,7 @@ export default {
                 if (res.code == "SUCCESS") {
                   ElMessage({
                     type: "success",
-                    message: `更新成功`,
+                    message: `保存成功`,
                     duration: 1500,
                   });
                 }
