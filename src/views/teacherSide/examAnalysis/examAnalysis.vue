@@ -26,6 +26,7 @@
           content="保存成绩"
           placement="bottom"
           :hide-after="0"
+          :disabled="!isValid()"
         >
           <el-button
             @click="save"

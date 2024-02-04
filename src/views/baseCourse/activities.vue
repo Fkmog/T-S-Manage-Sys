@@ -31,14 +31,16 @@
           content="保存成绩项"
           placement="bottom"
           :hide-after="0"
+          :disabled="!isValid()"
         >
           <el-button
             @click="save"
             link
-            style="padding-left: 20px"
+            class="saveBtn"
+            :style="!isValid() ? saveStyle : null"
             :disabled="!isValid()"
           >
-            <el-icon size="22px" color="rgb(137, 137, 137)" style="top: -1px">
+            <el-icon size="22px" color="rgb(137, 137, 137)">
               <!-- :disabled="!isValid()" -->
               <DocumentChecked />
             </el-icon>
@@ -59,7 +61,7 @@
       id="drag-tab"
     >
       <el-tab-pane
-        v-for="(item) in editableTabs"
+        v-for="item in editableTabs"
         :key="item.name"
         :label="item.title"
         :name="item.name"
@@ -251,6 +253,9 @@ export default {
   data() {
     let that = this;
     return {
+      saveStyle: {
+        cursor: "not-allowed",
+      },
       canedit: false,
 
       unsave: false,
@@ -409,6 +414,9 @@ export default {
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
       console.log(val, index, "双击编辑tabs");
+      this.dirty = true;
+      this.firstActivities = false;
+      this.isValid();
       this.unsave = true;
       if (index == "1" && this.identity == "教师") {
         val.inputFlag = false;
@@ -559,10 +567,10 @@ export default {
       let that = this;
       console.log("action", action, targetName);
       if (action === "add" && targetName == undefined) {
-        let item = [""];
-        let value = [""];
-        let remark = [""];
-        let weight = [""];
+        let item = [null];
+        let value = [null];
+        let remark = [null];
+        let weight = [null];
         let tempdata = [];
 
         tempdata.push(item);
@@ -570,7 +578,7 @@ export default {
         tempdata.push(remark);
         tempdata.push(weight);
         this.db.items.push(tempdata);
-
+        console.log("this.db.items", this.db.items);
         let newTabName = ++this.tabIndex + "";
         this.currenteditableTabsValue = this.tabIndex;
         this.maxeditableTabsValue = this.tabIndex;
@@ -737,7 +745,13 @@ export default {
           },
         },
         beforeCreateCol(index, amount, source) {
-          console.log("beforeRemoveCol", self.currenteditableTabsValue);
+          console.log(
+            "beforeCreateCol",
+            self.currenteditableTabsValue,
+            index,
+            amount,
+            source
+          );
           if (
             (self.currenteditableTabsValue === 1 ||
               self.currenteditableTabsValue === 0) &&
@@ -745,9 +759,10 @@ export default {
             self.isRespondent != "2"
           ) {
             // console.log('same');
-            console("since ");
+            console.log("return false;");
             return false;
           } else {
+            console.log("return;", self.db.items);
             return;
           }
         },
@@ -985,7 +1000,7 @@ export default {
         return false;
       } else {
         var result = this.toPostData();
-        // console.log('result',result);
+        console.log("result", result);
         return !!result;
       }
     },
@@ -1251,7 +1266,8 @@ export default {
     console.log("this.classInfo:", this.classInfo);
     if (
       (this.classInfo.status == "1" || this.classInfo.status == "4") &&
-      this.classInfo
+      this.classInfo &&
+      this.identity == "教师"
     ) {
       this.canedit = true;
     } else {
@@ -1273,6 +1289,9 @@ export default {
 </script>
 
 <style scoped>
+.saveBtn {
+  padding-left: 20px;
+}
 .descriptionCard {
   width: 400px;
   height: 50px;

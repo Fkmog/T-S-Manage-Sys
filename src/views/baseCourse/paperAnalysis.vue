@@ -19,7 +19,7 @@
           <Back />
         </el-icon>
       </el-tooltip>
-      <div class="title">课程分析表</div>
+      <div class="title">试卷分析表</div>
 
       <el-divider class="divider" direction="vertical" />
     </el-row>
@@ -532,6 +532,11 @@ export default {
       editExam(this.examEdit).then((res) => {
         console.log(res);
         if (res.code === "SUCCESS") {
+          ElMessage({
+            type: "success",
+            message: `更新成功`,
+            duration: 1500,
+          });
           this.examEdit = {};
           this.editDialog = false;
           this.getTeacherList();

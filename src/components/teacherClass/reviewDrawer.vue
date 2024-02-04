@@ -6,7 +6,11 @@
       </template>
 
       <template #default>
-        <div class="reviewCard" v-for="(review,index) in reviewInfo" :key="index">
+        <div
+          class="reviewCard"
+          v-for="(review, index) in reviewInfo"
+          :key="index"
+        >
           <div
             class="reviewCardStatus"
             :style="review.resultStatus === '3' ? statusPass : statusNotPass"
@@ -482,6 +486,7 @@ export default {
 .reviewCard {
   display: flex;
   justify-content: center;
+
   margin: 10px;
   border: 1px solid rgb(189, 189, 189);
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
