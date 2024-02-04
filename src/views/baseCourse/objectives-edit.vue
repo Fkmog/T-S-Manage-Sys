@@ -70,25 +70,25 @@
                     this.$store.state.currentInfo.identity === '课程负责人'
                   "
                 >
-                  <el-form-item label="简称" class="title">
+                  <el-form-item label="课程目标" class="title">
                     <el-input
                       v-model="objective.name"
                       maxlength="20"
                       show-word-limit
-                      placeholder="简称"
+                      placeholder="课程目标"
                     />
                   </el-form-item>
                   <el-form-item
-                    label="描述"
+                    label="达成途径"
                     class="title"
                     style="margin-top: 50px"
                   >
                     <el-input
                       v-model="objective.description"
-                      autosize
+                      :rows="3"
                       type="textarea"
                       maxlength="1000"
-                      placeholder="描述"
+                      placeholder="达成途径"
                     />
                   </el-form-item>
                 </div>

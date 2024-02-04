@@ -70,18 +70,18 @@
                 <el-col :span="22">
                   <el-form-item
                     :prop="'requirements.' + index1 + '.name'"
-                    label="课程目标"
+                    label="简称"
                     class="title"
                   >
                     <el-input
                       v-model="attribute.name"
                       maxlength="20"
                       show-word-limit
-                      placeholder="课程目标"
+                      placeholder="简称"
                     />
                   </el-form-item>
                   <el-form-item
-                    label="达成途径"
+                    label="描述"
                     class="title"
                     :prop="'requirements.' + index1 + '.description'"
                     :rules="rules.description"
@@ -89,9 +89,9 @@
                     <el-input
                       v-model="attribute.description"
                       type="textarea"
-                      :rows="3"
+                      autosize
                       maxlength="1000"
-                      placeholder="达成途径"
+                      placeholder="描述"
                     />
                   </el-form-item>
                 </el-col>
@@ -107,25 +107,25 @@
                       {{ detail.serialNum }}
                     </div>
                     <div class="detail-content" style="width: 700px">
-                      <el-form-item label="课程目标" class="title">
+                      <el-form-item label="简称" class="title">
                         <el-input
                           v-model="detail.name"
                           maxlength="20"
                           show-word-limit
-                          placeholder="课程目标"
+                          placeholder="简称"
                         />
                       </el-form-item>
                       <el-form-item
-                        label="达成途径"
+                        label="描述"
                         class="title"
                         :prop="'programIndicators.' + index2 + '.description'"
                       >
                         <el-input
                           v-model="detail.description"
-                          :rows="3"
+                          autosize
                           type="textarea"
                           maxlength="1000"
-                          placeholder="达成途径"
+                          placeholder="描述"
                         />
                       </el-form-item>
                     </div>
