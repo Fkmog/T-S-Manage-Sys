@@ -70,28 +70,28 @@
                 <el-col :span="22">
                   <el-form-item
                     :prop="'requirements.' + index1 + '.name'"
-                    label="简称"
+                    label="课程目标"
                     class="title"
                   >
                     <el-input
                       v-model="attribute.name"
                       maxlength="20"
                       show-word-limit
-                      placeholder="简称"
+                      placeholder="课程目标"
                     />
                   </el-form-item>
                   <el-form-item
-                    label="描述"
+                    label="达成途径"
                     class="title"
                     :prop="'requirements.' + index1 + '.description'"
                     :rules="rules.description"
                   >
                     <el-input
                       v-model="attribute.description"
-                      autosize
                       type="textarea"
+                      :rows="3"
                       maxlength="1000"
-                      placeholder="描述"
+                      placeholder="达成途径"
                     />
                   </el-form-item>
                 </el-col>
@@ -107,25 +107,25 @@
                       {{ detail.serialNum }}
                     </div>
                     <div class="detail-content" style="width: 700px">
-                      <el-form-item label="简称" class="title">
+                      <el-form-item label="课程目标" class="title">
                         <el-input
                           v-model="detail.name"
                           maxlength="20"
                           show-word-limit
-                          placeholder="简称"
+                          placeholder="课程目标"
                         />
                       </el-form-item>
                       <el-form-item
-                        label="描述"
+                        label="达成途径"
                         class="title"
                         :prop="'programIndicators.' + index2 + '.description'"
                       >
                         <el-input
                           v-model="detail.description"
-                          autosize
+                          :rows="3"
                           type="textarea"
                           maxlength="1000"
-                          placeholder="描述"
+                          placeholder="达成途径"
                         />
                       </el-form-item>
                     </div>
@@ -337,11 +337,10 @@ export default {
         currentObj.serialNum = attribute.serialNum + ".1";
         //确定id
         let a = currentObj.serialNum.split("\.");
-        if(a[0]<=9){
-        currentObj.id = "0" + a[0] + "0" + a[1];
-        }else{
-        currentObj.id = a[0] + "0" + a[1];
-
+        if (a[0] <= 9) {
+          currentObj.id = "0" + a[0] + "0" + a[1];
+        } else {
+          currentObj.id = a[0] + "0" + a[1];
         }
         let num = Number(attribute.serialNum);
         this.requirements[num - 1].programIndicators.push(currentObj);
@@ -368,7 +367,6 @@ export default {
     },
     //新增要求点
     addAttribute() {
-      
       let currentObj = new Object();
       //处理内部字段
       currentObj.name = null;
@@ -385,13 +383,12 @@ export default {
           ++currentObj.serialNum;
           currentObj.serialNum = currentObj.serialNum.toString();
         }
-        console.log("@",currentObj.serialNum,typeof currentObj.serialNum);
+        console.log("@", currentObj.serialNum, typeof currentObj.serialNum);
 
-        if(Number(currentObj.serialNum)<=9){
-
-        currentObj.id = "0" + currentObj.serialNum;
-        }else{
-        currentObj.id =  currentObj.serialNum+'';
+        if (Number(currentObj.serialNum) <= 9) {
+          currentObj.id = "0" + currentObj.serialNum;
+        } else {
+          currentObj.id = currentObj.serialNum + "";
         }
         this.requirements.push(currentObj);
       } else {
