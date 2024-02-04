@@ -531,7 +531,7 @@ export default {
               var cellProperties = {};
               if (!that.canedit) {
                 if (row >= 0) {
-                  cellProperties.readOnly = true;
+                  cellProperties.readOnly = false;
                 }
               } else {
                 if (row === 2) {
@@ -595,6 +595,23 @@ export default {
         console.log("@@@@@@@@@@@@@@@@", this.hotInstance);
         this.hotInstance.updateSettings({
           data: that.db.items[that.currenteditableTabsValue - 1],
+          cells(row, col) {
+            var cellProperties = {};
+            if (!that.canedit) {
+              if (row >= 0) {
+                cellProperties.readOnly = false;
+              }
+            } else {
+              if (row === 3) {
+                cellProperties.allowEmpty = false;
+              }
+              if (row < 4 && col >= 0) {
+                cellProperties.readOnly = false;
+              }
+            }
+
+            return cellProperties;
+          },
         });
         this.tempEditabel = JSON.parse(JSON.stringify(this.editableTabs));
         console.log(
@@ -1155,7 +1172,7 @@ export default {
                 if (res.code == "SUCCESS") {
                   ElMessage({
                     type: "success",
-                    message: `新建成功`,
+                    message: `保存成功`,
                     duration: 1000,
                   });
                 }
