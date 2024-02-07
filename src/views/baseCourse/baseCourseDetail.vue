@@ -489,7 +489,7 @@ export default {
         obj.param = that.detailId;
         obj.type = "syllabusFile";
         array.push(obj);
-        that.action = "http://47.113.206.164:8080/common/upload/files";
+        that.action = "https://jxjk.hdu.edu.cn/prod-api/common/upload/files";
         that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
         that.checkFileList();
