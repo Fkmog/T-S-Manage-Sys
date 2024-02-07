@@ -177,7 +177,7 @@ export default {
       headers: {
         Authorization: "Bearer " + Cookies.get("Admin-Token"),
       },
-      action: "http://47.113.206.164:8080/common/upload/files",
+      action: "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
       data: {
         type: "reportTemplateFile",
         param: "",
