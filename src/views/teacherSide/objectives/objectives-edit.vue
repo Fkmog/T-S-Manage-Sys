@@ -158,10 +158,10 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="4" class="object-name">{{ dialogObject.name }}</el-col>
-          <el-col :span="19" class="object-desc">{{
+          <el-col :span="10" class="object-name">{{ dialogObject.name }}</el-col>
+          <!-- <el-col :span="19" class="object-desc">{{
             dialogObject.description
-          }}</el-col>
+          }}</el-col> -->
         </el-row>
 
         <el-row
@@ -667,9 +667,7 @@ export default {
   justify-content: center;
   font-size: 20px;
 }
-.object-name {
-  font-weight: 700;
-}
+
 .assessment {
   margin: 30px 0 30px 0;
 }
