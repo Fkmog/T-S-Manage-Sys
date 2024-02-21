@@ -402,16 +402,26 @@ export default {
           })
           .catch(() => {});
       } else {
-        submit(this.classInfo.classId).then((res) => {
-          console.log("res", res);
-          if (res.code == "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `提交成功`,
-              duration: 1500,
-            });
+        ElMessageBox.confirm(
+          "请确保已录入完整的成绩和工作手册",
+          "是否确认提交",
+          {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "warning",
           }
-          this.getClassInfo();
+        ).then(() => {
+          submit(this.classInfo.classId).then((res) => {
+            console.log("res", res);
+            if (res.code == "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `提交成功`,
+                duration: 1500,
+              });
+            }
+            this.getClassInfo();
+          });
         });
       }
     },

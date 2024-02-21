@@ -491,11 +491,14 @@ export default {
       if (this.identity == "学院管理员") {
         this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
         console.log("identity:", this.identity);
+        this.canedit = true;
       } else if (this.identity == "课程负责人") {
         this.classInfo = this.$store.state.currentInfo.respondClassInfo;
+        this.canedit = true;
         console.log("identity:", this.identity);
       } else {
         this.classInfo = this.$store.state.currentInfo.teacherSideClassInfo;
+        this.canedit = false;
         console.log("identity:", this.identity);
       }
 

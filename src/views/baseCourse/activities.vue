@@ -93,6 +93,7 @@
             v-model="newActivityTitle"
             type="text"
             style="width: 250px; margin-left: 10px"
+            placeholder="标题"
             clearable
             @clear="
               item.inputFlag = false;
@@ -167,6 +168,7 @@
               v-model="newActivitydescription"
               type="textarea"
               clearable
+              placeholder="评分标准"
               @clear="
                 item.inputFlag = false;
                 item.description = originActivitydescription;
