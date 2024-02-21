@@ -26,7 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="设置关联模板"
+            content="设置手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -60,7 +60,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="删除关联模板"
+            content="删除手册模板"
             placement="bottom"
             :hide-after="0"
           >

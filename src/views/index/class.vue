@@ -406,7 +406,7 @@
           font-size: 14px;
           color: grey;
         "
-        >课程目标采取课程组统一的考核方式，但任课教师仍可以修改成绩小项</el-row
+        >课程目标采用课程组统一的考核方式</el-row
       >
       <template #footer>
         <span class="dialog-footer">

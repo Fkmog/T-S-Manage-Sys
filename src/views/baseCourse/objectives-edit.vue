@@ -73,8 +73,6 @@
                   <el-form-item label="课程目标" class="title">
                     <el-input
                       v-model="objective.name"
-                      maxlength="20"
-                      show-word-limit
                       placeholder="课程目标"
                     />
                   </el-form-item>
@@ -194,10 +192,10 @@
           <el-col :span="3" class="object-name"
             >课程目标{{ dialogObject.serialNum }}：
           </el-col>
-          <el-col :span="3" class="object-name">{{ dialogObject.name }}</el-col>
-          <el-col :span="18" class="object-desc">{{
+          <el-col :span="10" class="object-name">{{ dialogObject.name }}</el-col>
+          <!-- <el-col :span="18" class="object-desc">{{
             dialogObject.description
-          }}</el-col>
+          }}</el-col> -->
         </el-row>
 
         <el-row
@@ -861,9 +859,7 @@ export default {
   justify-content: center;
   font-size: 20px;
 }
-.object-name {
-  font-weight: 700;
-}
+
 .assessment {
   margin: 30px 0 30px 0;
 }
