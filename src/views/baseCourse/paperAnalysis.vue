@@ -55,10 +55,10 @@
     </el-row>
   </div>
 
-  <div v-show="hasNoBaseCourse" class="no-class">没有分析表</div>
+  <div v-show="hasNoBaseCourse" class="no-class">没有试卷分析表</div>
 
   <div class="no-major-detail" v-show="hasNoBaseCourse">
-    请先点击右上角圆形按钮添加分析表
+    请先点击右上角圆形按钮添加试卷分析表
   </div>
 
   <addBtn @click="goAddTeacher" v-show="canedit"></addBtn>
@@ -140,7 +140,7 @@
 
   <el-dialog
     v-model="dialogFormVisible"
-    title="添加分析表"
+    title="添加试卷分析表"
     width="380px"
     :show-close="false"
     :align-center="true"
@@ -182,7 +182,7 @@
 
   <el-dialog
     v-model="editDialog"
-    title="修改分析表"
+    title="修改试卷分析表"
     width="380px"
     :show-close="false"
     :align-center="true"

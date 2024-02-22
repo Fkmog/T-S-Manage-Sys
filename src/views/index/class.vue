@@ -331,6 +331,7 @@
       :show-close="false"
       :align-center="true"
     >
+    <div class="prompt">请选择课程大纲版本以及试卷分析表</div>
       <el-cascader
         v-model="assignedDetail"
         :options="detailList"
@@ -1546,5 +1547,11 @@ export default {
   justify-content: center;
   padding-top: 24px;
   padding-bottom: 24px;
+}
+.prompt{
+  display: flex;
+  justify-content: center; 
+  margin-bottom: 20px;
+  margin-top: -20px;
 }
 </style>

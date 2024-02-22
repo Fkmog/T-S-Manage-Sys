@@ -158,7 +158,7 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="10" class="object-name">{{ dialogObject.name }}</el-col>
+          <el-col :span="20" class="object-name">{{ dialogObject.name }}</el-col>
           <!-- <el-col :span="19" class="object-desc">{{
             dialogObject.description
           }}</el-col> -->
