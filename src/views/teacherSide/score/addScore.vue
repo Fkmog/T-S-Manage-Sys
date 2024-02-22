@@ -399,7 +399,7 @@ export default {
           preventOverflow: "horizontal",
           manualColumnMove: false,
           copyPaste: true,
-          colWidths: 120,
+          colWidths: 60,
 
           contextMenu: {
             items: {

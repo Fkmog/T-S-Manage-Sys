@@ -37,7 +37,7 @@
       </el-col>
       <el-col :span="16">
         <div class="numSelectedTeacher">
-          已选中 {{ numSelected }} 份考试分析表
+          已选中 {{ numSelected }} 份试卷分析表
         </div>
       </el-col>
       <el-col :span="4">
@@ -46,7 +46,7 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="deleteTeacher">
-                删除考试分析表
+                删除试卷分析表
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -420,7 +420,7 @@ export default {
     deleteTeacher() {
       let that = this;
       let teacherId = this.teacherId;
-      ElMessageBox.confirm("是否确认删除教师", "", {
+      ElMessageBox.confirm("是否确认删除试卷分析表？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",

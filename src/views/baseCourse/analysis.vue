@@ -126,12 +126,7 @@
               placement="bottom"
               :hide-after="0"
             >
-              <el-button
-                @click="addActivities"
-                link
-                :disabled="!over21"
-                style="padding: 10px"
-              >
+              <el-button @click="addActivities" link style="padding: 10px">
                 <el-icon size="22px" color="rgb(137, 137, 137)">
                   <CirclePlus />
                 </el-icon>
@@ -184,12 +179,7 @@
         placement="bottom"
         :hide-after="0"
       >
-        <el-button
-          @click="addActivities"
-          link
-          :disabled="!over21"
-          style="padding: 10px"
-        >
+        <el-button @click="addActivities" link style="padding: 10px">
           <el-icon size="22px" color="rgb(137, 137, 137)">
             <CirclePlus />
           </el-icon>
@@ -289,7 +279,7 @@ export default {
       tabIndex: 0,
 
       colNum: 1,
-      over21: Boolean,
+
       activityList: [],
       departmentId: "",
       schoolId: "",
@@ -671,21 +661,16 @@ export default {
       }
     },
     addActivities() {
-      console.log("this.db.objectives", this.db.objectives);
-
-      this.db.objectives.forEach((objective) => {
-        objective.push(null);
-      });
-      // for(let i=0;i<this.objectivesName.length;i++){
-
-      //   this.db.objectives[i].push('');
-      // }
-
-      this.columnChange++;
-
-      this.hotInstance.updateSettings({
-        data: this.db.objectives,
-      });
+      console.log("this.db.objectives[0].length", this.db.objectives[0].length);
+      if (this.db.objectives[0].length < 20) {
+        this.db.objectives.forEach((objective) => {
+          objective.push(null);
+        });
+        this.columnChange++;
+        this.hotInstance.updateSettings({
+          data: this.db.objectives,
+        });
+      }
     },
     activateHotcolumn() {
       let self = this;
@@ -703,10 +688,10 @@ export default {
         colHeaders: false,
         dragToScroll: true,
         rowHeaders: self.objectivesName,
-        rowHeaderWidth: 100,
+        rowHeaderWidth: 70,
         copyPaste: true,
         allowRemoveColumn: true,
-        colWidths: 100,
+        colWidths: 70,
         formulas: {
           engine: HyperFormula,
         },
@@ -1093,6 +1078,7 @@ export default {
   /* height: 100px; */
   /* margin-top: 10px; */
   margin-left: 10px;
+  padding-bottom: 10px;
 }
 .divider {
   margin-left: 20px;

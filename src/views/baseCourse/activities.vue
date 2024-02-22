@@ -169,6 +169,7 @@
               type="textarea"
               clearable
               placeholder="评分标准"
+              :rows="2"
               @clear="
                 item.inputFlag = false;
                 item.description = originActivitydescription;
@@ -1349,6 +1350,7 @@ export default {
   /* height: 100px; */
   /* margin-top: 10px; */
   margin-left: 10px;
+  padding-bottom: 10px;
 }
 .divider {
   margin-left: 20px;

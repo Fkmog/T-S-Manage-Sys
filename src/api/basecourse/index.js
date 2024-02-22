@@ -175,7 +175,7 @@ export function copyProgram(Array) {
     data: Array,
   });
 }
-//提交考试分析表
+//提交试卷分析表
 export function submitPaperAnalysis(dict) {
   return request({
     url: "/analysis",
@@ -183,7 +183,7 @@ export function submitPaperAnalysis(dict) {
     data: dict,
   });
 }
-//修改考试分析表
+//修改试卷分析表
 export function editPaperAnalysis(dict) {
   return request({
     url: "/analysis",
@@ -191,7 +191,7 @@ export function editPaperAnalysis(dict) {
     data: dict,
   });
 }
-//删除考试分析表
+//删除试卷分析表
 export function deletePaperAnalysis(array) {
   return request({
     url: "/analysis",
@@ -199,7 +199,7 @@ export function deletePaperAnalysis(array) {
     data: array,
   });
 }
-//获取所有考试分析表
+//获取所有试卷分析表
 export function getPaperAnalysisList(detailId) {
   return request({
     url: "/analysis/list/?detailId="+detailId,
