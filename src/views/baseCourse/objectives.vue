@@ -48,7 +48,7 @@
         </div>
 
         <div v-for="objective in list.objectives" :key="objective.id">
-          <el-row>
+          <el-row style="width:700px">
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
@@ -65,10 +65,10 @@
               v-show="!objective.hasAchieve"
             >
             </el-col>
-            <el-col :span="18">
-              <div class="objective-name">
+            <el-col :span="18" >
+              <el-row class="objective-name">
                 {{ objective.name }}
-              </div>
+              </el-row>
               <div class="objective-description">
                 {{ objective.description }}
               </div>
@@ -299,7 +299,8 @@ export default {
 .objective-name {
   font-size: 1.2em;
   font-weight: bold;
-  white-space: nowrap;
+  word-wrap: break-all;
+  /* white-space: normal; */
   margin-top: 33px;
 }
 .objective-achieve {
