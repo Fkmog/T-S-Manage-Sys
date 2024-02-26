@@ -49,129 +49,9 @@
     </div>
 
     <!-- @tab-add="this.handleTabsEdit('','add')"   -->
-    <el-tabs
-      v-show="showActivities && hasObjectives"
-      v-model="editableTabsValue"
-      type="card"
-      class="activity-tab"
-      editable="true"
-      @tab-click="editableTabsValueChange"
-      @edit="handleTabsEdit"
-      id="drag-tab"
-    >
-      <el-tab-pane
-        v-for="(item, index) in editableTabs"
-        :key="item.name"
-        :label="item.title"
-        :name="item.name"
-      >
-        <template v-slot="label">
-          <span
-            v-if="!item.inputFlag"
-            style="
-              display: inline-block;
-              width: 200px;
-              text-align: center;
-              padding: 10px;
-            "
-          >
-            <el-icon
-              size="22px"
-              color="rgb(137, 137, 137)"
-              style="float: left; top: 4px; cursor: pointer"
-              @click="tabsContent(item, item.name)"
-            >
-              <EditPen />
-            </el-icon>
-            {{ item.title }}
-          </span>
-          <el-input
-            v-else-if="!!item.inputFlag"
-            :ref="`myInput${item.name}`"
-            v-model="newActivityTitle"
-            type="text"
-            style="width: 250px; margin-left: 10px"
-            clearable
-            @clear="
-              item.inputFlag = false;
-              item.title = originActivityTitle;
-            "
-          >
-            <template #append>
-              <el-icon
-                size="22px"
-                style="cursor: pointer"
-                @click="
-                  item.inputFlag = false;
-                  item.title = newActivityTitle;
-                  item.description = newActivitydescription;
-                  unsave = false;
-                "
-              >
-                <Checked />
-              </el-icon>
-            </template>
-          </el-input>
-
-          <div
-            v-show="
-              !(this.identity === '教师' && this.currenteditableTabsValue == 1)
-            "
-            style="width: 100px; display: inline-block"
-          >
-            <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="添加成绩项"
-              placement="bottom"
-              :hide-after="0"
-            >
-              <el-button @click="addActivities" link style="padding: 10px">
-                <el-icon size="22px" color="rgb(137, 137, 137)">
-                  <CirclePlus />
-                </el-icon>
-              </el-button>
-            </el-tooltip>
-          </div>
-
-          <div class="descriptionCard" v-if="!item.inputFlag">
-            <span
-              style="
-                width: 90%;
-                padding-left: 20px;
-                font-size: 14px;
-                color: gray;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                word-wrap: break-word;
-              "
-            >
-              {{ item.description }}
-            </span>
-          </div>
-          <div
-            v-else-if="!!item.inputFlag"
-            style="width: 400px; height: 100px; padding: 1px 11px"
-          >
-            <el-input
-              :ref="`myInput${item.name}`"
-              v-model="newActivitydescription"
-              type="textarea"
-              clearable
-              @clear="
-                item.inputFlag = false;
-                item.description = originActivitydescription;
-              "
-            >
-            </el-input>
-          </div>
-        </template>
-      </el-tab-pane>
-    </el-tabs>
 
     <div class="card-container" v-show="hasObjectives">
       <el-tooltip
-        v-if="!showActivities"
         class="box-item"
         style="display: flex"
         effect="dark"
@@ -185,7 +65,9 @@
           </el-icon>
         </el-button>
       </el-tooltip>
-      <div class="hot-table-container" id="courseHot"></div>
+      <div style="height: 200px">
+        <div class="hot-table-container" id="courseHot"></div>
+      </div>
     </div>
 
     <div v-show="!hasObjectives" class="no-class">尚未设置课程目标</div>
@@ -1048,37 +930,20 @@ export default {
 }
 .card-container {
   margin-top: 100px;
-
   margin-left: 10%;
   width: 80%;
-  /* height: 150px; */
+  height: 250px;
   background-color: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
+  overflow: auto;
 }
-.activity-tab {
-  height: 200px;
-  margin-top: 68px;
-  background: white;
-  box-shadow: 0px 1px 3px rgb(164, 163, 163);
-  width: 80%;
-  margin-left: 10%;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  width: 750px;
-  background: white;
-  margin-bottom: 20px;
-  box-shadow: 0px 1px 3px rgb(164, 163, 163);
-  padding: 0 0 50px 20px;
-}
+
 .hot-table-container {
   /* float: left; */
   display: flex;
-  /* height: 100px; */
+  /* height: 200px; */
   /* margin-top: 10px; */
   margin-left: 10px;
-  padding-bottom: 10px;
 }
 .divider {
   margin-left: 20px;
