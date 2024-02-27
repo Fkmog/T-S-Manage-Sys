@@ -327,7 +327,8 @@ export default {
                     listType: "text",
                     multiple: true,
                     name: "files",
-                    action: "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
+                    action:
+                      "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
                     headers: {
                       Authorization: "Bearer " + Cookies.get("Admin-Token"),
                     },
@@ -417,11 +418,12 @@ export default {
     getPresent() {
       // TODO:detailId可能为null 还没有处理
       if (this.detailId) {
-        console.log("34");
         getPresent(this.detailId).then((res) => {
           console.log(res);
           this.formPresent = res.data.preset.formPreset;
           this.formPresent.forEach((i) => {
+              // console.log("!", i.value);
+
             if (i.value[0] == "[") {
               i.value = i.value.match(/\d+/g);
               // console.log("!", i.value);
@@ -429,21 +431,18 @@ export default {
           });
           console.log("getPresent", this.formPresent);
           // this.showPresent(this.json);
+           this.getLocalValue();
         });
       }
-      this.getLocalValue();
+     
     },
     async getLocalValue() {
       await this.showPresent(this.json);
-      console.log("22");
       if (localStorage.getItem("workbook")) {
-        console.log("11");
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
-          console.log("#", this.value);
         } else {
-          console.log("yichu");
           localStorage.removeItem("classId");
           localStorage.removeItem("workbook");
         }
@@ -462,7 +461,7 @@ export default {
         } else {
           if (form !== "") {
             this.formPresent.forEach((present) => {
-              if (present.field == form.field && form.value === undefined) {
+              if (present.field === form.field && form.value === undefined) {
                 form.value = present.value;
               }
             });
