@@ -65,24 +65,24 @@
           />
         </div>
         <div v-for="objective in objectives" :key="objective.id">
-          <el-row>
+          <el-row style="width:800px">
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="4"
+              :span="3"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
               {{ objective.achievementTwo }}
             </el-col>
             <el-col
-              :span="2"
+              :span="1"
               class="objective-achieve"
               v-show="!objective.hasAchieve"
             >
             </el-col>
-            <el-col :span="18">
+            <el-col :span="20">
               <div class="objective-name">
                 {{ objective.name }}
               </div>
@@ -343,7 +343,8 @@ export default {
 .objective-name {
   font-size: 1.2em;
   font-weight: bold;
-  white-space: nowrap;
+  word-wrap: break-all;
+
   margin-top: 33px;
 }
 .objective-description {

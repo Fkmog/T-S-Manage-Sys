@@ -48,24 +48,24 @@
         </div>
 
         <div v-for="objective in list.objectives" :key="objective.id">
-          <el-row style="width:700px">
+          <el-row style="width:800px">
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
             <el-col
-              :span="4"
+              :span="3"
               class="objective-achieve"
               v-show="objective.hasAchieve"
             >
               {{ objective.achievementTwo }}
             </el-col>
             <el-col
-              :span="2"
+              :span="1"
               class="objective-achieve"
               v-show="!objective.hasAchieve"
             >
             </el-col>
-            <el-col :span="18" >
+            <el-col :span="20" >
               <el-row class="objective-name">
                 {{ objective.name }}
               </el-row>
@@ -281,13 +281,12 @@ export default {
 .card {
   display: flex;
   flex-direction: column;
-  width: 750px;
+  width: 800px;
   background: white;
-  padding: 0 0 10px 10px;
-  margin-bottom: 20px;
-  margin-top: 100px;
+  margin-bottom: 30px;
+  margin-top: 80px;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
-  padding: 0 0 20px 20px;
+  padding: 20px ;
 }
 .objective-num {
   font-size: 1.6em;
