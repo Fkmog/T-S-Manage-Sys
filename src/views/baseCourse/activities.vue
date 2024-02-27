@@ -93,6 +93,7 @@
             v-model="newActivityTitle"
             type="text"
             style="width: 250px; margin-left: 10px"
+            placeholder="标题"
             clearable
             @clear="
               item.inputFlag = false;
@@ -144,29 +145,24 @@
           </div>
 
           <div class="descriptionCard" v-if="!item.inputFlag">
-            <span
-              style="
-                width: 90%;
-                padding-left: 20px;
-                font-size: 14px;
-                color: gray;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                word-wrap: break-word;
-              "
-            >
-              {{ item.description }}
-            </span>
+            <div style="margin-left: 10px; margin-right: 10px">
+              <span style="font-size: 14px; color: gray">
+                {{ item.description }}
+              </span>
+            </div>
           </div>
           <div
             v-else-if="!!item.inputFlag"
-            style="width: 400px; height: 100px; padding: 1px 11px"
+            style="width: 95%; height: 100px; padding: 1px 11px"
           >
             <el-input
               :ref="`myInput${item.name}`"
               v-model="newActivitydescription"
               type="textarea"
               clearable
+              placeholder="评分标准"
+              :rows="2"
+              :autosize="{ minRows: 2, maxRows: 3 }"
               @clear="
                 item.inputFlag = false;
                 item.description = originActivitydescription;
@@ -1310,8 +1306,11 @@ export default {
   padding-left: 20px;
 }
 .descriptionCard {
-  width: 400px;
-  height: 50px;
+  /* margin-left: 10px;
+  padding-right: 10px; */
+  width: 100%;
+  height: 90px;
+  overflow: auto;
 }
 :deep().el-tabs__new-tab {
   margin: 10px;
@@ -1320,9 +1319,10 @@ export default {
   /* margin-top: 100px; */
   margin-left: 10%;
   width: 80%;
-  /* height: 150px; */
+  height: 120px;
   background-color: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
+  overflow: auto;
 }
 .activity-tab {
   height: 200px;

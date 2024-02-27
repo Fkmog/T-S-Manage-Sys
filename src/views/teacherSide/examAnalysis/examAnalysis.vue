@@ -505,11 +505,9 @@ export default {
 
             for (let i = 1; i < templistscoreRateOnTitle.length; i++) {
               let sum = "";
-              for (let j = 0; j < setting.sum.length; j++) {
-                let tempNum = 2 + j;
-                sum = String.fromCharCode(65 + i) + tempNum + "+" + sum;
-              }
-              console.log("sum:", sum.slice(0, -1));
+              sum = String.fromCharCode(65 + i) + 2;
+
+              console.log("sum:", sum);
               templistscoreRateOnTitle[i] =
                 "=" +
                 "TEXT(" +
@@ -517,7 +515,7 @@ export default {
                 (this.objectivesName.length - 1) +
                 "/" +
                 "SUM(" +
-                sum.slice(0, -1) +
+                sum +
                 ")*100" +
                 ',"0.00%")';
             }

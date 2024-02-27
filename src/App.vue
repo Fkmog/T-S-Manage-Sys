@@ -49,7 +49,7 @@ export default {
           JSON.parse(sessionStorage.getItem("store"))
         )
       );
-      console.log("this.$store.state", this.$store.state);
+      // console.log("this.$store.state", this.$store.state);
     }
     //在页面刷新时保存vuex信息
     window.addEventListener("beforeunload", () => {
