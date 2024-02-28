@@ -389,6 +389,13 @@ export default {
                     duration: 1500,
                   });
                 }
+                if (res.code == "conflict") {
+                  ElMessage({
+                    type: "error",
+                    message: `提交失败,`,
+                    duration: 1500,
+                  });
+                }
                 this.getClassInfo();
               })
               .catch((e) => {
@@ -400,7 +407,9 @@ export default {
                 console.log("e", e);
               });
           })
-          .catch(() => {});
+          .catch((e) => {
+            console.log("e", e);
+          });
       } else {
         ElMessageBox.confirm(
           "请确保已录入完整的成绩和工作手册",
@@ -410,19 +419,34 @@ export default {
             cancelButtonText: "取消",
             type: "warning",
           }
-        ).then(() => {
-          submit(this.classInfo.classId).then((res) => {
-            console.log("res", res);
-            if (res.code == "SUCCESS") {
-              ElMessage({
-                type: "success",
-                message: `提交成功`,
-                duration: 1500,
+        )
+          .then(() => {
+            submit(this.classInfo.classId)
+              .then((res) => {
+                console.log("res", res);
+                if (res.code == "SUCCESS") {
+                  ElMessage({
+                    type: "success",
+                    message: `提交成功`,
+                    duration: 1500,
+                  });
+                }
+                if (res.code == "conflict") {
+                  ElMessage({
+                    type: "error",
+                    message: `提交失败,`,
+                    duration: 1500,
+                  });
+                }
+                this.getClassInfo();
+              })
+              .catch((e) => {
+                console.log("e", e);
               });
-            }
-            this.getClassInfo();
+          })
+          .catch((e) => {
+            console.log("e", e);
           });
-        });
       }
     },
     openDrawerChange() {

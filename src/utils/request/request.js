@@ -94,6 +94,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (res) => {
+    
     // 未设置状态码则默认成功状态
     // const code = res.data.code || 200;
     if (res.headers["content-type"] === "application/octet-stream") {
@@ -202,6 +203,10 @@ service.interceptors.response.use(
         });
         return Promise.reject(error);
       }
+    }
+    else if (error.response.status === 409) {
+      console.log('error',error)
+      return error;
     }
   }
 );
