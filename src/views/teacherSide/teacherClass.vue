@@ -392,7 +392,7 @@ export default {
                 if (res.code == "conflict") {
                   ElMessage({
                     type: "error",
-                    message: `提交失败,`,
+                    message: `成绩或工作手册尚未填写完整`,
                     duration: 1500,
                   });
                 }
@@ -434,7 +434,7 @@ export default {
                 if (res.code == "conflict") {
                   ElMessage({
                     type: "error",
-                    message: `提交失败,`,
+                    message: `成绩或工作手册尚未填写完整`,
                     duration: 1500,
                   });
                 }
