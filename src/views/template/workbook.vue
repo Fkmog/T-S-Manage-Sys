@@ -197,7 +197,7 @@ export default {
         }
       });
     },
-    createValue() {
+    async createValue() {
       return new Promise((resolve, reject) => {
         this.identity = this.$store.state.currentInfo.identity;
         if (this.identity == "学院管理员") {
@@ -305,7 +305,14 @@ export default {
             this.getClassInfo();
           }
         });
-      });
+      })
+      .catch((e)=>{
+        ElMessage({
+              type: "error",
+              message: `部分字段未填写完整`,
+              duration: 1500,
+            });
+      })
     },
     // 查询对应的工作手册 by classId
     getWorkbook() {
@@ -439,10 +446,12 @@ export default {
     async getLocalValue() {
       await this.showPresent(this.json);
       if (localStorage.getItem("workbook")) {
+        console.log("!",this.classInfo.classId);
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
         } else {
+          console.log("remove");
           localStorage.removeItem("classId");
           localStorage.removeItem("workbook");
         }

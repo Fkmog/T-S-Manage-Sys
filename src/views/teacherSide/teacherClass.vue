@@ -371,7 +371,7 @@ export default {
   methods: {
     //提交
     submit() {
-      console.log("submit", this.status, this.identity);
+      // console.log("submit", this.status, this.identity);
       if (this.status == "已退回" && this.identity == "教师") {
         ElMessageBox.confirm("是否已按照审核意见进行修改?", "", {
           confirmButtonText: "确认",
@@ -426,12 +426,12 @@ export default {
       }
     },
     openDrawerChange() {
-      console.log("setting opendrawer");
+      // console.log("setting opendrawer");
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
-      console.log(
-        "currentInfo/setOpenDrawer",
-        this.$store.state.currentInfo.opendrawer
-      );
+      // console.log(
+      //   "currentInfo/setOpenDrawer",
+      //   this.$store.state.currentInfo.opendrawer
+      // );
       // sessionStorage.setItem("teacherClassOpenDrawer",this.openDrawer);
     },
     getdata(val) {
@@ -538,7 +538,7 @@ export default {
     },
     //确定提交状态
     classStatus() {
-      console.log("this.classInfo.status", this.classInfo.status);
+      // console.log("this.classInfo.status", this.classInfo.status);
       switch (this.classInfo.status) {
         case "1":
           this.status = "未提交";
@@ -553,7 +553,7 @@ export default {
           this.status = "已退回";
           break;
       }
-      console.log("this.status", this.status);
+      // console.log("this.status", this.status);
     },
     // 下载报告
     downloadReport() {
