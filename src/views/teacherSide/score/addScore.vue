@@ -135,6 +135,8 @@ export default {
   data() {
     let self = this;
     return {
+      errorInTable: false,
+
       editableTabsValue: "0",
       currenteditableTabsValue: 0,
       maxeditableTabsValue: 0,
@@ -169,7 +171,7 @@ export default {
       addNewStudentList: [],
       hotInstance: undefined,
       columnList: [],
-      scoreSettingOptions: ["总评", "期末"],
+      scoreSettingOptions: [" ", "缺考", "缓考", "不及格", "取消考试资格"],
       isRouterAlive: true,
       dirty: false,
       saving: false,
@@ -311,20 +313,7 @@ export default {
           });
       }
     },
-    // addActivities(){
-    //         this.firstActivities = false;
-    //         let length = Object.keys(this.db.items[0]).length-2;
-    //         let activityName = '成绩项'+length.toString();
-    //         var activityDict = {
-    //             data:activityName
-    //         }
-    //         this.columnList.push(activityDict)
-    //         this.hotInstance.updateSettings({
-    //                 columns:this.columnList,
-    //               });
-    //         console.log('db items:',this.db.items,'column List',this.columnList);
-    //         // this.db.items[0][activityName] = '';
-    //       },
+
     activate() {
       this.identity = this.$store.state.currentInfo.identity;
       this.departmentId = this.$store.state.currentInfo.departmentId;
@@ -502,8 +491,11 @@ export default {
         if (row != 0 && row != 2 && col >= 3) {
           // for 2nd row(分值), also validScore
           cellProperties.type = "numeric"; // by default: 'string'
-          //   cellProperties.validator = that.validScore();
-          cellProperties.format = "0[.]0"; // http://numeraljs.com/
+          // cellProperties.validator = validScore();
+          cellProperties.format = "0.00"; // http://numeraljs.com/
+          cellProperties.validator =
+            /^(100(\.00?)?|0(\.\d{1,2})?|[1-9]?\d(\.\d{1,2})?)$/;
+          // cellProperties.validator = that.validateNumberWithin100;
         } else {
           //   cellProperties.validator =  that.validString();
         }
@@ -528,13 +520,6 @@ export default {
           }
         }
 
-        // if (col > 2 && row === 2) {
-        // cellProperties.type = 'dropdown';
-        // cellProperties.source = [' ','总评','期末'];
-        // cellProperties.allowEmpty = true;
-        // cellProperties.className = 'ht-s-size';
-        // //   cellProperties.validator = that.validScoreSetting();
-        // }
         if (col === 2 && row > 2) {
           console.log(
             "updating cell rules current currenteditableTabsValue:",
@@ -553,11 +538,16 @@ export default {
               "取消考试资格",
             ];
             cellProperties.allowEmpty = true;
+            // cellProperties.validator = that.validScoreSetting();
           } else {
             cellProperties.readOnly = true;
           }
         }
         if (row <= 2) {
+          cellProperties.readOnly = true;
+        }
+
+        if (col < 2) {
           cellProperties.readOnly = true;
         }
 
@@ -589,11 +579,33 @@ export default {
         callback(false);
       }
     },
-    validScoreSetting(value, callback) {
-      if (this.scoreSettingOptions.indexOf(value) >= 0) {
-        callback(true);
+    validScoreSetting(value) {
+      console.log(value, this.scoreSettingOptions.indexOf(value));
+      if (!value) {
+        this.errorInTable = false;
       } else {
-        callback(false);
+        if (this.scoreSettingOptions.indexOf(value) >= 0) {
+          this.errorInTable = false;
+        } else {
+          this.errorInTable = true;
+        }
+      }
+    },
+    validateNumberWithin100(value) {
+      console.log(value, /^\d{1,2}(\.\d{1,2})?$/.test(value));
+      if (!value) {
+        this.errorInTable = false;
+      } else {
+        if (
+          !isNaN(value) &&
+          value >= 0 &&
+          value <= 200 &&
+          /^\d+(\.\d{1,2})?$/.test(value)
+        ) {
+          this.errorInTable = false;
+        } else {
+          this.errorInTable = true;
+        }
       }
     },
 
@@ -863,8 +875,29 @@ export default {
                   } else if (key == 1) {
                     tempDict["studentName"] = student[i][key];
                   } else if (key == 2) {
+                    if (this.errorInTable === false) {
+                      this.validScoreSetting(student[i][key]);
+                      console.log(
+                        "validScoreSetting",
+                        student[i][key],
+                        "errorInTable",
+                        this.errorInTable
+                      );
+                    }
+
                     passList = student[i][key];
                   } else {
+                    // console.log("score", student[i][key]);
+                    if (this.errorInTable === false) {
+                      this.validateNumberWithin100(student[i][key]);
+                      console.log(
+                        "validateNumberWithin100",
+                        student[i][key],
+                        "errorInTable",
+                        this.errorInTable
+                      );
+                    }
+
                     gradList.push(student[i][key]);
                   }
                   infoList.push(tempDict);
@@ -887,8 +920,17 @@ export default {
         // console.log('scoreDist',scoreDist,count++);
         that.postData.scores.push(scoreDist);
       });
-      // console.log('postData.scores',that.postData.scores);
-      that.addScores(that.postData.scores);
+      console.log("this.errorInTable", this.errorInTable);
+      if (this.errorInTable) {
+        ElMessage({
+          type: "error",
+          message: "保存出错，请检查分数",
+          duration: 1500,
+        });
+        this.errorInTable = false;
+      } else {
+        that.addScores(that.postData.scores);
+      }
     },
     toPostData() {
       let that = this;
@@ -902,68 +944,7 @@ export default {
       var AndFlag = Boolean;
       var trueFlagNum = 0; //为空的个数
       var falseFlagNum = 0; //不为空的个数
-      // studentList.forEach(function(student){
-      //   that.columnList.forEach((column)=>{
-      //     let activityNumber = column.length;
 
-      //     var trueFlagNum = 0;//为空的个数
-      //     var falseFlagNum = 0;//不为空的个数
-      //         // console.log('current student:',student);
-      //         for(let j=0;j<activityNumber-3;j++){
-      //             let activityLabel = column[3+j];//从columnList中获取成绩项名称
-
-      //             console.log('student[activityLabel.data]',student[activityLabel.data]);//去student[activityLabel.data]查看是否为空
-      //             if(!student[activityLabel.data]){
-      //                 trueFlagNum++;
-      //             }
-      //             else{
-      //                 falseFlagNum++;
-      //             }
-      //       };
-      //      // true means null, false mens not null
-      //       if(trueFlagNum>0){
-      //         OrFlag = true;
-      //         if(trueFlagNum == activityNumber-3){
-      //             AndFlag = true;
-      //         }
-      //         else{
-      //             AndFlag = false;
-      //         }
-      //       }
-      //       else{
-      //         OrFlag = false;
-      //         AndFlag = false;
-      //       }
-      //       console.log('OrFlag:',OrFlag,'AndFlag:',AndFlag);
-      //     if (!student.studentNumber || !student.studentName || OrFlag) {
-      //       if (!student.studentNumber && !student.studentName && AndFlag) {
-      //         // console.log('scoreRes:',scoreRes,'res: ',res);
-      //         console.log('----------全都为空------------');
-      //         return;
-      //       } else {  // either name OR teacherNo is empty, but not both
-      //         valid = false;
-      //         // console.log('scoreRes:',scoreRes,'res: ',res);
-      //         console.log('-----------部分为空-----------',student.studentNumber,student.studentName);
-      //         return;
-      //       }
-      //     }
-      //     else {  // both are not empty: post 添加学生
-      //       // var distTeacher = {
-      //       //   'studentNumber':student.studentNumber,
-      //       //   'studentName':student.studentName,
-      //       //   // 'email':teacher.email,
-      //       //   'programId': that.programId,
-      //       //   // 'pass':student.pass,
-      //       //   'departmentId':that.departmentId,
-      //       //   'schoolId':that.schoolId
-      //       // };
-      //     // res.push(distTeacher);
-      //     // console.log('scoreRes:',scoreRes,'res: ',res);
-      //     // console.log('-----------都不空-----------');
-      //     };
-      //   })
-
-      //   });
       this.db.items.forEach((students) => {
         var studentList = JSON.parse(JSON.stringify(students));
 
@@ -1025,66 +1006,11 @@ export default {
 
       return valid;
     },
-    // async searchForStudent(){
-    //     let that = this;
-    //     var newStudentList = [];
-    //     var addFlag = Boolean;
-    //     // console.log('this.postData.newStudents:',this.postData.newStudents);
-    //             this.postData.newStudents.forEach(function(student){
-    //                         newStudentList.push(student);
-    //             });
-
-    //             console.log('newStudentList:',newStudentList);
-
-    //                 this.addTeacher(newStudentList).then(function(res){
-    //                 console.log('add student res:',res);
-    //                 that.firstActivities = true;
-    //                 //   that.getActivities();
-    //                 if(res.code == '200'){
-    //                     ElMessage({
-    //                         type: 'success',
-    //                         message: `添加成功`,
-    //                         duration:1000,
-    //                     });
-    //                     addFlag = true;
-    //                 }
-    //                 else{
-    //                 ElMessage({
-    //                         type: 'error',
-    //                         message: `添加失败`,
-    //                         duration:1000,
-    //                     })
-    //                     addFlag = false;
-    //             }
-    //                 });
-    //             return  addFlag;
-
-    // },
 
     goBackandClean() {
       let that = this;
-      // this.db.items = [];
-      // this.columnList = [{
-      //         data:'studentNumber',
-      //     },
-      //     {
-      //         data:'studentName',
-      //     },
-      //     {
-      //         data:'pass',
-      //     },];
-      // this.postData.students = [];
-      this.postData.scores = [];
-      // this.postData.newStudents = [];
 
-      // this.getActivities().then(function(res){
-      //   that.hotInstance.updateSettings({
-      //           data:that.db.items[that.currenteditableTabsValue-1],
-      //           column:that.columnList[that.currenteditableTabsValue-1]
-      //         });
-      //   that.dirty = false;
-      //   console.log('datas:', that.db.items,that.postData.students);
-      // })
+      this.postData.scores = [];
     },
     goTeacher() {
       console.log("goteacher:" + this.saving + this.dirty); //只有dirty = flase 或者 saving = true时才可以退出
@@ -1103,36 +1029,6 @@ export default {
         this.$router.push({ path: "/score" });
       }
     },
-    //  async searchStudent(postData){
-
-    //         return request({
-    //             url:'/student/number'+'/'+postData,
-    //             method:'get'
-    //         }).then(function(res){
-    //             console.log('searching for studentNumber:',postData,'student search res:',res);
-    //             if(res.data == undefined){
-
-    //                 return true;
-    //             }
-    //             else{
-    //                 return false;
-    //             }
-
-    //         })
-    //     },
-    //  async addTeacher(postData){
-    //       var localres;
-    //       console.log('student postData:',postData);
-    //       return request({
-    //                 url:'/student/addStudents',
-    //                 method:'post',
-    //                 data:postData
-    //             }).then(function(res){
-    //               localres = res;
-
-    //               return localres;
-    //             });
-    //     },
     addScores(postData) {
       let that = this;
       console.log("score postData:", postData);
@@ -1162,7 +1058,7 @@ export default {
           console.log("e:", e);
           ElMessage({
             type: "error",
-            message: e.code,
+            message: "保存出错，请检查分数",
             duration: 1500,
           });
           // console.log('postData.scores', that.postData.scores);
@@ -1186,6 +1082,7 @@ export default {
   /* 这里用auto而不是hidden，应为hidden会直接把多出的部分删除，而auto则会保留多出来的部分，形成页面滑动scroll */
 }
 .activity-tab {
+  height: 200px;
   margin-top: 68px;
   background: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
