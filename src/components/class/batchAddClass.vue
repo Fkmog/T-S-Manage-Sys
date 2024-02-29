@@ -299,21 +299,31 @@ export default {
 
       let that = this;
 
-      this.addBaseCourses(this.postData.courses).then(function (res) {
-        console.log("res:", res);
+      this.addBaseCourses(this.postData.courses)
+        .then(function (res) {
+          console.log("res:", res);
 
-        that.firstActivities = true;
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `新建成功`,
-            duration: 1500,
-          });
+          that.firstActivities = true;
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `新建成功`,
+              duration: 1500,
+            });
 
-          that.goBackandClean();
-          that.isNotDirty();
-        } else {
-          if (res.code == "E_CLASS_EXIST") {
+            that.goBackandClean();
+            that.isNotDirty();
+          }
+        })
+        .catch((e) => {
+          let error = e.data;
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else if (error.code == "E_CLASS_EXIST") {
             res.data.forEach(function (teacher) {
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
                 validator: /.+fkmog@.+/,
@@ -382,8 +392,8 @@ export default {
               if (valid) {
               }
             });
-          } else if (res.code == "E_TEACHER_NOT_EXIST") {
-            res.data.forEach(function (teacher) {
+          } else if (error.code == "E_TEACHER_NOT_EXIST") {
+            error.data.forEach(function (teacher) {
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
                 validator: undefined,
               });
@@ -450,8 +460,8 @@ export default {
               if (valid) {
               }
             });
-          } else if (res.msg == "课程号不存在") {
-            res.data.forEach(function (teacher) {
+          } else if (error.msg == "课程号不存在") {
+            error.data.forEach(function (teacher) {
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
                 validator: undefined,
               });
@@ -521,15 +531,12 @@ export default {
           } else {
             ElMessage({
               type: "error",
-              message: "新建失败",
-
+              message: `未知错误,请联系相关人员`,
               duration: 1500,
             });
           }
-          // that.goBackandClean();
           that.isNotDirty();
-        }
-      });
+        });
     },
     toPostData() {
       this.postData.courses.length = 0; // clean array
@@ -648,7 +655,6 @@ export default {
       }
     },
     addBaseCourses(postData) {
-      let localres;
       let courseList = [];
 
       this.postData.courses.forEach(function (course) {
@@ -660,19 +666,7 @@ export default {
         url: "/classes/addClasses",
         method: "post",
         data: courseList,
-      })
-        .then(function (res) {
-          localres = res;
-          console.log("localres", localres);
-          return localres;
-        })
-        .catch((e) => {
-          if (e.response) {
-            return e.response.data;
-          } else {
-            return e;
-          }
-        });
+      });
     },
     async handleEvent(event) {
       switch (event.keyCode) {

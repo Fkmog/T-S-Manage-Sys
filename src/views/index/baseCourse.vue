@@ -1157,25 +1157,35 @@ export default {
         url: "/system/role/editRespondent",
         method: "post",
         data: this.respondentPostdata,
-      }).then(function (res) {
-        console.log("respondentPostdata :", res);
-        that.getBaseCourse(that.pageSize, that.pageNum);
-        that.showPrinciple = false;
-        that.respondentPostdata = [];
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `新建成功`,
-            duration: 1500,
-          });
-        } else {
-          ElMessage({
-            type: "error",
-            message: `新建失败`,
-            duration: 1500,
-          });
-        }
-      });
+      })
+        .then(function (res) {
+          console.log("respondentPostdata :", res);
+          that.getBaseCourse(that.pageSize, that.pageNum);
+          that.showPrinciple = false;
+          that.respondentPostdata = [];
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `新建成功`,
+              duration: 1500,
+            });
+          }
+        })
+        .catch((e) => {
+          if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `新建出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
+        });
     },
     //获取负责人信息
     getPrincipleInfo() {
@@ -1238,7 +1248,19 @@ export default {
           }
         })
         .catch((e) => {
-          console.log("e", e);
+          if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `添加出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
         });
     },
     submitWorkbook() {
@@ -1263,7 +1285,19 @@ export default {
           }
         })
         .catch((e) => {
-          console.log("e", e);
+          if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `添加出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
         });
     },
     //添加课程负责人
@@ -1353,9 +1387,12 @@ export default {
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
               }
+            })
+            .catch((e) => {
+              console.log("e", e);
               if (
-                res.code == "UNPROCESSABLE ENTITY" &&
-                res.msg == "UNPROCESSABLE ENTIT"
+                e.data.code == "UNPROCESSABLE ENTITY" &&
+                e.data.msg == "UNPROCESSABLE ENTIT"
               ) {
                 ElMessage({
                   type: "error",
@@ -1364,15 +1401,26 @@ export default {
                 });
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
+              } else if (e.status === 409) {
+                ElMessage({
+                  type: "error",
+                  message: `新建失败,课程已存在`,
+                  duration: 1500,
+                });
+              } else if (e.status === 500) {
+                ElMessage({
+                  type: "error",
+                  message: `保存出错，请检查填写的内容`,
+                  duration: 1500,
+                });
+              } else {
+                ElMessage({
+                  type: "error",
+                  message: `未知错误,请联系相关人员`,
+                  duration: 1500,
+                });
               }
-            })
-            .catch((e) => {
-              console.log("e", e);
-              ElMessage({
-                type: "error",
-                message: `新建失败`,
-                duration: 1500,
-              });
+
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize, that.pageNum);
             });
@@ -1504,25 +1552,36 @@ export default {
         .catch((e) => {
           console.log("e", e);
           that.dialogFormVisible = true;
-          if (e.code == "E_CODE_EXIST") {
+          if (e.data.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
               message: "新建失败，课程已存在",
               duration: 1500,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
-          } else if (e.code == "DATA_DUPLICATED") {
+          } else if (e.data.code == "DATA_DUPLICATED") {
             ElMessage({
               type: "error",
               message: "新建失败，数据重复",
               duration: 1500,
             });
             that.C_ErrorMsg = "课程已存在，请重新输入";
+          } else if (e.status === 409) {
+            ElMessage({
+              type: "error",
+              message: `新建失败,课程已存在`,
+              duration: 1500,
+            });
+          } else if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
           } else {
             ElMessage({
               type: "error",
-              message: "新建失败",
-
+              message: `未知错误,请联系相关人员`,
               duration: 1500,
             });
           }
@@ -1843,24 +1902,29 @@ export default {
         .catch((e) => {
           that.dialogFormVisible1 = true;
           console.log("e", e);
-          if (e.code == "E_CODE_EXIST") {
+          if (e.data.code == "E_CODE_EXIST") {
             ElMessage({
               type: "error",
               message: "更新失败，课程已存在",
               duration: 1500,
             });
             that.C_ErrorMsg_edit = "课程已存在，请重新输入";
-          } else if (e.code == "UNAUTHENTICATED") {
+          } else if (e.data.code == "UNAUTHENTICATED") {
             ElMessage({
               type: "error",
               message: "更新失败，无权限",
               duration: 1500,
             });
+          } else if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `更新出错，请检查填写的内容`,
+              duration: 1500,
+            });
           } else {
             ElMessage({
               type: "error",
-              message: "更新失败",
-
+              message: `未知错误,请联系相关人员`,
               duration: 1500,
             });
           }

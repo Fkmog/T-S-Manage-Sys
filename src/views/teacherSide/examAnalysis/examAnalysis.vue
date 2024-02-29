@@ -508,6 +508,7 @@ export default {
               sum = String.fromCharCode(65 + i) + 2;
 
               console.log("sum:", sum);
+
               templistscoreRateOnTitle[i] =
                 "=" +
                 "TEXT(" +
@@ -718,11 +719,19 @@ export default {
             }
           })
           .catch((e) => {
-            ElMessage({
-              type: "error",
-              message: e.msg,
-              duration: 1500,
-            });
+            if (e.status == 500) {
+              ElMessage({
+                type: "error",
+                message: `保存出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            } else {
+              ElMessage({
+                type: "error",
+                message: `未知错误,请联系相关人员`,
+                duration: 1500,
+              });
+            }
           });
       }
     },
@@ -813,11 +822,19 @@ export default {
         })
         .catch((e) => {
           console.log("e:", e);
-          ElMessage({
-            type: "error",
-            message: e.code,
-            duration: 1500,
-          });
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `更新出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
           // console.log('postData.scores', that.postData.scores);
         });
     },

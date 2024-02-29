@@ -186,7 +186,7 @@ service.interceptors.response.use(
         });
       }
     } else if (error.response.status === 404 || error.response.status === 422) {
-      return Promise.reject(error.response.data);
+      return Promise.reject(error.response);
     } else if (error.response.status === 400) {
       if (error.response.data.msg == "用户不存在/密码错误") {
         ElMessage({
@@ -204,9 +204,10 @@ service.interceptors.response.use(
         return Promise.reject(error);
       }
     }
-    else if (error.response.status === 409) {
-      return error.response.data;
-    }
+    // else if (error.response.status === 409) {
+    //   console.log('error.response.status === 409')
+    //   return error.response;
+    // }
     else{
       return Promise.reject(error.response);
     }

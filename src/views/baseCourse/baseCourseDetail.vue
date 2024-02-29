@@ -402,12 +402,12 @@ export default {
       pageNum: 1,
       total: 0,
       showLoadmore: false,
-      url:''
+      url: "",
     };
   },
   mounted() {
     this.getRouter();
-    this.url = inject('$baseURL')
+    this.url = inject("$baseURL");
     // sessionStorage.setItem("baseCourseSearchForm", this.form.courseName);
     this.$store.commit("course/setCourseName", this.form.courseName);
     this.$store.commit("course/setCourseId", this.courseId);
@@ -430,27 +430,36 @@ export default {
             departmentId: that.departmentId,
             schoolId: that.schoolId,
           },
-        }).then(function (res) {
-          console.log(res);
-          if (res.code == "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `新建成功`,
-              duration: 1500,
-            });
-            //成功后根据vesionId和basecouseId获取详细信息
-            that.isVisiable = true;
-            that.getDetail();
-          } else {
-            ElMessage({
-              type: "error",
-              message: `新建失败`,
-              duration: 1500,
-            });
-            //失败后退回basecouse页面
+        })
+          .then(function (res) {
+            console.log(res);
+            if (res.code == "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `新建成功`,
+                duration: 1500,
+              });
+              //成功后根据vesionId和basecouseId获取详细信息
+              that.isVisiable = true;
+              that.getDetail();
+            }
+          })
+          .catch((e) => {
+            if (e.status === 500) {
+              ElMessage({
+                type: "error",
+                message: `保存出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            } else {
+              ElMessage({
+                type: "error",
+                message: `未知错误,请联系相关人员`,
+                duration: 1500,
+              });
+            }
             that.goBaseCourse();
-          }
-        });
+          });
       });
     } else {
       this.isVisiable = true;

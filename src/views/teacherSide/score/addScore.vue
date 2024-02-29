@@ -1056,11 +1056,20 @@ export default {
         })
         .catch((e) => {
           console.log("e:", e);
-          ElMessage({
-            type: "error",
-            message: "保存出错，请检查分数",
-            duration: 1500,
-          });
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: "未知错误,请联系相关人员",
+              duration: 1500,
+            });
+          }
+
           // console.log('postData.scores', that.postData.scores);
         });
     },

@@ -242,134 +242,138 @@ export default {
             });
             that.isNotDirty();
             that.goBackandClean();
-          } else {
-            if (res.code == "E_TEACHER_EXIST") {
-              res.data.forEach(function (teacher) {
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
-                  validator: /.+gmail@.+/,
-                });
-              });
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                0,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                1,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                2,
-                { validator: undefined }
-              );
-
-              that.hotInstance.validateCells((valid) => {
-                if (valid) {
-                }
-              });
-
-              ElMessage({
-                type: "error",
-                message: `新建失败,标红教师已存在`,
-                duration: 1500,
-              });
-            } else if (res.code == "E_TEACHER_DUPLICATE") {
-              res.data.forEach(function (teacher) {
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
-                  validator: /.+gmail@.+/,
-                });
-              });
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                0,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                1,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                2,
-                { validator: undefined }
-              );
-
-              that.hotInstance.validateCells((valid) => {
-                if (valid) {
-                }
-              });
-
-              ElMessage({
-                type: "error",
-                message: `新建失败,标红教师重复`,
-                duration: 1500,
-              });
-            } else if (res.code == "DATA_DUPLICATED") {
-              res.data.forEach(function (teacher) {
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
-                  validator: /.+@.+/,
-                });
-                that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
-                  validator: /.+gmail@.+/,
-                });
-              });
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                0,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                1,
-                { validator: undefined }
-              );
-              that.hotInstance.setCellMetaObject(
-                that.postData.teachers.length,
-                2,
-                { validator: undefined }
-              );
-
-              that.hotInstance.validateCells((valid) => {
-                if (valid) {
-                }
-              });
-
-              ElMessage({
-                type: "error",
-                message: `新建失败,标红数据重复`,
-                duration: 1500,
-              });
-            } else {
-              ElMessage({
-                type: "error",
-                message: `新建失败`,
-                duration: 1500,
-              });
-            }
-
-            that.count = 0;
           }
         })
         .catch((e) => {
-          console.log("e", e);
+          let error = e.data;
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else if (error.code == "E_TEACHER_EXIST") {
+            error.data.forEach(function (teacher) {
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                validator: /.+gmail@.+/,
+              });
+            });
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              0,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              1,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              2,
+              { validator: undefined }
+            );
+
+            that.hotInstance.validateCells((valid) => {
+              if (valid) {
+              }
+            });
+
+            ElMessage({
+              type: "error",
+              message: `新建失败,标红教师已存在`,
+              duration: 1500,
+            });
+          } else if (error.code == "E_TEACHER_DUPLICATE") {
+            error.data.forEach(function (teacher) {
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                validator: /.+gmail@.+/,
+              });
+            });
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              0,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              1,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              2,
+              { validator: undefined }
+            );
+
+            that.hotInstance.validateCells((valid) => {
+              if (valid) {
+              }
+            });
+
+            ElMessage({
+              type: "error",
+              message: `新建失败,标红教师重复`,
+              duration: 1500,
+            });
+          } else if (error.code == "DATA_DUPLICATED") {
+            error.data.forEach(function (teacher) {
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 1, {
+                validator: /.+@.+/,
+              });
+              that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 2, {
+                validator: /.+gmail@.+/,
+              });
+            });
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              0,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              1,
+              { validator: undefined }
+            );
+            that.hotInstance.setCellMetaObject(
+              that.postData.teachers.length,
+              2,
+              { validator: undefined }
+            );
+
+            that.hotInstance.validateCells((valid) => {
+              if (valid) {
+              }
+            });
+
+            ElMessage({
+              type: "error",
+              message: `新建失败,标红数据重复`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
+          that.count = 0;
         });
     },
     toPostData() {

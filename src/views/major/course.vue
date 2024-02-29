@@ -2,13 +2,13 @@
   <div v-show="hasProgram">
     <div v-show="hasCourse">
       <div v-show="!closeShow">
-          <HeaderSearch
+        <HeaderSearch
           msg="搜索课程名称"
           @SearchValue="getSearchValueformProgram"
           :value="keywordforProgrameCourse"
         >
           <template #rightTime>
-            <div  class="rightSlot">
+            <div class="rightSlot">
               <div class="selectionBar">
                 <el-select
                   v-model="option1.value"
@@ -39,7 +39,6 @@
           </template>
         </HeaderSearch>
       </div>
-      
 
       <div v-show="closeShow" class="submenu">
         <el-row class="rowStyle">
@@ -733,26 +732,37 @@ export default {
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
               }
+            })
+            .catch((e) => {
+              console.log("e", e);
               if (
-                res.code == "UNPROCESSABLE ENTITY" &&
-                res.msg == "UNPROCESSABLE ENTIT"
+                e.data.code == "UNPROCESSABLE ENTITY" &&
+                e.data.msg == "UNPROCESSABLE ENTIT"
               ) {
                 ElMessage({
                   type: "error",
                   message: `没有选择课程大纲版本`,
                   duration: 1500,
                 });
-                //成功后根据vesionId和basecouseId获取详细信息
-                that.getBaseCourse(that.pageSize, that.pageNum);
+              } else if (e.status === 409) {
+                ElMessage({
+                  type: "error",
+                  message: `新建失败,大纲版本已存在`,
+                  duration: 1500,
+                });
+              } else if (e.status === 500) {
+                ElMessage({
+                  type: "error",
+                  message: `新建出错，请检查填写的内容`,
+                  duration: 1500,
+                });
+              } else {
+                ElMessage({
+                  type: "error",
+                  message: `未知错误,请联系相关人员`,
+                  duration: 1500,
+                });
               }
-            })
-            .catch((e) => {
-              console.log("e", e);
-              ElMessage({
-                type: "error",
-                message: `新建失败`,
-                duration: 1500,
-              });
               //失败后退回basecouse页面
               that.getBaseCourse(that.pageSize, that.pageNum);
             });
@@ -777,8 +787,6 @@ export default {
     },
     //跳转到详细页面
     goBaseCourseDetail(row, column) {
-
-
       sessionStorage.setItem("courseSearchForm", this.keywordforProgrameCourse);
       // sessionStorage.removeItem("courseSearchFlag");
       console.log(
@@ -799,7 +807,7 @@ export default {
         "baseCourseDetailProgram/setmajorcourseCode",
         row.courseCode
       );
-      
+
       this.$router.push("/courseDetail");
     },
     //是否有program
@@ -1046,11 +1054,25 @@ export default {
         .catch((e) => {
           console.log("e", e);
 
-          ElMessage({
-            type: "error",
-            message: `新建失败`,
-            duration: 1500,
-          });
+          if (e.status === 409) {
+            ElMessage({
+              type: "error",
+              message: `新建失败,课程已存在`,
+              duration: 1500,
+            });
+          } else if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `新建出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
           that.clearForm();
           that.getBaseCourse(that.pageSize, that.pageNum);
         });
@@ -1259,11 +1281,25 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          ElMessage({
-            type: "error",
-            message: `新建失败`,
-            duration: 1500,
-          });
+          if (e.status === 409) {
+            ElMessage({
+              type: "error",
+              message: `新建失败,课程已存在`,
+              duration: 1500,
+            });
+          } else if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `新建出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
           that.drawercourseId = [];
           that.drawerCourseIndex = [];
           that.$refs.drawermultipleTable.clearSelection();
@@ -1308,11 +1344,19 @@ export default {
         .catch((e) => {
           console.log("e", e);
 
-          ElMessage({
-            type: "error",
-            message: `更新失败`,
-            duration: 1500,
-          });
+          if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `更新出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
           that.getBaseCourse(that.pageSize, that.pageNum);
         });
     },
@@ -1578,8 +1622,12 @@ export default {
       this.activate();
     }
     if (sessionStorage.getItem("courseSearchFlag")) {
-      this.keywordforProgrameCourse = sessionStorage.getItem("courseSearchForm");
-      console.log("this.keywordforProgrameCourse", this.keywordforProgrameCourse);
+      this.keywordforProgrameCourse =
+        sessionStorage.getItem("courseSearchForm");
+      console.log(
+        "this.keywordforProgrameCourse",
+        this.keywordforProgrameCourse
+      );
       this.getSearchValueformProgram(this.keywordforProgrameCourse);
     } else {
       sessionStorage.removeItem("courseSearchForm");
@@ -1655,7 +1703,6 @@ export default {
   height: 18px;
   width: 18px;
 }
-
 
 .row-style {
   padding-top: 5px;

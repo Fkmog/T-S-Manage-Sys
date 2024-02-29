@@ -327,18 +327,34 @@ export default {
         name: name,
         description: description,
         detailId: this.detailId,
-      }).then((res) => {
-        console.log("create analysis", res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `添加成功`,
-            duration: 1500,
-          });
-        }
-        this.dialogFormVisible = false;
-        this.getTeacherList();
-      });
+      })
+        .then((res) => {
+          console.log("create analysis", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `添加成功`,
+              duration: 1500,
+            });
+          }
+          this.dialogFormVisible = false;
+          this.getTeacherList();
+        })
+        .catch((e) => {
+          if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `添加出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
+        });
     },
     goPaperAnalysisDetail(row, column) {
       if (column.columnKey === undefined) {
