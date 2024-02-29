@@ -259,16 +259,26 @@ export default {
       // 处理单选框，多选框的value类型
       this.searchChildren(this.total.formJson);
       console.log("save", this.total);
-      editWorkbookInfo(this.total).then((res) => {
-        if (res.code === "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `更新成功`,
-            duration: 1500,
-          });
-          this.getWorkbookInfo();
-        }
-      });
+      editWorkbookInfo(this.total)
+        .then((res) => {
+          if (res.code === "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            this.getWorkbookInfo();
+          }
+        })
+        .catch((e) => {
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          }
+        });
     },
     // 获取样式规则
     getOption() {

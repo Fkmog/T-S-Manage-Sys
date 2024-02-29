@@ -330,6 +330,7 @@ import {
 } from "@/api/basecourse";
 import DrawerSearch from "@/components/general/drawerSearch.vue";
 import { downloadFileId, downloadFile, removeFileId } from "@/api/common";
+import { inject } from "vue";
 
 export default {
   name: "baseCourseDetail",
@@ -401,11 +402,12 @@ export default {
       pageNum: 1,
       total: 0,
       showLoadmore: false,
+      url:''
     };
   },
   mounted() {
     this.getRouter();
-
+    this.url = inject('$baseURL')
     // sessionStorage.setItem("baseCourseSearchForm", this.form.courseName);
     this.$store.commit("course/setCourseName", this.form.courseName);
     this.$store.commit("course/setCourseId", this.courseId);
@@ -489,7 +491,9 @@ export default {
         obj.param = that.detailId;
         obj.type = "syllabusFile";
         array.push(obj);
-        that.action = "https://jxjk.hdu.edu.cn/prod-api/common/upload/files";
+        // that.action = "https://jxjk.hdu.edu.cn/prod-api/common/upload/files";
+        // that.action = "https://jxjk.hdu.edu.cn/prod-api/common/upload/files";
+        that.action = that.url + "common/upload/files";
         that.data = array[0];
         that.$store.commit("course/setDetailId", that.detailId);
         that.checkFileList();

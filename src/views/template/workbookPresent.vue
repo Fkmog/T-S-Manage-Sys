@@ -103,18 +103,28 @@ export default {
       // this.presentValue = this.formPresent;
       this.searchChildren(this.json);
       // console.log("presentValue", this.presentValue);
-      present(this.detailId, this.presentValue, this.courseId).then((res) => {
-        if (res.code === "SUCCESS") {
-          console.log("present", res);
-          // this.showPresent(this.json);
-          this.getPresent();
-          ElMessage({
-            type: "success",
-            message: "更新成功",
-            duration: 1500,
-          });
-        }
-      });
+      present(this.detailId, this.presentValue, this.courseId)
+        .then((res) => {
+          if (res.code === "SUCCESS") {
+            console.log("present", res);
+            // this.showPresent(this.json);
+            this.getPresent();
+            ElMessage({
+              type: "success",
+              message: "更新成功",
+              duration: 1500,
+            });
+          }
+        })
+        .catch((e) => {
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          }
+        });
     },
     // 查询预设信息
     getPresent() {

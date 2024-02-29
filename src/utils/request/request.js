@@ -207,6 +207,9 @@ service.interceptors.response.use(
     else if (error.response.status === 409) {
       return error.response.data;
     }
+    else{
+      return Promise.reject(error.response);
+    }
   }
 );
 

@@ -492,26 +492,36 @@ export default {
         });
         console.log("保存内容", major);
         major.courseIndicators = major.indicators;
-        saveIndicators(major).then((res) => {
-          console.log("save", res);
-          if (res.code === "SUCCESS") {
-            this.successNum = this.successNum + 1;
-            ElMessage({
-              type: "success",
-              message: `更新成功`,
-              duration: 1500,
-            });
-            //更新副本
-            this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
-            this.back();
-          } else {
-            ElMessage({
-              type: "error",
-              message: `更新失败`,
-              duration: 1500,
-            });
-          }
-        });
+        saveIndicators(major)
+          .then((res) => {
+            console.log("save", res);
+            if (res.code === "SUCCESS") {
+              this.successNum = this.successNum + 1;
+              ElMessage({
+                type: "success",
+                message: `更新成功`,
+                duration: 1500,
+              });
+              //更新副本
+              this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
+              this.back();
+            } else {
+              ElMessage({
+                type: "error",
+                message: `更新失败`,
+                duration: 1500,
+              });
+            }
+          })
+          .catch((e) => {
+            if (e.status == 500) {
+              ElMessage({
+                type: "error",
+                message: `保存出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            }
+          });
       });
     },
     //获取数据字典

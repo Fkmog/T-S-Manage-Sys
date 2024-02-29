@@ -12,7 +12,6 @@ import upload from "./components/form-designer/upload.vue";
 formCreate.component("upload", upload);
 
 import _ from "lodash";
-
 const app = createApp(App)
   .use(store)
   .use(router)
@@ -23,6 +22,8 @@ const app = createApp(App)
   .use(FcDesigner)
   .use(Codemirror)
   .component("upload", upload)
+  // .provide("$baseURL", "http://47.113.206.164/prod-api/")
+  .provide("$baseURL", "https://jxjk.hdu.edu.cn/prod-api/")
   .mount("#app");
 //解决el-table  ResizeObserver loop limit exceeded问题
 const debounce = (fn, delay) => {
@@ -53,5 +54,5 @@ app.$.appContext.components.ElDialog.props.closeOnClickModal.default = false;
 //     if (logDebug) {
 //       oriLogFunc.apply(this, arguments);
 //     }
-//   }
+//   };
 // })(console.log);

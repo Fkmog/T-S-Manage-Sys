@@ -91,7 +91,7 @@
                         {{ assessment.name }}
                       </el-col>
                       <el-col :span="5">( {{ assessment.weight }}% )</el-col>
-                     <el-col :span="12">
+                      <el-col :span="12">
                         <el-row>
                           <el-col
                             :span="6"
@@ -158,7 +158,9 @@
         :align-center="true"
       >
         <el-row style="margin-bottom: 10px">
-          <el-col :span="20" class="object-name">{{ dialogObject.name }}</el-col>
+          <el-col :span="20" class="object-name">{{
+            dialogObject.name
+          }}</el-col>
           <!-- <el-col :span="19" class="object-desc">{{
             dialogObject.description
           }}</el-col> -->
@@ -358,36 +360,48 @@ export default {
       }
     },
     save() {
-      saveObjectives(this.list).then((res) => {
-        console.log("save", res);
-        if (res.code == 'SUCCESS') {
-          ElMessage({
-            type: "success",
-            message: `更新成功`,
-            duration: 1500,
-          });
-          this.backObjectives();
-        } else {
-          ElMessage({
-            type: "error",
-            message: `更新失败`,
-            duration: 1500,
-          });
-        }
-      });
+      saveObjectives(this.list)
+        .then((res) => {
+          console.log("save", res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            this.backObjectives();
+          } else {
+            ElMessage({
+              type: "error",
+              message: `更新失败`,
+              duration: 1500,
+            });
+          }
+        })
+        .catch((e) => {
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          }
+        });
     },
     //获取课程目标
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         //list存放初始数据
         this.list = res.data;
-        console.log("getObjectives",res);
+        console.log("getObjectives", res);
         this.allActivities = this.list.activities;
         // console.log("初始list", this.list);
         console.log("初始allActivities", this.list.activities);
-        this.allActivities.itemObject = this.allActivities[0].item.map((item) => ({
-          value: item,
-        }));
+        this.allActivities.itemObject = this.allActivities[0].item.map(
+          (item) => ({
+            value: item,
+          })
+        );
         // console.log("格式化后的allActivities", this.allActivities);
         // console.log("格式化后的list", this.list);
         //处理数据-serialNum
@@ -541,8 +555,7 @@ export default {
           this.objectives[this.objectives.length - 1].serialNum;
       } else {
         this.deleteSerialNum = 0;
-        this.canDelete = false
-
+        this.canDelete = false;
       }
     },
     // 编辑权重
