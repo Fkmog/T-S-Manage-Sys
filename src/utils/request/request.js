@@ -203,6 +203,12 @@ service.interceptors.response.use(
         return Promise.reject(error);
       }
     }
+    else if (error.response.status === 409) {
+      return error.response.data;
+    }
+    else{
+      return Promise.reject(error.response);
+    }
   }
 );
 

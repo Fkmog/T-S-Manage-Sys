@@ -463,23 +463,33 @@ export default {
       }
       this.programInfo.graduateAttributes = this.requirements;
       console.log("save", this.programInfo);
-      editProgram(this.programInfo).then((res) => {
-        console.log(res);
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `更新成功`,
-            duration: 1500,
-          });
-          this.backGoal();
-        } else {
-          ElMessage({
-            type: "error",
-            message: `更新失败`,
-            duration: 1500,
-          });
-        }
-      });
+      editProgram(this.programInfo)
+        .then((res) => {
+          console.log(res);
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `更新成功`,
+              duration: 1500,
+            });
+            this.backGoal();
+          } else {
+            ElMessage({
+              type: "error",
+              message: `更新失败`,
+              duration: 1500,
+            });
+          }
+        })
+        .catch((e) => {
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          }
+        });
     },
   },
 };

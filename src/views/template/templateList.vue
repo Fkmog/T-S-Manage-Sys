@@ -152,6 +152,7 @@ import {
   editWorkbookInfo,
 } from "@/api/workbook";
 import { downloadFileId, downloadFile, removeFileId } from "@/api/common";
+import { inject } from "vue";
 
 export default {
   name: "TemplateList",
@@ -166,6 +167,7 @@ export default {
   },
   data() {
     return {
+      url:'',
       departmentId: "",
       workbookList: [],
       dialogVisible: false,
@@ -177,7 +179,8 @@ export default {
       headers: {
         Authorization: "Bearer " + Cookies.get("Admin-Token"),
       },
-      action: "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
+      // action: "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
+      action:this.url+'common/upload/files',
       data: {
         type: "reportTemplateFile",
         param: "",

@@ -81,7 +81,6 @@ export function submit(classId) {
   return request({
     url: '/classes/submit/'+classId,
     method: 'POST',
- 
   })
 }
 //管理员or课程负责人审核反馈

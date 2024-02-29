@@ -103,6 +103,7 @@ import { getClassInfo } from "@/api/class";
 import { downloadFile } from "@/api/common";
 import Cookies from "js-cookie";
 import { getPresent } from "@/api/workbook";
+import { inject } from "vue";
 
 export default {
   name: "Workbook",
@@ -132,9 +133,11 @@ export default {
       //表单数据
       value: {},
       // watchValue:{}
+      url:''
     };
   },
   mounted() {
+    this.url = inject('$baseURL')
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     this.getPre();
   },
@@ -187,7 +190,7 @@ export default {
       console.log("classInfo", this.classInfo);
       this.courseId = this.classInfo.courseId;
       this.detailId = this.classInfo.detailId;
-      this.getPresent();
+      // this.getPresent();
     },
     async create() {
       await this.createValue();
@@ -291,28 +294,29 @@ export default {
     },
     // 保存
     save() {
-      this.fApi.submit((formData, fApi) => {
-        console.log("save", formData);
-        editByTeacher(this.classInfo.classId, formData).then((res) => {
-          if (res.code === "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `保存成功`,
-              duration: 1500,
-            });
-            localStorage.removeItem("classId");
-            localStorage.removeItem("workbook");
-            this.getClassInfo();
-          }
+      this.fApi
+        .submit((formData, fApi) => {
+          console.log("save", formData);
+          editByTeacher(this.classInfo.classId, formData).then((res) => {
+            if (res.code === "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `保存成功`,
+                duration: 1500,
+              });
+              localStorage.removeItem("classId");
+              localStorage.removeItem("workbook");
+              this.getClassInfo();
+            }
+          });
+        })
+        .catch((e) => {
+          ElMessage({
+            type: "error",
+            message: `部分字段未填写完整`,
+            duration: 1500,
+          });
         });
-      })
-      .catch((e)=>{
-        ElMessage({
-              type: "error",
-              message: `部分字段未填写完整`,
-              duration: 1500,
-            });
-      })
     },
     // 查询对应的工作手册 by classId
     getWorkbook() {
@@ -334,8 +338,8 @@ export default {
                     listType: "text",
                     multiple: true,
                     name: "files",
-                    action:
-                      "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
+                    action: this.url+'common/upload/files',
+                      // "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
                     headers: {
                       Authorization: "Bearer " + Cookies.get("Admin-Token"),
                     },
@@ -402,6 +406,7 @@ export default {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
         }
         this.value = res.data.workbookJson;
+        this.getPresent();
       });
     },
     // 下载文件
@@ -429,7 +434,7 @@ export default {
           console.log(res);
           this.formPresent = res.data.preset.formPreset;
           this.formPresent.forEach((i) => {
-              // console.log("!", i.value);
+            // console.log("!", i.value);
 
             if (i.value[0] == "[") {
               i.value = i.value.match(/\d+/g);
@@ -438,15 +443,14 @@ export default {
           });
           console.log("getPresent", this.formPresent);
           // this.showPresent(this.json);
-           this.getLocalValue();
+          this.getLocalValue();
         });
       }
-     
     },
     async getLocalValue() {
       await this.showPresent(this.json);
       if (localStorage.getItem("workbook")) {
-        console.log("!",this.classInfo.classId);
+        console.log("!", this.classInfo.classId);
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;

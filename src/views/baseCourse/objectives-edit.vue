@@ -71,10 +71,7 @@
                   "
                 >
                   <el-form-item label="课程目标" class="title">
-                    <el-input
-                      v-model="objective.name"
-                      placeholder="课程目标"
-                    />
+                    <el-input v-model="objective.name" placeholder="课程目标" />
                   </el-form-item>
                   <el-form-item
                     label="达成途径"
@@ -192,7 +189,9 @@
           <el-col :span="3" class="object-name"
             >课程目标{{ dialogObject.serialNum }}：
           </el-col>
-          <el-col :span="20" class="object-name">{{ dialogObject.name }}</el-col>
+          <el-col :span="20" class="object-name">{{
+            dialogObject.name
+          }}</el-col>
           <!-- <el-col :span="18" class="object-desc">{{
             dialogObject.description
           }}</el-col> -->
@@ -426,47 +425,67 @@ export default {
       if (this.$store.state.currentInfo.identity === "教师") {
         this.list.classId =
           this.$store.state.currentInfo.teacherSideClassInfo.classId;
-        saveObjectivesForClass(this.list).then((res) => {
-          console.log("保存的内容", this.list);
-          console.log("save", res);
-          if (res.code === "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `更新成功`,
-              duration: 1500,
-            });
-            // 更新副本
-            this.listCopy = JSON.parse(JSON.stringify(this.list));
-            this.backObjectives();
-          } else {
-            ElMessage({
-              type: "error",
-              message: `更新失败`,
-              duration: 1500,
-            });
-          }
-        });
+        saveObjectivesForClass(this.list)
+          .then((res) => {
+            console.log("保存的内容", this.list);
+            console.log("save", res);
+            if (res.code === "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `更新成功`,
+                duration: 1500,
+              });
+              // 更新副本
+              this.listCopy = JSON.parse(JSON.stringify(this.list));
+              this.backObjectives();
+            } else {
+              ElMessage({
+                type: "error",
+                message: `更新失败`,
+                duration: 1500,
+              });
+            }
+          })
+          .catch((e) => {
+            if (e.status == 500) {
+              ElMessage({
+                type: "error",
+                message: `保存出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            }
+          });
       } else {
-        saveObjectives(this.list).then((res) => {
-          console.log("保存的内容", this.list);
-          console.log("save", res);
-          if (res.code === "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `更新成功`,
-              duration: 1500,
-            });
-            // 更新副本
-            this.listCopy = JSON.parse(JSON.stringify(this.list));
-            this.backObjectives();
-          } else {
-            ElMessage({
-              type: "error",
-              message: `更新失败`,
-              duration: 1500,
-            });
-          }
-        });
+        saveObjectives(this.list)
+          .then((res) => {
+            console.log("保存的内容", this.list);
+            console.log("save", res);
+            if (res.code === "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `更新成功`,
+                duration: 1500,
+              });
+              // 更新副本
+              this.listCopy = JSON.parse(JSON.stringify(this.list));
+              this.backObjectives();
+            } else {
+              ElMessage({
+                type: "error",
+                message: `更新失败`,
+                duration: 1500,
+              });
+            }
+          })
+          .catch((e) => {
+            if (e.status == 500) {
+              ElMessage({
+                type: "error",
+                message: `保存出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            }
+          });
       }
     },
     //获取课程目标
