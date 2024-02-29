@@ -1022,6 +1022,7 @@ export default {
           that.courseTypeSource.push(type.dictLabel);
         });
       });
+
       return request({
         url: "detail/versionList",
         method: "get",
@@ -1392,7 +1393,7 @@ export default {
         } else {
           this.currentVersionId = value;
         }
-
+        console.log("currentVersionId", this.currentVersionId);
         this.$store.commit(
           "course/setbaseCourseVersionId",
           this.currentVersionId
@@ -1920,7 +1921,10 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.identity = this.$store.state.currentInfo.identity;
-
+      console.log(
+        "this.$store.state.course.baseCourseVersionId",
+        this.$store.state.course.baseCourseVersionId
+      );
       if (
         sessionStorage.getItem("baseCourseHasDetail") === null ||
         sessionStorage.getItem("baseCourseHasDetail")
