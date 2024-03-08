@@ -773,6 +773,9 @@ export default {
     };
 
     return {
+      canGobasecourse: true,
+      canAddbbasecourseDetail: true,
+
       hasVersion: false,
       hasNoVersion: false,
 
@@ -1342,95 +1345,97 @@ export default {
     },
     addBaseCourseDetail(row) {
       console.log("currentVersionId", this.currentVersionId);
-      if (this.currentVersionId) {
-        let that = this;
-        for (const element of this.versions) {
-          if (element["versionId"] == that.currentVersionId) {
-            console.log("find same ");
-            that.currentVersion = element["label"];
-            that.currentVersionName = element["label"];
+      if (this.canAddbbasecourseDetail) {
+        if (this.currentVersionId) {
+          let that = this;
+          for (const element of this.versions) {
+            if (element["versionId"] == that.currentVersionId) {
+              console.log("find same ");
+              that.currentVersion = element["label"];
+              that.currentVersionName = element["label"];
+            }
           }
-        }
-        console.log("currentVersionName", this.currentVersionName);
-        let versionMessage =
-          "是否确认添加课程大纲（版本：" + this.currentVersionName + " ）?";
-        ElMessageBox.confirm(versionMessage, "", {
-          confirmButtonText: "确认",
-          cancelButtonText: "取消",
-          type: "warning",
-        }).then(() => {
-          console.log(
-            "versionId",
-            that.currentVersionId,
-            "CourseId",
-            that.courseId
-          );
+          console.log("currentVersionName", this.currentVersionName);
+          let versionMessage =
+            "是否确认添加课程大纲（版本：" + this.currentVersionName + " ）?";
+          ElMessageBox.confirm(versionMessage, "", {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(() => {
+            console.log(
+              "versionId",
+              that.currentVersionId,
+              "CourseId",
+              that.courseId
+            );
 
-          return request({
-            url: "/detail",
-            method: "post",
-            data: {
-              versionId: that.currentVersionId,
-              courseId: row.courseId,
-              departmentId: that.departmentId,
-              schoolId: that.schoolId,
-            },
-          })
-            .then(function (res) {
-              console.log(res);
-              if (res.code == "SUCCESS") {
-                ElMessage({
-                  type: "success",
-                  message: `新建成功`,
-                  duration: 1500,
-                });
-                //成功后根据vesionId和basecouseId获取详细信息
-                that.getBaseCourse(that.pageSize, that.pageNum);
-              }
+            return request({
+              url: "/detail",
+              method: "post",
+              data: {
+                versionId: that.currentVersionId,
+                courseId: row.courseId,
+                departmentId: that.departmentId,
+                schoolId: that.schoolId,
+              },
             })
-            .catch((e) => {
-              console.log("e", e);
-              if (
-                e.data.code == "UNPROCESSABLE ENTITY" &&
-                e.data.msg == "UNPROCESSABLE ENTIT"
-              ) {
-                ElMessage({
-                  type: "error",
-                  message: `没有选择课程大纲版本`,
-                  duration: 1500,
-                });
-                //成功后根据vesionId和basecouseId获取详细信息
-                that.getBaseCourse(that.pageSize, that.pageNum);
-              } else if (e.status === 409) {
-                ElMessage({
-                  type: "error",
-                  message: `新建失败,课程已存在`,
-                  duration: 1500,
-                });
-              } else if (e.status === 500) {
-                ElMessage({
-                  type: "error",
-                  message: `保存出错，请检查填写的内容`,
-                  duration: 1500,
-                });
-              } else {
-                ElMessage({
-                  type: "error",
-                  message: `未知错误,请联系相关人员`,
-                  duration: 1500,
-                });
-              }
+              .then(function (res) {
+                console.log(res);
+                if (res.code == "SUCCESS") {
+                  ElMessage({
+                    type: "success",
+                    message: `新建成功`,
+                    duration: 1500,
+                  });
+                  //成功后根据vesionId和basecouseId获取详细信息
+                  that.getBaseCourse(that.pageSize, that.pageNum);
+                }
+              })
+              .catch((e) => {
+                console.log("e", e);
+                if (
+                  e.data.code == "UNPROCESSABLE ENTITY" &&
+                  e.data.msg == "UNPROCESSABLE ENTIT"
+                ) {
+                  ElMessage({
+                    type: "error",
+                    message: `没有选择课程大纲版本`,
+                    duration: 1500,
+                  });
+                  //成功后根据vesionId和basecouseId获取详细信息
+                  that.getBaseCourse(that.pageSize, that.pageNum);
+                } else if (e.status === 409) {
+                  ElMessage({
+                    type: "error",
+                    message: `新建失败,课程已存在`,
+                    duration: 1500,
+                  });
+                } else if (e.status === 500) {
+                  ElMessage({
+                    type: "error",
+                    message: `保存出错，请检查填写的内容`,
+                    duration: 1500,
+                  });
+                } else {
+                  ElMessage({
+                    type: "error",
+                    message: `未知错误,请联系相关人员`,
+                    duration: 1500,
+                  });
+                }
 
-              //失败后退回basecouse页面
-              that.getBaseCourse(that.pageSize, that.pageNum);
-            });
-        });
-      } else {
-        ElMessage({
-          type: "error",
-          message: `请选择课程大纲！`,
-          duration: 1500,
-        });
+                //失败后退回basecouse页面
+                that.getBaseCourse(that.pageSize, that.pageNum);
+              });
+          });
+        } else {
+          ElMessage({
+            type: "error",
+            message: `请选择课程大纲！`,
+            duration: 1500,
+          });
+        }
       }
     },
 
@@ -1488,6 +1493,13 @@ export default {
       var courseId = [];
       this.multipleSelection = val;
       console.log("选中的信息：", val);
+      if (val.length) {
+        this.canGobasecourse = false;
+        this.canAddbbasecourseDetail = false;
+      } else {
+        this.canGobasecourse = true;
+        this.canAddbbasecourseDetail = true;
+      }
       val.forEach(function (course) {
         let res = course.courseId;
         courseId.push(res);
@@ -1827,41 +1839,59 @@ export default {
         });
     },
     goBaseCourseDetail(row, column) {
-      console.log("goBaseCourseDetail", row.bcDetails.length);
+      if (this.canGobasecourse) {
+        console.log("goBaseCourseDetail", row, column);
 
-      sessionStorage.setItem("baseCourseSearchForm", this.keyword);
-      // sessionStorage.removeItem("baseCourseSearchFlag");
-      if (column.columnKey === undefined) {
-        if (row.bcDetails.length) {
-          let versionName = "";
-          for (const element of this.versions) {
-            if (element["versionId"] == this.currentVersionId) {
-              versionName = element["label"];
+        sessionStorage.setItem("baseCourseSearchForm", this.keyword);
+        // sessionStorage.removeItem("baseCourseSearchFlag");
+        if (column.columnKey === undefined) {
+          if (row.bcDetails.length) {
+            let versionName = "";
+            for (const element of this.versions) {
+              if (element["versionId"] == this.currentVersionId) {
+                versionName = element["label"];
+              }
             }
-          }
-          this.$store.commit("course/setbaseCourseVersionName", versionName);
-          this.$store.commit("course/setbaseCourseVersionFlag", row.versionId);
-          this.$store.commit(
-            "course/setbaseCourseVersionId",
-            this.currentVersionId
-          );
-          this.$store.commit("course/setbaseCourseCourseId", row.courseId);
-          this.$store.commit("course/setbaseCourseCourseName", row.courseName);
-          this.$store.commit("course/setbaseCourseCourseCode", row.courseCode);
-          this.$store.commit("course/setbaseCourseCourseType", row.courseType);
-          this.$store.commit(
-            "course/setbaseCourseCourseNature",
-            row.courseNature
-          );
-          this.$store.commit("course/setbaseCourseCredit", row.credit);
-          this.$store.commit("course/setbaseCourseCourseYear", row.courseYear);
-          this.$store.commit("course/setbaseCourseRemark", row.remark);
 
-          this.$router.push({
-            path: "/baseCourseDetail",
-          });
-        } else {
-          this.addBaseCourseDetail(row);
+            this.$store.commit("course/setbaseCourseVersionName", versionName);
+            this.$store.commit(
+              "course/setbaseCourseVersionFlag",
+              row.versionId
+            );
+            this.$store.commit(
+              "course/setbaseCourseVersionId",
+              this.currentVersionId
+            );
+            this.$store.commit("course/setbaseCourseCourseId", row.courseId);
+            this.$store.commit(
+              "course/setbaseCourseCourseName",
+              row.courseName
+            );
+            this.$store.commit(
+              "course/setbaseCourseCourseCode",
+              row.courseCode
+            );
+            this.$store.commit(
+              "course/setbaseCourseCourseType",
+              row.courseType
+            );
+            this.$store.commit(
+              "course/setbaseCourseCourseNature",
+              row.courseNature
+            );
+            this.$store.commit("course/setbaseCourseCredit", row.credit);
+            this.$store.commit(
+              "course/setbaseCourseCourseYear",
+              row.courseYear
+            );
+            this.$store.commit("course/setbaseCourseRemark", row.remark);
+
+            this.$router.push({
+              path: "/baseCourseDetail",
+            });
+          } else {
+            this.addBaseCourseDetail(row);
+          }
         }
       }
     },

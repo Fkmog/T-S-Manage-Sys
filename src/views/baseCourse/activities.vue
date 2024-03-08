@@ -886,8 +886,10 @@ export default {
     },
     getActivities() {
       let that = this;
+      this.db.items = [];
       if (this.from == "Score") {
         console.log("this is the activity from class");
+
         return request({
           url: "/classes/" + that.classInfo.classId,
           method: "get",
@@ -1024,6 +1026,7 @@ export default {
       let that = this;
       this.saving = true;
       this.dirty = false;
+      this.itemOrValueisEmpty = false;
       this.postData.objectives = {
         object: [],
         title: [],
@@ -1072,10 +1075,10 @@ export default {
             }
             if (!this.db.items[keyNum[i]][1][j]) {
               this.itemOrValueisEmpty = true;
-            } else {
-              this.itemOrValueisEmpty = false;
             }
-            tempitem.push(this.db.items[keyNum[i]][0][j]);
+            tempitem.push(
+              this.db.items[keyNum[i]][0][j].replace(/[\n\s]/g, "")
+            );
             tempvalue.push(this.db.items[keyNum[i]][1][j]);
             tempremark.push(this.db.items[keyNum[i]][2][j]);
             tempweight.push(this.db.items[keyNum[i]][3][j]);
@@ -1350,10 +1353,10 @@ export default {
   margin: 10px;
 }
 .card-container {
-  /* margin-top: 100px; */
+  z-index: 100;
   margin-left: 10%;
   width: 80%;
-  height: 120px;
+  height: 200px;
   background-color: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   overflow: auto;
@@ -1378,7 +1381,7 @@ export default {
 .hot-table-container {
   /* float: left; */
   display: flex;
-  /* height: 100px; */
+  /* height: 160px; */
   /* margin-top: 10px; */
   margin-left: 10px;
 }

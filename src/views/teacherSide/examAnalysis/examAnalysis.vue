@@ -403,7 +403,10 @@ export default {
               cellProperties.readOnly = true;
             }
           }
-          if (col == 0) {
+          if (col === 0 || row === 0) {
+            cellProperties.readOnly = true;
+          }
+          if (col === that.db.objectives["0"].length - 2) {
             cellProperties.readOnly = true;
           }
         }
@@ -437,12 +440,31 @@ export default {
             for (let i = 0; i < setting.sum.length; i++) {
               let templist = [];
               templist.push(setting.sum[i]);
-
+              let tempString = "";
               for (let j = 0; j < setting.value[i].length; j++) {
                 templist.push(setting.value[i][j]);
+                if (setting.value[i][j]) {
+                  let indexOfAverageScoreOnTitle = setting.sum.length + 2;
+                  console.log(setting.value[i][j], j);
+                  tempString =
+                    tempString +
+                    String.fromCharCode(66 + j) +
+                    indexOfAverageScoreOnTitle +
+                    "+";
+                }
               }
               if (averageScore) {
-                templist.push(averageScore.averageScoreOnObject[i]);
+                let calculateAverageScoreOnObject =
+                  "=" +
+                  "SUM(" +
+                  tempString.slice(0, tempString.length - 1) +
+                  ")";
+                console.log(
+                  "calculateAverageScoreOnObject",
+                  calculateAverageScoreOnObject
+                );
+                // templist.push(averageScore.averageScoreOnObject[i]);
+                templist.push(calculateAverageScoreOnObject);
               } else {
                 templist.push(null);
               }
