@@ -354,7 +354,25 @@ export default {
               }
             })
             .catch((e) => {
-              // console.log('e',e);
+              if (e.status === 409) {
+                ElMessage({
+                  type: "error",
+                  message: `新建失败,提交已存在`,
+                  duration: 1500,
+                });
+              } else if (e.status === 500) {
+                ElMessage({
+                  type: "error",
+                  message: `提交出错，请检查填写的内容`,
+                  duration: 1500,
+                });
+              } else {
+                ElMessage({
+                  type: "error",
+                  message: `未知错误,请联系相关人员`,
+                  duration: 1500,
+                });
+              }
             });
         } else {
           ElMessage({
@@ -437,27 +455,62 @@ export default {
                 this.getClassInfo();
               })
               .catch((e) => {
-                ElMessage({
-                  type: "error",
-                  message: `新建失败`,
-                  duration: 1500,
-                });
-                // console.log('e',e);
+                if (e.status === 409) {
+                  ElMessage({
+                    type: "error",
+                    message: `新建失败,提交已存在`,
+                    duration: 1500,
+                  });
+                } else if (e.status === 500) {
+                  ElMessage({
+                    type: "error",
+                    message: `新建出错，请检查填写的内容`,
+                    duration: 1500,
+                  });
+                } else {
+                  ElMessage({
+                    type: "error",
+                    message: `未知错误,请联系相关人员`,
+                    duration: 1500,
+                  });
+                }
               });
           })
           .catch(() => {});
       } else {
-        submit(this.classInfo.classId).then((res) => {
-          // console.log("res", res);
-          if (res.code == "SUCCESS") {
-            ElMessage({
-              type: "success",
-              message: `新建成功`,
-              duration: 1500,
-            });
-          }
-          this.getClassInfo();
-        });
+        submit(this.classInfo.classId)
+          .then((res) => {
+            // console.log("res", res);
+            if (res.code == "SUCCESS") {
+              ElMessage({
+                type: "success",
+                message: `新建成功`,
+                duration: 1500,
+              });
+            }
+            this.getClassInfo();
+          })
+          .catch((e) => {
+            if (e.status === 409) {
+              ElMessage({
+                type: "error",
+                message: `新建失败,提交已存在`,
+                duration: 1500,
+              });
+            } else if (e.status === 500) {
+              ElMessage({
+                type: "error",
+                message: `新建出错，请检查填写的内容`,
+                duration: 1500,
+              });
+            } else {
+              ElMessage({
+                type: "error",
+                message: `未知错误,请联系相关人员`,
+                duration: 1500,
+              });
+            }
+          });
       }
     },
     //确定提交状态

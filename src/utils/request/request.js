@@ -37,8 +37,8 @@ axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
 // 创建axios实例
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API,
-  // baseURL: "http://47.113.206.164/prod-api/",
-  baseURL: "https://jxjk.hdu.edu.cn/prod-api/",
+  baseURL: "http://47.113.206.164/prod-api/",
+  // baseURL: "https://jxjk.hdu.edu.cn/prod-api/",
   timeout: 20 * 1000, //超时请求时间：20s
 });
 
@@ -94,6 +94,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (res) => {
+    
     // 未设置状态码则默认成功状态
     // const code = res.data.code || 200;
     if (res.headers["content-type"] === "application/octet-stream") {
@@ -185,7 +186,7 @@ service.interceptors.response.use(
         });
       }
     } else if (error.response.status === 404 || error.response.status === 422) {
-      return Promise.reject(error.response.data);
+      return Promise.reject(error.response);
     } else if (error.response.status === 400) {
       if (error.response.data.msg == "用户不存在/密码错误") {
         ElMessage({
@@ -203,9 +204,10 @@ service.interceptors.response.use(
         return Promise.reject(error);
       }
     }
-    else if (error.response.status === 409) {
-      return error.response.data;
-    }
+    // else if (error.response.status === 409) {
+    //   console.log('error.response.status === 409')
+    //   return error.response;
+    // }
     else{
       return Promise.reject(error.response);
     }

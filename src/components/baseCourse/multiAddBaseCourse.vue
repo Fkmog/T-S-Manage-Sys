@@ -266,21 +266,26 @@ export default {
         );
       });
 
-      this.addBaseCourses(this.postData.courses).then(function (res) {
-        console.log("res:", res);
-        that.firstActivities = true;
-        if (res.code == "SUCCESS") {
-          ElMessage({
-            type: "success",
-            message: `新建成功`,
-            duration: 1500,
-          });
+      this.addBaseCourses(this.postData.courses)
+        .then(function (res) {
+          console.log("res123123123:", res);
+          that.firstActivities = true;
+          if (res.code == "SUCCESS") {
+            ElMessage({
+              type: "success",
+              message: `新建成功`,
+              duration: 1500,
+            });
 
-          that.goBackandClean();
-          that.isNotDirty();
-        } else {
-          if (res.code == "E_CODE_EXIST") {
-            res.data.forEach(function (teacher) {
+            that.goBackandClean();
+            that.isNotDirty();
+          }
+        })
+        .catch((e) => {
+          console.log("e", e);
+          let error = e.data;
+          if (error.code == "E_CODE_EXIST") {
+            error.data.forEach(function (teacher) {
               that.hotInstance.setCellMetaObject(Object.keys(teacher)[0], 0, {
                 validator: /.+@.+/,
               });
@@ -331,18 +336,21 @@ export default {
               message: `新建失败,标红课程已存在`,
               duration: 1500,
             });
+          } else if (e.status === 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
           } else {
             ElMessage({
               type: "error",
-              message: `新建失败`,
+              message: `未知错误,请联系相关人员`,
               duration: 1500,
             });
           }
-
-          // that.goBackandClean();
           that.isNotDirty();
-        }
-      });
+        });
     },
     toPostData() {
       this.postData.courses.length = 0; // clean array
@@ -440,7 +448,6 @@ export default {
       }
     },
     addBaseCourses(postData) {
-      let localres;
       let courseList = [];
 
       this.postData.courses.forEach(function (course) {
@@ -452,19 +459,7 @@ export default {
         url: "/baseCourse/addCourses",
         method: "post",
         data: courseList,
-      })
-        .then(function (res) {
-          localres = res;
-          console.log("localres", localres);
-          return localres;
-        })
-        .catch((e) => {
-          if (e.response) {
-            return e.response.data;
-          } else {
-            return e;
-          }
-        });
+      });
     },
     async handleEvent(event) {
       switch (event.keyCode) {

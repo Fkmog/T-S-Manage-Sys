@@ -252,17 +252,30 @@ export default {
             });
             that.isNotDirty();
             that.goBackandClean();
-          } else {
-            ElMessage({
-              type: "error",
-              message: `新建失败`,
-              duration: 1500,
-            });
-            that.goBackandClean();
           }
         })
         .catch((e) => {
-          console.log("e", e);
+          if (e.status == 500) {
+            ElMessage({
+              type: "error",
+              message: `保存出错，请检查填写的内容`,
+              duration: 1500,
+            });
+          } else if (e.status === 409) {
+            ElMessage({
+              type: "error",
+              message: `新建失败,教师已存在`,
+              duration: 1500,
+            });
+          } else {
+            ElMessage({
+              type: "error",
+              message: `未知错误,请联系相关人员`,
+              duration: 1500,
+            });
+          }
+          that.isNotDirty();
+          that.goBackandClean();
         });
     },
     toPostData() {

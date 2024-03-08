@@ -26,7 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="设置手册模板"
+            content="修改关联模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -43,7 +43,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="预设手册模板"
+            content="预设关联模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -60,7 +60,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="删除手册模板"
+            content="删除关联模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -79,7 +79,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="设置手册模板"
+            content="设置关联模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -250,7 +250,7 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.code == "NOT_FIND") {
+          if (e.data.code == "NOT_FIND") {
             this.hasWorkbook = false;
           }
         });
