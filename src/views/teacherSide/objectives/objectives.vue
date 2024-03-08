@@ -21,7 +21,7 @@
               <Back />
             </el-icon>
           </el-tooltip>
-          <div class="title">课程目标</div>
+          <div class="title">课程目标1</div>
           <el-divider class="divider" direction="vertical" />
           <el-tooltip
             class="box-item"
@@ -43,7 +43,7 @@
           <span class="head-text" style="color: grey; font-size: 14px"
             >课程目标</span
           >
-          <div v-show="isRespondent">
+          <div v-show="isRespondent&&identity === '教师'">
             <el-tooltip
               class="box-item"
               effect="dark"
@@ -65,7 +65,7 @@
           />
         </div>
         <div v-for="objective in objectives" :key="objective.id">
-          <el-row style="width:800px">
+          <el-row style="width: 800px">
             <el-col :span="1" class="objective-num">{{
               objective.serialNum
             }}</el-col>
@@ -83,13 +83,13 @@
             >
             </el-col>
             <el-col :span="20">
-              <div class="objective-name">
+              <div v-show="objective.name" class="objective-name">
                 {{ objective.name }}
               </div>
               <div class="objective-description">
                 {{ objective.description }}
               </div>
-              <div style="margin-top: 30px">
+              <div style="margin-top: 20px">
                 <span style="color: grey; font-size: 14px">考核方式</span>
               </div>
               <div
@@ -102,13 +102,21 @@
                   </el-col>
                   <el-col :span="4">( {{ assessment.weight }}% )</el-col>
                   <el-col :span="12">
-                    <el-row>
+                    <el-row :gutter="20">
                       <el-col
                         :span="8"
-                        v-for="(activity, index) in assessment.activities.item"
-                        :key="index"
+                        style="margin-bottom: 10px"
+                        v-for="(activity, index2) in assessment.activities.item"
+                        :key="index2"
                       >
+                        <el-tooltip
+                          :hide-after="0"
+                          :content="assessment.activities.table[index2]"
+                          effect="dark"
+                          placement="top"
+                        >
                         {{ activity }}
+                        </el-tooltip>
                       </el-col>
                     </el-row>
                   </el-col>
@@ -152,7 +160,7 @@
       <div v-show="hasDetailId && !hasObjective">
         <el-row class="no-info">
           <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
-          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent"
+          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent&&identity === '教师'"
             >去设置</el-col
           >
         </el-row>
@@ -257,10 +265,13 @@ export default {
                 object.hasAchieve = false;
               }
               object.assessmentMethods.forEach((assess) => {
-                if (assess.achievement === null||assess.achievement === undefined) {
+                if (
+                  assess.achievement === null ||
+                  assess.achievement === undefined
+                ) {
                   assess.achievementTwo = "";
                 } else {
-                  assess.achievementTwo = assess.achievement.toFixed(3) ;
+                  assess.achievementTwo = assess.achievement.toFixed(3);
                 }
               });
             });
@@ -330,14 +341,14 @@ export default {
   font-size: 1.6em;
   color: #5c6bc0;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 20px;
   padding-left: 16px;
 }
 .objective-achieve {
   font-size: 1.6em;
   color: #ff5722;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 20px;
   padding-left: 16px;
 }
 .objective-name {
@@ -345,10 +356,10 @@ export default {
   font-weight: bold;
   word-wrap: break-all;
 
-  margin-top: 33px;
+  margin-top: 20px;
 }
 .objective-description {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 .assessments {
   margin-top: 30px;

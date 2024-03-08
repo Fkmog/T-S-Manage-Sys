@@ -100,9 +100,7 @@ export default {
     // 提交预设信息
     save() {
       console.log("save", this.json);
-      // this.presentValue = this.formPresent;
       this.searchChildren(this.json);
-      // console.log("presentValue", this.presentValue);
       present(this.detailId, this.presentValue, this.courseId)
         .then((res) => {
           if (res.code === "SUCCESS") {
@@ -164,49 +162,31 @@ export default {
           res.data.formJson.forEach((form) => {
             // let that = this;
             if (form.type === "upload") {
-              //   console.log(form);
-              //   const limit = form.props.limit;
               form.props = {
                 disabled: true,
               };
-              //     limit: limit,
-              //     listType: "text",
-              //     multiple: true,
-              //     name: "files",
-              //     action: "http://81.68.103.96:8080/common/upload/files",
-              //     headers: {
-              //       Authorization: "Bearer " + Cookies.get("Admin-Token"),
-              //     },
-              //     data: {
-              //       param: this.classInfo.classId,
-              //       type: "workbookFile",
-              //       field: form.field,
-              //     },
-              //     onSuccess: function (res, file) {
-              //       console.log("upload", res, file);
-              //       file.url = res.fileRecords[0].fileAddress;
-              //     },
-              //     onExceed: function () {
-              //       ElMessage({
-              //         type: "warning",
-              //         message: `超出上传文件数量限制`,
-              //         duration: 1500,
-              //       });
-              //     },
-              //     onPreview: function (file) {
-              //       that.download(file);
-              //     },
-              //   };
             }
           });
           this.workbook = res.data;
           this.workbookId = this.workbook.workbookId;
           this.value = this.workbook.formJson;
+          this.dfs(this.value);
           console.log("getWorkbook", this.workbook);
           this.json = res.data.formJson;
           this.option = res.data.cssJson;
           // 保存提交
           this.option.submitBtn = false;
+        }
+      });
+    },
+    // 遍历，去掉所有required
+    dfs(forms) {
+      forms.forEach((form) => {
+        if (form.$required) {
+          form.$required = false;
+        }
+        if (form.children) {
+          this.dfs(form.children);
         }
       });
     },

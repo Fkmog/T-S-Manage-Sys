@@ -54,7 +54,7 @@
         </div>
         <el-form :model="objectives" ref="objectives" label-position="top">
           <el-col v-for="(objective, idx) in objectives" :key="objective.id">
-            <el-row style="margin-top: 20px">
+            <el-row style="margin-top: 0px">
               <el-col :span="3" class="two-digits" style="padding-left: 16px">
                 <section class="num-title">
                   <section class="num-wrap">
@@ -76,7 +76,7 @@
                   <el-form-item
                     label="达成途径"
                     class="title"
-                    style="margin-top: 50px"
+                    style="margin-top: 30px"
                   >
                     <el-input
                       v-model="objective.description"
@@ -95,7 +95,7 @@
                     {{ objective.description }}
                   </div>
                 </div>
-                <el-row style="margin-top: 50px">
+                <el-row style="margin-top: 20px">
                   <el-col :span="22">
                     <span style="color: grey; font-size: 14px">考核方式</span>
                   </el-col>
@@ -124,11 +124,18 @@
                         <el-row>
                           <el-col
                             :span="6"
-                            v-for="(activity, index) in assessment.activities
+                            v-for="(activity, index2) in assessment.activities
                               .item"
-                            :key="index"
+                            :key="index2"
                           >
-                            {{ activity }}
+                            <!-- <el-tooltip
+                              :hide-after="0"
+                              :content="123"
+                              effect="dark"
+                              placement="top"
+                            > -->
+                              {{ activity }}
+                            <!-- </el-tooltip> -->
                           </el-col>
                         </el-row>
                       </el-col>
@@ -150,7 +157,7 @@
                 </el-row>
               </el-col>
             </el-row>
-            <div style="height: 50px"></div>
+            <div style="height: 20px"></div>
           </el-col>
           <el-row
             class="attribute-Btn"
@@ -241,20 +248,13 @@
           </el-col>
           <el-col :span="1"></el-col>
           <el-col :span="13">
-            <el-select
-              multiple
+            <el-cascader
+              v-model="assessment.activities.frontItem"
+              :options="allOfAll"
+              :props="props"
               placeholder="成绩项"
-              v-model="assessment.activities.item"
               style="width: 330px"
-            >
-              <el-option
-                v-for="(item, index2) in allActivities.itemObject"
-                :key="index2"
-                :label="item.value"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
+            ></el-cascader>
           </el-col>
           <el-col :span="1">
             <div class="closeIcon">
@@ -306,6 +306,7 @@ import {
   saveObjectivesForClass,
 } from "@/api/basecourse";
 import { ElMessageBox, ElMessage } from "element-plus";
+import { getClassInfo } from "@/api/class";
 
 export default {
   name: "baseCourseObjectivesEdit",
@@ -320,6 +321,11 @@ export default {
   },
   data() {
     return {
+      classId: "",
+      map: {},
+      props: {
+        multiple: true,
+      },
       info: [],
       course: {
         name: "",
@@ -338,6 +344,7 @@ export default {
       deleteSerialNum: "",
       activities: {},
       allActivities: {},
+      allOfAll: [],
       isEditWeight: false,
       isChange: false, //页面有无修改
       canDelete: false,
@@ -355,7 +362,8 @@ export default {
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     this.checkObjectives();
-    console.log("123", this.$store.state.currentInfo.identity);
+    // console.log("123", this.$store.state.currentInfo.identity);
+    // console.log("123", this.$store.state.course);
   },
   methods: {
     backObjectives() {
@@ -405,7 +413,7 @@ export default {
         }
         this.list.objectives.forEach((object) => {
           if (object.description == "") {
-            ElMessage.error("描述内容不能为空");
+            ElMessage.error("达成途径不能为空");
             throw "true";
           } else if (object.assessmentMethods.length == 0) {
             ElMessage.error("请为课程目标添加考核方式");
@@ -455,7 +463,10 @@ export default {
               });
             }
           });
-      } else {
+      } else if (
+        this.$store.state.currentInfo.identity == "学院管理员" ||
+        this.$store.state.currentInfo.identity == "课程负责人"
+      ) {
         saveObjectives(this.list)
           .then((res) => {
             console.log("保存的内容", this.list);
@@ -490,56 +501,146 @@ export default {
     },
     //获取课程目标
     checkObjectives() {
-      getObjectives(this.course.detailId).then((res) => {
-        //list存放初始数据
-        this.list = res.data;
-        if (res.hasOwnProperty("info")) {
-          this.info = res.info;
-        }
-        console.log("getObjectives", res);
-        this.allActivities = this.list.activities;
-        // console.log("初始list", this.list);
-        console.log("初始allActivities", this.list.activities);
-        if (this.allActivities.length > 0) {
-          this.allActivities.itemObject = this.allActivities[0].item.map(
-            (item) => ({
-              value: item,
-            })
-          );
-        }
-
-        // console.log("格式化后的list", this.list);
-        //处理数据-serialNum
-        if (this.list.objectives) {
-          this.list.objectives.forEach((value) => {
-            if (value.id.charAt(0) == "0") {
-              value.serialNum = value.id.charAt(1);
-            } else {
-              value.serialNum = value.id;
-            }
-          });
-        }
-        this.objectives = this.list.objectives;
-        this.objectives.forEach((object) => {
-          object.assessmentMethods.forEach((assessment) => {
-            //处理select选择器所需要的数据结构
-            assessment.activities.itemObject = assessment.activities.item.map(
-              (item) => ({ value: item })
-            );
-            // 处理assessmentMethods 拼接控制展示/编辑字段
-            assessment.isEditWeight = false;
-          });
-        });
-        console.log("objectives:", this.objectives);
-        //保存成绩项
-        if (this.objectives.length > 0) {
-          if (this.objectives[0].assessmentMethods.length > 0) {
-            this.activities =
-              this.objectives[0].assessmentMethods[0].activities;
+      if (this.$store.state.currentInfo.identity === "教师") {
+        this.classId =
+          this.$store.state.currentInfo.teacherSideClassInfo.classId;
+        getClassInfo(this.classId).then((res) => {
+          //list存放初始数据
+          this.list = res.data;
+          if (res.hasOwnProperty("info")) {
+            this.info = res.info;
           }
-        }
-        this.getDeleteSerialNum();
-      });
+          console.log("getObjectives", res);
+
+          for (let i = 0; i < this.list.activities.length; i++) {
+            // 做一个映射的map
+            this.map[this.list.activities[i].name] = i;
+            let sheet = this.list.activities[i];
+            this.allOfAll.push({
+              children: [],
+              value: sheet.name,
+              label: sheet.name,
+            });
+            for (let j = 0; j < sheet.item.length; j++) {
+              let obj = {
+                value: sheet.item[j],
+                label: sheet.item[j],
+              };
+              this.allOfAll[i].children.push(obj);
+            }
+            console.log("all",this.allOfAll);
+            if (this.list.objectives[i]) {
+              let cur = this.list.objectives[i].assessmentMethods;
+              for (let k = 0; k < cur.length; k++) {
+                let temp = cur[k].activities;
+                temp.frontItem = [];
+                for (let l = 0; l < temp.item.length; l++) {
+                  if (temp.table) {
+                    temp.frontItem.push([temp.table[l], temp.item[l]]);
+                  }
+                }
+              }
+            }
+            // console.log("@", cur);
+          }
+          // console.log("AllofALL", this.allOfAll);
+          //处理数据-serialNum
+          if (this.list.objectives) {
+            this.list.objectives.forEach((value) => {
+              if (value.id.charAt(0) == "0") {
+                value.serialNum = value.id.charAt(1);
+              } else {
+                value.serialNum = value.id;
+              }
+            });
+          }
+          this.objectives = this.list.objectives;
+          this.objectives.forEach((object) => {
+            object.assessmentMethods.forEach((assessment) => {
+              // 处理assessmentMethods 拼接控制展示/编辑字段
+              assessment.isEditWeight = false;
+            });
+          });
+          console.log("objectives:", this.objectives);
+          //保存成绩项
+          // if (this.objectives.length > 0) {
+          //   if (this.objectives[0].assessmentMethods.length > 0) {
+          //     this.activities =
+          //       this.objectives[0].assessmentMethods[0].activities;
+          //   }
+          // }
+          this.getDeleteSerialNum();
+        });
+      } else if (
+        this.$store.state.currentInfo.identity == "学院管理员" ||
+        this.$store.state.currentInfo.identity == "课程负责人"
+      ) {
+        getObjectives(this.course.detailId).then((res) => {
+          //list存放初始数据
+          this.list = res.data;
+          if (res.hasOwnProperty("info")) {
+            this.info = res.info;
+          }
+          console.log("getObjectives", res);
+          for (let i = 0; i < this.list.activities.length; i++) {
+            // 做一个映射的map
+            this.map[this.list.activities[i].name] = i;
+            let sheet = this.list.activities[i];
+            this.allOfAll.push({
+              children: [],
+              value: sheet.name,
+              label: sheet.name,
+            });
+            for (let j = 0; j < sheet.item.length; j++) {
+              let obj = {
+                value: sheet.item[j],
+                label: sheet.item[j],
+              };
+              this.allOfAll[i].children.push(obj);
+            }
+             console.log("all",this.allOfAll);
+            if (this.list.objectives[i]) {
+              let cur = this.list.objectives[i].assessmentMethods;
+              for (let k = 0; k < cur.length; k++) {
+                let temp = cur[k].activities;
+                temp.frontItem = [];
+                for (let l = 0; l < temp.item.length; l++) {
+                  if (temp.table) {
+                    temp.frontItem.push([temp.table[l], temp.item[l]]);
+                  }
+                }
+              }
+            }
+          }
+          // console.log("AllofALL", this.allOfAll);
+          //处理数据-serialNum
+          if (this.list.objectives) {
+            this.list.objectives.forEach((value) => {
+              if (value.id.charAt(0) == "0") {
+                value.serialNum = value.id.charAt(1);
+              } else {
+                value.serialNum = value.id;
+              }
+            });
+          }
+          this.objectives = this.list.objectives;
+          this.objectives.forEach((object) => {
+            object.assessmentMethods.forEach((assessment) => {
+              // 处理assessmentMethods 拼接控制展示/编辑字段
+              assessment.isEditWeight = false;
+            });
+          });
+          console.log("objectives:", this.objectives);
+          //保存成绩项
+          // if (this.objectives.length > 0) {
+          //   if (this.objectives[0].assessmentMethods.length > 0) {
+          //     this.activities =
+          //       this.objectives[0].assessmentMethods[0].activities;
+          //   }
+          // }
+          this.getDeleteSerialNum();
+        });
+      }
     },
     //编辑考核方式
     editAssessments(objective, index) {
@@ -574,16 +675,15 @@ export default {
     },
     //确定编辑考核方式
     confirmAddAssessment(dialogObject) {
+      console.log("#",dialogObject);
       let sum = 0;
       // let isMethodsNameNull = false;
       let isItemNull = false;
       let haveZero = false;
       dialogObject.assessmentMethods.forEach((assessment) => {
         sum = sum + Number(assessment.weight);
-        // if (assessment.name == "") {
-        //   isMethodsNameNull = true;
-        // }
-        if (assessment.activities.item.length == 0) {
+        console.log("@",assessment.activities.frontItem);
+        if (assessment.activities.frontItem.length == 0) {
           isItemNull = true;
         }
         if (assessment.weight == "0") {
@@ -611,100 +711,45 @@ export default {
         // 处理activities
         // console.log("dialogObject",dialogObject);
         this.dialogObject.assessmentMethods.forEach((assessmentMethod) => {
-          console.log("assessmentMethod", assessmentMethod);
-          if (!assessmentMethod.hasOwnProperty("itemObject")) {
-            assessmentMethod.activities.itemObject =
-              assessmentMethod.activities.item.map((item) => ({ value: item }));
+          // frontItem 用于前端展示，处理，结果赋值给item，保存到后端
+          let cur = assessmentMethod.activities;
+          if(!('item' in cur)){
+            cur.item=[]
           }
-          // 先将value与remark全部置空，以免后面重复添加
-          assessmentMethod.activities.remark = [];
-          assessmentMethod.activities.value = [];
-          // console.log("制空后的assessmentMethod", assessmentMethod);
-          let array = assessmentMethod.activities.itemObject;
-          console.log("array", array, array[0]);
-          if (array.length === 1) {
-            console.log(
-              "this.allActivities",
-              this.allActivities,
-              this.allActivities.item
-            );
-            let index = this.allActivities.itemObject.findIndex(
-              (itemObject) => itemObject.value === array[0].value
-            );
-            console.log("index", index);
-            if (index > -1) {
-              console.log(!assessmentMethod.activities.hasOwnProperty("value"));
-              if (!(assessmentMethod.activities.item.length == array.length)) {
-                assessmentMethod.activities.item.push(
-                  this.allActivities[0].item[index]
-                );
-              }
-              if (
-                assessmentMethod.activities.value === null ||
-                !assessmentMethod.activities.hasOwnProperty("value")
-              ) {
-                assessmentMethod.activities.value = [];
-              }
-              assessmentMethod.activities.value.push(
-                this.allActivities[0].value[index]
-              );
-              if (
-                assessmentMethod.activities.remark === null ||
-                !assessmentMethod.activities.hasOwnProperty("remark")
-              ) {
-                assessmentMethod.activities.remark = [];
-              }
-              assessmentMethod.activities.remark.push(
-                this.allActivities[0].remark[index]
-              );
+          if(!('remark' in cur)){
+            cur.remark=[]
+          }
+          if(!('value' in cur)){
+            cur.value=[]
+          }
+          let len = 0;
+          if (cur.frontItem) {
+            len = cur.frontItem.length;
+          }
+          for (let i = 0; i < len; i++) {
+            console.log("@@cur",cur);
+            // 确定item：成绩项名，table：成绩表名
+            cur.item[i] = cur.frontItem[i][1];
+            if (!cur.table) {
+              cur.table = [];
             }
+            cur.table[i] = cur.frontItem[i][0];
+            //从map去找到对应的remark和value
+            // index指的是对应的成绩表
+            let index = this.map[cur.table[i]];
+            let sheet = this.list.activities[index];
+            // console.log("@", cur.item[i], sheet.item);
+            let idx = sheet.item.indexOf(cur.item[i]);
+            cur.remark[i] = sheet.remark[idx];
+            cur.value[i] = sheet.value[idx];
+            // weight???暂时不需要
+            // cur.weight[i]=sheet.weight[idx]
           }
-          if (array.length > 1) {
-            array.forEach((singleActivity) => {
-              let index = this.allActivities.itemObject.findIndex(
-                (itemObject) => itemObject.value === singleActivity.value
-              );
-              // console.log("多于1项的时候，",singleActivity,"index",index);
-              if (index > -1) {
-                // console.log("zheli执行了几次", array);
-                if (
-                  !(assessmentMethod.activities.item.length == array.length)
-                ) {
-                  assessmentMethod.activities.item.push(
-                    this.allActivities[0].item[index]
-                  );
-                }
-                if (
-                  assessmentMethod.activities.value === null ||
-                  !assessmentMethod.activities.hasOwnProperty("value")
-                ) {
-                  assessmentMethod.activities.value = [];
-                }
-                assessmentMethod.activities.value.push(
-                  this.allActivities[0].value[index]
-                );
-                if (
-                  assessmentMethod.activities.remark === null ||
-                  !assessmentMethod.activities.hasOwnProperty("remark")
-                ) {
-                  assessmentMethod.activities.remark = [];
-                }
-                assessmentMethod.activities.remark.push(
-                  this.allActivities[0].remark[index]
-                );
-              }
-            });
-          }
-
-          console.log("all", this.allActivities);
+          console.log("after", assessmentMethod);
         });
         this.objectives[this.index].assessmentMethods =
           this.dialogObject.assessmentMethods;
         this.dialogFormVisible = false;
-        console.log(
-          "确定编辑考核方式assessmentMethods",
-          this.dialogObject.assessmentMethods
-        );
       }
     },
     //新增课程目标
@@ -713,7 +758,7 @@ export default {
       newObject.description = "";
       newObject.name = "";
       newObject.achievement = Number;
-      newObject.numStudents = Number;
+      // newObject.numStudents = Number;
       newObject.serialNum = Number(this.deleteSerialNum) + 1;
       if (newObject.serialNum >= 10) {
         newObject.id = newObject.serialNum + "";
@@ -856,7 +901,7 @@ export default {
 }
 .assessment {
   color: #464646;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 .assessments:hover .penIcon {
   opacity: 1;
@@ -880,7 +925,7 @@ export default {
 }
 
 .assessment {
-  margin: 30px 0 30px 0;
+  margin: 10px 0 10px 0;
 }
 .closeIcon {
   margin-top: 7px;
@@ -920,10 +965,10 @@ export default {
   font-size: 1.2em;
   font-weight: bold;
   white-space: nowrap;
-  margin-top: 33px;
+  margin-top: 13px;
 }
 .objective-description {
-  margin-top: 30px;
+  margin-top: 10px;
 }
 :deep().penIcon .el-icon {
   width: 18px;

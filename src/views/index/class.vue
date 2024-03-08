@@ -696,6 +696,7 @@ export default {
       E_ErrorMsg: "",
       T_ErrorMsg: "",
       result: [],
+      canClick:true
     };
   },
   mounted() {
@@ -764,10 +765,12 @@ export default {
       deep: true,
       handler(value) {
         if (value.length > 0) {
+          this.canClick=false
           this.assignedDetail = [];
           this.getDetailList();
           this.showAdd = true;
         } else {
+          this.canClick=true
           this.assignedDetail = [];
           this.showAdd = false;
         }
@@ -785,6 +788,9 @@ export default {
   methods: {
     //跳转到审核页面
     goCheck(row, column) {
+      if(!this.canClick) {
+        return
+      }
       console.log("row:", row);
       if (column.columnKey === undefined) {
         this.$store.commit("currentInfo/setOpenDrawer", false);
