@@ -58,7 +58,8 @@
 import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { WorkbookByCourseId, present, getPresent } from "@/api/workbook";
 import _ from "lodash";
-import { ElMessage } from "element-plus";
+
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default {
   name: "WorkbookPresent",
@@ -84,29 +85,43 @@ export default {
       courseId: "",
       detailId: "",
       workbookId: "",
+      origin: {},
     };
   },
   mounted() {
     this.courseId = this.$store.state.course.courseId;
     this.detailId = this.$store.state.course.detailId;
     this.getWorkbook();
-    this.getPresent();
   },
   methods: {
     // 返回上级页面
     back() {
-      this.$router.push("/templateManage");
+      let temp = JSON.parse(JSON.stringify(this.json));
+      console.log(_.isEqual(this.origin, temp));
+      // console.log(this.origin);
+      if (!(_.isEqual(this.origin, temp))) {
+        ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.push("/templateManage");
+          })
+          .catch(() => {});
+      } else {
+        this.$router.push("/templateManage");
+      }
     },
     // 提交预设信息
     save() {
-      console.log("save", this.json);
+      // console.log("save", this.json, this.presentValue);
       this.searchChildren(this.json);
       present(this.detailId, this.presentValue, this.courseId)
         .then((res) => {
           if (res.code === "SUCCESS") {
-            console.log("present", res);
-            // this.showPresent(this.json);
-            this.getPresent();
+            // console.log("present", res);
+            this.getWorkbook();
             ElMessage({
               type: "success",
               message: "更新成功",
@@ -125,8 +140,8 @@ export default {
         });
     },
     // 查询预设信息
-    getPresent() {
-      getPresent(this.detailId).then((res) => {
+    async getPresent() {
+      await getPresent(this.detailId).then((res) => {
         this.formPresent = res.data.preset.formPreset;
         this.formPresent.forEach((i) => {
           if (i.value[0] == "[") {
@@ -134,12 +149,15 @@ export default {
             console.log("!", i.value);
           }
         });
-        console.log("getPresent", this.formPresent);
-        this.showPresent(this.json);
+        // console.log("getPresent", this.formPresent);
+        // console.log("final", this.json);
       });
+      await this.showPresent(this.json);
+      this.origin = JSON.parse(JSON.stringify(this.json));
+      // console.log("oringin", this.origin);
     },
     // 回显预设信息
-    showPresent(forms) {
+    async showPresent(forms) {
       forms.forEach((form) => {
         if (Array.isArray(form.children) && form.children.length > 0) {
           this.showPresent(form.children);
@@ -155,12 +173,11 @@ export default {
       });
     },
     // 查询对应的工作手册 by courseId
-    getWorkbook() {
+    async getWorkbook() {
       WorkbookByCourseId(this.courseId).then((res) => {
         if (res.code === "SUCCESS") {
           // 找到上传组件，注入props配置
           res.data.formJson.forEach((form) => {
-            // let that = this;
             if (form.type === "upload") {
               form.props = {
                 disabled: true,
@@ -171,11 +188,15 @@ export default {
           this.workbookId = this.workbook.workbookId;
           this.value = this.workbook.formJson;
           this.dfs(this.value);
-          console.log("getWorkbook", this.workbook);
+          console.log("this.value", this.value);
+
+          console.log("getWorkbook1111", this.workbook);
           this.json = res.data.formJson;
           this.option = res.data.cssJson;
           // 保存提交
           this.option.submitBtn = false;
+          // 获取手册信息后再查看预设信息
+          this.getPresent();
         }
       });
     },
