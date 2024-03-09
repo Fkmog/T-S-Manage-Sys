@@ -37,8 +37,8 @@ axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
 // 创建axios实例
 const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API,
-  baseURL: "http://47.113.206.164/prod-api/",
-  // baseURL: "https://jxjk.hdu.edu.cn/prod-api/",
+  // baseURL: "http://47.113.206.164/prod-api/",
+  baseURL: "https://jxjk.hdu.edu.cn/prod-api/",
   timeout: 20 * 1000, //超时请求时间：20s
 });
 
@@ -215,3 +215,6 @@ service.interceptors.response.use(
 );
 
 export default service;
+
+
+

@@ -538,6 +538,7 @@ export default {
               "取消考试资格",
             ];
             cellProperties.allowEmpty = true;
+
             // cellProperties.validator = that.validScoreSetting();
           } else {
             cellProperties.readOnly = true;
@@ -547,8 +548,15 @@ export default {
           cellProperties.readOnly = true;
         }
 
-        if (col < 2) {
-          cellProperties.readOnly = true;
+        if (col < 2 && row > 2) {
+          if (
+            that.currenteditableTabsValue - 1 == 0 ||
+            that.currenteditableTabsValue == 0
+          ) {
+            cellProperties.readOnly = false;
+          } else {
+            cellProperties.readOnly = true;
+          }
         }
 
         return cellProperties;
@@ -1062,6 +1070,12 @@ export default {
               message: `保存出错，请检查填写的内容`,
               duration: 1500,
             });
+          } else if (e.status == 409) {
+            ElMessage({
+              type: "error",
+              message: "成绩项分值为空",
+              duration: 1500,
+            });
           } else {
             ElMessage({
               type: "error",
@@ -1083,6 +1097,7 @@ export default {
 <style scoped>
 .card-container {
   margin-left: 10%;
+  margin-bottom: 50px;
   width: 80%;
   height: 600px;
   background-color: white;
@@ -1091,7 +1106,7 @@ export default {
   /* 这里用auto而不是hidden，应为hidden会直接把多出的部分删除，而auto则会保留多出来的部分，形成页面滑动scroll */
 }
 .activity-tab {
-  height: 200px;
+  height: 100px;
   margin-top: 68px;
   background: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
