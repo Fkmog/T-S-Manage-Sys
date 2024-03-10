@@ -22,6 +22,7 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+
       <!-- 成绩项 -->
       <el-tooltip
         class="box-item"
@@ -35,7 +36,7 @@
         </template>
 
         <el-icon
-          v-show="this.identity == '教师' || this.identity == '学院管理员'"
+          v-show="this.identity == '教师'"
           class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
@@ -43,6 +44,7 @@
           ><Histogram />
         </el-icon>
       </el-tooltip>
+
       <!-- 试卷分析 -->
       <el-tooltip
         v-show="this.identity == '教师'"
@@ -88,7 +90,7 @@
     <addBtn
       @click="goAddScore"
       v-show="
-        identity == '教师' &&
+        (identity == '教师' || identity == '课程负责人') &&
         (classInfo.status == '1' || classInfo.status == '4')
       "
     ></addBtn>
