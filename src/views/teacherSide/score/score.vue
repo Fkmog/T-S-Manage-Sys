@@ -90,7 +90,7 @@
     <addBtn
       @click="goAddScore"
       v-show="
-        (identity == '教师' || identity == '课程负责人') &&
+        identity == '教师' &&
         (classInfo.status == '1' || classInfo.status == '4')
       "
     ></addBtn>
@@ -201,8 +201,21 @@
             font-size: 13px;
             color: #828d96;
           "
+          v-show="identity === '教师'"
         >
           请先点击右上角圆形按钮添加成绩
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #828d96;
+          "
+          v-show="identity !== '教师'"
+        >
+          请先联系课程教师添加成绩
         </div>
       </div>
     </div>
@@ -240,6 +253,7 @@ import { ElMessageBox, ElSwitch, ElMessage } from "element-plus";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 
 import request from "@/utils/request/request";
+import { identity } from "lodash";
 export default {
   name: "Score",
   components: {

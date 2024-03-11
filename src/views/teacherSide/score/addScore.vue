@@ -223,7 +223,7 @@ export default {
             temp < Object.keys(this.db.items[currentPage][1]).length;
             temp++
           ) {
-            this.db.items[i][j][temp] = null;
+            this.db.items[currentPage][j][temp] = null;
           }
         }
         // console.log(Object.keys(this.db.items[i][j]).length);

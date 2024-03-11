@@ -416,145 +416,169 @@ export default {
     },
     getActivities() {
       let that = this;
-      getExamAnalysis(this.classInfo.classId).then((res) => {
-        console.log("getExamAnalysis", res);
-        if (res.data.setting) {
-          let setting = res.data.setting;
-          let averageScore = res.data.averageScore;
-          setting.object.forEach((objectname) => {
-            this.objectivesName.push(objectname);
-          });
-
-          this.objectivesName.push("平均得分");
-          this.objectivesName.push("得分率");
-          console.log("objectivesName", this.objectivesName);
-          if (setting.sum) {
-            // this.objectivesName.concat(setting.object);
-
-            let sum = ["合计"];
-            sum = sum.concat(setting.title);
-            sum.push("平均得分");
-            sum.push("得分率");
-            this.db.objectives.push(sum);
-
-            for (let i = 0; i < setting.sum.length; i++) {
-              let templist = [];
-              templist.push(setting.sum[i]);
-              let tempString = "";
-              for (let j = 0; j < setting.value[i].length; j++) {
-                templist.push(setting.value[i][j]);
-                if (setting.value[i][j]) {
-                  let indexOfAverageScoreOnTitle = setting.sum.length + 2;
-                  console.log(setting.value[i][j], j);
-                  tempString =
-                    tempString +
-                    String.fromCharCode(66 + j) +
-                    indexOfAverageScoreOnTitle +
-                    "+";
-                }
-              }
-              if (averageScore) {
-                let calculateAverageScoreOnObject =
-                  "=" +
-                  "SUM(" +
-                  tempString.slice(0, tempString.length - 1) +
-                  ")";
-                console.log(
-                  "calculateAverageScoreOnObject",
-                  calculateAverageScoreOnObject
-                );
-                // templist.push(averageScore.averageScoreOnObject[i]);
-                templist.push(calculateAverageScoreOnObject);
-              } else {
-                templist.push(null);
-              }
-
-              if (averageScore) {
-                templist.push(averageScore.scoreRateOnObject[i] + "%");
-              } else {
-                templist.push(null);
-              }
-
-              console.log("templist", templist);
-
-              templist[templist.length - 1] =
-                "=" +
-                "TEXT(" +
-                String.fromCharCode(63 + templist.length) +
-                (2 + i) +
-                "/" +
-                String.fromCharCode(65) +
-                (2 + i) +
-                "*100" +
-                ',"0.00%")';
-
-              this.db.objectives.push(templist);
-            }
-
-            let templistaverageScoreOnTitle;
-            if (averageScore) {
-              templistaverageScoreOnTitle = [""];
-              averageScore.averageScoreOnTitle.forEach(
-                (averageScoreOnTitle) => {
-                  templistaverageScoreOnTitle.push(averageScoreOnTitle);
-                }
-              );
-            } else {
-              templistaverageScoreOnTitle = [];
-              for (let i = 0; i < setting.title.length + 1; i++) {
-                templistaverageScoreOnTitle.push(null);
-              }
-            }
-
-            this.db.objectives.push(templistaverageScoreOnTitle);
-
-            let templistscoreRateOnTitle;
-            if (averageScore) {
-              templistscoreRateOnTitle = [""];
-              averageScore.scoreRateOnTitle.forEach((scoreRateOnTitle) => {
-                if (scoreRateOnTitle) {
-                  templistscoreRateOnTitle.push(scoreRateOnTitle + "%");
-                } else {
-                  templistscoreRateOnTitle.push(scoreRateOnTitle);
-                }
-              });
-            } else {
-              templistscoreRateOnTitle = [];
-              for (let i = 0; i < setting.title.length + 1; i++) {
-                templistscoreRateOnTitle.push(null);
-              }
-            }
-
-            for (let i = 1; i < templistscoreRateOnTitle.length; i++) {
-              let sum = "";
-              sum = String.fromCharCode(65 + i) + 2;
-
-              console.log("sum:", sum);
-
-              templistscoreRateOnTitle[i] =
-                "=" +
-                "TEXT(" +
-                String.fromCharCode(65 + i) +
-                (this.objectivesName.length - 1) +
-                "/" +
-                "SUM(" +
-                sum +
-                ")*100" +
-                ',"0.00%")';
-            }
-
-            this.db.objectives.push(templistscoreRateOnTitle);
-          } else {
-            setting.object.forEach(() => {
-              this.db.objectives.push([""]);
+      getExamAnalysis(this.classInfo.classId)
+        .then((res) => {
+          console.log("getExamAnalysis", res);
+          if (res.data.setting) {
+            let setting = res.data.setting;
+            let averageScore = res.data.averageScore;
+            setting.object.forEach((objectname) => {
+              this.objectivesName.push(objectname);
             });
+
+            this.objectivesName.push("平均得分");
+            this.objectivesName.push("得分率");
+            console.log("objectivesName", this.objectivesName);
+            if (setting.sum) {
+              // this.objectivesName.concat(setting.object);
+
+              let sum = ["合计"];
+              sum = sum.concat(setting.title);
+              sum.push("平均得分");
+              sum.push("得分率");
+              this.db.objectives.push(sum);
+
+              for (let i = 0; i < setting.sum.length; i++) {
+                let templist = [];
+                templist.push(setting.sum[i]);
+                let tempString = "";
+                for (let j = 0; j < setting.value[i].length; j++) {
+                  templist.push(setting.value[i][j]);
+                  if (setting.value[i][j]) {
+                    let indexOfAverageScoreOnTitle = setting.sum.length + 2;
+                    console.log(setting.value[i][j], j);
+                    tempString =
+                      tempString +
+                      String.fromCharCode(66 + j) +
+                      indexOfAverageScoreOnTitle +
+                      "+";
+                  }
+                }
+                if (averageScore) {
+                  let calculateAverageScoreOnObject =
+                    "=" +
+                    "SUM(" +
+                    tempString.slice(0, tempString.length - 1) +
+                    ")";
+                  console.log(
+                    "calculateAverageScoreOnObject",
+                    calculateAverageScoreOnObject
+                  );
+                  // templist.push(averageScore.averageScoreOnObject[i]);
+                  templist.push(calculateAverageScoreOnObject);
+                } else {
+                  templist.push(null);
+                }
+
+                if (averageScore) {
+                  templist.push(averageScore.scoreRateOnObject[i] + "%");
+                } else {
+                  templist.push(null);
+                }
+
+                console.log("templist", templist);
+
+                templist[templist.length - 1] =
+                  "=" +
+                  "TEXT(" +
+                  String.fromCharCode(63 + templist.length) +
+                  (2 + i) +
+                  "/" +
+                  String.fromCharCode(65) +
+                  (2 + i) +
+                  "*100" +
+                  ',"0.00%")';
+
+                this.db.objectives.push(templist);
+              }
+
+              let templistaverageScoreOnTitle;
+              if (averageScore) {
+                templistaverageScoreOnTitle = [""];
+                averageScore.averageScoreOnTitle.forEach(
+                  (averageScoreOnTitle) => {
+                    templistaverageScoreOnTitle.push(averageScoreOnTitle);
+                  }
+                );
+              } else {
+                templistaverageScoreOnTitle = [];
+                for (let i = 0; i < setting.title.length + 1; i++) {
+                  templistaverageScoreOnTitle.push(null);
+                }
+              }
+
+              this.db.objectives.push(templistaverageScoreOnTitle);
+
+              let templistscoreRateOnTitle;
+              if (averageScore) {
+                templistscoreRateOnTitle = [""];
+                averageScore.scoreRateOnTitle.forEach((scoreRateOnTitle) => {
+                  if (scoreRateOnTitle) {
+                    templistscoreRateOnTitle.push(scoreRateOnTitle + "%");
+                  } else {
+                    templistscoreRateOnTitle.push(scoreRateOnTitle);
+                  }
+                });
+              } else {
+                templistscoreRateOnTitle = [];
+                for (let i = 0; i < setting.title.length + 1; i++) {
+                  templistscoreRateOnTitle.push(null);
+                }
+              }
+
+              for (let i = 1; i < templistscoreRateOnTitle.length; i++) {
+                let sum = "";
+                sum = String.fromCharCode(65 + i) + 2;
+
+                console.log("sum:", sum);
+
+                templistscoreRateOnTitle[i] =
+                  "=" +
+                  "TEXT(" +
+                  String.fromCharCode(65 + i) +
+                  (this.objectivesName.length - 1) +
+                  "/" +
+                  "SUM(" +
+                  sum +
+                  ")*100" +
+                  ',"0.00%")';
+              }
+
+              this.db.objectives.push(templistscoreRateOnTitle);
+            } else {
+              setting.object.forEach(() => {
+                this.db.objectives.push([""]);
+              });
+            }
+            console.log("this.db.objectives", this.db.objectives);
+            this.activateHotcolumn();
+          } else {
+            this.hasExamAnalysis = false;
           }
-          console.log("this.db.objectives", this.db.objectives);
-          this.activateHotcolumn();
-        } else {
+        })
+        .catch((e) => {
           this.hasExamAnalysis = false;
-        }
-      });
+          console.log("e:", e);
+          // if (e.status == 500) {
+          //   ElMessage({
+          //     type: "error",
+          //     message: `保存出错，请检查填写的内容`,
+          //     duration: 1500,
+          //   });
+          // } else if (e.status == 409) {
+          //   ElMessage({
+          //     type: "error",
+          //     message: "成绩项分值为空",
+          //     duration: 1500,
+          //   });
+          // } else {
+          //   ElMessage({
+          //     type: "error",
+          //     message: "未知错误,请联系相关人员",
+          //     duration: 1500,
+          //   });
+          // }
+        });
     },
     isValid() {
       if (this.firstActivities) {
