@@ -22,8 +22,8 @@ const app = createApp(App)
   .use(FcDesigner)
   .use(Codemirror)
   .component("upload", upload)
-  .provide("$baseURL", "http://47.113.206.164/prod-api/")
-  // .provide("$baseURL", "https://jxjk.hdu.edu.cn/prod-api/")
+  // .provide("$baseURL", "http://47.113.206.164/prod-api/")
+  .provide("$baseURL", "https://jxjk.hdu.edu.cn/prod-api/")
   .mount("#app");
 //解决el-table  ResizeObserver loop limit exceeded问题
 const debounce = (fn, delay) => {
