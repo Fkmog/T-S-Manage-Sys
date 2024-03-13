@@ -58,7 +58,7 @@
 import { Back, DocumentChecked } from "@element-plus/icons-vue";
 import { WorkbookByCourseId, present, getPresent } from "@/api/workbook";
 import _ from "lodash";
-
+import { Base64 } from "js-base64";
 import { ElMessage, ElMessageBox } from "element-plus";
 
 export default {

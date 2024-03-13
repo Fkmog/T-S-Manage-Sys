@@ -1362,73 +1362,75 @@ export default {
             confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
-          }).then(() => {
-            console.log(
-              "versionId",
-              that.currentVersionId,
-              "CourseId",
-              that.courseId
-            );
+          })
+            .then(() => {
+              console.log(
+                "versionId",
+                that.currentVersionId,
+                "CourseId",
+                that.courseId
+              );
 
-            return request({
-              url: "/detail",
-              method: "post",
-              data: {
-                versionId: that.currentVersionId,
-                courseId: row.courseId,
-                departmentId: that.departmentId,
-                schoolId: that.schoolId,
-              },
-            })
-              .then(function (res) {
-                console.log(res);
-                if (res.code == "SUCCESS") {
-                  ElMessage({
-                    type: "success",
-                    message: `新建成功`,
-                    duration: 1500,
-                  });
-                  //成功后根据vesionId和basecouseId获取详细信息
-                  that.getBaseCourse(that.pageSize, that.pageNum);
-                }
+              return request({
+                url: "/detail",
+                method: "post",
+                data: {
+                  versionId: that.currentVersionId,
+                  courseId: row.courseId,
+                  departmentId: that.departmentId,
+                  schoolId: that.schoolId,
+                },
               })
-              .catch((e) => {
-                console.log("e", e);
-                if (
-                  e.data.code == "UNPROCESSABLE ENTITY" &&
-                  e.data.msg == "UNPROCESSABLE ENTIT"
-                ) {
-                  ElMessage({
-                    type: "error",
-                    message: `没有选择课程大纲版本`,
-                    duration: 1500,
-                  });
-                  //成功后根据vesionId和basecouseId获取详细信息
-                  that.getBaseCourse(that.pageSize, that.pageNum);
-                } else if (e.status === 409) {
-                  ElMessage({
-                    type: "error",
-                    message: `新建失败,课程已存在`,
-                    duration: 1500,
-                  });
-                } else if (e.status === 500) {
-                  ElMessage({
-                    type: "error",
-                    message: `保存出错，请检查填写的内容`,
-                    duration: 1500,
-                  });
-                } else {
-                  ElMessage({
-                    type: "error",
-                    message: `未知错误,请联系相关人员`,
-                    duration: 1500,
-                  });
-                }
+                .then(function (res) {
+                  console.log(res);
+                  if (res.code == "SUCCESS") {
+                    ElMessage({
+                      type: "success",
+                      message: `新建成功`,
+                      duration: 1500,
+                    });
+                    //成功后根据vesionId和basecouseId获取详细信息
+                    that.getBaseCourse(that.pageSize, that.pageNum);
+                  }
+                })
+                .catch((e) => {
+                  console.log("e", e);
+                  if (
+                    e.data.code == "UNPROCESSABLE ENTITY" &&
+                    e.data.msg == "UNPROCESSABLE ENTIT"
+                  ) {
+                    ElMessage({
+                      type: "error",
+                      message: `没有选择课程大纲版本`,
+                      duration: 1500,
+                    });
+                    //成功后根据vesionId和basecouseId获取详细信息
+                    that.getBaseCourse(that.pageSize, that.pageNum);
+                  } else if (e.status === 409) {
+                    ElMessage({
+                      type: "error",
+                      message: `新建失败,课程已存在`,
+                      duration: 1500,
+                    });
+                  } else if (e.status === 500) {
+                    ElMessage({
+                      type: "error",
+                      message: `保存出错，请检查填写的内容`,
+                      duration: 1500,
+                    });
+                  } else {
+                    ElMessage({
+                      type: "error",
+                      message: `未知错误,请联系相关人员`,
+                      duration: 1500,
+                    });
+                  }
 
-                //失败后退回basecouse页面
-                that.getBaseCourse(that.pageSize, that.pageNum);
-              });
-          });
+                  //失败后退回basecouse页面
+                  that.getBaseCourse(that.pageSize, that.pageNum);
+                });
+            })
+            .catch(() => {});
         } else {
           ElMessage({
             type: "error",

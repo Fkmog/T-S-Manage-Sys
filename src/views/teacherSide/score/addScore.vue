@@ -523,25 +523,6 @@ export default {
           },
           afterCreateRow(index, amount, source) {
             console.log(self.db.items);
-            // for (let i = 1; i < self.db.items.length; i++) {
-            //   for (let j = 3; j < self.db.items[0].length; j++) {
-            //     if (!self.db.items[i][j]) {
-            //       console.log(i, j);
-            //       self.db.items[i][j] = {};
-            //     }
-            //     console.log(Object.keys(self.db.items[i][j]).length);
-            //     for (let k = 0; k < 2; k++) {
-            //       console.log(
-            //         self.db.items[i][j][k] + ":" + self.db.items[0][j][k]
-            //       );
-            //       if (!self.db.items[0][j][k]) {
-            //         self.db.items[i][j][k] = null;
-            //       } else {
-            //         self.db.items[i][j][k] = self.db.items[0][j][k];
-            //       }
-            //     }
-            //   }
-            // }
           },
           beforeRemoveRow(index, amount, physicalRows, source) {
             if (source === "loadData") {
@@ -901,7 +882,6 @@ export default {
 
     save() {
       this.saving = true;
-
       this.postData.scores = [];
       var result = this.isValid();
       if (!result) {
@@ -1092,8 +1072,8 @@ export default {
     },
     goTeacher() {
       console.log("goteacher:" + this.saving + this.dirty); //只有dirty = flase 或者 saving = true时才可以退出
-      console.log(_.isEqual(this.compareData, this.db.objectives));
-      let isSame = _.isEqual(this.compareData, this.db.objectives);
+      console.log(_.isEqual(this.compareData, this.db.items));
+      let isSame = _.isEqual(this.compareData, this.db.items);
       if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
