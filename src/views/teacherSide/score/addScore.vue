@@ -130,11 +130,15 @@ import "handsontable/dist/handsontable.full.css";
 
 import "handsontable/dist/handsontable.full.css";
 
+// 用来判断两个值是否一样
+import _ from "lodash";
+
 export default {
   name: "addTeacher",
   data() {
     let self = this;
     return {
+      compareData: {},
       errorInTable: false,
 
       editableTabsValue: "0",
@@ -560,32 +564,6 @@ export default {
               return;
             } else {
               self.isValid();
-              if (self.count == 0) {
-                self.dirty = false;
-                console.log(
-                  "console:",
-                  self.count,
-                  "dirty",
-                  self.dirty,
-                  "items:",
-                  self.db.items
-                );
-              } else {
-                self.dirty = true;
-                self.firstActivities = false;
-                console.log(
-                  "console:",
-                  self.count,
-                  "dirty",
-                  self.dirty,
-                  "items:",
-                  self.db.items,
-                  "firstActivities:",
-                  self.firstActivities
-                );
-              }
-              self.count++;
-              console.log("console:", self.count);
             }
           },
         });
@@ -847,6 +825,7 @@ export default {
             that.editableTabsValue = "1";
             that.currenteditableTabsValue = 1;
             that.originData = JSON.parse(JSON.stringify(that.db.items));
+            that.compareData = JSON.parse(JSON.stringify(that.db.items));
             console.log(
               "db.items",
               that.db.items,
@@ -903,6 +882,7 @@ export default {
               that.db.items.push(tempList);
             });
             that.originData = JSON.parse(JSON.stringify(that.db.items));
+            that.compareData = JSON.parse(JSON.stringify(that.db.items));
             console.log(
               "db.items",
               that.db.items,
@@ -914,51 +894,14 @@ export default {
       });
     },
     isValid() {
-      if (this.firstActivities) {
-        return false;
-      } else {
-        var result = !this.compareArrays(this.originData, this.db.items);
-        console.log("result:", result);
-        return result;
-      }
+      var result = !_.isEqual(this.compareData, this.db.items);
+      console.log("result:", result);
+      return result;
     },
-    compareArrays(arr1, arr2) {
-      // console.log('arr1',arr1,'arr2',arr2);
-      // 检查数组长度是否相等
-      // console.log('length:',arr1.length,arr2.length);
-      if (arr1.length !== arr2.length) {
-        return false;
-      }
 
-      // 深度比较每个对象
-      for (let i = 0; i < arr1.length; i++) {
-        // 检查对象属性数量是否相等
-        console.log(
-          "Object.keys:",
-          Object.keys(arr1[i]).length,
-          Object.keys(arr2[i]).length
-        );
-        if (Object.keys(arr1[i]).length !== Object.keys(arr2[i]).length) {
-          return false;
-        }
-
-        // 检查对象属性值是否相等
-        for (let key in arr1[i]) {
-          console.log("keys:", arr1[i][key], arr2[i][key]);
-          if (arr1[i][key] !== arr2[i][key]) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    },
-    isNotDirty() {
-      this.dirty = false;
-    },
     save() {
       this.saving = true;
-      this.dirty = false;
+
       this.postData.scores = [];
       var result = this.isValid();
       if (!result) {
@@ -1149,8 +1092,9 @@ export default {
     },
     goTeacher() {
       console.log("goteacher:" + this.saving + this.dirty); //只有dirty = flase 或者 saving = true时才可以退出
-
-      if (this.dirty == true || (this.saving == false && this.dirty == true)) {
+      console.log(_.isEqual(this.compareData, this.db.objectives));
+      let isSame = _.isEqual(this.compareData, this.db.objectives);
+      if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
@@ -1186,6 +1130,8 @@ export default {
               duration: 1500,
             });
             that.goBackandClean();
+            that.originData = JSON.parse(JSON.stringify(that.db.items));
+            that.compareData = JSON.parse(JSON.stringify(that.db.items));
           }
           console.log("postData.scores", that.postData.scores);
         })

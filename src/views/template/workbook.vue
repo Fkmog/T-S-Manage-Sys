@@ -26,24 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="保存"
-            placement="bottom"
-            :hide-after="0"
-          >
-            <el-icon
-              class="icon"
-              size="24px"
-              color="rgb(137, 137, 137)"
-              @click="save()"
-              style="margin-left: 10px"
-            >
-              <DocumentChecked />
-            </el-icon>
-          </el-tooltip>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="临时保存（仅临时存放在当前浏览器，请及时保存到服务器）"
+            content="临时保存（仅临时存放在当前浏览器，请及时保存至服务器）"
             placement="bottom"
             :hide-after="0"
           >
@@ -52,6 +35,23 @@
               size="24px"
               color="rgb(137, 137, 137)"
               @click="tempSave(value, classId)"
+              style="margin-left: 10px"
+            >
+              <DocumentChecked />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="保存至服务器"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              @click="save()"
               style="margin-left: 20px"
             >
               <UploadFilled />
@@ -145,6 +145,7 @@ export default {
       fApi: {},
       //表单数据
       value: {},
+      afterPreValue:{},
       // watchValue:{}
       url: "",
       editor: [],
@@ -230,7 +231,7 @@ export default {
         } else {
           this.noEdit = false;
         }
-        if (!(this.classInfo.workbookJson === null)) {
+        if (!this.classInfo.workbookJson) {
           this.value = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
           console.log(
             "*(*())",
@@ -245,15 +246,31 @@ export default {
     openDrawerChange() {
       this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
     },
+    isBase64Encoded(str) {
+      // Base64 编码的正则表达式
+      const base64Regex =
+        /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+      return base64Regex.test(str);
+    },
     // 返回上级页面
     backClass() {
       if (this.identity == "教师") {
         console.log("save", this.value);
-        let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
+        // let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
+        let temp = JSON.parse(JSON.stringify(this.afterPreValue));
+        let another = JSON.parse(JSON.stringify(this.value));
+        console.log(temp,another,_.isEqual(temp, another));
         this.editor.forEach((edit) => {
-          temp[edit] = Base64.decode(temp[edit]);
+          if (typeof temp[edit] === "string") {
+            if (temp[edit].includes("zheshibase64bianma/")) {
+              temp[edit] = temp[edit].slice(19);
+              if (this.isBase64Encoded(temp[edit])) {
+                temp[edit] = Base64.decode(temp[edit]);
+              }
+            }
+          }
         });
-        if (_.isEqual(temp, this.value)) {
+        if (_.isEqual(temp, another)) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -329,6 +346,7 @@ export default {
         .submit((formData, fApi) => {
           this.editor.forEach((edit) => {
             formData[edit] = Base64.encode(formData[edit]);
+            formData[edit] = "zheshibase64bianma/" + formData[edit];
           });
           console.log("save", formData);
           editByTeacher(this.classInfo.classId, formData).then((res) => {
@@ -373,7 +391,6 @@ export default {
                     multiple: true,
                     name: "files",
                     action: this.url + "common/upload/files",
-                    // "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
                     headers: {
                       Authorization: "Bearer " + Cookies.get("Admin-Token"),
                     },
@@ -383,9 +400,7 @@ export default {
                       field: form.field,
                     },
                     onSuccess: function (res, file) {
-                      // console.log("upload", res, file);
                       file.url = res.fileRecords[0].fileAddress;
-                      // form.value.push(file.url);
                     },
                     onExceed: function () {
                       ElMessage({
@@ -402,10 +417,10 @@ export default {
               });
               this.workbook = res.data;
               this.workbookId = this.workbook.workbookId;
-              if (this.classInfo.workbookJson === null) {
-                this.value = JSON.parse(JSON.stringify(this.workbook.formJson));
-                console.log("^^^^");
-              }
+              // if (this.classInfo.workbookJson === null) {
+              //   this.value = JSON.parse(JSON.stringify(this.workbook.formJson));
+              //   // console.log("^^^^");
+              // }
               console.log("workbook", this.workbook);
               this.json = res.data.formJson;
 
@@ -452,8 +467,14 @@ export default {
         this.value = JSON.parse(JSON.stringify(res.data.workbookJson));
         console.log("value", this.value);
         this.editor.forEach((edit) => {
-          // console.log("!",Base64.decode(this.value[edit]));
-          this.value[edit] = Base64.decode(this.value[edit]);
+          if (typeof this.value[edit] === "string") {
+            if (this.value[edit].includes("zheshibase64bianma/")) {
+              this.value[edit] = this.value[edit].slice(19);
+              if (this.isBase64Encoded(this.value[edit])) {
+                this.value[edit] = Base64.decode(this.value[edit]);
+              }
+            }
+          }
         });
         console.log("decode", this.value);
         this.getPresent();
@@ -503,6 +524,8 @@ export default {
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
+          this.afterPreValue=temp
+          console.log("????");
         } else {
           console.log("remove");
           localStorage.removeItem("classId");
