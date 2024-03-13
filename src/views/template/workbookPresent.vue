@@ -36,7 +36,7 @@
               @click="save()"
               style="margin-left: 10px"
             >
-              <DocumentChecked />
+              <UploadFilled />
             </el-icon>
           </el-tooltip>
         </div>
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { Back, DocumentChecked } from "@element-plus/icons-vue";
+import { Back, DocumentChecked, UploadFilled } from "@element-plus/icons-vue";
 import { WorkbookByCourseId, present, getPresent } from "@/api/workbook";
 import _ from "lodash";
 import { Base64 } from "js-base64";
@@ -66,6 +66,7 @@ export default {
   components: {
     Back,
     DocumentChecked,
+    UploadFilled,
   },
   data() {
     return {
@@ -86,6 +87,7 @@ export default {
       detailId: "",
       workbookId: "",
       origin: {},
+      editor: [],
     };
   },
   mounted() {
@@ -98,8 +100,7 @@ export default {
     back() {
       let temp = JSON.parse(JSON.stringify(this.json));
       console.log(_.isEqual(this.origin, temp));
-      // console.log(this.origin);
-      if (!(_.isEqual(this.origin, temp))) {
+      if (!_.isEqual(this.origin, temp)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
@@ -115,8 +116,16 @@ export default {
     },
     // 提交预设信息
     save() {
-      // console.log("save", this.json, this.presentValue);
       this.searchChildren(this.json);
+      let tempEditor = [...new Set(this.editor)];
+      tempEditor.forEach((edit) => {
+        this.presentValue.forEach((item) => {
+          if (edit == item.field) {
+            item.value = "zheshibase64bianma/" + Base64.encode(item.value);
+          }
+        });
+      });
+      console.log("!", tempEditor, this.presentValue);
       present(this.detailId, this.presentValue, this.courseId)
         .then((res) => {
           if (res.code === "SUCCESS") {
@@ -149,12 +158,16 @@ export default {
             console.log("!", i.value);
           }
         });
-        // console.log("getPresent", this.formPresent);
-        // console.log("final", this.json);
       });
       await this.showPresent(this.json);
       this.origin = JSON.parse(JSON.stringify(this.json));
       // console.log("oringin", this.origin);
+    },
+    isBase64Encoded(str) {
+      // Base64 编码的正则表达式
+      const base64Regex =
+        /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+      return base64Regex.test(str);
     },
     // 回显预设信息
     async showPresent(forms) {
@@ -166,6 +179,16 @@ export default {
             this.formPresent.forEach((present) => {
               if (present.field == form.field) {
                 form.value = present.value;
+                // 解码
+                if (typeof form.value === "string") {
+                  if (form.value.includes("zheshibase64bianma/")) {
+                    let temp = form.value.slice(19);
+                    if (this.isBase64Encoded(temp)) {
+                      form.value = Base64.decode(temp);
+                      console.log("@@", Base64.decode(temp));
+                    }
+                  }
+                }
               }
             });
           }
@@ -192,6 +215,14 @@ export default {
 
           console.log("getWorkbook1111", this.workbook);
           this.json = res.data.formJson;
+          this.json.forEach((item) => {
+            if (item.type) {
+              if (item.type === "fc-editor") {
+                this.editor.push(item.field);
+              }
+            }
+          });
+
           this.option = res.data.cssJson;
           // 保存提交
           this.option.submitBtn = false;
