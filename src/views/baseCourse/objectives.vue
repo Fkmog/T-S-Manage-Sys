@@ -44,7 +44,7 @@
             type="error"
             :closable="false"
             show-icon
-            style="width: 300px; margin-top: 5px"
+            style="width: 350px; margin-top: 5px"
           />
         </div>
 
@@ -203,7 +203,7 @@ export default {
     };
   },
   mounted() {
-    console.log("###");
+    // console.log("###");
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     if (this.course.detailId === null) {
@@ -220,14 +220,34 @@ export default {
     goEdit() {
       this.$router.push("/baseCourseObjectivesEdit");
     },
+    checkActivityInfo() {
+      let allTable = new Set();
+      let activities = this.list.activities;
+      for (let i = 0; i < activities.length; i++) {
+        let ac = activities[i];
+        allTable.add(ac.name);
+      }
+      let tables = new Set();
+      let objects = this.list.objectives;
+      for (let i = 0; i < objects.length; i++) {
+        let assessments = objects[i].assessmentMethods;
+        assessments.forEach((assess) => {
+          let table = assess.activities.table;
+          let item = assess.activities.item;
+          tables.add(...table);
+        });
+      }
+      for (let item of tables) {
+        if (!allTable.has(item)) {
+          this.info.push("成绩项表：" + item + " 不存在，请重新设置");
+        }
+      }
+      console.log("tables", tables, allTable);
+    },
     //获取课程目标
     checkObjectives() {
       getObjectives(this.course.detailId).then((res) => {
         this.list = res.data;
-        if (res.hasOwnProperty("info")) {
-          this.info = res.info;
-        }
-        console.log(this.list);
         //处理数据-serialNum
         if (this.list.objectives) {
           this.hasObjective = true;
@@ -256,6 +276,7 @@ export default {
           });
         }
         console.log("getObjectives:", this.list);
+        this.checkActivityInfo()
       });
     },
   },
