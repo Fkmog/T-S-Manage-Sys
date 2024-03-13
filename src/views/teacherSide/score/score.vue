@@ -22,6 +22,7 @@
       </el-tooltip>
       <div class="title">{{ classInfo.className }}</div>
       <el-divider class="divider" direction="vertical" />
+
       <!-- 成绩项 -->
       <el-tooltip
         class="box-item"
@@ -35,7 +36,7 @@
         </template>
 
         <el-icon
-          v-show="this.identity == '教师' || this.identity == '学院管理员'"
+          v-show="this.identity == '教师'"
           class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
@@ -43,6 +44,7 @@
           ><Histogram />
         </el-icon>
       </el-tooltip>
+
       <!-- 试卷分析 -->
       <el-tooltip
         v-show="this.identity == '教师'"
@@ -199,8 +201,21 @@
             font-size: 13px;
             color: #828d96;
           "
+          v-show="identity === '教师'"
         >
           请先点击右上角圆形按钮添加成绩
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #828d96;
+          "
+          v-show="identity !== '教师'"
+        >
+          请先联系课程教师添加成绩
         </div>
       </div>
     </div>
@@ -238,6 +253,7 @@ import { ElMessageBox, ElSwitch, ElMessage } from "element-plus";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 
 import request from "@/utils/request/request";
+import { identity } from "lodash";
 export default {
   name: "Score",
   components: {

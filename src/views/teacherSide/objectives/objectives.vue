@@ -43,7 +43,7 @@
           <span class="head-text" style="color: grey; font-size: 14px"
             >课程目标</span
           >
-          <div v-show="isRespondent&&identity === '教师'">
+          <div v-show="isRespondent && identity === '教师'">
             <el-tooltip
               class="box-item"
               effect="dark"
@@ -61,7 +61,7 @@
             type="error"
             :closable="false"
             show-icon
-            style="width: 300px; margin-top: 5px"
+            style="width: 350px; margin-top: 5px"
           />
         </div>
         <div v-for="objective in objectives" :key="objective.id">
@@ -115,7 +115,7 @@
                           effect="dark"
                           placement="top"
                         >
-                        {{ activity }}
+                          {{ activity }}
                         </el-tooltip>
                       </el-col>
                     </el-row>
@@ -160,7 +160,10 @@
       <div v-show="hasDetailId && !hasObjective">
         <el-row class="no-info">
           <el-col style="margin: 10px 0 10px">暂未设置课程目标</el-col>
-          <el-col class="go-edit" @click="goEdit()" v-show="isRespondent&&identity === '教师'"
+          <el-col
+            class="go-edit"
+            @click="goEdit()"
+            v-show="isRespondent && identity === '教师'"
             >去设置</el-col
           >
         </el-row>
@@ -241,13 +244,37 @@ export default {
     backClass() {
       this.$router.push("/teacherClass");
     },
+    // 校验是否存在成绩表或成绩项不对应的情况
+    checkActivityInfo() {
+      let allTable = new Set();
+      let activities = this.classInfo.activities;
+      for (let i = 0; i < activities.length; i++) {
+        let ac = activities[i];
+        allTable.add(ac.name);
+      }
+      let tables = new Set();
+      let objects = this.classInfo.objectives;
+      for (let i = 0; i < objects.length; i++) {
+        let assessments = objects[i].assessmentMethods;
+        assessments.forEach((assess) => {
+          let table = assess.activities.table;
+          let item = assess.activities.item;
+          tables.add(...table);
+        });
+      }
+      for(let item of tables){
+        if(!allTable.has(item)){
+          this.info.push('成绩项表：'+item+' 不存在，请重新设置')
+        }
+      }
+      console.log("tables", tables,allTable);
+    },
     //获取教学班信息
     checkClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         // console.log("getClassInfo", res.data);
-        if (res.hasOwnProperty("info")) {
-          this.info = res.info;
-        }
+        
+        // this.checkActivityInfo();
         this.objectives = res.data.objectives;
         if (this.objectives) {
           if (this.objectives.length > 0) {

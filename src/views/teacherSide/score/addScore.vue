@@ -211,11 +211,111 @@ export default {
     editableTabsValueChange(pane) {
       let that = this;
       this.currenteditableTabsValue = Number(pane.props.name);
-      this.hotInstance.updateSettings({
-        columns: that.db.items[that.currenteditableTabsValue - 1][0],
-        data: that.db.items[that.currenteditableTabsValue - 1],
-        cells: that.getHotCellsFunction(),
-      });
+      let tempDB = this.originData;
+      let currentPage = this.currenteditableTabsValue - 1;
+
+      for (let j = 3; j < this.db.items[0].length; j++) {
+        if (!this.db.items[currentPage][j]) {
+          // console.log(i, j);
+          this.db.items[currentPage][j] = {};
+          for (
+            let temp = 0;
+            temp < Object.keys(this.db.items[currentPage][1]).length;
+            temp++
+          ) {
+            this.db.items[currentPage][j][temp] = null;
+          }
+        }
+        // console.log(Object.keys(this.db.items[i][j]).length);
+        if (this.db.items[0].length < this.db.items[currentPage].length) {
+          while (this.db.items[0].length != this.db.items[currentPage].length) {
+            this.db.items[currentPage].pop();
+          }
+        }
+
+        for (let k = 0; k < 2; k++) {
+          // console.log(this.db.items[i][j][k] + ":" + this.db.items[0][j][k]);
+
+          if (!this.db.items[0][j][k]) {
+            this.db.items[currentPage][j][k] = null;
+          } else {
+            this.db.items[currentPage][j][k] = this.db.items[0][j][k];
+          }
+        }
+      }
+
+      for (let j = 3; j < this.db.items[currentPage].length; j++) {
+        let ID = this.db.items[currentPage][j][0];
+        let Name = this.db.items[currentPage][j][1];
+        console.log("ID:", ID);
+        if (!ID || !Name) {
+          console.log("this Id is null", this.db.items[currentPage][j]);
+
+          for (
+            let i = 0;
+            i < Object.keys(this.db.items[currentPage][j]).length;
+            i++
+          ) {
+            this.db.items[currentPage][j][i] = null;
+          }
+        } else {
+          for (let l = 3; l < tempDB[currentPage].length; l++) {
+            let keys = Object.keys(tempDB[currentPage][l]);
+            let index = keys.find((key) => tempDB[currentPage][l][key] === ID);
+            let Nameindex = keys.find(
+              (key) => tempDB[currentPage][l][key] === Name
+            );
+            // console.log(index);
+
+            if (index == 0) {
+              // console.log(tempDB[currentPage][l]);
+              // console.log(
+              //   "student:",
+              //   this.db.items[currentPage][j],
+              //   "origin score:",
+              //   tempDB[currentPage][l]
+              // );
+              for (
+                let i = 0;
+                i < Object.keys(tempDB[currentPage][l]).length;
+                i++
+              ) {
+                if (i != 1) {
+                  this.db.items[currentPage][j][i] = tempDB[currentPage][l][i];
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (this.currenteditableTabsValue !== 1) {
+        this.hotInstance.updateSettings({
+          columns: that.db.items[that.currenteditableTabsValue - 1][0],
+          data: that.db.items[that.currenteditableTabsValue - 1],
+          contextMenu: false,
+        });
+      } else {
+        this.hotInstance.updateSettings({
+          columns: that.db.items[that.currenteditableTabsValue - 1][0],
+          data: that.db.items[that.currenteditableTabsValue - 1],
+          contextMenu: {
+            items: {
+              row_above: {
+                name: "在上方插入行",
+              },
+              row_below: {
+                name: "在下方插入行",
+              },
+              remove_row: {
+                name: "删除行",
+              },
+            },
+          },
+          cells: that.getHotCellsFunction(),
+        });
+      }
+
       return console.log("currenteditableTabsValue:", Number(pane.props.name));
     },
     handleTabsEdit(targetName, action, activityName) {
@@ -409,11 +509,35 @@ export default {
               return;
             } else {
               console.log("add extare row", index, amount, source);
+
+              console.log(self.db.items);
               if (index <= 2) {
                 // console.log('this row should not created!')
                 return false;
               }
             }
+          },
+          afterCreateRow(index, amount, source) {
+            console.log(self.db.items);
+            // for (let i = 1; i < self.db.items.length; i++) {
+            //   for (let j = 3; j < self.db.items[0].length; j++) {
+            //     if (!self.db.items[i][j]) {
+            //       console.log(i, j);
+            //       self.db.items[i][j] = {};
+            //     }
+            //     console.log(Object.keys(self.db.items[i][j]).length);
+            //     for (let k = 0; k < 2; k++) {
+            //       console.log(
+            //         self.db.items[i][j][k] + ":" + self.db.items[0][j][k]
+            //       );
+            //       if (!self.db.items[0][j][k]) {
+            //         self.db.items[i][j][k] = null;
+            //       } else {
+            //         self.db.items[i][j][k] = self.db.items[0][j][k];
+            //       }
+            //     }
+            //   }
+            // }
           },
           beforeRemoveRow(index, amount, physicalRows, source) {
             if (source === "loadData") {
@@ -425,6 +549,9 @@ export default {
                 return false;
               }
             }
+          },
+          afterRemoveRow() {
+            console.log(self.db.items);
           },
 
           afterChange(changes, source) {

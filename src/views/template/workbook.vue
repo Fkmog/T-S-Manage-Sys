@@ -40,6 +40,23 @@
               <DocumentChecked />
             </el-icon>
           </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="临时保存（仅临时存放在当前浏览器，请及时保存到服务器）"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              @click="tempSave(value, classId)"
+              style="margin-left: 20px"
+            >
+              <UploadFilled />
+            </el-icon>
+          </el-tooltip>
         </div>
         <el-divider class="divider" direction="vertical" />
         <el-tooltip
@@ -94,7 +111,7 @@
 </template>
 
 <script>
-import { Back, DocumentChecked } from "@element-plus/icons-vue";
+import { Back, DocumentChecked, UploadFilled } from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
 import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
 import _ from "lodash";
@@ -104,15 +121,11 @@ import { downloadFile } from "@/api/common";
 import Cookies from "js-cookie";
 import { getPresent } from "@/api/workbook";
 import { inject } from "vue";
+import { Base64 } from "js-base64";
 
 export default {
   name: "Workbook",
-  components: {
-    Back,
-    reviewDrawer,
-    ElSwitch,
-    DocumentChecked,
-  },
+  components: { UploadFilled, Back, reviewDrawer, ElSwitch, DocumentChecked },
   data() {
     return {
       identity: "",
@@ -133,11 +146,12 @@ export default {
       //表单数据
       value: {},
       // watchValue:{}
-      url:''
+      url: "",
+      editor: [],
     };
   },
   mounted() {
-    this.url = inject('$baseURL')
+    this.url = inject("$baseURL");
     this.openDrawer = this.$store.state.currentInfo.opendrawer;
     this.getPre();
   },
@@ -217,7 +231,11 @@ export default {
           this.noEdit = false;
         }
         if (!(this.classInfo.workbookJson === null)) {
-          this.value = this.classInfo.workbookJson;
+          this.value = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
+          console.log(
+            "*(*())",
+            _.isEqual(this.classInfo.workbookJson, this.value)
+          );
         }
         this.getWorkbook();
         resolve("suc");
@@ -231,7 +249,11 @@ export default {
     backClass() {
       if (this.identity == "教师") {
         console.log("save", this.value);
-        if (_.isEqual(this.classInfo.workbookJson, this.value)) {
+        let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
+        this.editor.forEach((edit) => {
+          temp[edit] = Base64.decode(temp[edit]);
+        });
+        if (_.isEqual(temp, this.value)) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -292,10 +314,22 @@ export default {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
     },
+    tempSave(value, classId) {
+      localStorage.setItem("classId", JSON.stringify(classId));
+      localStorage.setItem("workbook", JSON.stringify(value));
+      ElMessage({
+        type: "success",
+        message: `临时保存成功`,
+        duration: 1500,
+      });
+    },
     // 保存
     save() {
       this.fApi
         .submit((formData, fApi) => {
+          this.editor.forEach((edit) => {
+            formData[edit] = Base64.encode(formData[edit]);
+          });
           console.log("save", formData);
           editByTeacher(this.classInfo.classId, formData).then((res) => {
             if (res.code === "SUCCESS") {
@@ -338,8 +372,8 @@ export default {
                     listType: "text",
                     multiple: true,
                     name: "files",
-                    action: this.url+'common/upload/files',
-                      // "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
+                    action: this.url + "common/upload/files",
+                    // "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
                     headers: {
                       Authorization: "Bearer " + Cookies.get("Admin-Token"),
                     },
@@ -369,10 +403,20 @@ export default {
               this.workbook = res.data;
               this.workbookId = this.workbook.workbookId;
               if (this.classInfo.workbookJson === null) {
-                this.value = this.workbook.formJson;
+                this.value = JSON.parse(JSON.stringify(this.workbook.formJson));
+                console.log("^^^^");
               }
               console.log("workbook", this.workbook);
               this.json = res.data.formJson;
+
+              // 找到所有的fc-editor，存到editor
+              this.json.forEach((item) => {
+                if (item.type) {
+                  if (item.type === "fc-editor") {
+                    this.editor.push(item.field);
+                  }
+                }
+              });
               this.option = res.data.cssJson;
               // 保存提交
               this.option.submitBtn = false;
@@ -405,7 +449,13 @@ export default {
         } else {
           this.$store.commit("currentInfo/setTeacherSideClassInfo", res.data);
         }
-        this.value = res.data.workbookJson;
+        this.value = JSON.parse(JSON.stringify(res.data.workbookJson));
+        console.log("value", this.value);
+        this.editor.forEach((edit) => {
+          // console.log("!",Base64.decode(this.value[edit]));
+          this.value[edit] = Base64.decode(this.value[edit]);
+        });
+        console.log("decode", this.value);
         this.getPresent();
       });
     },
@@ -431,11 +481,10 @@ export default {
       // TODO:detailId可能为null 还没有处理
       if (this.detailId) {
         getPresent(this.detailId).then((res) => {
-          console.log(res);
+          console.log("getPresent", res);
           this.formPresent = res.data.preset.formPreset;
           this.formPresent.forEach((i) => {
             // console.log("!", i.value);
-
             if (i.value[0] == "[") {
               i.value = i.value.match(/\d+/g);
               // console.log("!", i.value);
@@ -450,7 +499,7 @@ export default {
     async getLocalValue() {
       await this.showPresent(this.json);
       if (localStorage.getItem("workbook")) {
-        console.log("!", this.classInfo.classId);
+        // console.log("!", this.classInfo.classId);
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
