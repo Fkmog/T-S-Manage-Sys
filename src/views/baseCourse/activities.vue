@@ -109,6 +109,7 @@
                   item.title = newActivityTitle;
                   item.description = newActivitydescription;
                   unsave = false;
+                  dirty = true;
                 "
               >
                 <Checked />
@@ -243,12 +244,15 @@ import "element-plus/dist/index.css";
 import "handsontable/dist/handsontable.full.css";
 
 import "handsontable/dist/handsontable.full.css";
+import _ from "lodash";
 
 export default {
   name: "activities",
   data() {
     let that = this;
     return {
+      compareData: {},
+
       saveStyle: {
         cursor: "not-allowed",
       },
@@ -294,8 +298,6 @@ export default {
       courseId: "",
       detailId: "",
       currentNumberofActivities: 0,
-
-      firstActivities: true,
 
       dirty: false,
       saving: false,
@@ -410,8 +412,7 @@ export default {
     //tabs的双击可编辑   //双击表格可编辑存在input框问题(2023-04-19)
     tabsContent(val, index) {
       console.log(val, index, "双击编辑tabs");
-      this.dirty = true;
-      this.firstActivities = false;
+
       this.isValid();
       this.unsave = true;
       if (index == "1" && this.identity == "教师") {
@@ -544,7 +545,6 @@ export default {
                   cellProperties.readOnly = false;
                 }
               }
-
               return cellProperties;
             },
           });
@@ -700,8 +700,6 @@ export default {
 
         // console.log('colNum:',this.colNum);
         if (this.colNum < 21) {
-          this.firstActivities = false;
-
           if (!this.currenteditableTabsValue) {
             this.db.items[this.currenteditableTabsValue][0].push("");
             this.db.items[this.currenteditableTabsValue][1].push(null);
@@ -794,42 +792,15 @@ export default {
           }
         },
         afterChange(changes, source) {
+          console.log("changes", changes, "source", source);
           if (source === "loadData") {
             // console.log("same");
             return;
           } else {
             self.isValid();
-            if (self.count == 0) {
-              self.dirty = false;
-              // console.log(
-              //   "console:",
-              //   self.count,
-              //   "dirty",
-              //   self.dirty,
-              //   "items:",
-              //   self.db.items
-              // );
-            } else {
-              self.dirty = true;
-              self.firstActivities = false;
-              // console.log(
-              //   "console:",
-              //   self.count,
-              //   "dirty",
-              //   self.dirty,
-              //   "items:",
-              //   self.db.items,
-              //   "firstActivities",
-              //   self.firstActivities
-              // );
-            }
-            self.count++;
-            // console.log("console:", self.count);
           }
         },
-        afterRemoveCol(changes, source) {
-          self.firstActivities = false;
-        },
+        afterRemoveCol(changes, source) {},
       });
 
       this.hotInstance = hotRegisterer;
@@ -925,6 +896,7 @@ export default {
             that.editableTabsValue = "1";
             that.currenteditableTabsValue = 1;
             console.log("res has activities:", that.db.items);
+            that.compareData = JSON.parse(JSON.stringify(that.db.items));
             that.dragTab();
           } else {
             console.log("res has no activities");
@@ -939,6 +911,7 @@ export default {
             tempdata.push(remark);
             tempdata.push(weight);
             that.db.items.push(tempdata);
+            that.compareData = JSON.parse(JSON.stringify(that.db.items));
           }
 
           that.activateHotcolumn();
@@ -985,7 +958,7 @@ export default {
               that.editableTabsValue = "1";
               that.currenteditableTabsValue = 1;
               console.log("res has activities:", that.db.items);
-
+              that.compareData = JSON.parse(JSON.stringify(that.db.items));
               that.dragTab();
             } else {
               console.log("res has no activities");
@@ -1000,8 +973,8 @@ export default {
               tempdata.push(remark);
               tempdata.push(weight);
               that.db.items.push(tempdata);
+              that.compareData = JSON.parse(JSON.stringify(that.db.items));
             }
-
             that.activateHotcolumn();
           })
           .catch((e) => {
@@ -1010,22 +983,15 @@ export default {
       }
     },
     isValid() {
-      if (this.firstActivities) {
-        console.log("isValid:this.firstActivities:", this.firstActivities);
-        return false;
-      } else {
-        var result = this.toPostData();
-        console.log("result", result);
-        return !!result;
-      }
+      var result = this.toPostData();
+      console.log("result", result);
+      return result;
     },
-    isNotDirty() {
-      this.dirty = false;
-    },
+
     save() {
       let that = this;
       this.saving = true;
-      this.dirty = false;
+
       this.itemOrValueisEmpty = false;
       this.postData.objectives = {
         object: [],
@@ -1114,7 +1080,6 @@ export default {
               },
             })
               .then(function (res) {
-                that.firstActivities = true;
                 console.log("res:", res);
                 // that.getActivities();
                 if (res.code == "SUCCESS") {
@@ -1124,6 +1089,8 @@ export default {
                     duration: 1500,
                   });
                 }
+                that.compareData = JSON.parse(JSON.stringify(that.db.items));
+                that.dirty = false;
               })
               .catch((e) => {
                 let error = e.data;
@@ -1182,7 +1149,6 @@ export default {
               },
             })
               .then(function (res) {
-                that.firstActivities = true;
                 console.log("res:", res);
                 // that.getActivities();
                 if (res.code == "SUCCESS") {
@@ -1192,6 +1158,8 @@ export default {
                     duration: 1000,
                   });
                 }
+                that.compareData = JSON.parse(JSON.stringify(that.db.items));
+                that.dirty = false;
               })
               .catch((e) => {
                 let error = e.data;
@@ -1244,20 +1212,26 @@ export default {
     toPostData() {
       this.postData.activities.length = 0; // clean array
       let valid = true;
-      if (!this.currenteditableTabsValue) {
-        let length = this.db.items[this.currenteditableTabsValue][0].length;
+      // let length;
+      // if (!this.currenteditableTabsValue) {
+      //   length = this.db.items[this.currenteditableTabsValue][0].length;
+      // } else {
+      //   length = this.db.items[this.currenteditableTabsValue - 1][0].length;
+      // }
+      // for (let i = 0; i < length; i++) {
+      //   if (
+      //     !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
+      //     !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
+      //     !this.db.items[this.currenteditableTabsValue - 1][i][3]
+      //   ) {
+      //     valid = false;
+      //     break;
+      //   }
+      // }
+      if (!_.isEqual(this.compareData, this.db.items) || this.dirty) {
+        valid = true;
       } else {
-        let length = this.db.items[this.currenteditableTabsValue - 1][0].length;
-      }
-      for (let i = 0; i < length; i++) {
-        if (
-          !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
-          !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
-          !this.db.items[this.currenteditableTabsValue - 1][i][3]
-        ) {
-          valid = false;
-          break;
-        }
+        valid = false;
       }
       return valid;
     },
@@ -1269,7 +1243,9 @@ export default {
     },
     gobaseCourseDetail() {
       console.log("gobaseCourseDetail:" + this.saving + this.dirty);
-      if (this.dirty == true || (this.saving == false && this.dirty == true)) {
+      console.log(_.isEqual(this.compareData, this.db.items));
+      let isSame = _.isEqual(this.compareData, this.db.items);
+      if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
@@ -1334,6 +1310,13 @@ export default {
     }
     console.log("from", this.from);
     this.getActivities();
+  },
+  watch: {
+    dirty: {
+      handler() {
+        console.log("dirty changes!", this.dirty);
+      },
+    },
   },
 };
 </script>
