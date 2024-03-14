@@ -34,7 +34,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              @click="tempSave(value, classId)"
+              @click="tempSave(value, classInfo.classId)"
               style="margin-left: 10px"
             >
               <DocumentChecked />
@@ -145,10 +145,11 @@ export default {
       fApi: {},
       //表单数据
       value: {},
-      afterPreValue:{},
+      afterPreValue: {},
       // watchValue:{}
       url: "",
       editor: [],
+      canSave:false
     };
   },
   mounted() {
@@ -259,7 +260,7 @@ export default {
         // let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
         let temp = JSON.parse(JSON.stringify(this.afterPreValue));
         let another = JSON.parse(JSON.stringify(this.value));
-        console.log(temp,another,_.isEqual(temp, another));
+        console.log(temp, another, _.isEqual(temp, another));
         this.editor.forEach((edit) => {
           if (typeof temp[edit] === "string") {
             if (temp[edit].includes("zheshibase64bianma/")) {
@@ -270,7 +271,7 @@ export default {
             }
           }
         });
-        if (_.isEqual(temp, another)) {
+        if (_.isEqual(temp, another)||this.canSave) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -330,15 +331,43 @@ export default {
     saveToLocal(value, classId) {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
+      console.log(value, "   s!!!!2134234234234");
+      for (let key in value) {
+        if (!value[key]) {
+          continue;
+        }
+        this.editor.forEach((e) => {
+          if (e == key && value[key].includes("zheshibase64bianma/")) {
+            value[key] = value[key].slice(19);
+            if (this.isBase64Encoded(value[key])) {
+              value[key] = Base64.decode(value[key]);
+            }
+          }
+        });
+      }
     },
     tempSave(value, classId) {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
+      for (let key in value) {
+        if (!value[key]) {
+          continue;
+        }
+        this.editor.forEach((e) => {
+          if (e == key && value[key].includes("zheshibase64bianma/")) {
+            value[key] = value[key].slice(19);
+            if (this.isBase64Encoded(value[key])) {
+              value[key] = Base64.decode(value[key]);
+            }
+          }
+        });
+      }
       ElMessage({
         type: "success",
         message: `临时保存成功`,
         duration: 1500,
       });
+      this.canSave=true
     },
     // 保存
     save() {
@@ -520,11 +549,11 @@ export default {
     async getLocalValue() {
       await this.showPresent(this.json);
       if (localStorage.getItem("workbook")) {
-        // console.log("!", this.classInfo.classId);
+        console.log("!", this.classInfo.classId);
         if (localStorage.getItem("classId") == this.classInfo.classId) {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
-          this.afterPreValue=temp
+          this.afterPreValue = temp;
           console.log("????");
         } else {
           console.log("remove");
