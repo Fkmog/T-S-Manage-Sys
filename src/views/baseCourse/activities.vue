@@ -251,7 +251,7 @@ export default {
   data() {
     let that = this;
     return {
-      compareData: {},
+      compareData: [],
 
       saveStyle: {
         cursor: "not-allowed",

@@ -138,7 +138,7 @@ export default {
   data() {
     let self = this;
     return {
-      compareData: {},
+      compareData: [],
       errorInTable: false,
 
       editableTabsValue: "0",

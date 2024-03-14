@@ -125,7 +125,7 @@ export default {
   data() {
     let that = this;
     return {
-      compareData: {},
+      compareData: [],
       columnChange: 0,
       unsave: false,
 
