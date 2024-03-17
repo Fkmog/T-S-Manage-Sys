@@ -294,7 +294,7 @@
             <el-radio label="2">是否允许任课教师修改考核方式</el-radio>
             <el-radio label="0">不允许任课教师修改考核方式</el-radio>
           </el-radio-group> -->
-          允许任课教师修改考核方式&nbsp;<el-switch
+          允许任课教师修改达成度评价方式&nbsp;<el-switch
             v-model="classEditForm.isRespondent"
             inline-prompt
             active-text="是"
@@ -397,7 +397,7 @@
           font-size: 14px;
           color: grey;
         "
-        >任课教师可修改课程目标的考核方式</el-row
+        >任课教师可修改课程目标的达成度评价方式</el-row
       >
       <el-row
         v-show="multIsRespondent === '0'"
@@ -407,7 +407,7 @@
           font-size: 14px;
           color: grey;
         "
-        >课程目标采用课程组统一的考核方式</el-row
+        >课程目标采用课程组统一的达成度评价方式</el-row
       >
       <template #footer>
         <span class="dialog-footer">

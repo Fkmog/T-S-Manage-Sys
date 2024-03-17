@@ -144,7 +144,7 @@
                       style="color: #6573c0"
                       text
                       @click="newAssessmentPart(objective, idx)"
-                      >添加考核方式
+                      >添加达成度评价方式
                     </el-button>
                   </div>
                 </el-row>
@@ -233,7 +233,7 @@
           </el-col>
           <el-col :span="4">
             <el-input
-              placeholder="考核方式"
+              placeholder="达成度评价方式"
               v-model="assessment.name"
               width="50px"
             >
@@ -408,7 +408,7 @@ export default {
             ElMessage.error("描述内容不能为空");
             throw "true";
           } else if (object.assessmentMethods.length == 0) {
-            ElMessage.error("请为课程目标添加考核方式");
+            ElMessage.error("请为课程目标添加达成度评价方式");
             throw "true";
           }
         });
@@ -556,7 +556,7 @@ export default {
       assess.weight = 0;
       assess.activities = {};
       // assess.activities = this.activities;
-      console.log("新增考核方式", assess);
+      console.log("新增达成度评价方式", assess);
       // console.log("addAssessment:", assess, this.dialogObject);
       this.dialogObject.assessmentMethods.push(assess);
     },
@@ -566,13 +566,13 @@ export default {
       // 深克隆
       this.dialogObject = JSON.parse(JSON.stringify(objective));
       this.dialogFormVisible = true;
-      console.log("新创建的课程目标下 新建考核方式", this.dialogObject);
+      console.log("新创建的课程目标下 新建达成度评价方式", this.dialogObject);
     },
-    //删除考核方式
+    //删除达成度评价方式
     deleteAssessment(assessment) {
       this.dialogObject.assessmentMethods.pop(assessment);
     },
-    //确定编辑考核方式
+    //确定编辑达成度评价方式
     confirmAddAssessment(dialogObject) {
       let sum = 0;
       // let isMethodsNameNull = false;
@@ -600,7 +600,7 @@ export default {
       //   ElMessage.error("考核方式不能为空");
       // }
       if (isItemNull == true) {
-        ElMessage.error("请为考核方式选择成绩项");
+        ElMessage.error("请为达成度评价方式选择成绩项");
       }
       if (
         sum == 100 &&

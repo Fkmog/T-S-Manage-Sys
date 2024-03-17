@@ -74,7 +74,7 @@
                 {{ objective.description }}
               </div>
               <div style="margin-top: 20px">
-                <span style="color: grey; font-size: 14px">考核方式</span>
+                <span style="color: grey; font-size: 14px">达成度评价方式</span>
               </div>
               <div
                 v-for="(assessment, index) in objective.assessmentMethods"
@@ -239,7 +239,7 @@ export default {
       }
       for (let item of tables) {
         if (!allTable.has(item)) {
-          this.info.push("成绩项表：" + item + " 不存在，请重新设置");
+          this.info.push("成绩项表：" + item + " 不存在，请重新设置课程目标的考核方式");
         }
       }
       console.log("tables", tables, allTable);

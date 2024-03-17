@@ -97,7 +97,7 @@
                 </div>
                 <el-row style="margin-top: 20px">
                   <el-col :span="22">
-                    <span style="color: grey; font-size: 14px">考核方式</span>
+                    <span style="color: grey; font-size: 14px">达成度评价方式</span>
                   </el-col>
                   <el-col :span="2" class="penIcon">
                     <el-icon
@@ -187,7 +187,7 @@
     <div>
       <el-dialog
         v-model="dialogFormVisible"
-        title="设置考核方式"
+        title="设置达成度评价方式"
         width="680px"
         :show-close="false"
         :align-center="true"
@@ -272,7 +272,7 @@
           @click="addAssessment()"
         >
           <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
-          新增考核方式
+          新增达成度评价方式
         </el-button>
         <template #footer>
           <span class="dialog-footer">
@@ -657,7 +657,7 @@ export default {
       assess.weight = 0;
       assess.activities = {};
       // assess.activities = this.activities;
-      console.log("新增考核方式", assess);
+      console.log("新增达成度评价方式", assess);
       // console.log("addAssessment:", assess, this.dialogObject);
       this.dialogObject.assessmentMethods.push(assess);
     },
@@ -667,7 +667,7 @@ export default {
       // 深克隆
       this.dialogObject = JSON.parse(JSON.stringify(objective));
       this.dialogFormVisible = true;
-      console.log("新创建的课程目标下 新建考核方式", this.dialogObject);
+      console.log("新创建的课程目标下 新建达成度评价方式", this.dialogObject);
     },
     //删除考核方式
     deleteAssessment(assessment) {
@@ -700,7 +700,7 @@ export default {
       //   ElMessage.error("考核方式不能为空");
       // }
       if (isItemNull == true) {
-        ElMessage.error("请为考核方式选择成绩项");
+        ElMessage.error("请为达成度评价方式选择成绩项");
       }
       if (
         sum == 100 &&

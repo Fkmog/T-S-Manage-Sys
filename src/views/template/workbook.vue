@@ -21,7 +21,11 @@
           </el-icon>
         </el-tooltip>
         <div class="block_title">工作手册</div>
-        <el-divider class="divider" direction="vertical" />
+        <el-divider
+          v-show="hasWorkbook && identity == '教师' && !noEdit"
+           class="divider"
+          direction="vertical"
+        />
         <div v-show="hasWorkbook && identity == '教师' && !noEdit">
           <el-tooltip
             class="box-item"
@@ -37,7 +41,7 @@
               @click="tempSave(value, classInfo.classId)"
               style="margin-left: 10px"
             >
-              <DocumentChecked />
+              <Clock />
             </el-icon>
           </el-tooltip>
           <el-tooltip
@@ -54,7 +58,7 @@
               @click="save()"
               style="margin-left: 20px"
             >
-              <UploadFilled />
+              <DocumentChecked />
             </el-icon>
           </el-tooltip>
         </div>
@@ -111,7 +115,12 @@
 </template>
 
 <script>
-import { Back, DocumentChecked, UploadFilled } from "@element-plus/icons-vue";
+import {
+  Back,
+  DocumentChecked,
+  UploadFilled,
+  Clock,
+} from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
 import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
 import _ from "lodash";
@@ -125,7 +134,14 @@ import { Base64 } from "js-base64";
 
 export default {
   name: "Workbook",
-  components: { UploadFilled, Back, reviewDrawer, ElSwitch, DocumentChecked },
+  components: {
+    UploadFilled,
+    Back,
+    reviewDrawer,
+    ElSwitch,
+    DocumentChecked,
+    Clock,
+  },
   data() {
     return {
       identity: "",
@@ -149,7 +165,7 @@ export default {
       // watchValue:{}
       url: "",
       editor: [],
-      canSave:false
+      canSave: false,
     };
   },
   mounted() {
@@ -271,7 +287,7 @@ export default {
             }
           }
         });
-        if (_.isEqual(temp, another)||this.canSave) {
+        if (_.isEqual(temp, another) || this.canSave) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -331,7 +347,7 @@ export default {
     saveToLocal(value, classId) {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
-      console.log(value, "   s!!!!2134234234234");
+      // console.log(value, "   s!!!!2134234234234");
       for (let key in value) {
         if (!value[key]) {
           continue;
@@ -346,6 +362,7 @@ export default {
         });
       }
     },
+    // 点击暂存按钮
     tempSave(value, classId) {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
@@ -367,7 +384,7 @@ export default {
         message: `临时保存成功`,
         duration: 1500,
       });
-      this.canSave=true
+      this.canSave = true;
     },
     // 保存
     save() {
@@ -563,8 +580,8 @@ export default {
       }
       this.$watch("value", (newValue) => {
         // 在元素值变化时执行特定的操作
-        console.log("元素的值已经变化：", newValue);
-        this.saveToLocal(newValue, this.classInfo.classId);
+        // console.log("元素的值已经变化：", newValue);
+        // this.saveToLocal(newValue, this.classInfo.classId);
       });
     },
     // 回显预设信息

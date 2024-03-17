@@ -90,7 +90,7 @@
                 {{ objective.description }}
               </div>
               <div style="margin-top: 20px">
-                <span style="color: grey; font-size: 14px">考核方式</span>
+                <span style="color: grey; font-size: 14px">达成度评价方式</span>
               </div>
               <div
                 v-for="(assessment, index) in objective.assessmentMethods"
