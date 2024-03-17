@@ -215,19 +215,23 @@ export default {
     backList() {
       this.json = JSON.parse(this.$refs.designer.getJson());
       this.getOption();
-      console.log(
-        "!",
-        _.isEqual(this.total.formJson, this.JSON),
-        this.total.formJson,
-        this.json
-      );
-      console.log(
-        _.isEqual(this.total.cssJson, this.option),
-        this.total.cssJson,
-        this.option
-      );
+      // 解决上传组件内部内容不一致，导致无法正确判断是否修改
+      const customCompare = (value1, value2) => {
+        if (value1.type === "upload" && value2.type === "upload") {
+          return true;
+        }
+        return undefined;
+      };
+      // console.log(
+      //   "!",
+      //   _.isEqual(this.total.formJson[0], this.json[0]),
+      //   this.total.formJson,
+      //   this.json
+      // );
+      // console.log(this.total.formJson[40], this.json[40]);
+
       if (
-        _.isEqual(this.total.formJson, this.json) &&
+        _.isEqualWith(this.total.formJson, this.json, customCompare) &&
         _.isEqual(this.total.cssJson, this.option)
       ) {
         this.$router.push("/templateList");

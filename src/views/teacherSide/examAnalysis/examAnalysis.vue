@@ -102,7 +102,7 @@ export default {
   data() {
     let self = this;
     return {
-      compareData: {},
+      compareData: [],
 
       canedit: false,
 
@@ -739,7 +739,7 @@ export default {
     },
     goTeacher() {
       console.log("goteacher:" + this.saving + this.dirty); //只有dirty = flase 或者 saving = true时才可以退出
-      console.log(_.isEqual(this.compareData, this.db.objectives));
+      console.log(this.compareData, this.db.objectives);
       let isSame = _.isEqual(this.compareData, this.db.objectives);
       if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {

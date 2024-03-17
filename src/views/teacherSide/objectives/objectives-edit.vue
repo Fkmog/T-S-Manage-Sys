@@ -77,7 +77,7 @@
                   />
                 </el-form-item>
                 <div style="margin-top: 50px">
-                  <span style="color: grey; font-size: 14px">考核方式</span>
+                  <span style="color: grey; font-size: 14px">达成度评价方式</span>
                 </div>
                 <el-row v-if="objective.assessmentMethods.length !== 0">
                   <el-col
@@ -152,7 +152,7 @@
     <div>
       <el-dialog
         v-model="dialogFormVisible"
-        title="设置考核方式"
+        title="设置达成度评价方式"
         width="680px"
         :show-close="false"
         :align-center="true"
@@ -246,7 +246,7 @@
           @click="addAssessment()"
         >
           <el-icon :size="18" color="#586dbe"><Plus /></el-icon>
-          新增考核方式
+          新增达成度评价方式
         </el-button>
         <template #footer>
           <span class="dialog-footer">
@@ -491,10 +491,10 @@ export default {
         ElMessage.error("权重之和必须为100%");
       }
       if (isMethodsNameNull == true) {
-        ElMessage.error("考核方式不能为空");
+        ElMessage.error("达成度评价方式不能为空");
       }
       if (isItemNull == true) {
-        ElMessage.error("请为考核方式选择成绩项");
+        ElMessage.error("请为达成度评价方式选择成绩项");
       }
       if (
         sum == 100 &&

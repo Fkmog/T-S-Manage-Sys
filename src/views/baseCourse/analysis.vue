@@ -1,78 +1,76 @@
 <template>
-  <div layout="column" flex class="ng-scope layout-column flex">
-    <!-- 顶部导航栏 -->
-    <div class="block">
-      <el-row class="block-row">
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="返回"
-          placement="bottom"
-          :hide-after="0"
-        >
-          <el-icon
-            class="icon"
-            size="24px"
-            color="rgb(137, 137, 137)"
-            style="margin-left: 50px"
-            @click="gobaseCourseDetail()"
-          >
-            <Back />
-          </el-icon>
-        </el-tooltip>
-
-        <div class="title">试卷分析表</div>
-
-        <el-divider class="divider" direction="vertical" />
-
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="保存成绩项"
-          placement="bottom"
-          :hide-after="0"
-          :disabled="!isValid()"
-        >
-          <el-button
-            @click="save"
-            link
-            style="padding-left: 20px"
-            :disabled="!isValid()"
-          >
-            <el-icon size="22px" color="rgb(137, 137, 137)" style="top: -1px">
-              <!-- :disabled="!isValid()" -->
-              <DocumentChecked />
-            </el-icon>
-          </el-button>
-        </el-tooltip>
-      </el-row>
-    </div>
-
-    <!-- @tab-add="this.handleTabsEdit('','add')"   -->
-
-    <div class="card-container" v-show="hasObjectives">
+  <!-- 顶部导航栏 -->
+  <div class="block">
+    <el-row class="block-row">
       <el-tooltip
         class="box-item"
-        style="display: flex"
         effect="dark"
-        content="添加成绩项"
+        content="返回"
         placement="bottom"
         :hide-after="0"
       >
-        <el-button @click="addActivities" link style="padding: 10px">
-          <el-icon size="22px" color="rgb(137, 137, 137)">
-            <CirclePlus />
+        <el-icon
+          class="icon"
+          size="24px"
+          color="rgb(137, 137, 137)"
+          style="margin-left: 50px"
+          @click="gobaseCourseDetail()"
+        >
+          <Back />
+        </el-icon>
+      </el-tooltip>
+
+      <div class="title">试卷分析表</div>
+
+      <el-divider class="divider" direction="vertical" />
+
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="保存成绩项"
+        placement="bottom"
+        :hide-after="0"
+        :disabled="!isValid()"
+      >
+        <el-button
+          @click="save"
+          link
+          style="padding-left: 20px"
+          :disabled="!isValid()"
+        >
+          <el-icon size="22px" color="rgb(137, 137, 137)" style="top: -1px">
+            <!-- :disabled="!isValid()" -->
+            <DocumentChecked />
           </el-icon>
         </el-button>
       </el-tooltip>
-      <div style="height: 200px">
-        <div class="hot-table-container" id="courseHot"></div>
-      </div>
-    </div>
-
-    <div v-show="!hasObjectives" class="no-class">尚未设置课程目标</div>
-    <div class="no-major-detail" v-show="!hasObjectives">请先设置课程目标</div>
+    </el-row>
   </div>
+
+  <!-- @tab-add="this.handleTabsEdit('','add')"   -->
+
+  <div class="card-container" v-show="hasObjectives">
+    <el-tooltip
+      class="box-item"
+      style="display: flex"
+      effect="dark"
+      content="添加成绩项"
+      placement="bottom"
+      :hide-after="0"
+    >
+      <el-button @click="addActivities" link style="padding: 10px">
+        <el-icon size="22px" color="rgb(137, 137, 137)">
+          <CirclePlus />
+        </el-icon>
+      </el-button>
+    </el-tooltip>
+    <div style="height: 200px">
+      <div class="hot-table-container" id="courseHot"></div>
+    </div>
+  </div>
+
+  <div v-show="!hasObjectives" class="no-class">尚未设置课程目标</div>
+  <div class="no-major-detail" v-show="!hasObjectives">请先设置课程目标</div>
 </template>
 
 <script>
@@ -120,11 +118,14 @@ import "handsontable/dist/handsontable.full.css";
 
 import "handsontable/dist/handsontable.full.css";
 
+import _ from "lodash";
+
 export default {
   name: "activities",
   data() {
     let that = this;
     return {
+      compareData: [],
       columnChange: 0,
       unsave: false,
 
@@ -612,33 +613,6 @@ export default {
             return;
           } else {
             self.isValid();
-
-            if (self.count == 0) {
-              self.dirty = false;
-              // console.log(
-              //   "console:",
-              //   self.count,
-              //   "dirty",
-              //   self.dirty,
-              //   "items:",
-              //   self.db.objectives
-              // );
-            } else {
-              self.dirty = true;
-              self.firstActivities = false;
-              // console.log(
-              //   "console:",
-              //   self.count,
-              //   "dirty",
-              //   self.dirty,
-              //   "items:",
-              //   self.db.objectives,
-              //   "firstActivities",
-              //   self.firstActivities
-              // );
-            }
-            self.count++;
-            // console.log("console:", self.count);
           }
         },
         afterRemoveCol(changes, source) {
@@ -670,81 +644,77 @@ export default {
       };
     },
     getActivities() {
-      let that = this;
-
-      getDetailedPaperAnalysis(this.paperAnalysisId).then((res) => {
-        console.log("getDetailedPaperAnalysis", res);
-        if (res) {
-          this.hasObjectives = true;
-          let setting = res.data.setting;
-          setting.object.forEach((objectname) => {
-            this.objectivesName.push(objectname);
-          });
-
-          if (setting.sum) {
-            // this.objectivesName.concat(setting.object);
-
-            let sum = ["合计"];
-            this.db.objectives.push(sum.concat(setting.title));
-            for (let i = 0; i < setting.sum.length; i++) {
-              let templist = [];
-              let tempLine = "";
-              for (let k = 0; k < setting.value[i].length; k++) {
-                tempLine =
-                  String.fromCharCode(66 + k) + (i + 2) + "+" + tempLine;
-              }
-              console.log("tempLine", tempLine.slice(0, -1));
-
-              let tempString = "=" + "SUM(" + tempLine.slice(0, -1) + ")";
-
-              templist.push(tempString);
-
-              for (let j = 0; j < setting.value[i].length; j++) {
-                templist.push(setting.value[i][j]);
-              }
-
-              this.db.objectives.push(templist);
-            }
-            for (
-              let i = setting.sum.length + 1;
-              i < this.objectivesName.length;
-              i++
-            ) {
-              this.db.objectives.push([""]);
-            }
-            console.log("this.db.objectives", this.db.objectives);
-          } else {
-            this.db.objectives.push(["合计", ""]);
-            this.db.objectives.push(["", ""]);
-            setting.object.forEach(() => {
-              this.db.objectives.push(["", ""]);
+      getDetailedPaperAnalysis(this.paperAnalysisId)
+        .then((res) => {
+          console.log("getDetailedPaperAnalysis", res);
+          if (res) {
+            this.hasObjectives = true;
+            let setting = res.data.setting;
+            setting.object.forEach((objectname) => {
+              this.objectivesName.push(objectname);
             });
-          }
 
-          this.activateHotcolumn();
-          this.columnChange++;
-        } else {
-          this.hasObjectives = false;
-        }
-      });
+            if (setting.sum) {
+              // this.objectivesName.concat(setting.object);
+
+              let sum = ["合计"];
+              this.db.objectives.push(sum.concat(setting.title));
+              for (let i = 0; i < setting.sum.length; i++) {
+                let templist = [];
+                let tempLine = "";
+                for (let k = 0; k < setting.value[i].length; k++) {
+                  tempLine =
+                    String.fromCharCode(66 + k) + (i + 2) + "+" + tempLine;
+                }
+                console.log("tempLine", tempLine.slice(0, -1));
+
+                let tempString = "=" + "SUM(" + tempLine.slice(0, -1) + ")";
+
+                templist.push(tempString);
+
+                for (let j = 0; j < setting.value[i].length; j++) {
+                  templist.push(setting.value[i][j]);
+                }
+
+                this.db.objectives.push(templist);
+              }
+              for (
+                let i = setting.sum.length + 1;
+                i < this.objectivesName.length;
+                i++
+              ) {
+                this.db.objectives.push([""]);
+              }
+              console.log("this.db.objectives", this.db.objectives);
+            } else {
+              this.db.objectives.push(["合计", ""]);
+              this.db.objectives.push(["", ""]);
+              setting.object.forEach(() => {
+                this.db.objectives.push(["", ""]);
+              });
+            }
+
+            this.compareData = JSON.parse(JSON.stringify(this.db.objectives));
+            this.activateHotcolumn();
+            this.columnChange++;
+          } else {
+            this.hasObjectives = false;
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     isValid() {
-      if (this.firstActivities) {
-        console.log("isValid:this.firstActivities:", this.firstActivities);
-        return false;
-      } else {
-        var result = this.toPostData();
-        // console.log('result',result);
-        return !!result;
-      }
+      var result = this.toPostData();
+
+      return result;
     },
-    isNotDirty() {
-      this.dirty = false;
-    },
+
     save() {
       let that = this;
       this.saving = true;
-      this.dirty = false;
+
       this.postData.objectives = {
         object: [],
         title: [],
@@ -824,6 +794,8 @@ export default {
               message: "更新成功",
               duration: 1500,
             });
+
+            this.compareData = JSON.parse(JSON.stringify(this.db.objectives));
           }
         })
         .catch((e) => {
@@ -855,18 +827,18 @@ export default {
       } else {
         valid = false;
       }
+      if (valid && _.isEqual(this.compareData, this.db.objectives)) {
+        valid = false;
+      }
 
       return valid;
     },
-    goBackandClean() {
-      this.db.items = [];
-      this.postData.activities = [];
-      console.log("datas:", this.db.items, this.postData.activities);
-      this.reload();
-    },
+
     gobaseCourseDetail() {
       console.log("gobaseCourseDetail:" + this.saving + this.dirty);
-      if (this.dirty == true || (this.saving == false && this.dirty == true)) {
+      console.log(_.isEqual(this.compareData, this.db.objectives));
+      let isSame = _.isEqual(this.compareData, this.db.objectives);
+      if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",

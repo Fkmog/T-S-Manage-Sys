@@ -60,7 +60,7 @@
               </el-row>
               <div v-show="!hasIndicators[index1]" class="noIndicator">
                 <el-button style="color: #6573c0" text @click="goEdit(index1)"
-                  >添加考核方式
+                  >添加达成度评价方式
                 </el-button>
               </div>
               <div

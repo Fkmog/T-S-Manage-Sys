@@ -61,17 +61,17 @@ export default {
   computed: {},
   watch: {},
   mounted() {
-    // 点击"设置"后，默认进入版本页面，后期可能会出现bug
-    // console.log(this.$route);
-    // if (this.$route.matched.length == 2) {
-    //   this.toVersion();
-    // }
+    console.log(this.$route);
+    if (this.$route.fullPath === "/version") {
+      this.NavMsg = "课程大纲版本";
+    }
+    if (this.$route.fullPath === "/templateList") {
+      this.NavMsg = "工作手册模板";
+    }
   },
   methods: {
     toVersion() {
-      // console.log(this.$route);
       this.NavMsg = "课程大纲版本";
-
       this.$router.push({ name: "Version" });
     },
     //跳转到模板编辑页面

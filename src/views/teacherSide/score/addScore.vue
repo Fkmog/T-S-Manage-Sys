@@ -51,6 +51,8 @@
       v-model="editableTabsValue"
       type="card"
       class="activity-tab"
+      closable
+      @edit="handleTabsEdit"
       @tab-click="editableTabsValueChange"
       v-show="hasActivities && hasObjectives"
     >
@@ -138,7 +140,7 @@ export default {
   data() {
     let self = this;
     return {
-      compareData: {},
+      compareData: [],
       errorInTable: false,
 
       editableTabsValue: "0",
@@ -251,9 +253,9 @@ export default {
       for (let j = 3; j < this.db.items[currentPage].length; j++) {
         let ID = this.db.items[currentPage][j][0];
         let Name = this.db.items[currentPage][j][1];
-        console.log("ID:", ID);
+        // console.log("ID:", ID);
         if (!ID || !Name) {
-          console.log("this Id is null", this.db.items[currentPage][j]);
+          // console.log("this Id is null", this.db.items[currentPage][j]);
 
           for (
             let i = 0;
@@ -311,6 +313,7 @@ export default {
               row_below: {
                 name: "在下方插入行",
               },
+
               remove_row: {
                 name: "删除行",
               },
@@ -332,6 +335,13 @@ export default {
         "activityName",
         activityName
       );
+      if (targetName === "tab") {
+        ElMessage({
+          type: "error",
+          message: "请先在成绩项表中添加成绩项",
+          duration: 1500,
+        });
+      }
       if (action === "add" && !targetName) {
         console.log("handleTabsEdit add processing");
         let item = [""];
@@ -382,6 +392,7 @@ export default {
         //     });
         console.log("currenteditableTabsValue:", this.currenteditableTabsValue);
       }
+
       if (action === "remove") {
         ElMessageBox.confirm("是否确认删除成绩项", "", {
           confirmButtonText: "确认",
@@ -410,6 +421,7 @@ export default {
 
             this.editableTabsValue = activeName;
             this.editableTabs = tabs.filter((tab) => tab.name !== targetName);
+
             console.log("editableTabs:", this.editableTabs);
           })
           .catch((e) => {
@@ -502,6 +514,7 @@ export default {
               row_below: {
                 name: "在下方插入行",
               },
+
               remove_row: {
                 name: "删除行",
               },
@@ -523,25 +536,6 @@ export default {
           },
           afterCreateRow(index, amount, source) {
             console.log(self.db.items);
-            // for (let i = 1; i < self.db.items.length; i++) {
-            //   for (let j = 3; j < self.db.items[0].length; j++) {
-            //     if (!self.db.items[i][j]) {
-            //       console.log(i, j);
-            //       self.db.items[i][j] = {};
-            //     }
-            //     console.log(Object.keys(self.db.items[i][j]).length);
-            //     for (let k = 0; k < 2; k++) {
-            //       console.log(
-            //         self.db.items[i][j][k] + ":" + self.db.items[0][j][k]
-            //       );
-            //       if (!self.db.items[0][j][k]) {
-            //         self.db.items[i][j][k] = null;
-            //       } else {
-            //         self.db.items[i][j][k] = self.db.items[0][j][k];
-            //       }
-            //     }
-            //   }
-            // }
           },
           beforeRemoveRow(index, amount, physicalRows, source) {
             if (source === "loadData") {
@@ -554,6 +548,14 @@ export default {
               }
             }
           },
+          // beforeRemoveCol(index) {
+          //   console.log(index);
+          //   // if (index <= 2) {
+          //   //     // console.log('this row should not created!')
+          //   //     return false;
+          //   //   }
+          //   return false;
+          // },
           afterRemoveRow() {
             console.log(self.db.items);
           },
@@ -693,7 +695,7 @@ export default {
       }
     },
     validScoreSetting(value) {
-      console.log(value, this.scoreSettingOptions.indexOf(value));
+      // console.log(value, this.scoreSettingOptions.indexOf(value));
       if (!value) {
         this.errorInTable = false;
       } else {
@@ -705,7 +707,7 @@ export default {
       }
     },
     validateNumberWithin100(value) {
-      console.log(value, /^\d{1,2}(\.\d{1,2})?$/.test(value));
+      // console.log(value, /^\d{1,2}(\.\d{1,2})?$/.test(value));
       if (!value) {
         this.errorInTable = false;
       } else {
@@ -746,11 +748,37 @@ export default {
             that.hasActivities = true;
             that.hasNoActivities = false;
             let currentactivitCount = 0;
+            for (let i = 0; i < course.scores[0]["grade"].length; i++) {
+              if (i >= course.activities.length) {
+                let itemLength = course.scores[0]["grade"][i].length;
+                let dict = {
+                  description: "",
+                  item: Array.from({ length: itemLength }),
+                  name: "未知成绩项" + Number(i + 1),
+                  remark: Array.from({ length: itemLength }),
+                  value: Array.from({ length: itemLength }),
+                };
+                course.activities.push(dict);
+              } else {
+                let activity = course.activities[i];
+                console.log(activity);
+                if (
+                  activity["item"].length < course.scores[0]["grade"][i].length
+                ) {
+                  for (let j = 0; j < course.scores.length; j++) {
+                    course.scores[j]["grade"][i].length =
+                      activity["item"].length;
+                  }
+                }
+              }
+            }
+            console.log("course.activities", course.activities);
             course.activities.forEach((activity) => {
-              console.log('activity["name"]', activity["name"]);
+              // console.log('activity["name"]', activity["name"]);
               that.handleTabsEdit(1, "add", activity["name"]);
               let activityNumber = activity["item"].length;
-              console.log("activityNumber:", activityNumber);
+
+              // console.log("activityNumber:", activityNumber);
               let studentNum = course.scores.length;
               that.currentNumberofActivities = activityNumber;
 
@@ -901,7 +929,6 @@ export default {
 
     save() {
       this.saving = true;
-
       this.postData.scores = [];
       var result = this.isValid();
       if (!result) {
@@ -924,11 +951,18 @@ export default {
       }
       let count = 0;
       // console.log('allStudentsNumber:',allStudentsNumber,'studentList.length',studentList.length);
+
+      let currentItems = [];
+      for (let i = 0; i < this.editableTabs.length; i++) {
+        let num = Number(this.editableTabs[i]["value"]) - 1;
+        currentItems.push(this.db.items[num]);
+      }
+      console.log(currentItems);
       allStudentsNumber.forEach((studentNumber) => {
         let infoList = [];
         let finalGrade = [];
         let finalPass = [];
-        that.db.items.forEach((activity) => {
+        currentItems.forEach((activity) => {
           let gradList = [];
           let passList = "";
           let student = JSON.parse(JSON.stringify(activity));
@@ -955,12 +989,12 @@ export default {
                   } else if (key == 2) {
                     if (this.errorInTable === false) {
                       this.validScoreSetting(student[i][key]);
-                      console.log(
-                        "validScoreSetting",
-                        student[i][key],
-                        "errorInTable",
-                        this.errorInTable
-                      );
+                      // console.log(
+                      //   "validScoreSetting",
+                      //   student[i][key],
+                      //   "errorInTable",
+                      //   this.errorInTable
+                      // );
                     }
 
                     passList = student[i][key];
@@ -968,12 +1002,12 @@ export default {
                     // console.log("score", student[i][key]);
                     if (this.errorInTable === false) {
                       this.validateNumberWithin100(student[i][key]);
-                      console.log(
-                        "validateNumberWithin100",
-                        student[i][key],
-                        "errorInTable",
-                        this.errorInTable
-                      );
+                      // console.log(
+                      //   "validateNumberWithin100",
+                      //   student[i][key],
+                      //   "errorInTable",
+                      //   this.errorInTable
+                      // );
                     }
 
                     gradList.push(student[i][key]);
@@ -1092,8 +1126,8 @@ export default {
     },
     goTeacher() {
       console.log("goteacher:" + this.saving + this.dirty); //只有dirty = flase 或者 saving = true时才可以退出
-      console.log(_.isEqual(this.compareData, this.db.objectives));
-      let isSame = _.isEqual(this.compareData, this.db.objectives);
+      console.log(_.isEqual(this.compareData, this.db.items));
+      let isSame = _.isEqual(this.compareData, this.db.items);
       if (!isSame || (this.saving == false && !isSame)) {
         ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
           confirmButtonText: "确认",
@@ -1144,11 +1178,20 @@ export default {
               duration: 1500,
             });
           } else if (e.status == 409) {
-            ElMessage({
-              type: "error",
-              message: "成绩项分值为空",
-              duration: 1500,
-            });
+            if (e.data.code === "E_ACTIVITY_NOT_SAME") {
+              ElMessage({
+                type: "error",
+                message:
+                  "课程目标达成度计算错误，请提醒课程负责人修改课程目标的达成度评价方式",
+                duration: 2000,
+              });
+            } else {
+              ElMessage({
+                type: "error",
+                message: "成绩项或成绩项表名不符合",
+                duration: 1500,
+              });
+            }
           } else {
             ElMessage({
               type: "error",

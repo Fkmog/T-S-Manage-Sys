@@ -193,7 +193,9 @@ export default {
   },
   methods: {
     backSetting() {
-      this.$router.push("/departmentSetting");
+      this.$router.push({
+        path:"/departmentSetting",
+      });
     },
     //跳转编辑
     goEdit(row) {
