@@ -70,7 +70,7 @@
 
       <!-- 试卷分析 -->
       <el-tooltip
-        v-show="this.identity == '教师'"
+        v-show="this.identity == '教师' && this.hasoverallScoreStatics == true"
         class="box-item"
         effect="dark"
         placement="bottom"
@@ -85,6 +85,7 @@
           size="24px"
           color="rgb(137, 137, 137)"
           style="margin-left: 20px"
+          v-show="this.hasoverallScoreStatics == true"
           @click="goScoreStatistics()"
         >
           <List />
@@ -292,6 +293,7 @@ export default {
   },
   data() {
     return {
+      hasoverallScoreStatics: false,
       identity: "",
       isRespondent: "",
 
@@ -499,6 +501,10 @@ export default {
             that.hasScores = true;
             that.hasNoScores = false;
             let count = 0;
+            if (course.overallScoreStatics) {
+              that.hasoverallScoreStatics = true;
+            }
+
             if (course.activities.length) {
               that.hasActivities = true;
               course.activities.forEach((activity) => {
@@ -556,6 +562,7 @@ export default {
             }
           } else {
             console.log("res has no scores");
+            console.log("overallScoreStatics", that.hasoverallScoreStatics);
             that.hasScores = false;
             that.hasNoScores = true;
           }
@@ -564,6 +571,8 @@ export default {
         this.hasDetail = false;
         this.hasNoDetail = true;
       }
+
+      console.log("overallScoreStatics", this.hasoverallScoreStatics);
     },
   },
 };
