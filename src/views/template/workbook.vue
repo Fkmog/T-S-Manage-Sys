@@ -463,13 +463,8 @@ export default {
               });
               this.workbook = res.data;
               this.workbookId = this.workbook.workbookId;
-              // if (this.classInfo.workbookJson === null) {
-              //   this.value = JSON.parse(JSON.stringify(this.workbook.formJson));
-              //   // console.log("^^^^");
-              // }
               console.log("workbook", this.workbook);
               this.json = res.data.formJson;
-
               // 找到所有的fc-editor，存到editor
               this.json.forEach((item) => {
                 if (item.type) {
@@ -554,7 +549,6 @@ export default {
             // console.log("!", i.value);
             if (i.value[0] == "[") {
               i.value = i.value.match(/\d+/g);
-              // console.log("!", i.value);
             }
           });
           console.log("getPresent", this.formPresent);
@@ -571,7 +565,7 @@ export default {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
           this.afterPreValue = temp;
-          console.log("????");
+        
         } else {
           console.log("remove");
           localStorage.removeItem("classId");

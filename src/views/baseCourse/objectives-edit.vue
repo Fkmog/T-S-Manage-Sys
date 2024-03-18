@@ -123,19 +123,19 @@
                       <el-col :span="12">
                         <el-row>
                           <el-col
-                            :span="6"
+                            :span="8"
                             v-for="(activity, index2) in assessment.activities
                               .item"
                             :key="index2"
                           >
-                            <!-- <el-tooltip
+                            <el-tooltip
                               :hide-after="0"
-                              :content="123"
+                              :content="assessment.activities.table[index2] || ''"
                               effect="dark"
                               placement="top"
-                            > -->
+                            >
                               {{ activity }}
-                            <!-- </el-tooltip> -->
+                            </el-tooltip>
                           </el-col>
                         </el-row>
                       </el-col>
