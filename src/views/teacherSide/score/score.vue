@@ -68,6 +68,29 @@
         </el-icon>
       </el-tooltip>
 
+      <!-- 试卷分析 -->
+      <el-tooltip
+        v-show="this.identity == '教师'"
+        class="box-item"
+        effect="dark"
+        placement="bottom"
+        :hide-after="0"
+      >
+        <template #content>
+          <span v-show="hasDetail"> 成绩统计 </span>
+          <span v-show="hasNoDetail"> 请先关联课程大纲 </span>
+        </template>
+        <el-icon
+          class="icon"
+          size="24px"
+          color="rgb(137, 137, 137)"
+          style="margin-left: 20px"
+          @click="goScoreStatistics()"
+        >
+          <List />
+        </el-icon>
+      </el-tooltip>
+
       <el-divider class="divider" direction="vertical" />
 
       <el-tooltip
@@ -247,7 +270,7 @@
 </template>
 
 <script>
-import { Back, Histogram, DataAnalysis } from "@element-plus/icons-vue";
+import { Back, Histogram, DataAnalysis, List } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElMessageBox, ElSwitch, ElMessage } from "element-plus";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
@@ -265,6 +288,7 @@ export default {
     Histogram,
     ElMessage,
     DataAnalysis,
+    List,
   },
   data() {
     return {
@@ -438,6 +462,17 @@ export default {
     goPaperAnalysis() {
       if (this.hasDetail) {
         this.$router.push("/examAnalysis");
+      } else {
+        ElMessage({
+          type: "error",
+          message: `请先关联课程大纲`,
+          duration: 1500,
+        });
+      }
+    },
+    goScoreStatistics() {
+      if (this.hasDetail) {
+        this.$router.push("/scoreStatistics");
       } else {
         ElMessage({
           type: "error",
