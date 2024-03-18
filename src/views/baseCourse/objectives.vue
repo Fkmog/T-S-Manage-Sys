@@ -44,7 +44,7 @@
             type="error"
             :closable="false"
             show-icon
-            style="width: 350px; margin-top: 5px"
+            style="width: 500px; margin-top: 5px"
           />
         </div>
 
@@ -93,15 +93,14 @@
                         v-for="(activity, index2) in assessment.activities.item"
                         :key="index2"
                       >
-                        <!-- <el-tooltip
-                        
+                        <el-tooltip
                           :hide-after="0"
-                          :content="assessment.activities.table[index2]"
+                          :content="assessment.activities.table[index2] || ''"
                           effect="dark"
                           placement="top"
-                        > -->
-                        {{ activity }}
-                        <!-- </el-tooltip> -->
+                        >
+                          {{ activity }}
+                        </el-tooltip>
                       </el-col>
                     </el-row>
                   </el-col>
@@ -203,7 +202,6 @@ export default {
     };
   },
   mounted() {
-    // console.log("###");
     this.course.name = this.$store.state.course.courseName;
     this.course.detailId = this.$store.state.course.detailId;
     if (this.course.detailId === null) {
@@ -222,26 +220,48 @@ export default {
     },
     checkActivityInfo() {
       let allTable = new Set();
+      let allAc = new Set();
       let activities = this.list.activities;
       for (let i = 0; i < activities.length; i++) {
         let ac = activities[i];
         allTable.add(ac.name);
+        if (ac.item) {
+          let temp = Array.from(ac.item);
+          temp.forEach((t) => allAc.add(t));
+        }
       }
       let tables = new Set();
+      let Ac = new Set();
       let objects = this.list.objectives;
       for (let i = 0; i < objects.length; i++) {
         let assessments = objects[i].assessmentMethods;
         assessments.forEach((assess) => {
           let table = assess.activities.table;
           let item = assess.activities.item;
+          Ac.add(...item);
           tables.add(...table);
         });
       }
+      let Nosheet = [];
+      let NoAc = [];
       for (let item of tables) {
         if (!allTable.has(item)) {
-          this.info.push("成绩项表：" + item + " 不存在，请重新设置课程目标的考核方式");
+          Nosheet.push(item);
         }
       }
+      for (let item of Ac) {
+        if (!allAc.has(item)) {
+          NoAc.push(item);
+        }
+      }
+      let Actemp = NoAc.join("、");
+      let temp = Nosheet.join("、");
+      this.info.push(
+        "以下成绩项表标题已变更：" + temp + "，请重新设置课程目标的考核方式"
+      );
+      this.info.push(
+        "以下考核项名称已变更：" + Actemp + "，请重新设置课程目标的考核方式"
+      );
       console.log("tables", tables, allTable);
     },
     //获取课程目标
@@ -276,7 +296,7 @@ export default {
           });
         }
         console.log("getObjectives:", this.list);
-        this.checkActivityInfo()
+        this.checkActivityInfo();
       });
     },
   },
