@@ -22,8 +22,8 @@ const app = createApp(App)
   .use(FcDesigner)
   .use(Codemirror)
   .component("upload", upload)
-  // .provide("$baseURL", "http://47.113.206.164/prod-api/")
-  .provide("$baseURL", "https://jxjk.hdu.edu.cn/prod-api/")
+  .provide("$baseURL", "http://47.113.206.164/prod-api/")
+  // .provide("$baseURL", "https://jxjk.hdu.edu.cn/prod-api/")
   .mount("#app");
 //解决el-table  ResizeObserver loop limit exceeded问题
 const debounce = (fn, delay) => {
@@ -48,11 +48,11 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
 app.$.appContext.components.ElDialog.props.closeOnClickModal.default = false;
 
 // 判断配置文件是否开启日志调试 是否输出日志 True 输出 False 不输出
-var logDebug = false;
-console.log = (function (oriLogFunc) {
-  return function () {
-    if (logDebug) {
-      oriLogFunc.apply(this, arguments);
-    }
-  };
-})(console.log);
+// var logDebug = false;
+// console.log = (function (oriLogFunc) {
+//   return function () {
+//     if (logDebug) {
+//       oriLogFunc.apply(this, arguments);
+//     }
+//   };
+// })(console.log);

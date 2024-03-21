@@ -68,7 +68,7 @@
         </el-icon>
       </el-tooltip>
 
-      <!-- 试卷分析 -->
+      <!-- 成绩统计 -->
       <el-tooltip
         v-show="this.identity == '教师' && this.hasoverallScoreStatics == true"
         class="box-item"
@@ -134,6 +134,11 @@
           :label="item.title"
           :name="item.name"
         >
+          <template v-slot="label">
+            <span class="description">
+              {{ item.description }}
+            </span>
+          </template>
         </el-tab-pane>
       </el-tabs>
 
@@ -374,7 +379,7 @@ export default {
       this.tableWidth = length.toString() + "px";
       return console.log("currenteditableTabsValue:", Number(pane.props.name));
     },
-    handleTabsEdit(targetName, action, activityName) {
+    handleTabsEdit(targetName, action, activityName, activityDescription) {
       let that = this;
       console.log("action", action);
       if (action === "add" && !targetName) {
@@ -396,6 +401,7 @@ export default {
           title: "成绩项" + " " + newTabName,
           name: newTabName.toString(),
           value: newTabName,
+          description: "",
         });
         this.editableTabsValue = newTabName.toString();
         this.hotInstance.updateSettings({
@@ -416,6 +422,7 @@ export default {
           title: activityName ? activityName : "成绩项" + " " + newTabName,
           name: newTabName.toString(),
           value: newTabName,
+          description: activityDescription,
         });
         this.editableTabsValue = newTabName.toString();
 
@@ -508,7 +515,12 @@ export default {
             if (course.activities.length) {
               that.hasActivities = true;
               course.activities.forEach((activity) => {
-                that.handleTabsEdit(1, "add", activity.name);
+                that.handleTabsEdit(
+                  1,
+                  "add",
+                  activity.name,
+                  activity.description
+                );
                 let activityNumber = activity["item"].length;
                 that.activityName.push(activity["item"]);
                 that.activityScores.push(activity["value"]);
@@ -579,6 +591,14 @@ export default {
 </script>
 
 <style scoped>
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  height: 50px;
+  padding: 10px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
 .switchstyle {
   bottom: 4px;
 }
@@ -611,7 +631,7 @@ export default {
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding {
-  margin-top: 90px;
+  margin-top: 70px;
 }
 .block {
   position: absolute;

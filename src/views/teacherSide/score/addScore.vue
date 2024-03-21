@@ -63,14 +63,7 @@
         :name="item.name"
       >
         <template v-slot="label">
-          <span
-            style="
-              display: inline-block;
-              width: 90%;
-
-              padding: 10px;
-            "
-          >
+          <span class="description">
             {{ item.description }}
           </span>
         </template>
@@ -79,19 +72,6 @@
 
     <div class="card-container" v-show="hasActivities && hasObjectives">
       <div class="hot-table-container" id="courseHot"></div>
-    </div>
-
-    <div
-      v-show="hasNoActivities"
-      style="
-        padding-top: 120px;
-        display: flex;
-        justify-content: center;
-        font-size: 22px;
-        background-color: #f2f2f2;
-      "
-    >
-      未创建成绩项
     </div>
 
     <div
@@ -614,8 +594,8 @@ export default {
           cellProperties.type = "numeric"; // by default: 'string'
           // cellProperties.validator = validScore();
           cellProperties.format = "0.00"; // http://numeraljs.com/
-          cellProperties.validator =
-            /^(100(\.00?)?|0(\.\d{1,2})?|[1-9]?\d(\.\d{1,2})?)$/;
+          cellProperties.validator = /^(\d+(\.\d+)?|[A-Z]|良好|优秀)$/;
+          // /^(100(\.00?)?|0(\.\d{1,2})?|[1-9]?\d(\.\d{1,2})?)$/;
           // cellProperties.validator = that.validateNumberWithin100;
         } else {
           //   cellProperties.validator =  that.validString();
@@ -665,7 +645,7 @@ export default {
             cellProperties.readOnly = true;
           }
         }
-        if (row <= 2) {
+        if (row < 2) {
           cellProperties.readOnly = true;
         }
 
@@ -679,6 +659,50 @@ export default {
             cellProperties.readOnly = true;
           }
         }
+        // if (
+        //   that.currenteditableTabsValue - 1 == 0 ||
+        //   that.currenteditableTabsValue == 0
+        // ) {
+        //   if (
+        //     row === 2 &&
+        //     col > 2 &&
+        //     col < Object.keys(that.db.items[0]["2"]).length + 1
+        //   ) {
+        //     for (
+        //       let i = 0;
+        //       i < Object.keys(that.db.items[0]["2"]).length;
+        //       i++
+        //     ) {
+        //       if (
+        //         that.db.items[0]["2"][i + 3] === null ||
+        //         that.db.items[0]["2"][i + 3] === ""
+        //       ) {
+        //         cellProperties.type = "dropdown";
+        //         cellProperties.source = [" ", "非数值"];
+        //         cellProperties.allowEmpty = true;
+        //       }
+        //     }
+        //   }
+        // } else {
+        //   if (row === 2 && col > 2) {
+        //     for (let i = 1; i < that.db.items.length; i++) {
+        //       for (
+        //         let j = 0;
+        //         j < Object.keys(that.db.items[i][2]).length;
+        //         j++
+        //       ) {
+        //         if (
+        //           that.db.items[i]["2"][j + 3] === "" ||
+        //           that.db.items[i]["2"][j + 3] === null
+        //         ) {
+        //           cellProperties.type = "dropdown";
+        //           cellProperties.source = [" ", "非数值"];
+        //           cellProperties.allowEmpty = true;
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
 
         return cellProperties;
       };
@@ -873,6 +897,7 @@ export default {
             that.currenteditableTabsValue = 1;
             that.originData = JSON.parse(JSON.stringify(that.db.items));
             that.compareData = JSON.parse(JSON.stringify(that.db.items));
+
             console.log(
               "db.items",
               that.db.items,
@@ -937,7 +962,7 @@ export default {
             that.compareData = JSON.parse(JSON.stringify(that.db.items));
             console.log(
               "db.items",
-              that.db.items,
+              that.db.items[0]["2"].length,
               "columnList:",
               that.columnList
             );
@@ -981,7 +1006,7 @@ export default {
         let num = Number(this.editableTabs[i]["value"]) - 1;
         currentItems.push(this.db.items[num]);
       }
-      console.log(currentItems);
+      console.log("currentItems", currentItems);
       allStudentsNumber.forEach((studentNumber) => {
         let infoList = [];
         let finalGrade = [];
@@ -1025,7 +1050,12 @@ export default {
                   } else {
                     // console.log("score", student[i][key]);
                     if (this.errorInTable === false) {
-                      this.validateNumberWithin100(student[i][key]);
+                      let num = /^\d+$/.test(student[i][key]);
+                      console.log(num);
+                      if (num) {
+                        this.validateNumberWithin100(student[i][key]);
+                      }
+
                       // console.log(
                       //   "validateNumberWithin100",
                       //   student[i][key],
@@ -1228,6 +1258,7 @@ export default {
         });
     },
   },
+
   mounted: function () {
     this.activate();
   },
@@ -1235,6 +1266,14 @@ export default {
 </script>
 
 <style scoped>
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  height: 50px;
+  padding: 10px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
 .card-container {
   margin-left: 10%;
   margin-bottom: 50px;
@@ -1246,7 +1285,7 @@ export default {
   /* 这里用auto而不是hidden，应为hidden会直接把多出的部分删除，而auto则会保留多出来的部分，形成页面滑动scroll */
 }
 .activity-tab {
-  height: 100px;
+  position: relative;
   margin-top: 68px;
   background: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);

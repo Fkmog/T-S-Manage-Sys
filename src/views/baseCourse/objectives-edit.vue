@@ -97,7 +97,9 @@
                 </div>
                 <el-row style="margin-top: 20px">
                   <el-col :span="22">
-                    <span style="color: grey; font-size: 14px">达成度评价方式</span>
+                    <span style="color: grey; font-size: 14px"
+                      >达成度评价方式</span
+                    >
                   </el-col>
                   <el-col :span="2" class="penIcon">
                     <el-icon
@@ -130,7 +132,9 @@
                           >
                             <el-tooltip
                               :hide-after="0"
-                              :content="assessment.activities.table[index2] || ''"
+                              :content="
+                                assessment.activities.table[index2] || ''
+                              "
                               effect="dark"
                               placement="top"
                             >
@@ -516,6 +520,7 @@ export default {
             // 做一个映射的map
             this.map[this.list.activities[i].name] = i;
             let sheet = this.list.activities[i];
+            console.log("sheet", sheet);
             this.allOfAll.push({
               children: [],
               value: sheet.name,
@@ -526,13 +531,16 @@ export default {
                 value: sheet.item[j],
                 label: sheet.item[j],
               };
-              this.allOfAll[i].children.push(obj);
+              if (sheet.remark[j] !== "非数值") {
+                this.allOfAll[i].children.push(obj);
+              }
             }
-            console.log("all",this.allOfAll);
+            console.log("all", this.allOfAll);
             if (this.list.objectives[i]) {
               let cur = this.list.objectives[i].assessmentMethods;
               for (let k = 0; k < cur.length; k++) {
                 let temp = cur[k].activities;
+                console.log("temp", temp);
                 temp.frontItem = [];
                 for (let l = 0; l < temp.item.length; l++) {
                   if (temp.table) {
@@ -562,13 +570,6 @@ export default {
             });
           });
           console.log("objectives:", this.objectives);
-          //保存成绩项
-          // if (this.objectives.length > 0) {
-          //   if (this.objectives[0].assessmentMethods.length > 0) {
-          //     this.activities =
-          //       this.objectives[0].assessmentMethods[0].activities;
-          //   }
-          // }
           this.getDeleteSerialNum();
         });
       } else if (
@@ -586,6 +587,8 @@ export default {
             // 做一个映射的map
             this.map[this.list.activities[i].name] = i;
             let sheet = this.list.activities[i];
+            console.log("sheet", sheet);
+
             this.allOfAll.push({
               children: [],
               value: sheet.name,
@@ -596,9 +599,11 @@ export default {
                 value: sheet.item[j],
                 label: sheet.item[j],
               };
-              this.allOfAll[i].children.push(obj);
+              if (sheet.remark[j] !== "非数值") {
+                this.allOfAll[i].children.push(obj);
+              }
             }
-             console.log("all",this.allOfAll);
+            console.log("all", this.allOfAll);
             if (this.list.objectives[i]) {
               let cur = this.list.objectives[i].assessmentMethods;
               for (let k = 0; k < cur.length; k++) {
@@ -675,14 +680,14 @@ export default {
     },
     //确定编辑考核方式
     confirmAddAssessment(dialogObject) {
-      console.log("#",dialogObject);
+      console.log("#", dialogObject);
       let sum = 0;
       // let isMethodsNameNull = false;
       let isItemNull = false;
       let haveZero = false;
       dialogObject.assessmentMethods.forEach((assessment) => {
         sum = sum + Number(assessment.weight);
-        console.log("@",assessment.activities.frontItem);
+        console.log("@", assessment.activities.frontItem);
         if (assessment.activities.frontItem.length == 0) {
           isItemNull = true;
         }
@@ -713,21 +718,21 @@ export default {
         this.dialogObject.assessmentMethods.forEach((assessmentMethod) => {
           // frontItem 用于前端展示，处理，结果赋值给item，保存到后端
           let cur = assessmentMethod.activities;
-          if(!('item' in cur)){
-            cur.item=[]
+          if (!("item" in cur)) {
+            cur.item = [];
           }
-          if(!('remark' in cur)){
-            cur.remark=[]
+          if (!("remark" in cur)) {
+            cur.remark = [];
           }
-          if(!('value' in cur)){
-            cur.value=[]
+          if (!("value" in cur)) {
+            cur.value = [];
           }
           let len = 0;
           if (cur.frontItem) {
             len = cur.frontItem.length;
           }
           for (let i = 0; i < len; i++) {
-            console.log("@@cur",cur);
+            console.log("@@cur", cur);
             // 确定item：成绩项名，table：成绩表名
             cur.item[i] = cur.frontItem[i][1];
             if (!cur.table) {
