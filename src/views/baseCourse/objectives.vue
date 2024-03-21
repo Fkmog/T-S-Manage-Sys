@@ -44,7 +44,7 @@
             type="error"
             :closable="false"
             show-icon
-            style="width: 500px; margin-top: 5px"
+            style="max-width: 100%; margin-top: 5px"
           />
         </div>
 
@@ -254,14 +254,19 @@ export default {
           NoAc.push(item);
         }
       }
-      let Actemp = NoAc.join("、");
-      let temp = Nosheet.join("、");
-      this.info.push(
-        "以下成绩项表标题已变更：" + temp + "，请重新设置课程目标的考核方式"
-      );
-      this.info.push(
-        "以下考核项名称已变更：" + Actemp + "，请重新设置课程目标的考核方式"
-      );
+      if (Nosheet.length > 0) {
+        let temp = Nosheet.join("、");
+        this.info.push(
+          "以下考核项表标题已变更：" + temp + "，请重新设置课程目标的考核方式"
+        );
+      }
+      if (NoAc.length > 0) {
+        let Actemp = NoAc.join("、");
+        this.info.push(
+          "以下成绩项名称已变更：" + Actemp + "，请重新设置课程目标的考核方式"
+        );
+      }
+
       console.log("tables", tables, allTable);
     },
     //获取课程目标

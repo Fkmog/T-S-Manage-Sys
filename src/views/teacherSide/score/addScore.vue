@@ -62,6 +62,18 @@
         :label="item.title"
         :name="item.name"
       >
+        <template v-slot="label">
+          <span
+            style="
+              display: inline-block;
+              width: 90%;
+
+              padding: 10px;
+            "
+          >
+            {{ item.description }}
+          </span>
+        </template>
       </el-tab-pane>
     </el-tabs>
 
@@ -325,7 +337,7 @@ export default {
 
       return console.log("currenteditableTabsValue:", Number(pane.props.name));
     },
-    handleTabsEdit(targetName, action, activityName) {
+    handleTabsEdit(targetName, action, activityName, activityDescription) {
       let that = this;
       console.log(
         "action",
@@ -362,6 +374,7 @@ export default {
           title: "成绩项" + " " + newTabName,
           name: newTabName.toString(),
           value: newTabName,
+          description: "",
         });
         this.editableTabsValue = newTabName.toString();
         this.hotInstance.updateSettings({
@@ -384,6 +397,7 @@ export default {
           title: activityName ? activityName : "成绩项" + " " + newTabName,
           name: newTabName.toString(),
           value: newTabName,
+          description: activityDescription,
         });
         this.editableTabsValue = this.editableTabs[0].name;
         this.currenteditableTabsValue = 1;
@@ -724,7 +738,7 @@ export default {
       }
     },
 
-    async getActivities() {
+    getActivities() {
       let that = this;
       return request({
         url: "/classes/" + this.classInfo.classId,
@@ -775,7 +789,12 @@ export default {
             console.log("course.activities", course.activities);
             course.activities.forEach((activity) => {
               // console.log('activity["name"]', activity["name"]);
-              that.handleTabsEdit(1, "add", activity["name"]);
+              that.handleTabsEdit(
+                1,
+                "add",
+                activity["name"],
+                activity["description"]
+              );
               let activityNumber = activity["item"].length;
 
               // console.log("activityNumber:", activityNumber);
@@ -875,7 +894,12 @@ export default {
             that.hasActivities = true;
             that.hasNoActivities = false;
             course.activities.forEach((activity) => {
-              that.handleTabsEdit(1, "add", activity["name"]);
+              that.handleTabsEdit(
+                1,
+                "add",
+                activity["name"],
+                activity["description"]
+              );
               let activityNumber = activity["item"].length;
               let studentNum = course.scores ? course.scores.length : 1;
               that.currentNumberofActivities = activityNumber;

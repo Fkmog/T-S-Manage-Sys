@@ -331,7 +331,7 @@
       :show-close="false"
       :align-center="true"
     >
-    <div class="prompt">请选择课程大纲版本以及试卷分析表</div>
+      <div class="prompt">请选择课程大纲版本以及试卷分析表</div>
       <el-cascader
         v-model="assignedDetail"
         :options="detailList"
@@ -427,7 +427,7 @@
     :data="classTable"
     @selection-change="handleSelectionChange"
     @row-click="goCheck"
-    style="width: 1500px"
+    style="width: 1550px"
     :header-cell-class-name="cellClass"
     :header-cell-style="{
       'padding-left': '20px',
@@ -480,13 +480,15 @@
         <div v-else></div>
       </template>
     </el-table-column>
-    <el-table-column prop="isRespondent" label="" width="50">
+    <el-table-column prop="isRespondent" label="" width="100">
       <template #default="scope">
         <div v-if="scope.row.isRespondent == 2">
           <el-tooltip content="允许任课教师修改考核方式" :hide-after="0">
-            <el-button link style="color: #3f51b5; cursor: default"
+            <el-tag>特色班</el-tag>
+
+            <!-- <el-button link style="color: #3f51b5; cursor: default"
               ><el-icon style="color: #3f51b5"><SetUp /></el-icon>
-            </el-button>
+            </el-button> -->
           </el-tooltip>
         </div>
 
@@ -696,7 +698,7 @@ export default {
       E_ErrorMsg: "",
       T_ErrorMsg: "",
       result: [],
-      canClick:true
+      canClick: true,
     };
   },
   mounted() {
@@ -765,12 +767,12 @@ export default {
       deep: true,
       handler(value) {
         if (value.length > 0) {
-          this.canClick=false
+          this.canClick = false;
           this.assignedDetail = [];
           this.getDetailList();
           this.showAdd = true;
         } else {
-          this.canClick=true
+          this.canClick = true;
           this.assignedDetail = [];
           this.showAdd = false;
         }
@@ -788,8 +790,8 @@ export default {
   methods: {
     //跳转到审核页面
     goCheck(row, column) {
-      if(!this.canClick) {
-        return
+      if (!this.canClick) {
+        return;
       }
       console.log("row:", row);
       if (column.columnKey === undefined) {
@@ -1554,9 +1556,9 @@ export default {
   padding-top: 24px;
   padding-bottom: 24px;
 }
-.prompt{
+.prompt {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   margin-bottom: 20px;
   margin-top: -20px;
 }

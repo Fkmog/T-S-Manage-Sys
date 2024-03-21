@@ -50,6 +50,7 @@ import TeacherClass from "@/views/teacherSide/teacherClass.vue";
 import Students from "@/views/teacherSide/students/students.vue";
 import AddScore from "@/views/teacherSide/score/addScore.vue";
 import Score from "@/views/teacherSide/score/score.vue";
+import ScoreStatistics from "@/views/teacherSide/score/scoreStatistics.vue";
 import Objectives from "@/views/teacherSide/objectives/objectives.vue";
 import objectivesEdit from "@/views/teacherSide/objectives/objectives-edit.vue";
 import examAnalysis from "@/views/teacherSide/examAnalysis/examAnalysis.vue";
@@ -304,6 +305,11 @@ const router = createRouter({
           name: "Score",
           path: "/score",
           component: Score,
+        },
+        {
+          name: "ScoreStatistics",
+          path: "/scoreStatistics",
+          component: ScoreStatistics,
         },
         {
           name: "Objectives",
