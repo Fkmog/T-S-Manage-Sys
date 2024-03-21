@@ -356,7 +356,6 @@ export default {
     saveToLocal(value, classId) {
       localStorage.setItem("classId", JSON.stringify(classId));
       localStorage.setItem("workbook", JSON.stringify(value));
-      // console.log(value, "   s!!!!2134234234234");
       for (let key in value) {
         if (!value[key]) {
           continue;
@@ -499,10 +498,14 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          e = e.data;
-          if (e.msg == "资源不存在" && e.code == "NOT_FIND") {
+          if (e.status == "404") {
             this.hasWorkbook = false;
           }
+          // if (e.data.msg) {
+          //   if (e.data.msg == "资源不存在" && e.data.code == "NOT_FIND") {
+          //     this.hasWorkbook = false;
+          //   }
+          // }
         });
     },
     // 获取对应教学班手册保存内容
