@@ -147,7 +147,16 @@
 
           <div class="descriptionCard" v-if="!item.inputFlag">
             <div style="margin-left: 10px; margin-right: 10px">
-              <span style="font-size: 14px; color: gray">
+              <span
+                style="
+                  font-size: 14px;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 3;
+                  color: gray;
+                  overflow: hidden;
+                  white-space: pre-wrap;
+                "
+              >
                 {{ item.description }}
               </span>
             </div>
@@ -448,7 +457,7 @@ export default {
             } else {
               if (row === 2) {
                 cellProperties.type = "dropdown";
-                cellProperties.source = [" ", "总评", "期末"];
+                cellProperties.source = [" ", "非数值", "总评", "期末"];
                 cellProperties.allowEmpty = true;
                 cellProperties.className = "ht-s-size";
                 //   cellProperties.validator = that.validScoreSetting();
@@ -485,7 +494,7 @@ export default {
               } else {
                 if (row === 2) {
                   cellProperties.type = "dropdown";
-                  cellProperties.source = [" ", "总评", "期末"];
+                  cellProperties.source = [" ", "非数值", "总评", "期末"];
                   cellProperties.allowEmpty = true;
                   cellProperties.className = "ht-s-size";
                   //   cellProperties.validator = that.validScoreSetting();
@@ -533,7 +542,7 @@ export default {
               } else {
                 if (row === 2) {
                   cellProperties.type = "dropdown";
-                  cellProperties.source = [" ", "总评", "期末"];
+                  cellProperties.source = [" ", "非数值", "总评", "期末"];
                   cellProperties.allowEmpty = true;
                   cellProperties.className = "ht-s-size";
                   //   cellProperties.validator = that.validScoreSetting();
@@ -563,6 +572,7 @@ export default {
       let that = this;
       console.log("action", action, targetName);
       if (action === "add" && targetName == undefined) {
+        this.dirty = true;
         let item = [null];
         let value = [null];
         let remark = [null];
@@ -636,6 +646,7 @@ export default {
       }
       if (action === "remove") {
         console.log("removing targetName:", targetName);
+        this.dirty = true;
         if (targetName != "1") {
           ElMessageBox.confirm("是否确认删除当前成绩项？", "", {
             confirmButtonText: "确认",
@@ -676,7 +687,11 @@ export default {
             confirmButtonText: "确认",
             cancelButtonText: "取消",
             type: "warning",
-          });
+          })
+            .then()
+            .catch((e) => {
+              console.log(e);
+            });
         }
       }
     },
@@ -831,7 +846,7 @@ export default {
         } else {
           if (row === 2) {
             cellProperties.type = "dropdown";
-            cellProperties.source = [" ", "总评", "期末"];
+            cellProperties.source = [" ", "非数值", "总评", "期末"];
             cellProperties.allowEmpty = true;
             cellProperties.className = "ht-s-size";
             //   cellProperties.validator = that.validScoreSetting();
@@ -1212,22 +1227,7 @@ export default {
     toPostData() {
       this.postData.activities.length = 0; // clean array
       let valid = true;
-      // let length;
-      // if (!this.currenteditableTabsValue) {
-      //   length = this.db.items[this.currenteditableTabsValue][0].length;
-      // } else {
-      //   length = this.db.items[this.currenteditableTabsValue - 1][0].length;
-      // }
-      // for (let i = 0; i < length; i++) {
-      //   if (
-      //     !this.db.items[this.currenteditableTabsValue - 1][i][0] ||
-      //     !this.db.items[this.currenteditableTabsValue - 1][i][1] ||
-      //     !this.db.items[this.currenteditableTabsValue - 1][i][3]
-      //   ) {
-      //     valid = false;
-      //     break;
-      //   }
-      // }
+      console.log(_.isEqual(this.compareData, this.db.items), this.dirty);
       if (!_.isEqual(this.compareData, this.db.items) || this.dirty) {
         valid = true;
       } else {

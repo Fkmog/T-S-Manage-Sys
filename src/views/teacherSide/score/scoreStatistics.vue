@@ -24,32 +24,9 @@
 
         <div class="title" v-show="from !== 'Score'">课程信息</div>
         <el-divider class="divider" direction="vertical" />
-
-        <!-- <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="保存成绩项"
-          placement="bottom"
-          :hide-after="0"
-          :disabled="!isValid()"
-        >
-          <el-button
-            @click="save"
-            link
-            class="saveBtn"
-            :style="!isValid() ? saveStyle : null"
-            :disabled="!isValid()"
-          >
-            <el-icon size="22px" color="rgb(137, 137, 137)"> -->
-        <!-- :disabled="!isValid()" -->
-        <!-- <DocumentChecked />
-            </el-icon>
-          </el-button>
-        </el-tooltip> -->
       </el-row>
     </div>
 
-    <!-- @tab-add="this.handleTabsEdit('','add')"   -->
     <el-tabs
       v-show="showActivities"
       v-model="editableTabsValue"
@@ -66,56 +43,6 @@
         :name="item.name"
       >
         <template v-slot="label">
-          <span
-            v-if="!item.inputFlag"
-            style="
-              display: inline-block;
-              width: 200px;
-              text-align: center;
-              padding: 10px;
-            "
-          >
-            <!-- <el-icon
-              size="22px"
-              color="rgb(137, 137, 137)"
-              style="float: left; top: 4px; cursor: pointer"
-              v-show="canedit"
-              @click="tabsContent(item, item.name)"
-            >
-              <EditPen />
-            </el-icon> -->
-            {{ item.title }}
-          </span>
-          <!-- <el-input
-            v-else-if="!!item.inputFlag"
-            :ref="`myInput${item.name}`"
-            v-model="newActivityTitle"
-            type="text"
-            style="width: 250px; margin-left: 10px"
-            placeholder="标题"
-            clearable
-            @clear="
-              item.inputFlag = false;
-              item.title = originActivityTitle;
-            "
-          >
-            <template #append>
-              <el-icon
-                size="22px"
-                style="cursor: pointer"
-                @click="
-                  item.inputFlag = false;
-                  item.title = newActivityTitle;
-                  item.description = newActivitydescription;
-                  unsave = false;
-                  dirty = true;
-                "
-              >
-                <Checked />
-              </el-icon>
-            </template>
-          </el-input> -->
-
           <div
             v-show="
               !(
@@ -123,53 +50,7 @@
               ) && this.canedit
             "
             style="width: 100px; display: inline-block"
-          >
-            <!-- <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="添加成绩项"
-              placement="bottom"
-              :hide-after="0"
-            >
-              <el-button
-                @click="addActivities"
-                link
-                :disabled="!over21"
-                style="padding: 10px"
-              >
-                <el-icon size="22px" color="rgb(137, 137, 137)">
-                  <CirclePlus />
-                </el-icon>
-              </el-button>
-            </el-tooltip> -->
-          </div>
-
-          <div class="descriptionCard" v-if="!item.inputFlag">
-            <div style="margin-left: 10px; margin-right: 10px">
-              <span style="font-size: 14px; color: gray">
-                {{ item.description }}
-              </span>
-            </div>
-          </div>
-          <div
-            v-else-if="!!item.inputFlag"
-            style="width: 95%; height: 100px; padding: 1px 11px"
-          >
-            <el-input
-              :ref="`myInput${item.name}`"
-              v-model="newActivitydescription"
-              type="textarea"
-              clearable
-              placeholder="评分标准"
-              :rows="2"
-              :autosize="{ minRows: 2, maxRows: 3 }"
-              @clear="
-                item.inputFlag = false;
-                item.description = originActivitydescription;
-              "
-            >
-            </el-input>
-          </div>
+          ></div>
         </template>
       </el-tab-pane>
     </el-tabs>
@@ -743,7 +624,7 @@ export default {
 
         if (course.overallScoreStatics) {
           that.handleTabsEdit(1, "add", "总评成绩统计");
-          that.handleTabsEdit(1, "add", "试卷成绩分析统计");
+
           let tempLine0 = [
             "教学班人数",
             "",
@@ -809,55 +690,57 @@ export default {
           ];
 
           that.db.items.push(overallScoreStatics);
+          if (course.examScoreStatics) {
+            that.handleTabsEdit(1, "add", "试卷成绩分析统计");
+            let exam0 = [
+              "卷面成绩分布",
+              "90-100(优秀)",
+              "80-89(良好)",
+              "70-79(中等)",
+              "60-69(及格)",
+              "<60(不及格)",
+              "合计",
+            ];
+            let exam1 = [
+              "人数",
+              course.examScoreStatics.examA,
+              course.examScoreStatics.examB,
+              course.examScoreStatics.examC,
+              course.examScoreStatics.examD,
+              course.examScoreStatics.examE,
+              course.overallScoreStatics.stuNum,
+            ].map((x) => x + "");
+            let exam2 = [
+              "所占比例",
+              course.examScoreStatics.examAPer + "%",
+              course.examScoreStatics.examBPer + "%",
+              course.examScoreStatics.examCPer + "%",
+              course.examScoreStatics.examDPer + "%",
+              course.examScoreStatics.examEPer + "%",
+              "100%",
+            ];
+            let exam3 = [
+              "最高分",
+              course.examScoreStatics.maxExam,
+              "最低分",
+              course.examScoreStatics.minExam,
+              "标准差",
+              course.examScoreStatics.std,
+              "",
+            ].map((x) => x + "");
+            let exam4 = [
+              "卷面成绩平均分",
+              "",
+              "",
+              course.examScoreStatics.averageExamScore,
+              "",
+              "",
+              "",
+            ].map((x) => x + "");
 
-          let exam0 = [
-            "卷面成绩分布",
-            "90-100(优秀)",
-            "80-89(良好)",
-            "70-79(中等)",
-            "60-69(及格)",
-            "<60(不及格)",
-            "合计",
-          ];
-          let exam1 = [
-            "人数",
-            course.examScoreStatics.examA,
-            course.examScoreStatics.examB,
-            course.examScoreStatics.examC,
-            course.examScoreStatics.examD,
-            course.examScoreStatics.examE,
-            course.overallScoreStatics.stuNum,
-          ].map((x) => x + "");
-          let exam2 = [
-            "所占比例",
-            course.examScoreStatics.examAPer + "%",
-            course.examScoreStatics.examBPer + "%",
-            course.examScoreStatics.examCPer + "%",
-            course.examScoreStatics.examDPer + "%",
-            course.examScoreStatics.examEPer + "%",
-            "100%",
-          ];
-          let exam3 = [
-            "最高分",
-            course.examScoreStatics.maxExam,
-            "最低分",
-            course.examScoreStatics.minExam,
-            "标准差",
-            course.examScoreStatics.std,
-            "",
-          ].map((x) => x + "");
-          let exam4 = [
-            "卷面成绩平均分",
-            "",
-            "",
-            course.examScoreStatics.averageExamScore,
-            "",
-            "",
-            "",
-          ].map((x) => x + "");
-
-          let examScoreStatics = [exam0, exam1, exam2, exam3, exam4];
-          that.db.items.push(examScoreStatics);
+            let examScoreStatics = [exam0, exam1, exam2, exam3, exam4];
+            that.db.items.push(examScoreStatics);
+          }
 
           that.editableTabsValue = "1";
           that.currenteditableTabsValue = 1;
@@ -1239,7 +1122,7 @@ export default {
   overflow: auto;
 }
 .activity-tab {
-  height: 200px;
+  height: 100px;
   margin-top: 68px;
   background: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
