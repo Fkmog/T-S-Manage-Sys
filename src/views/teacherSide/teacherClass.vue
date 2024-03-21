@@ -185,10 +185,18 @@
       <div class="card">
         <h3>课程信息</h3>
         <el-col>
-          <el-col style="margin-top: 15px">
-            <div class="detail-title">课程名</div>
-            <div class="detail-info">{{ classInfo.className }}</div>
-          </el-col>
+          <el-row style="margin-top: 15px">
+            <el-col :span="12">
+              <div class="detail-title">课程名</div>
+              <div class="detail-info">{{ classInfo.className }}</div>
+            </el-col>
+            <el-col :span="12" style="margin-top:25px;cursor:default" v-show="classInfo.isRespondent == 2">
+              <el-tooltip   placement="top" content="允许任课教师修改考核方式" :hide-after="0">
+                <el-tag>特色班</el-tag>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+
           <el-row style="margin-top: 15px">
             <el-col :span="12" style="margin-top: 10px">
               <div class="detail-title">课程号</div>

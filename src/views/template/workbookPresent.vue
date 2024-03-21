@@ -36,7 +36,7 @@
               @click="save()"
               style="margin-left: 10px"
             >
-              <UploadFilled />
+              <DocumentChecked />
             </el-icon>
           </el-tooltip>
         </div>
@@ -133,7 +133,7 @@ export default {
             this.getWorkbook();
             ElMessage({
               type: "success",
-              message: "更新成功",
+              message: "保存成功",
               duration: 1500,
             });
           }

@@ -23,7 +23,7 @@
         <div class="block_title">工作手册</div>
         <el-divider
           v-show="hasWorkbook && identity == '教师' && !noEdit"
-           class="divider"
+          class="divider"
           direction="vertical"
         />
         <div v-show="hasWorkbook && identity == '教师' && !noEdit">
@@ -226,11 +226,12 @@ export default {
     },
     async create() {
       await this.createValue();
-      await editByTeacher(this.classInfo.classId, this.value).then((res) => {
-        if (res.code === "SUCCESS") {
-          this.getClassInfo();
-        }
-      });
+      this.getClassInfo();
+      // await editByTeacher(this.classInfo.classId, this.value).then((res) => {
+      //   if (res.code === "SUCCESS") {
+      //     this.getClassInfo();
+      //   }
+      // });
     },
     async createValue() {
       return new Promise((resolve, reject) => {
@@ -248,7 +249,11 @@ export default {
         } else {
           this.noEdit = false;
         }
-        if (!this.classInfo.workbookJson) {
+        if (
+          this.classInfo.workbookJson !== null &&
+          this.classInfo.workbookJson !== undefined
+        ) {
+          console.log("###", this.classInfo);
           this.value = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
           console.log(
             "*(*())",
@@ -287,7 +292,11 @@ export default {
             }
           }
         });
-        if (_.isEqual(temp, another) || this.canSave) {
+        if (
+          _.isEqual(temp, another) ||
+          this.canSave ||
+          JSON.stringify(this.afterPreValue) === "{}"
+        ) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -489,6 +498,8 @@ export default {
           }
         })
         .catch((e) => {
+          console.log("e", e);
+          e = e.data;
           if (e.msg == "资源不存在" && e.code == "NOT_FIND") {
             this.hasWorkbook = false;
           }
@@ -507,16 +518,18 @@ export default {
         }
         this.value = JSON.parse(JSON.stringify(res.data.workbookJson));
         console.log("value", this.value);
-        this.editor.forEach((edit) => {
-          if (typeof this.value[edit] === "string") {
-            if (this.value[edit].includes("zheshibase64bianma/")) {
-              this.value[edit] = this.value[edit].slice(19);
-              if (this.isBase64Encoded(this.value[edit])) {
-                this.value[edit] = Base64.decode(this.value[edit]);
+        if (this.value) {
+          this.editor.forEach((edit) => {
+            if (typeof this.value[edit] === "string") {
+              if (this.value[edit].includes("zheshibase64bianma/")) {
+                this.value[edit] = this.value[edit].slice(19);
+                if (this.isBase64Encoded(this.value[edit])) {
+                  this.value[edit] = Base64.decode(this.value[edit]);
+                }
               }
             }
-          }
-        });
+          });
+        }
         console.log("decode", this.value);
         this.getPresent();
       });
@@ -543,15 +556,22 @@ export default {
       // TODO:detailId可能为null 还没有处理
       if (this.detailId) {
         getPresent(this.detailId).then((res) => {
-          console.log("getPresent", res);
           this.formPresent = res.data.preset.formPreset;
           this.formPresent.forEach((i) => {
-            // console.log("!", i.value);
             if (i.value[0] == "[") {
               i.value = i.value.match(/\d+/g);
             }
+            if (typeof i.value === "string") {
+              if (i.value.includes("zheshibase64bianma/")) {
+                i.value = i.value.slice(19);
+                if (this.isBase64Encoded(i.value)) {
+                  i.value = Base64.decode(i.value);
+                }
+              }
+            }
           });
           console.log("getPresent", this.formPresent);
+
           // this.showPresent(this.json);
           this.getLocalValue();
         });
@@ -565,7 +585,7 @@ export default {
           let temp = JSON.parse(localStorage.getItem("workbook"));
           this.value = temp;
           this.afterPreValue = temp;
-        
+          console.log("getLocalValue", this.afterPreValue);
         } else {
           console.log("remove");
           localStorage.removeItem("classId");
