@@ -611,6 +611,17 @@ export default {
             this.formPresent.forEach((present) => {
               if (present.field === form.field && form.value === undefined) {
                 form.value = present.value;
+                // console.log("@", present);
+                if (typeof present.value === "string") {
+                  if (present.value.includes("zheshibase64bianma/")) {
+                    let cur = present.value.slice(19);
+                    if (this.isBase64Encoded(cur)) {
+                      cur = Base64.decode(cur);
+                      // console.log("#@", cur);
+                      form.value = cur;
+                    }
+                  }
+                }
               }
             });
           }
