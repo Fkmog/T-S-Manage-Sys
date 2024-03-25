@@ -603,27 +603,48 @@ export default {
         console.log("this.db.objectives", this.db.objectives);
         let tempaverageScoreOnObject = [];
         let tempscoreRateOnObject = [];
-        this.db.objectives.forEach((row) => {
-          if (
-            row[this.db.objectives["0"].length - 2] !== "平均得分" &&
-            row[0] !== ""
-          ) {
-            console.log("row", typeof row[this.db.objectives["0"].length - 2]);
-            if (typeof row[this.db.objectives["0"].length - 2] === "string") {
-              tempaverageScoreOnObject.push(
-                parseFloat(row[this.db.objectives["0"].length - 2].trim())
-              );
-            } else {
-              if (row[this.db.objectives["0"].length - 2]) {
-                tempaverageScoreOnObject.push(
-                  parseFloat(row[this.db.objectives["0"].length - 2])
-                );
-              } else {
-                tempaverageScoreOnObject.push(null);
-              }
-            }
+        // this.db.objectives.forEach((row) => {
+        //   if (
+        //     row[this.db.objectives["0"].length - 2] !== "平均得分" &&
+        //     row[0] !== ""
+        //   ) {
+        //     console.log(
+        //       "row",
+        //       row[this.db.objectives["0"].length - 2],
+        //       typeof row[this.db.objectives["0"].length - 2]
+        //     );
+        //     if (typeof row[this.db.objectives["0"].length - 2] === "string") {
+        //       tempaverageScoreOnObject.push(
+        //         parseFloat(row[this.db.objectives["0"].length - 2].trim())
+        //       );
+        //     } else {
+        //       console.log(
+        //         "tempaverageScoreOnObject",
+        //         row[this.db.objectives["0"].length - 2]
+        //       );
+        //       if (row[this.db.objectives["0"].length - 2]) {
+        //         tempaverageScoreOnObject.push(
+        //           parseFloat(row[this.db.objectives["0"].length - 2])
+        //         );
+        //       } else {
+        //         tempaverageScoreOnObject.push(null);
+        //       }
+        //     }
+        //   }
+        // });
+        for (let i = 0; i < this.objectivesName.length - 3; i++) {
+          let tempRate = this.hotInstance.getDataAtCell(
+            i + 1,
+            this.db.objectives[0].length - 2
+          );
+          console.log("tempRate", tempRate);
+          if (tempRate) {
+            tempaverageScoreOnObject.push(parseFloat(tempRate));
+          } else {
+            tempaverageScoreOnObject.push(null);
           }
-        });
+        }
+
         for (let i = 0; i < this.objectivesName.length - 3; i++) {
           let tempRate = this.hotInstance.getDataAtCell(
             i + 1,
