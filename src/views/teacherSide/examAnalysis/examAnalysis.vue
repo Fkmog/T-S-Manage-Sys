@@ -43,6 +43,20 @@
             </el-icon>
           </el-button>
         </el-tooltip>
+        <el-divider class="divider" direction="vertical" />
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="审核意见"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-switch
+            v-model="openDrawer"
+            class="switchstyle"
+            @change="openDrawerChange"
+          />
+        </el-tooltip>
       </el-row>
     </div>
   </div>
@@ -55,10 +69,12 @@
   <div class="no-major-detail" v-show="!hasExamAnalysis">
     请先添加试卷分析表
   </div>
+  <reviewDrawer v-bind:visible="openDrawer" />
 </template>
 
 <script>
 import { ref, onMounted, reactive } from "vue";
+import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 
 import { HotTable, HotColumn } from "@handsontable/vue3";
 import { registerAllModules } from "handsontable/registry";
@@ -102,6 +118,7 @@ export default {
   data() {
     let self = this;
     return {
+      openDrawer: false,
       compareData: [],
 
       canedit: false,
@@ -188,8 +205,12 @@ export default {
     Action,
     CirclePlus,
     DocumentChecked,
+    reviewDrawer,
   },
   methods: {
+    openDrawerChange() {
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     editableTabsValueChange(pane) {
       let that = this;
       this.currenteditableTabsValue = Number(pane.props.name);
@@ -300,6 +321,7 @@ export default {
       this.departmentId = this.$store.state.currentInfo.departmentId;
       this.schoolId = this.$store.state.currentInfo.schoolId;
       this.programId = this.$store.state.major.programId;
+      this.openDrawer = this.$store.state.currentInfo.opendrawer;
       if (this.identity == "学院管理员") {
         this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
         console.log("identity:", this.identity);
@@ -828,6 +850,10 @@ export default {
 </script>
 
 <style scoped>
+.divider {
+  margin-left: 20px;
+  height: 24px;
+}
 .no-class {
   margin-top: 120px;
   display: flex;

@@ -24,6 +24,19 @@
 
         <div class="title" v-show="from !== 'Score'">课程信息</div>
         <el-divider class="divider" direction="vertical" />
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          content="审核意见"
+          placement="bottom"
+          :hide-after="0"
+        >
+          <el-switch
+            v-model="openDrawer"
+            class="switchstyle"
+            @change="openDrawerChange"
+          />
+        </el-tooltip>
       </el-row>
     </div>
 
@@ -79,10 +92,12 @@
       <div class="hot-table-container" id="courseHot"></div>
     </div>
   </div>
+  <reviewDrawer v-bind:visible="openDrawer" />
 </template>
 
 <script>
 import { ref, onMounted, reactive } from "vue";
+import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
 
 import { HotTable, HotColumn } from "@handsontable/vue3";
 import { registerAllModules } from "handsontable/registry";
@@ -131,6 +146,7 @@ export default {
   data() {
     let that = this;
     return {
+      openDrawer: false,
       compareData: [],
 
       saveStyle: {
@@ -228,9 +244,13 @@ export default {
     EditPen,
     Checked,
     CloseBold,
+    reviewDrawer,
   },
 
   methods: {
+    openDrawerChange() {
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     confirmSave(newval, oldVal) {
       this.activityTitleConfirm = true;
       ElMessageBox.confirm("是否保存更改后的成绩项名称？", "", {
@@ -1055,6 +1075,7 @@ export default {
     this.courseId = this.$store.state.course.baseCourseCourseId;
     this.identity = this.$store.state.currentInfo.identity;
     this.detailId = this.$store.state.course.detailId;
+    this.openDrawer = this.$store.state.currentInfo.opendrawer;
 
     if (this.identity == "学院管理员") {
       this.classInfo = this.$store.state.currentInfo.adminSideClassInfo;
@@ -1099,6 +1120,9 @@ export default {
 </script>
 
 <style scoped>
+.switchstyle {
+  bottom: 4px;
+}
 .saveBtn {
   padding-left: 20px;
 }

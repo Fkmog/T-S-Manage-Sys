@@ -73,6 +73,7 @@
     <div class="card-container" v-show="hasActivities && hasObjectives">
       <div class="hot-table-container" id="courseHot"></div>
     </div>
+    <div class="bottom"></div>
 
     <div
       v-show="hasNoObjectives"
@@ -1266,6 +1267,9 @@ export default {
 </script>
 
 <style scoped>
+.bottom {
+  height: 50px;
+}
 .description {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1276,9 +1280,8 @@ export default {
 }
 .card-container {
   margin-left: 10%;
-  margin-bottom: 50px;
   width: 80%;
-  height: 600px;
+  height: 30vw;
   background-color: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   overflow: auto;

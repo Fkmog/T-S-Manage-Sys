@@ -54,10 +54,11 @@
         :hide-after="0"
       >
         <template #content>
-          <span v-show="hasDetail"> 试卷分析 </span>
+          <span v-show="hasDetail && hasExamAnalysis"> 试卷分析 </span>
           <span v-show="hasNoDetail"> 请先关联课程大纲 </span>
         </template>
         <el-icon
+          v-show="hasDetail && hasExamAnalysis"
           class="icon"
           size="24px"
           color="rgb(137, 137, 137)"
@@ -165,26 +166,34 @@
             fixed
             prop="studentNumber"
             label="学号"
-            width="180px"
+            width="150px"
           />
           <el-table-column
             fixed
             prop="studentName"
             label="姓名"
-            width="180px"
+            width="150px"
           />
           <el-table-column
             fixed
-            prop="studentStatus"
             label="考试情况"
-            width="160px"
+            width="130px"
             v-if="this.currenteditableTabsValue - 1 == 0"
-          />
+          >
+            <template #default="scope">
+              <el-tag
+                v-show="scope.row.studentStatus"
+                type="danger"
+                class="noBaseCourseDetail"
+                >{{ scope.row.studentStatus }}
+              </el-tag></template
+            >
+          </el-table-column>
           <el-table-column
             v-for="(item, i) in currentactivityName"
             :label="item"
             :key="item"
-            width="180px"
+            width="140px"
           >
             <template #header>
               <el-col>
@@ -280,6 +289,7 @@ import { Back, Histogram, DataAnalysis, List } from "@element-plus/icons-vue";
 import addBtn from "@/components/general/addBtn.vue";
 import { ElMessageBox, ElSwitch, ElMessage } from "element-plus";
 import reviewDrawer from "@/components/teacherClass/reviewDrawer.vue";
+import { getExamAnalysis } from "@/api/exam";
 
 import request from "@/utils/request/request";
 import { identity } from "lodash";
@@ -298,6 +308,7 @@ export default {
   },
   data() {
     return {
+      hasExamAnalysis: true,
       hasoverallScoreStatics: false,
       identity: "",
       isRespondent: "",
@@ -339,8 +350,19 @@ export default {
       console.log("identity:", this.identity);
     }
     this.getActivities();
+    this.getExam();
   },
   methods: {
+    getExam() {
+      getExamAnalysis(this.classInfo.classId).then((res) => {
+        if (!res.data.setting) {
+          this.hasExamAnalysis = false;
+        }
+      });
+    },
+    openDrawerChange() {
+      this.$store.commit("currentInfo/setOpenDrawer", this.openDrawer);
+    },
     goActivity() {
       if (this.hasDetail) {
         this.$store.commit(
