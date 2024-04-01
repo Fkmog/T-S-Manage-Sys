@@ -180,7 +180,7 @@ export default {
         Authorization: "Bearer " + Cookies.get("Admin-Token"),
       },
       // action: "https://jxjk.hdu.edu.cn/prod-api/common/upload/files",
-      action:this.url+'common/upload/files',
+      action: "",
       data: {
         type: "reportTemplateFile",
         param: "",
@@ -188,6 +188,7 @@ export default {
     };
   },
   mounted() {
+    this.action = inject("$baseURL");
     this.departmentId = this.$store.state.currentInfo.departmentId;
     this.getWorkbookList();
   },

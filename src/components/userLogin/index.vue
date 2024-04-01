@@ -4,7 +4,7 @@
     <div class="loginContainer">
       <div class="card">
         <div class="loginCard">
-          <h2 style="  text-align: center;">教学过程质量监控管理平台</h2>
+          <h2 style="text-align: center">教学过程质量监控管理平台</h2>
           <el-form
             :rules="rules"
             ref="loginForm"
@@ -65,6 +65,7 @@ import { login } from "@/api/login/login";
 import { getUserInfo } from "@/api/userInfo/getUserInfo";
 import { User, Lock } from "@element-plus/icons-vue";
 import { getToken } from "@/utils/request/auth";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 export default {
   name: "userLogin",
@@ -153,12 +154,21 @@ export default {
                   }
                 });
               }
-
               if (res.code === "ERROR") {
                 this.errorMsg = "账号/密码不正确，请重新输入";
                 this.loginForm.passWord = "";
                 return;
               }
+            },
+            (e) => {
+              // console.log("e", e);
+              // if (e.code === "ERROR" && e.msg == "用户不存在/密码错误") {
+              //   // ElMessage({
+              //   //   type: "error",
+              //   //   message: `用户不存在/密码错误`,
+              //   //   duration: 1500,
+              //   // });
+              // }
             }
           );
         } else {

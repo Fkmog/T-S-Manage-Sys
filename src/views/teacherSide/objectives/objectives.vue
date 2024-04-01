@@ -21,7 +21,7 @@
               <Back />
             </el-icon>
           </el-tooltip>
-          <div class="title">课程目标1</div>
+          <div class="title">课程目标</div>
           <el-divider class="divider" direction="vertical" />
           <el-tooltip
             class="box-item"

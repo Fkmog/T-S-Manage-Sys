@@ -26,7 +26,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="修改关联模板"
+            content="修改手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -34,7 +34,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              style="margin-left: 20px"
+              style="margin-left: 15px"
               @click="changeWorkbook = true"
             >
               <Switch />
@@ -51,7 +51,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              style="margin-left: 10px"
+              style="margin-left: 15px"
               @click="goPresent()"
             >
               <Document />
@@ -60,7 +60,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="删除关联模板"
+            content="删除手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -68,7 +68,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              style="margin-left: 20px"
+              style="margin-left:15px"
               @click="Delete"
             >
               <Delete />
@@ -79,7 +79,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="设置关联模板"
+            content="设置手册模板"
             placement="bottom"
             :hide-after="0"
           >
@@ -129,10 +129,10 @@
         请先分配工作手册模板
       </div>
     </div>
-    <!-- 修改关联模板 -->
+    <!-- 修改手册模板 -->
     <el-dialog
       v-model="changeWorkbook"
-      title="修改关联模板"
+      title="修改手册模板"
       width="330px"
       :show-close="false"
       :align-center="true"
@@ -157,7 +157,6 @@
         </span>
       </template>
     </el-dialog>
-    <!-- 新增关联模板 -->
     <el-dialog
       v-model="addWorkbook"
       title="修改手册模板"
@@ -258,7 +257,7 @@ export default {
     //提交修改
     submit() {
       if (this.changeWorkbook == true) {
-        ElMessageBox.confirm("是否确认修改关联的工作手册模板？", "", {
+        ElMessageBox.confirm("是否确认修改预设的工作手册模板？", "", {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
@@ -297,9 +296,9 @@ export default {
         }
       });
     },
-    // 删除关联模板
+    // 删除模板
     Delete() {
-      ElMessageBox.confirm("是否确认删除关联的工作手册模板？", "", {
+      ElMessageBox.confirm("是否确认删除预设的工作手册模板？", "", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",

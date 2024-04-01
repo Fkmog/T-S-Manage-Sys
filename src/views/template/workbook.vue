@@ -166,6 +166,7 @@ export default {
       url: "",
       editor: [],
       canSave: false,
+      submitted: false,
     };
   },
   mounted() {
@@ -227,11 +228,6 @@ export default {
     async create() {
       await this.createValue();
       this.getClassInfo();
-      // await editByTeacher(this.classInfo.classId, this.value).then((res) => {
-      //   if (res.code === "SUCCESS") {
-      //     this.getClassInfo();
-      //   }
-      // });
     },
     async createValue() {
       return new Promise((resolve, reject) => {
@@ -255,10 +251,6 @@ export default {
         ) {
           console.log("###", this.classInfo);
           this.value = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
-          console.log(
-            "*(*())",
-            _.isEqual(this.classInfo.workbookJson, this.value)
-          );
         }
         this.getWorkbook();
         resolve("suc");
@@ -279,9 +271,11 @@ export default {
       if (this.identity == "教师") {
         console.log("save", this.value);
         // let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
+        // 临时保存后，canSave = true
         let temp = JSON.parse(JSON.stringify(this.afterPreValue));
         let another = JSON.parse(JSON.stringify(this.value));
         console.log(temp, another, _.isEqual(temp, another));
+        console.log("!!!", this.canSave, this.afterPreValue);
         this.editor.forEach((edit) => {
           if (typeof temp[edit] === "string") {
             if (temp[edit].includes("zheshibase64bianma/")) {
@@ -295,7 +289,8 @@ export default {
         if (
           _.isEqual(temp, another) ||
           this.canSave ||
-          JSON.stringify(this.afterPreValue) === "{}"
+          this.submitted
+          // JSON.stringify(this.afterPreValue) === "{}"
         ) {
           this.$router.push({ name: "TeacherClass" });
         } else {
@@ -512,6 +507,10 @@ export default {
     getClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         console.log("getClassInfo", res);
+        if (res.data.status == "3" || res.data.status == "2") {
+          // 已经提交或保存
+          this.submitted = true;
+        }
         if (this.identity == "学院管理员") {
           this.$store.commit("currentInfo/setadminSideClassInfo", res.data);
         } else if (this.identity == "课程负责人") {
@@ -598,7 +597,7 @@ export default {
       this.$watch("value", (newValue) => {
         // 在元素值变化时执行特定的操作
         // console.log("元素的值已经变化：", newValue);
-        // this.saveToLocal(newValue, this.classInfo.classId);
+        this.saveToLocal(newValue, this.classInfo.classId);
       });
     },
     // 回显预设信息

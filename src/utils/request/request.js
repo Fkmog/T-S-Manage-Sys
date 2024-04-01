@@ -50,7 +50,6 @@ service.interceptors.request.use(
     // 是否需要防止数据重复提交
     const isRepeatSubmit = (config.headers || {}).repeatSubmit === false;
     const hasToken = getToken() === undefined ? false : true;
-    // console.log("^^^",Cookies.get("first-Login"));
     const firstLogin =
       Cookies.get("first-Login") === undefined ||
       Cookies.get("first-Login") === false
@@ -94,7 +93,6 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (res) => {
-    
     // 未设置状态码则默认成功状态
     // const code = res.data.code || 200;
     if (res.headers["content-type"] === "application/octet-stream") {
@@ -184,6 +182,7 @@ service.interceptors.response.use(
           message: error.response.data.msg,
           duration: 1500,
         });
+        return Promise.reject(error.response.data);
       }
     } else if (error.response.status === 404 || error.response.status === 422) {
       return Promise.reject(error.response);
@@ -204,17 +203,10 @@ service.interceptors.response.use(
         return Promise.reject(error);
       }
     }
-    // else if (error.response.status === 409) {
-    //   console.log('error.response.status === 409')
-    //   return error.response;
-    // }
-    else{
+    else {
       return Promise.reject(error.response);
     }
   }
 );
 
 export default service;
-
-
-
