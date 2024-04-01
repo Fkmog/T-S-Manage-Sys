@@ -222,6 +222,7 @@ export default {
             temp < Object.keys(this.db.items[currentPage][1]).length;
             temp++
           ) {
+            console.log(3);
             this.db.items[currentPage][j][temp] = null;
           }
         }
@@ -236,8 +237,10 @@ export default {
           // console.log(this.db.items[i][j][k] + ":" + this.db.items[0][j][k]);
 
           if (!this.db.items[0][j][k]) {
+            console.log(1);
             this.db.items[currentPage][j][k] = null;
           } else {
+            console.log(2);
             this.db.items[currentPage][j][k] = this.db.items[0][j][k];
           }
         }
@@ -255,6 +258,7 @@ export default {
             i < Object.keys(this.db.items[currentPage][j]).length;
             i++
           ) {
+            console.log(4);
             this.db.items[currentPage][j][i] = null;
           }
         } else {
@@ -280,7 +284,11 @@ export default {
                 i++
               ) {
                 if (i != 1) {
-                  this.db.items[currentPage][j][i] = tempDB[currentPage][l][i];
+                  console.log(5);
+                  if (tempDB[currentPage][l][i]) {
+                    this.db.items[currentPage][j][i] =
+                      tempDB[currentPage][l][i];
+                  }
                 }
               }
             }
@@ -293,6 +301,7 @@ export default {
           columns: that.db.items[that.currenteditableTabsValue - 1][0],
           data: that.db.items[that.currenteditableTabsValue - 1],
           contextMenu: false,
+          cells: that.getHotCellsFunction(),
         });
       } else {
         this.hotInstance.updateSettings({
@@ -306,7 +315,6 @@ export default {
               row_below: {
                 name: "在下方插入行",
               },
-
               remove_row: {
                 name: "删除行",
               },
@@ -316,7 +324,7 @@ export default {
         });
       }
 
-      return console.log("currenteditableTabsValue:", Number(pane.props.name));
+      console.log("currenteditableTabsValue:", Number(pane.props.name));
     },
     handleTabsEdit(targetName, action, activityName, activityDescription) {
       let that = this;
@@ -527,6 +535,14 @@ export default {
                 // console.log('this row should not created!')
                 return false;
               }
+              if (!_.isEqual(self.compareData, self.db.items)) {
+                ElMessage({
+                  type: "error",
+                  message: "请先保存成绩",
+                  duration: 1500,
+                });
+                return false;
+              }
             }
           },
           afterCreateRow(index, amount, source) {
@@ -539,6 +555,14 @@ export default {
             } else {
               if (index <= 2) {
                 // console.log('this row should not created!')
+                return false;
+              }
+              if (!_.isEqual(self.compareData, self.db.items)) {
+                ElMessage({
+                  type: "error",
+                  message: "请先保存成绩",
+                  duration: 1500,
+                });
                 return false;
               }
             }
@@ -561,6 +585,7 @@ export default {
               return;
             } else {
               self.isValid();
+              console.log(that.db.items);
             }
           },
         });
@@ -623,10 +648,10 @@ export default {
         }
 
         if (col === 2 && row > 2) {
-          console.log(
-            "updating cell rules current currenteditableTabsValue:",
-            that.currenteditableTabsValue
-          );
+          // console.log(
+          //   "updating cell rules current currenteditableTabsValue:",
+          //   that.currenteditableTabsValue
+          // );
           if (
             that.currenteditableTabsValue - 1 == 0 ||
             that.currenteditableTabsValue == 0
@@ -973,7 +998,7 @@ export default {
     },
     isValid() {
       var result = !_.isEqual(this.compareData, this.db.items);
-      console.log("result:", result);
+      console.log("result:", result, this.compareData, this.db.items);
       return result;
     },
 
@@ -999,7 +1024,7 @@ export default {
           allStudentsNumber.push(studentList[i][0]);
         }
       }
-      let count = 0;
+
       // console.log('allStudentsNumber:',allStudentsNumber,'studentList.length',studentList.length);
 
       let currentItems = [];
@@ -1012,10 +1037,12 @@ export default {
         let infoList = [];
         let finalGrade = [];
         let finalPass = [];
+
         currentItems.forEach((activity) => {
           let gradList = [];
           let passList = "";
           let student = JSON.parse(JSON.stringify(activity));
+          let activityList = student[0];
           for (let m = 0; m < 3; m++) {
             student.shift();
           }
@@ -1024,6 +1051,7 @@ export default {
             // console.log("student[i]",student[i]);
             if (student[i]) {
               // console.log("student[i]['studentNumber']",student[i][0],);
+
               if (student[i][0] == studentNumber) {
                 // console.log('socres:',student[i])
                 let tempDict = {
@@ -1064,8 +1092,9 @@ export default {
                       //   this.errorInTable
                       // );
                     }
-
-                    gradList.push(student[i][key]);
+                    if (key < Object.keys(activityList).length) {
+                      gradList.push(student[i][key]);
+                    }
                   }
                   infoList.push(tempDict);
                 }

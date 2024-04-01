@@ -481,37 +481,40 @@ export default {
                   // templist.push(averageScore.averageScoreOnObject[i]);
                   templist.push(calculateAverageScoreOnObject);
                 } else {
-                  templist.push(null);
+                  let calculateAverageScoreOnObject =
+                    "=" +
+                    "SUM(" +
+                    tempString.slice(0, tempString.length - 1) +
+                    ")";
+                  console.log(
+                    "calculateAverageScoreOnObject",
+                    calculateAverageScoreOnObject
+                  );
+                  console.log(
+                    "calculateAverageScoreOnObject",
+                    calculateAverageScoreOnObject
+                  );
+                  templist.push(calculateAverageScoreOnObject);
                 }
 
                 if (averageScore) {
                   templist.push(averageScore.scoreRateOnObject[i] + "%");
                 } else {
-                  templist.push(
-                    "=" +
-                      "TEXT(" +
-                      String.fromCharCode(63 + templist.length) +
-                      (2 + i) +
-                      "/" +
-                      String.fromCharCode(65) +
-                      (2 + i) +
-                      "*100" +
-                      ',"0.00%")'
-                  );
+                  templist.push(null);
                 }
 
                 console.log("templist", templist);
 
-                // templist[templist.length - 1] =
-                //   "=" +
-                //   "TEXT(" +
-                //   String.fromCharCode(63 + templist.length) +
-                //   (2 + i) +
-                //   "/" +
-                //   String.fromCharCode(65) +
-                //   (2 + i) +
-                //   "*100" +
-                //   ',"0.00%")';
+                templist[templist.length - 1] =
+                  "=" +
+                  "TEXT(" +
+                  String.fromCharCode(63 + templist.length) +
+                  (2 + i) +
+                  "/" +
+                  String.fromCharCode(65) +
+                  (2 + i) +
+                  "*100" +
+                  ',"0.00%")';
 
                 this.db.objectives.push(templist);
               }
