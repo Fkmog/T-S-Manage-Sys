@@ -487,21 +487,31 @@ export default {
                 if (averageScore) {
                   templist.push(averageScore.scoreRateOnObject[i] + "%");
                 } else {
-                  templist.push(null);
+                  templist.push(
+                    "=" +
+                      "TEXT(" +
+                      String.fromCharCode(63 + templist.length) +
+                      (2 + i) +
+                      "/" +
+                      String.fromCharCode(65) +
+                      (2 + i) +
+                      "*100" +
+                      ',"0.00%")'
+                  );
                 }
 
                 console.log("templist", templist);
 
-                templist[templist.length - 1] =
-                  "=" +
-                  "TEXT(" +
-                  String.fromCharCode(63 + templist.length) +
-                  (2 + i) +
-                  "/" +
-                  String.fromCharCode(65) +
-                  (2 + i) +
-                  "*100" +
-                  ',"0.00%")';
+                // templist[templist.length - 1] =
+                //   "=" +
+                //   "TEXT(" +
+                //   String.fromCharCode(63 + templist.length) +
+                //   (2 + i) +
+                //   "/" +
+                //   String.fromCharCode(65) +
+                //   (2 + i) +
+                //   "*100" +
+                //   ',"0.00%")';
 
                 this.db.objectives.push(templist);
               }
