@@ -434,7 +434,8 @@ export default {
           console.log(this.hasAttribute);
         })
         .catch((e) => {
-          if (e.msg == "资源不存在" && e.code == "PROGRAM_NOT_FIND") {
+          console.log(e)
+          if (e.data.msg == "资源不存在" && e.data.code == "PROGRAM_NOT_FIND") {
             this.hasProgram = false;
             this.noProgram = true;
             this.$store.commit("major/setProgramId", "");

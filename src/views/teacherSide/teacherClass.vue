@@ -73,7 +73,7 @@
             <Management />
           </el-icon>
         </el-tooltip>
-        <!-- <el-tooltip
+        <el-tooltip
           class="box-item"
           effect="dark"
           content="下载报告"
@@ -89,7 +89,7 @@
           >
             <Download />
           </el-icon>
-        </el-tooltip> -->
+        </el-tooltip>
 
         <el-divider class="divider" direction="vertical" />
         <div v-show="status == '未提交' && identity == '教师'">
@@ -190,8 +190,16 @@
               <div class="detail-title">课程名</div>
               <div class="detail-info">{{ classInfo.className }}</div>
             </el-col>
-            <el-col :span="12" style="margin-top:25px;cursor:default" v-show="classInfo.isRespondent == 2">
-              <el-tooltip   placement="top" content="允许任课教师修改考核方式" :hide-after="0">
+            <el-col
+              :span="12"
+              style="margin-top: 25px; cursor: default"
+              v-show="classInfo.isRespondent == 2"
+            >
+              <el-tooltip
+                placement="top"
+                content="允许任课教师修改考核方式"
+                :hide-after="0"
+              >
                 <el-tag>特色班</el-tag>
               </el-tooltip>
             </el-col>
@@ -293,7 +301,7 @@ export default {
   data() {
     return {
       isRespondent: "",
-
+      downloading: false,
       reviewInfo: [],
       activeNames: "",
       openDrawer: false,
@@ -608,21 +616,42 @@ export default {
     },
     // 下载报告
     downloadReport() {
-      downloadReport(this.classInfo.classId).then((res) => {
-        console.log("下载报告", res);
-        // console.log("downloadFile", res);
-        const blob = new Blob([res]);
-        // console.log("blob", blob);
-        // saveAs(blob, this.objectInfo.fileName)
-        const link = document.createElement("a");
-        link.download = decodeURI("报告.doc");
-        link.style.display = "none";
-        link.href = URL.createObjectURL(blob);
-        document.body.appendChild(link);
-        link.click();
-        URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
-      });
+      // console.log(this.classInfo.status);
+      if (this.classInfo.status == 3 && this.downloading == false) {
+        this.downloading = true;
+        downloadReport(this.classInfo.classId).then((res) => {
+          console.log("下载报告", res, this.classInfo);
+          let num = this.classInfo.identifier.slice(
+            this.classInfo.identifier.length - 2
+          );
+          let name =
+            num +
+            "-教师教学工作手册-" +
+            this.classInfo.teacherName +
+            "-" +
+            this.classInfo.identifier +
+            ".doc";
+          // console.log("downloadFile", res);
+          const blob = new Blob([res]);
+          console.log("blob", blob);
+          // saveAs(blob, this.objectInfo.fileName)
+          const link = document.createElement("a");
+          link.download = decodeURI(name);
+          link.style.display = "none";
+          link.href = URL.createObjectURL(blob);
+          document.body.appendChild(link);
+          link.click();
+          URL.revokeObjectURL(link.href);
+          document.body.removeChild(link);
+          this.downloading = false;
+        });
+      } else {
+        ElMessage({
+          type: "error",
+          message: `提交课程并审核通过后可以下载报告`,
+          duration: 1500,
+        });
+      }
     },
   },
 };

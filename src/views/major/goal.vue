@@ -217,7 +217,7 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.msg == "资源不存在") {
+          if (e.data.msg == "资源不存在") {
             this.noProgram = true;
             this.hasProgram = false;
           }
