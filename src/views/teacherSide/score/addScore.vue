@@ -535,14 +535,14 @@ export default {
                 // console.log('this row should not created!')
                 return false;
               }
-              if (!_.isEqual(self.compareData, self.db.items)) {
-                ElMessage({
-                  type: "error",
-                  message: "请先保存成绩",
-                  duration: 1500,
-                });
-                return false;
-              }
+              // if (!_.isEqual(self.compareData, self.db.items)) {
+              //   ElMessage({
+              //     type: "error",
+              //     message: "请先保存成绩",
+              //     duration: 1500,
+              //   });
+              //   return false;
+              // }
             }
           },
           afterCreateRow(index, amount, source) {
