@@ -594,11 +594,41 @@ export default {
               duration: 1500,
             });
           } else if (e.status == 409) {
-            ElMessage({
-              type: "error",
-              message: "成绩项分值为空",
-              duration: 1500,
-            });
+            if (e.data.code === "E_SCORE_INCOMPLETE_OR_ACTIVITY_DELETED") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_COLLUMN_NOT_SAME") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_STUDENT_NUM_NOT_CONSISTENT") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_SCORE_INCOMPLETE") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_ACTIVITY_NOT_SAME") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
           } else {
             ElMessage({
               type: "error",

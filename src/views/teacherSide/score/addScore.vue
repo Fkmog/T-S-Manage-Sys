@@ -1269,10 +1269,39 @@ export default {
                   "课程目标达成度计算错误，请提醒课程负责人修改课程目标的达成度评价方式",
                 duration: 2000,
               });
-            } else {
+            }
+            if (e.data.code === "E_SCORE_INCOMPLETE_OR_ACTIVITY_DELETED") {
               ElMessage({
                 type: "error",
-                message: "成绩项或成绩项表名不符合",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_COLLUMN_NOT_SAME") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_STUDENT_NUM_NOT_CONSISTENT") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_SCORE_INCOMPLETE") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
+                duration: 1500,
+              });
+            }
+            if (e.data.code === "E_ACTIVITY_NOT_SAME") {
+              ElMessage({
+                type: "error",
+                message: e.data.msg,
                 duration: 1500,
               });
             }
