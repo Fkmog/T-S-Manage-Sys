@@ -148,7 +148,6 @@
         <el-table
           class="studentsTable"
           :data="studentsTable[this.currenteditableTabsValue - 1]"
-          height="600px"
           :header-cell-style="{
             'padding-left': '40px',
             'font-size': '14.4px',
@@ -634,7 +633,6 @@ export default {
 .studentCard {
   margin-left: 5%;
   margin-right: 5%;
-  height: 500px;
 }
 .scoreintable {
   margin-left: 19px;
@@ -650,6 +648,8 @@ export default {
 }
 .studentsTable {
   margin: 0 auto;
+  height: calc(100vh - 400px);
+  min-height: 300px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }
 .md-padding {
