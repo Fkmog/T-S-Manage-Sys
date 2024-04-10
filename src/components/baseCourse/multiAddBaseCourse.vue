@@ -345,7 +345,7 @@ export default {
           } else {
             ElMessage({
               type: "error",
-              message: `未知错误,请联系相关人员`,
+              message: `请联系课程负责人`,
               duration: 1500,
             });
           }

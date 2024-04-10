@@ -30,6 +30,23 @@
           <el-tooltip
             class="box-item"
             effect="dark"
+            content="清除内容"
+            placement="bottom"
+            :hide-after="0"
+          >
+            <el-icon
+              class="icon"
+              size="24px"
+              color="rgb(137, 137, 137)"
+              @click="clear(value, classInfo.classId)"
+              style="margin-left: 10px"
+            >
+              <DocumentDelete />
+            </el-icon>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
             content="临时保存（仅临时存放在当前浏览器，请及时保存至服务器）"
             placement="bottom"
             :hide-after="0"
@@ -39,7 +56,7 @@
               size="24px"
               color="rgb(137, 137, 137)"
               @click="tempSave(value, classInfo.classId)"
-              style="margin-left: 10px"
+              style="margin-left: 20px"
             >
               <Clock />
             </el-icon>
@@ -120,6 +137,7 @@ import {
   DocumentChecked,
   UploadFilled,
   Clock,
+  DocumentDelete,
 } from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
 import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
@@ -141,6 +159,7 @@ export default {
     ElSwitch,
     DocumentChecked,
     Clock,
+    DocumentDelete,
   },
   data() {
     return {
@@ -167,6 +186,7 @@ export default {
       editor: [],
       canSave: false,
       submitted: false,
+      preDataforBack: {},
     };
   },
   mounted() {
@@ -269,10 +289,14 @@ export default {
     // 返回上级页面
     backClass() {
       if (this.identity == "教师") {
-        console.log("save", this.value);
+        console.log("save", this.value, this.afterPreValue);
         // let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
         // 临时保存后，canSave = true
-        let temp = JSON.parse(JSON.stringify(this.afterPreValue));
+        // temp就是预设信息,将预设信息和暂存信息afterPreValue两种信息合并，冲突以暂存为准
+        let temp = JSON.parse(JSON.stringify(this.preDataforBack));
+        for (let saveKey in this.afterPreValue) {
+          temp[saveKey] = this.afterPreValue[saveKey];
+        }
         let another = JSON.parse(JSON.stringify(this.value));
         console.log(temp, another, _.isEqual(temp, another));
         console.log("!!!", this.canSave, this.afterPreValue);
@@ -286,12 +310,7 @@ export default {
             }
           }
         });
-        if (
-          _.isEqual(temp, another) ||
-          this.canSave ||
-          this.submitted
-          // JSON.stringify(this.afterPreValue) === "{}"
-        ) {
+        if (_.isEqual(temp, another) || this.canSave || this.submitted) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -343,14 +362,40 @@ export default {
     },
     abledForm() {
       this.workbook.formJson.forEach((form) => {
+        console.log("!", form);
         form.props.disabled = false;
       });
       // console.log("abled后", this.workbook);
     },
+    // 清除内容，同时删除暂存，以及服务器内容，之后再加载一次预设信息
+    clear(value, classId) {
+      console.log(value, classId);
+      for (let key in value) {
+        console.log(key);
+        value[key] = undefined;
+      }
+      editByTeacher(this.classInfo.classId, value).then((res) => {
+        if (res.code === "SUCCESS") {
+          localStorage.removeItem(this.classInfo.classId);
+          this.getPresent();
+          ElMessage({
+            type: "success",
+            message: `清除成功`,
+            duration: 1500,
+          });
+        }
+      });
+    },
     // 暂存至localStorage
     saveToLocal(value, classId) {
-      localStorage.setItem("classId", JSON.stringify(classId));
-      localStorage.setItem("workbook", JSON.stringify(value));
+      let obj = {
+        classId: classId,
+        value: value,
+      };
+      localStorage.setItem("temp" + classId, JSON.stringify(obj));
+
+      // localStorage.setItem("classId", JSON.stringify(classId));
+      // localStorage.setItem("workbook", JSON.stringify(value));
       for (let key in value) {
         if (!value[key]) {
           continue;
@@ -367,8 +412,13 @@ export default {
     },
     // 点击暂存按钮
     tempSave(value, classId) {
-      localStorage.setItem("classId", JSON.stringify(classId));
-      localStorage.setItem("workbook", JSON.stringify(value));
+      let obj = {
+        classId: classId,
+        value: value,
+      };
+      localStorage.setItem(classId, JSON.stringify(obj));
+      // localStorage.setItem("classId", JSON.stringify(classId));
+      // localStorage.setItem("workbook", JSON.stringify(value));
       for (let key in value) {
         if (!value[key]) {
           continue;
@@ -405,8 +455,9 @@ export default {
                 message: `保存成功`,
                 duration: 1500,
               });
-              localStorage.removeItem("classId");
-              localStorage.removeItem("workbook");
+              // localStorage.removeItem("classId");
+              localStorage.removeItem(this.classInfo.classId);
+              // localStorage.removeItem("workbook");
               this.getClassInfo();
             }
           });
@@ -556,24 +607,31 @@ export default {
     // 查询预设信息
     getPresent() {
       // TODO:detailId可能为null 还没有处理
+      // 现在无detailId进不到此页面了04/10
       if (this.detailId) {
         getPresent(this.detailId).then((res) => {
           this.formPresent = res.data.preset.formPreset;
-          this.formPresent.forEach((i) => {
-            if (i.value[0] == "[") {
-              i.value = i.value.match(/\d+/g);
-            }
-            if (typeof i.value === "string") {
-              if (i.value.includes("zheshibase64bianma/")) {
-                i.value = i.value.slice(19);
-                if (this.isBase64Encoded(i.value)) {
-                  i.value = Base64.decode(i.value);
+          if (this.formPresent.length > 0) {
+            this.formPresent.forEach((i) => {
+              console.log("$", i);
+              if (i.value[0] == "[") {
+                i.value = i.value.match(/\d+/g);
+              }
+              if (typeof i.value === "string") {
+                if (i.value.includes("zheshibase64bianma/")) {
+                  i.value = i.value.slice(19);
+                  if (this.isBase64Encoded(i.value)) {
+                    i.value = Base64.decode(i.value);
+                  }
                 }
               }
-            }
-          });
-          console.log("getPresent", this.formPresent);
+              let field = i.field;
+              let value = i.value;
+              this.preDataforBack[field] = value;
+            });
+          }
 
+          console.log("getPresent", this.formPresent, this.preDataforBack);
           // this.showPresent(this.json);
           this.getLocalValue();
         });
@@ -581,19 +639,26 @@ export default {
     },
     async getLocalValue() {
       await this.showPresent(this.json);
-      if (localStorage.getItem("workbook")) {
-        console.log("!", this.classInfo.classId);
-        if (localStorage.getItem("classId") == this.classInfo.classId) {
-          let temp = JSON.parse(localStorage.getItem("workbook"));
-          this.value = temp;
-          this.afterPreValue = temp;
-          console.log("getLocalValue", this.afterPreValue);
-        } else {
-          console.log("remove");
-          localStorage.removeItem("classId");
-          localStorage.removeItem("workbook");
-        }
+      if (localStorage.getItem(this.classInfo.classId)) {
+        // console.log("getLocalValue");
+        let temp = JSON.parse(localStorage.getItem(this.classInfo.classId));
+        this.value = temp.value;
+        this.afterPreValue = temp.value;
+        console.log("getLocalValue", this.afterPreValue);
       }
+      // if (localStorage.getItem("workbook")) {
+      //   console.log("!", this.classInfo.classId);
+      //   if (localStorage.getItem("classId") == this.classInfo.classId) {
+      //     let temp = JSON.parse(localStorage.getItem("workbook"));
+      //     this.value = temp;
+      //     this.afterPreValue = temp;
+      //     console.log("getLocalValue", this.afterPreValue);
+      //   } else {
+      //     console.log("remove");
+      //     localStorage.removeItem("classId");
+      //     localStorage.removeItem("workbook");
+      //   }
+      // }
       this.$watch("value", (newValue) => {
         // 在元素值变化时执行特定的操作
         // console.log("元素的值已经变化：", newValue);
@@ -610,13 +675,11 @@ export default {
             this.formPresent.forEach((present) => {
               if (present.field === form.field && form.value === undefined) {
                 form.value = present.value;
-                // console.log("@", present);
                 if (typeof present.value === "string") {
                   if (present.value.includes("zheshibase64bianma/")) {
                     let cur = present.value.slice(19);
                     if (this.isBase64Encoded(cur)) {
                       cur = Base64.decode(cur);
-                      // console.log("#@", cur);
                       form.value = cur;
                     }
                   }

@@ -57,7 +57,7 @@
         <div
           class="reviewBoxStyle"
           v-show="
-            status == '已提交' &&
+            (status == '已提交' || status == '已审核') &&
             (identity == '学院管理员' || identity == '课程负责人')
           "
         >
@@ -101,7 +101,7 @@
         <span
           class="dialog-footer"
           v-show="
-            status == '已提交' &&
+            (status == '已提交' || status == '已审核') &&
             (identity == '学院管理员' || identity == '课程负责人')
           "
         >
