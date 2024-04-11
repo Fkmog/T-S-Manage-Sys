@@ -209,20 +209,28 @@ export default {
     },
     //跳转班级视图
     toClass(Class) {
-      this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
-      this.$store.commit("currentInfo/setOpenDrawer", false);
-      sessionStorage.setItem("teacherSearchForm", this.keyword);
-      sessionStorage.removeItem("classTeacherSearchFlag");
-      if (
-        this.chosenYear !== "" ||
-        this.chosenSemester !== "" ||
-        this.chosenStatus !== ""
-      ) {
-        sessionStorage.setItem("teacherChosenYear", this.chosenYear);
-        sessionStorage.setItem("teacherChosenSemester", this.chosenSemester);
-        sessionStorage.setItem("teacherChosenStatus", this.chosenStatus);
+      if (Class.detailId === null) {
+        ElMessage({
+          type: "error",
+          message: `未关联课程大纲，请联系课程负责人`,
+          duration: 1500,
+        });
+      } else {
+        this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);
+        this.$store.commit("currentInfo/setOpenDrawer", false);
+        sessionStorage.setItem("teacherSearchForm", this.keyword);
+        sessionStorage.removeItem("classTeacherSearchFlag");
+        if (
+          this.chosenYear !== "" ||
+          this.chosenSemester !== "" ||
+          this.chosenStatus !== ""
+        ) {
+          sessionStorage.setItem("teacherChosenYear", this.chosenYear);
+          sessionStorage.setItem("teacherChosenSemester", this.chosenSemester);
+          sessionStorage.setItem("teacherChosenStatus", this.chosenStatus);
+        }
+        this.$router.push({ name: "TeacherClass" });
       }
-      this.$router.push({ name: "TeacherClass" });
     },
     // 搜索栏查询
     getSearchValue(data) {

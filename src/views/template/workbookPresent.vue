@@ -152,12 +152,14 @@ export default {
     async getPresent() {
       await getPresent(this.detailId).then((res) => {
         this.formPresent = res.data.preset.formPreset;
-        this.formPresent.forEach((i) => {
-          if (i.value[0] == "[") {
-            i.value = i.value.match(/\d+/g);
-            console.log("!", i.value);
-          }
-        });
+        if (this.formPresent && this.formPresent.length > 0) {
+          this.formPresent.forEach((i) => {
+            if (i.value[0] == "[") {
+              i.value = i.value.match(/\d+/g);
+              console.log("!", i.value);
+            }
+          });
+        }
       });
       await this.showPresent(this.json);
       this.origin = JSON.parse(JSON.stringify(this.json));
@@ -176,21 +178,23 @@ export default {
           this.showPresent(form.children);
         } else {
           if (form !== "") {
-            this.formPresent.forEach((present) => {
-              if (present.field == form.field) {
-                form.value = present.value;
-                // 解码
-                if (typeof form.value === "string") {
-                  if (form.value.includes("zheshibase64bianma/")) {
-                    let temp = form.value.slice(19);
-                    if (this.isBase64Encoded(temp)) {
-                      form.value = Base64.decode(temp);
-                      console.log("@@", Base64.decode(temp));
+            if (this.formPresent && this.formPresent.length > 0) {
+              this.formPresent.forEach((present) => {
+                if (present.field == form.field) {
+                  form.value = present.value;
+                  // 解码
+                  if (typeof form.value === "string") {
+                    if (form.value.includes("zheshibase64bianma/")) {
+                      let temp = form.value.slice(19);
+                      if (this.isBase64Encoded(temp)) {
+                        form.value = Base64.decode(temp);
+                        console.log("@@", Base64.decode(temp));
+                      }
                     }
                   }
                 }
-              }
-            });
+              });
+            }
           }
         }
       });

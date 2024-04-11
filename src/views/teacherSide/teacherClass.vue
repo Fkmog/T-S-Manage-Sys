@@ -619,32 +619,40 @@ export default {
       // console.log(this.classInfo.status);
       if (this.classInfo.status == 3 && this.downloading == false) {
         this.downloading = true;
-        downloadReport(this.classInfo.classId).then((res) => {
-          console.log("下载报告", res, this.classInfo);
-          let num = this.classInfo.identifier.slice(
-            this.classInfo.identifier.length - 2
-          );
-          let name =
-            num +
-            "-教师教学工作手册-" +
-            this.classInfo.teacherName +
-            "-" +
-            this.classInfo.identifier +
-            ".doc";
-          // console.log("downloadFile", res);
-          const blob = new Blob([res]);
-          console.log("blob", blob);
-          // saveAs(blob, this.objectInfo.fileName)
-          const link = document.createElement("a");
-          link.download = decodeURI(name);
-          link.style.display = "none";
-          link.href = URL.createObjectURL(blob);
-          document.body.appendChild(link);
-          link.click();
-          URL.revokeObjectURL(link.href);
-          document.body.removeChild(link);
-          this.downloading = false;
-        });
+        downloadReport(this.classInfo.classId)
+          .then((res) => {
+            console.log("下载报告", res, this.classInfo);
+            let num = this.classInfo.identifier.slice(
+              this.classInfo.identifier.length - 2
+            );
+            let name =
+              num +
+              "-教师教学工作手册-" +
+              this.classInfo.teacherName +
+              "-" +
+              this.classInfo.identifier +
+              ".doc";
+            // console.log("downloadFile", res);
+            const blob = new Blob([res]);
+            console.log("blob", blob);
+            // saveAs(blob, this.objectInfo.fileName)
+            const link = document.createElement("a");
+            link.download = decodeURI(name);
+            link.style.display = "none";
+            link.href = URL.createObjectURL(blob);
+            document.body.appendChild(link);
+            link.click();
+            URL.revokeObjectURL(link.href);
+            document.body.removeChild(link);
+            this.downloading = false;
+          })
+          .catch((e) => {
+            ElMessage({
+              type: "error",
+              message: `下载失败，请联系管理员`,
+              duration: 1500,
+            });
+          });
       } else {
         ElMessage({
           type: "error",

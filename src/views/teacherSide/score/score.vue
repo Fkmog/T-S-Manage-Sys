@@ -648,7 +648,7 @@ export default {
 }
 .studentsTable {
   margin: 0 auto;
-  height: calc(100vh - 400px);
+  height: calc(100vh - 350px);
   min-height: 300px;
   box-shadow: 0 1px 2px rgb(43 59 93 / 29%), 0 0 13px rgb(43 59 93 / 29%);
 }

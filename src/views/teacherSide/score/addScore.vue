@@ -211,6 +211,7 @@ export default {
     editableTabsValueChange(pane) {
       let that = this;
       this.currenteditableTabsValue = Number(pane.props.name);
+
       if (this.currenteditableTabsValue !== 1) {
         this.hotInstance.updateSettings({
           columns: that.db.items[that.currenteditableTabsValue - 1][0],
@@ -460,14 +461,6 @@ export default {
                 // console.log('this row should not created!')
                 return false;
               }
-              // if (!_.isEqual(self.compareData, self.db.items)) {
-              //   ElMessage({
-              //     type: "error",
-              //     message: "请先保存成绩",
-              //     duration: 1500,
-              //   });
-              //   return false;
-              // }
             }
           },
           afterCreateRow(index, amount, source) {
@@ -478,18 +471,13 @@ export default {
               source,
               self.currenteditableTabsValue
             );
+
             for (let i = 0; i < self.db.items.length; i++) {
               if (i === self.currenteditableTabsValue - 1) continue;
-              let addArr = new Array(
-                Object.keys(
-                  self.db.items[self.currenteditableTabsValue - 1][index]
-                ).length
-              ).fill(null);
-              addArr[0] =
-                self.db.items[self.currenteditableTabsValue - 1][index][0];
-              addArr[1] =
-                self.db.items[self.currenteditableTabsValue - 1][index][1];
-              self.db.items[i].splice(index, 0, addArr);
+              let addArr = { 0: null, 1: null };
+              for (let j = index; j < index + amount; j++) {
+                self.db.items[i].splice(j, 0, addArr);
+              }
             }
             // console.log(self.db.items);
           },
@@ -517,7 +505,7 @@ export default {
 
             for (let i = 0; i < self.db.items.length; i++) {
               if (i === self.currenteditableTabsValue - 1) continue;
-              self.db.items[i].splice(index, 1);
+              self.db.items[i].splice(index, amount);
             }
           },
 
@@ -527,7 +515,19 @@ export default {
               return;
             } else {
               self.isValid();
-              console.log(that.db.items);
+              console.log("changes:", changes);
+              if (changes) {
+                for (let i = 0; i < changes.length; i++) {
+                  let change = changes[i];
+                  if (change[1] === 1 || change[1] === 0) {
+                    console.log("changing other tabs");
+                    for (let i = 0; i < self.db.items.length; i++) {
+                      if (i === self.currenteditableTabsValue - 1) continue;
+                      self.db.items[i][change[0]][change[1]] = change[3];
+                    }
+                  }
+                }
+              }
             }
           },
         });
