@@ -51,6 +51,10 @@
         </el-col>
       </el-row>
     </div>
+    <el-row style="margin-top: 20px">
+      <img src="@/assets/PDF.png" alt="Icon" class="pdfIcon" />
+      <div class="download" @click="downloadFile()">用户使用手册v1.0.2</div>
+    </el-row>
   </el-card>
   <!-- 修改密码 -->
   <el-dialog title="修改密码" v-model="dialogFormVisible" width="400px">
@@ -113,6 +117,8 @@ import { logout } from "@/api/login/login.js";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { CaretBottom, CaretTop } from "@element-plus/icons-vue";
 import { updateUserPwd } from "@/api/userInfo/getUserInfo";
+import { downloadFileId } from "@/api/common";
+
 export default {
   name: "HeaderIdentity",
   data() {
@@ -133,7 +139,7 @@ export default {
 
       if (value.length < 8 || value.length20) {
         callback(new Error("密码长度应为8至20位"));
-      } else if (strength<3) {
+      } else if (strength < 3) {
         callback(new Error("应包含数字,大写字母,小写字母,特殊字符中的三项"));
       } else {
         callback();
@@ -147,6 +153,7 @@ export default {
       }
     };
     return {
+      teacherId: false,
       showDown: true,
       showCard: false,
       dialogFormVisible: false,
@@ -179,6 +186,33 @@ export default {
   },
   mounted() {},
   methods: {
+    downloadFile() {
+      console.log("download", this.$store.state.userInfo.identity);
+      for (let item of this.$store.state.userInfo.identity) {
+        if (item.roleName == "教师") {
+          this.teacherId = true;
+        }
+      }
+      let id = "";
+      if (this.teacherId == true) {
+        id = 164;
+      } else {
+        id = 163;
+      }
+      downloadFileId(id).then((res) => {
+        console.log("downloadFile", res);
+        const blob = new Blob([res]);
+        // console.log("blob",blob);
+        const link = document.createElement("a");
+        link.download = decodeURI("教学过程质量监控管理平台用户使用手册.pdf");
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      });
+    },
     // 控制角色信息卡片
     show() {
       this.showCard = !this.showCard;
@@ -230,7 +264,7 @@ export default {
         (hasSpecialChar ? 1 : 0);
 
       if (this.user.newPassword.length < 8) {
-        this.passwordStrength = '';
+        this.passwordStrength = "";
       } else if (strength >= 3) {
         this.passwordStrength = 100;
       } else if (strength === 2) {
@@ -238,7 +272,7 @@ export default {
       } else if (strength === 1) {
         this.passwordStrength = 30;
       } else {
-        this.passwordStrength = '';
+        this.passwordStrength = "";
       }
     },
     format(percentage) {
@@ -265,45 +299,45 @@ export default {
     },
     // 修改密码
     changePwd() {
-        this.$refs["form"].validate((valid) => {
-          if (valid) {
-            updateUserPwd(this.user.oldPassword, this.user.newPassword).then(
-              (res) => {
-                if (res.code === "SUCCESS") {
-                  this.dialogFormVisible = false;
+      this.$refs["form"].validate((valid) => {
+        if (valid) {
+          updateUserPwd(this.user.oldPassword, this.user.newPassword).then(
+            (res) => {
+              if (res.code === "SUCCESS") {
+                this.dialogFormVisible = false;
+                ElMessage({
+                  type: "success",
+                  message: `更新成功`,
+                  duration: 1500,
+                });
+              }
+              if (res.code === "ERROR") {
+                if (res.msg == "新密码不能与旧密码相同") {
                   ElMessage({
-                    type: "success",
-                    message: `更新成功`,
+                    type: "error",
+                    message: res.msg,
+                    duration: 1500,
+                  });
+                } else if (res.msg == "修改密码失败，旧密码错误") {
+                  ElMessage({
+                    type: "error",
+                    message: res.msg,
                     duration: 1500,
                   });
                 }
-                if (res.code === "ERROR") {
-                  if (res.msg == "新密码不能与旧密码相同") {
-                    ElMessage({
-                      type: "error",
-                      message: res.msg,
-                      duration: 1500,
-                    });
-                  } else if (res.msg == "修改密码失败，旧密码错误") {
-                    ElMessage({
-                      type: "error",
-                      message: res.msg,
-                      duration: 1500,
-                    });
-                  }
-                }
               }
-            );
-          }
-        })
+            }
+          );
+        }
+      });
     },
     // 取消修改
     cancel() {
       this.dialogFormVisible = false;
       this.user = {
-        oldPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       };
     },
     //修改当前专业/学院等信息
@@ -330,15 +364,29 @@ export default {
       if (identity.roleName === "课程负责人") {
         this.$router.replace("BaseCourse");
       }
-    },}
+    },
+  },
 };
 </script>
 
 <style scoped>
-.progress{
+.pdfIcon {
+  width: 20px;
+  height: 20px;
+}
+.download {
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration-line: underline;
+  margin-left: 5px;
+}
+.download:hover {
+  color: #5c6bc0;
+}
+.progress {
   margin-left: 80px;
   margin-bottom: 10px;
-  width:310px;
+  width: 310px;
 }
 .info {
   color: white;

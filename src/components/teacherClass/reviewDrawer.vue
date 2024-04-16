@@ -351,6 +351,9 @@ export default {
 
                 this.getClassInfo();
                 this.getReviewInfo();
+
+                this.checkFeedback.message = null;
+                this.checkFeedback.checkState = null;
               }
             })
             .catch((e) => {

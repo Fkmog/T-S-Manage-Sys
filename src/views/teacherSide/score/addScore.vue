@@ -14,16 +14,15 @@
           placement="bottom"
           :hide-after="0"
         >
-          <el-button link @click="goTeacher()">
-            <el-icon
-              class="icon"
-              size="24px"
-              color="rgb(137, 137, 137)"
-              style="margin-left: 50px"
-            >
-              <Back />
-            </el-icon>
-          </el-button>
+          <el-icon
+            class="icon"
+            size="24px"
+            color="rgb(137, 137, 137)"
+            @click="goTeacher()"
+            style="margin-left: 50px"
+          >
+            <Back />
+          </el-icon>
         </el-tooltip>
         <el-tooltip
           class="box-item"
@@ -101,6 +100,7 @@ import {
   ElInput,
   ElMessage,
   ElMessageBox,
+  tagEmits,
 } from "element-plus";
 
 import Action from "element-plus";
@@ -133,6 +133,7 @@ export default {
   data() {
     let self = this;
     return {
+      unknowActivity: 0,
       compareData: [],
       errorInTable: false,
 
@@ -210,91 +211,6 @@ export default {
     editableTabsValueChange(pane) {
       let that = this;
       this.currenteditableTabsValue = Number(pane.props.name);
-      let tempDB = this.originData;
-      let currentPage = this.currenteditableTabsValue - 1;
-
-      for (let j = 3; j < this.db.items[0].length; j++) {
-        if (!this.db.items[currentPage][j]) {
-          // console.log(i, j);
-          this.db.items[currentPage][j] = {};
-          for (
-            let temp = 0;
-            temp < Object.keys(this.db.items[currentPage][1]).length;
-            temp++
-          ) {
-            console.log(3);
-            this.db.items[currentPage][j][temp] = null;
-          }
-        }
-        // console.log(Object.keys(this.db.items[i][j]).length);
-        if (this.db.items[0].length < this.db.items[currentPage].length) {
-          while (this.db.items[0].length != this.db.items[currentPage].length) {
-            this.db.items[currentPage].pop();
-          }
-        }
-
-        for (let k = 0; k < 2; k++) {
-          // console.log(this.db.items[i][j][k] + ":" + this.db.items[0][j][k]);
-
-          if (!this.db.items[0][j][k]) {
-            console.log(1);
-            this.db.items[currentPage][j][k] = null;
-          } else {
-            console.log(2);
-            this.db.items[currentPage][j][k] = this.db.items[0][j][k];
-          }
-        }
-      }
-
-      for (let j = 3; j < this.db.items[currentPage].length; j++) {
-        let ID = this.db.items[currentPage][j][0];
-        let Name = this.db.items[currentPage][j][1];
-        // console.log("ID:", ID);
-        if (!ID || !Name) {
-          // console.log("this Id is null", this.db.items[currentPage][j]);
-
-          for (
-            let i = 0;
-            i < Object.keys(this.db.items[currentPage][j]).length;
-            i++
-          ) {
-            console.log(4);
-            this.db.items[currentPage][j][i] = null;
-          }
-        } else {
-          for (let l = 3; l < tempDB[currentPage].length; l++) {
-            let keys = Object.keys(tempDB[currentPage][l]);
-            let index = keys.find((key) => tempDB[currentPage][l][key] === ID);
-            let Nameindex = keys.find(
-              (key) => tempDB[currentPage][l][key] === Name
-            );
-            // console.log(index);
-
-            if (index == 0) {
-              // console.log(tempDB[currentPage][l]);
-              // console.log(
-              //   "student:",
-              //   this.db.items[currentPage][j],
-              //   "origin score:",
-              //   tempDB[currentPage][l]
-              // );
-              for (
-                let i = 0;
-                i < Object.keys(tempDB[currentPage][l]).length;
-                i++
-              ) {
-                if (i != 1) {
-                  console.log(5);
-                  if (tempDB[currentPage][l][i]) {
-                    this.db.items[currentPage][j][i] =
-                      tempDB[currentPage][l][i];
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
 
       if (this.currenteditableTabsValue !== 1) {
         this.hotInstance.updateSettings({
@@ -406,26 +322,35 @@ export default {
             let tabs = this.editableTabs;
             // this.currenteditableTabsValue = --this.tabIndex;
             console.log("targetName:", targetName);
-            let activeName = this.editableTabsValue;
-            if (activeName === targetName) {
-              tabs.forEach((tab, index) => {
-                if (tab.name === targetName) {
-                  let nextTab = tabs[index + 1] || tabs[index - 1];
-                  if (nextTab) {
-                    activeName = nextTab.name;
+            if (targetName > tabs.length - this.unknowActivity) {
+              let activeName = this.editableTabsValue;
+              if (activeName === targetName) {
+                tabs.forEach((tab, index) => {
+                  if (tab.name === targetName) {
+                    let nextTab = tabs[index + 1] || tabs[index - 1];
+                    if (nextTab) {
+                      activeName = nextTab.name;
+                    }
                   }
-                }
+                });
+              }
+              this.hotInstance.updateSettings({
+                data: that.db.items[Number(activeName - 1)],
+                cells: that.getHotCellsFunction(),
               });
+
+              this.editableTabsValue = activeName;
+              this.editableTabs = tabs.filter((tab) => tab.name !== targetName);
+
+              console.log("editableTabs:", this.editableTabs);
+            } else {
+              ElMessage({
+                type: "error",
+                message: "请在成绩项表中删除此成绩项",
+                duration: 1500,
+              });
+              return;
             }
-            this.hotInstance.updateSettings({
-              data: that.db.items[Number(activeName - 1)],
-              cells: that.getHotCellsFunction(),
-            });
-
-            this.editableTabsValue = activeName;
-            this.editableTabs = tabs.filter((tab) => tab.name !== targetName);
-
-            console.log("editableTabs:", this.editableTabs);
           })
           .catch((e) => {
             console.log("e", e);
@@ -472,6 +397,7 @@ export default {
           colHeaders: function (index) {
             // false
             // return index === 0 ? '学号' : '成绩项';
+
             if (index === 0) {
               return "学号";
             } else if (index === 1) {
@@ -535,18 +461,25 @@ export default {
                 // console.log('this row should not created!')
                 return false;
               }
-              // if (!_.isEqual(self.compareData, self.db.items)) {
-              //   ElMessage({
-              //     type: "error",
-              //     message: "请先保存成绩",
-              //     duration: 1500,
-              //   });
-              //   return false;
-              // }
             }
           },
           afterCreateRow(index, amount, source) {
-            console.log(self.db.items);
+            console.log(
+              "create row:",
+              index,
+              amount,
+              source,
+              self.currenteditableTabsValue
+            );
+
+            for (let i = 0; i < self.db.items.length; i++) {
+              if (i === self.currenteditableTabsValue - 1) continue;
+              let addArr = { 0: null, 1: null };
+              for (let j = index; j < index + amount; j++) {
+                self.db.items[i].splice(j, 0, addArr);
+              }
+            }
+            // console.log(self.db.items);
           },
           beforeRemoveRow(index, amount, physicalRows, source) {
             if (source === "loadData") {
@@ -557,26 +490,23 @@ export default {
                 // console.log('this row should not created!')
                 return false;
               }
-              if (!_.isEqual(self.compareData, self.db.items)) {
-                ElMessage({
-                  type: "error",
-                  message: "请先保存成绩",
-                  duration: 1500,
-                });
-                return false;
-              }
             }
           },
-          // beforeRemoveCol(index) {
-          //   console.log(index);
-          //   // if (index <= 2) {
-          //   //     // console.log('this row should not created!')
-          //   //     return false;
-          //   //   }
-          //   return false;
-          // },
-          afterRemoveRow() {
-            console.log(self.db.items);
+
+          afterRemoveRow(index, amount, source) {
+            // console.log(self.db.items);
+            console.log(
+              "remove row:",
+              index,
+              amount,
+              source,
+              self.currenteditableTabsValue
+            );
+
+            for (let i = 0; i < self.db.items.length; i++) {
+              if (i === self.currenteditableTabsValue - 1) continue;
+              self.db.items[i].splice(index, amount);
+            }
           },
 
           afterChange(changes, source) {
@@ -585,7 +515,19 @@ export default {
               return;
             } else {
               self.isValid();
-              console.log(that.db.items);
+              console.log("changes:", changes);
+              if (changes) {
+                for (let i = 0; i < changes.length; i++) {
+                  let change = changes[i];
+                  if (change[1] === 1 || change[1] === 0) {
+                    console.log("changing other tabs");
+                    for (let i = 0; i < self.db.items.length; i++) {
+                      if (i === self.currenteditableTabsValue - 1) continue;
+                      self.db.items[i][change[0]][change[1]] = change[3];
+                    }
+                  }
+                }
+              }
             }
           },
         });
@@ -815,6 +757,7 @@ export default {
             for (let i = 0; i < course.scores[0]["grade"].length; i++) {
               if (i >= course.activities.length) {
                 let itemLength = course.scores[0]["grade"][i].length;
+                that.unknowActivity++;
                 let dict = {
                   description: "",
                   item: Array.from({ length: itemLength }),
@@ -1339,7 +1282,7 @@ export default {
 .card-container {
   margin-left: 10%;
   width: 80%;
-  height: 30vw;
+  height: calc(100vh - 390px);
   background-color: white;
   box-shadow: 0px 1px 3px rgb(164, 163, 163);
   overflow: auto;

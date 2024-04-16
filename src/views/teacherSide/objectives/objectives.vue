@@ -55,13 +55,21 @@
             </el-tooltip>
           </div>
         </el-row>
+        <el-alert
+          v-show="showInfo"
+          title="成绩项不匹配,请课程负责人重新选择达成度评价方式中的成绩项"
+          type="warning"
+          :closable="false"
+          show-icon
+          style="max-width: 100%; margin-top: 5px"
+        ></el-alert>
         <div v-for="(info, index) in this.info" :key="index">
           <el-alert
             :title="info"
             type="error"
             :closable="false"
             show-icon
-            style="width: 350px; margin-top: 5px"
+            style="max-width: 100%; margin-top: 5px"
           />
         </div>
         <div v-for="objective in objectives" :key="objective.id">
@@ -199,6 +207,7 @@ export default {
       classInfo: [],
       list: [],
       objectives: [],
+      showInfo: false,
     };
   },
   mounted() {
@@ -247,34 +256,65 @@ export default {
     // 校验是否存在成绩表或成绩项不对应的情况
     checkActivityInfo() {
       let allTable = new Set();
+      let allAc = new Set();
       let activities = this.classInfo.activities;
       for (let i = 0; i < activities.length; i++) {
         let ac = activities[i];
         allTable.add(ac.name);
+        if (ac.item) {
+          let temp = Array.from(ac.item);
+          temp.forEach((t) => allAc.add(t));
+        }
       }
       let tables = new Set();
+      let Ac = new Set();
       let objects = this.classInfo.objectives;
       for (let i = 0; i < objects.length; i++) {
         let assessments = objects[i].assessmentMethods;
         assessments.forEach((assess) => {
           let table = assess.activities.table;
           let item = assess.activities.item;
+          Ac.add(...item);
           tables.add(...table);
         });
       }
-      for(let item of tables){
-        if(!allTable.has(item)){
-          this.info.push('成绩项表：'+item+' 不存在，请重新设置')
+      let Nosheet = [];
+      let NoAc = [];
+      for (let item of tables) {
+        if (!allTable.has(item)) {
+          Nosheet.push(item);
         }
       }
-      console.log("tables", tables,allTable);
+      // 目前只是简单的看全部的乘积项里有没有，但可能不同表下会出现一样的成绩项，所以查不出来
+      for (let item of Ac) {
+        console.log("@", item);
+
+        if (!allAc.has(item)) {
+          NoAc.push(item);
+        }
+      }
+      console.log("allAc", allAc);
+
+      console.log("noac", NoAc, allAc, Ac);
+
+      if (Nosheet.length > 0) {
+        let temp = Nosheet.join("、");
+        this.info.push("以下考核项表标题已变更：" + temp);
+      }
+      if (NoAc.length > 0) {
+        let Actemp = NoAc.join("、");
+        this.info.push("以下成绩项名称已变更：" + Actemp);
+      }
+      console.log("info", this.info);
+      if (this.info.length > 0) {
+        this.showInfo = true;
+      }
+      console.log("tables", tables, allTable);
     },
     //获取教学班信息
     checkClassInfo() {
       getClassInfo(this.classInfo.classId).then((res) => {
         // console.log("getClassInfo", res.data);
-        
-        // this.checkActivityInfo();
         this.objectives = res.data.objectives;
         if (this.objectives) {
           if (this.objectives.length > 0) {
@@ -308,6 +348,7 @@ export default {
         }
         console.log("getClassInfo", this.objectives);
       });
+      this.checkActivityInfo();
     },
   },
 };
