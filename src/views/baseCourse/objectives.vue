@@ -38,6 +38,14 @@
             <el-icon class="edit-pen" @click="goEdit()"><EditPen /></el-icon>
           </el-tooltip>
         </el-row>
+        <el-alert
+          v-show="showInfo"
+          title="成绩项不匹配,请课程负责人重新选择达成度评价方式中的成绩项"
+          type="warning"
+          :closable="false"
+          show-icon
+          style="max-width: 100%; margin-top: 5px"
+        ></el-alert>
         <div v-for="(info, index) in this.info" :key="index">
           <el-alert
             :title="info"
@@ -199,6 +207,7 @@ export default {
         departmentId: Number,
         schoolId: Number,
       },
+      showInfo:false
     };
   },
   mounted() {
@@ -256,18 +265,17 @@ export default {
       }
       if (Nosheet.length > 0) {
         let temp = Nosheet.join("、");
-        this.info.push(
-          "以下考核项表标题已变更：" + temp + "，请重新设置课程目标的考核方式"
-        );
+        this.info.push("以下考核项表标题已变更：" + temp);
       }
       if (NoAc.length > 0) {
         let Actemp = NoAc.join("、");
-        this.info.push(
-          "以下成绩项名称已变更：" + Actemp + "，请重新设置课程目标的考核方式"
-        );
+        this.info.push("以下成绩项名称已变更：" + Actemp);
       }
-
       console.log("tables", tables, allTable);
+      console.log("info", this.info);
+      if(this.info.length>0){
+        this.showInfo=true
+      }
     },
     //获取课程目标
     checkObjectives() {

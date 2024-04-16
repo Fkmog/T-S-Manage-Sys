@@ -967,10 +967,11 @@ export default {
   height: 24px;
 }
 .objective-name {
-  font-size: 1.2em;
+   font-size: 1.2em;
   font-weight: bold;
-  white-space: nowrap;
-  margin-top: 13px;
+  word-wrap: break-all;
+  /* white-space: normal; */
+  margin-top: 20px;
 }
 .objective-description {
   margin-top: 10px;

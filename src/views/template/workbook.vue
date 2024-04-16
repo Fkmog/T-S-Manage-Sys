@@ -269,7 +269,7 @@ export default {
           this.classInfo.workbookJson !== null &&
           this.classInfo.workbookJson !== undefined
         ) {
-          console.log("###", this.classInfo);
+          // console.log("###", this.classInfo);
           this.value = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
         }
         this.getWorkbook();
@@ -293,6 +293,7 @@ export default {
         // let temp = JSON.parse(JSON.stringify(this.classInfo.workbookJson));
         // 临时保存后，canSave = true
         // temp就是预设信息,将预设信息和暂存信息afterPreValue两种信息合并，冲突以暂存为准
+        // 目前的value怎么办？
         let temp = JSON.parse(JSON.stringify(this.preDataforBack));
         for (let saveKey in this.afterPreValue) {
           temp[saveKey] = this.afterPreValue[saveKey];
@@ -369,22 +370,30 @@ export default {
     },
     // 清除内容，同时删除暂存，以及服务器内容，之后再加载一次预设信息
     clear(value, classId) {
-      console.log(value, classId);
-      for (let key in value) {
-        console.log(key);
-        value[key] = undefined;
-      }
-      editByTeacher(this.classInfo.classId, value).then((res) => {
-        if (res.code === "SUCCESS") {
-          localStorage.removeItem(this.classInfo.classId);
-          this.getPresent();
-          ElMessage({
-            type: "success",
-            message: `清除成功`,
-            duration: 1500,
+      ElMessageBox.confirm("是否清除所有已填写内容？（该操作不可撤回）", "注意", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          console.log(value, classId);
+          for (let key in value) {
+            console.log(key);
+            value[key] = undefined;
+          }
+          editByTeacher(this.classInfo.classId, value).then((res) => {
+            if (res.code === "SUCCESS") {
+              localStorage.removeItem(this.classInfo.classId);
+              this.getPresent();
+              ElMessage({
+                type: "success",
+                message: `清除成功`,
+                duration: 1500,
+              });
+            }
           });
-        }
-      });
+        })
+        .catch(() => {});
     },
     // 暂存至localStorage
     saveToLocal(value, classId) {
@@ -613,7 +622,7 @@ export default {
           this.formPresent = res.data.preset.formPreset;
           if (this.formPresent.length > 0) {
             this.formPresent.forEach((i) => {
-              console.log("$", i);
+              // console.log("$", i);
               if (i.value[0] == "[") {
                 i.value = i.value.match(/\d+/g);
               }
