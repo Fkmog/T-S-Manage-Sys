@@ -205,7 +205,7 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.code == "PROGRAM_NOT_FIND") {
+          if (e.data.code == "PROGRAM_NOT_FIND") {
             this.hasProgram = false;
           }
         });

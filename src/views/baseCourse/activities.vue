@@ -431,7 +431,7 @@ export default {
         ElMessage({
           type: "error",
           message: "该成绩项为课程组统一，不可修改",
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         this.originActivityTitle = val.title;
@@ -707,7 +707,7 @@ export default {
         ElMessage({
           type: "error",
           message: "该成绩项为课程组统一，不可修改",
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         if (this.currenteditableTabsValue == 0) {
@@ -1026,7 +1026,7 @@ export default {
         ElMessage({
           type: "error",
           message: `课程已审核或提交，不可以修改成绩项`,
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         let keyNum = [];
@@ -1082,7 +1082,7 @@ export default {
           ElMessage({
             type: "error",
             message: `成绩项或者分值为空`,
-            duration: 1500,
+            duration: 4000,
           });
         } else {
           if (this.from == "Score") {
@@ -1103,7 +1103,7 @@ export default {
                   ElMessage({
                     type: "success",
                     message: `保存成功`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
                 that.compareData = JSON.parse(JSON.stringify(that.db.items));
@@ -1116,7 +1116,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `保存出错，请检查填写的内容`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1125,7 +1125,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，总评未设置`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1134,7 +1134,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，有权重为空`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1143,13 +1143,13 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，权重之和必须为100%`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else {
                   ElMessage({
                     type: "error",
                     message: `未知错误,请联系相关人员`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               });
@@ -1185,7 +1185,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `保存出错，请检查填写的内容`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1194,7 +1194,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，总评未设置`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1203,7 +1203,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，有权重为空`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1212,13 +1212,13 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，权重和不对`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else {
                   ElMessage({
                     type: "error",
                     message: `未知错误,请联系相关人员`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               });

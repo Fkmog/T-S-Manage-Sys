@@ -377,7 +377,7 @@ export default {
         ElMessage({
           type: "error",
           message: `请先关联课程大纲`,
-          duration: 1500,
+          duration: 4000,
         });
       }
     },
@@ -496,7 +496,7 @@ export default {
         ElMessage({
           type: "error",
           message: `请先关联课程大纲`,
-          duration: 1500,
+          duration: 4000,
         });
       }
     },
@@ -507,7 +507,7 @@ export default {
         ElMessage({
           type: "error",
           message: `请先关联课程大纲`,
-          duration: 1500,
+          duration: 4000,
         });
       }
     },

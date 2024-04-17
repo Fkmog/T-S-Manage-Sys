@@ -269,7 +269,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.getWorkbookInfo();
           }
@@ -279,7 +279,7 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         });

@@ -161,7 +161,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.getMajorList();
           });
@@ -182,7 +182,7 @@ export default {
             ElMessage({
               type: "success",
               message: "删除成功",
-              duration: 1500,
+              duration: 4000,
             });
           })
           .catch(() => {});
@@ -206,7 +206,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `更新成功`,
-                duration: 1500,
+                duration: 4000,
               });
               console.log("changeMajor", res);
               this.getMajorList();
@@ -361,7 +361,7 @@ export default {
 :deep() .el-icon svg {
   height: 18px;
   width: 18px;
-} 
+}
 
 :deep().searchBlock .el-icon {
   height: 20px;

@@ -224,18 +224,18 @@ export default {
       ).then((res) => {
         console.log("addProgram", res);
         checkProgram(this.currentMajorId, this.currentYear)
-        .then((r) => {
-          console.log("checkProgram", r);
-          this.programId = r.data.programId;
-          console.log("@", this.programId);
-          this.noProgram = false;
-          this.copyInfo()
-        })
-        .catch((e) => {
-          if (e.code === "PROGRAM_NOT_FIND" && e.msg === "资源不存在") {
-            this.noProgram = true;
-          }
-        });
+          .then((r) => {
+            console.log("checkProgram", r);
+            this.programId = r.data.programId;
+            console.log("@", this.programId);
+            this.noProgram = false;
+            this.copyInfo();
+          })
+          .catch((e) => {
+            if (e.code === "PROGRAM_NOT_FIND" && e.msg === "资源不存在") {
+              this.noProgram = true;
+            }
+          });
       });
     },
     //复制
@@ -266,7 +266,7 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1500,
+            duration: 4000,
           });
           this.drawer = false;
         }

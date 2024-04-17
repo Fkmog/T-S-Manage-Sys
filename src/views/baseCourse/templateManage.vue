@@ -68,7 +68,7 @@
               class="icon"
               size="24px"
               color="rgb(137, 137, 137)"
-              style="margin-left:15px"
+              style="margin-left: 15px"
               @click="Delete"
             >
               <Delete />
@@ -280,7 +280,7 @@ export default {
           ElMessage({
             type: "success",
             message: `更新成功`,
-            duration: 1500,
+            duration: 4000,
           });
           this.changeWorkbook = false;
           this.getWorkbookInfo();
@@ -289,7 +289,7 @@ export default {
           ElMessage({
             type: "success",
             message: `分配成功`,
-            duration: 1500,
+            duration: 4000,
           });
           this.addWorkbook = false;
           this.getWorkbookInfo();
@@ -314,7 +314,7 @@ export default {
             ElMessage({
               type: "success",
               message: `删除成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.getWorkbookInfo();
           }

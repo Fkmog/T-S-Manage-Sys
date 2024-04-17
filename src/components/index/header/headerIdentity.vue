@@ -231,7 +231,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: "已退出登录",
-                duration: 1500,
+                duration: 4000,
               });
               Cookies.remove("Admin-Token");
               Cookies.remove("first-Login");
@@ -240,7 +240,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: "退出登录失败",
-                duration: 1500,
+                duration: 4000,
               });
             }
           });
@@ -308,7 +308,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `更新成功`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               }
               if (res.code === "ERROR") {
@@ -316,13 +316,13 @@ export default {
                   ElMessage({
                     type: "error",
                     message: res.msg,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (res.msg == "修改密码失败，旧密码错误") {
                   ElMessage({
                     type: "error",
                     message: res.msg,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               }

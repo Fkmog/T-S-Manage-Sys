@@ -166,7 +166,7 @@ export default {
               //   // ElMessage({
               //   //   type: "error",
               //   //   message: `用户不存在/密码错误`,
-              //   //   duration: 1500,
+              //   //   duration: 4000,
               //   // });
               // }
             }

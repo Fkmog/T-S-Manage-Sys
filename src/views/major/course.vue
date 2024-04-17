@@ -258,13 +258,17 @@
             @selection-change="drawerchandleSelectionChange"
             :row-key="rowKey"
           >
+            <!-- :reserve-selection="true" -->
             <el-table-column
               width="55"
               type="selection"
               :selectable="selectable"
-              :reserve-selection="true"
               column-key="select"
             >
+              <!-- <template #default="scope">
+                <div v-show="scope.row.remark">1</div>
+
+              </template> -->
             </el-table-column>
             <el-table-column prop="courseName" label="课程名" width="180" />
             <el-table-column prop="courseCode" label="课程号" width="130" />
@@ -663,7 +667,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `没有版本信息，请先添加版本！`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           })
@@ -727,7 +731,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `新建成功`,
-                  duration: 1500,
+                  duration: 4000,
                 });
                 //成功后根据vesionId和basecouseId获取详细信息
                 that.getBaseCourse(that.pageSize, that.pageNum);
@@ -742,25 +746,25 @@ export default {
                 ElMessage({
                   type: "error",
                   message: `没有选择课程大纲版本`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               } else if (e.status === 409) {
                 ElMessage({
                   type: "error",
                   message: `新建失败,大纲版本已存在`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               } else if (e.status === 500) {
                 ElMessage({
                   type: "error",
                   message: `新建出错，请检查填写的内容`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               } else {
                 ElMessage({
                   type: "error",
                   message: `未知错误,请联系相关人员`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               }
               //失败后退回basecouse页面
@@ -771,7 +775,7 @@ export default {
         ElMessage({
           type: "error",
           message: `请选择课程大纲！`,
-          duration: 1500,
+          duration: 4000,
         });
       }
     },
@@ -1045,7 +1049,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.clearForm();
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1058,19 +1062,19 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,课程已存在`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (e.status === 500) {
             ElMessage({
               type: "error",
               message: `新建出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           that.clearForm();
@@ -1144,7 +1148,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `删除成功`,
-                duration: 1500,
+                duration: 4000,
               });
               // that.clearForm();
               that.getProgramCourse();
@@ -1161,7 +1165,7 @@ export default {
             ElMessage({
               type: "error",
               message: `删除失败`,
-              duration: 1500,
+              duration: 4000,
             });
             // that.clearForm();
             // that.getProgramCourse();
@@ -1247,9 +1251,13 @@ export default {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
-      }).then(function () {
-        that.addBaseCourseInProgram();
-      });
+      })
+        .then(function () {
+          that.addBaseCourseInProgram();
+        })
+        .catch((e) => {
+          console.log("cancle");
+        });
       // }
     },
     //向programe添加课程
@@ -1265,7 +1273,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.drawercourseId = [];
             that.drawerCourseIndex = [];
@@ -1285,19 +1293,19 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,课程已存在`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (e.status === 500) {
             ElMessage({
               type: "error",
               message: `新建出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           that.drawercourseId = [];
@@ -1335,7 +1343,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
 
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1348,13 +1356,13 @@ export default {
             ElMessage({
               type: "error",
               message: `更新出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -1591,8 +1599,13 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.code == "PROGRAM_NOT_FIND") {
+          if (e.data.code == "PROGRAM_NOT_FIND") {
             this.hasProgram = false;
+            // ElMessage({
+            //   type: "error",
+            //   message: "培养方案不存在",
+            //   duration: 4000,
+            // });
           }
         });
     },

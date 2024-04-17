@@ -86,24 +86,24 @@
                 <el-row
                   v-for="coreBaseCourse in detail.coreBaseCourses"
                   :key="coreBaseCourse.id"
-                  style="margin-top:20px"
+                  style="margin-top: 20px"
                 >
-                    <el-col :span="8" class="method-weight"
-                      >{{ coreBaseCourse.courseName }}
-                    </el-col>
-                    <el-tooltip
-                      effect="dark"
-                      content="权重"
-                      placement="bottom"
-                      :hide-after="0"
+                  <el-col :span="8" class="method-weight"
+                    >{{ coreBaseCourse.courseName }}
+                  </el-col>
+                  <el-tooltip
+                    effect="dark"
+                    content="权重"
+                    placement="bottom"
+                    :hide-after="0"
+                  >
+                    <el-col
+                      :span="8"
+                      class="method-desc"
+                      style="margin-left: 80px"
+                      >（ {{ coreBaseCourse.weight }}% ）</el-col
                     >
-                      <el-col
-                        :span="8"
-                        class="method-desc"
-                        style="margin-left: 80px"
-                        >（ {{ coreBaseCourse.weight }}% ）</el-col
-                      >
-                    </el-tooltip>
+                  </el-tooltip>
                 </el-row>
               </div>
             </div>
@@ -434,7 +434,7 @@ export default {
           console.log(this.hasAttribute);
         })
         .catch((e) => {
-          console.log(e)
+          console.log(e);
           if (e.data.msg == "资源不存在" && e.data.code == "PROGRAM_NOT_FIND") {
             this.hasProgram = false;
             this.noProgram = true;
@@ -592,7 +592,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.dialogFormVisible = false;
           }

@@ -1067,18 +1067,18 @@ export default {
               this.getClassList();
             })
             .catch((e) => {
-              if (e.code === "E_CODE_NOT_EXIST") {
+              if (e.data.AddBtncode === "E_CODE_NOT_EXIST") {
                 ElMessage({
                   type: "error",
                   message: "课程号不存在",
-                  duration: 1500,
+                  duration: 4000,
                 });
                 this.E_ErrorMsg = "课程号不存在，请重新输入";
-              } else if (e.code === "E_TEACHER_NOT_EXIST") {
+              } else if (e.data.code === "E_TEACHER_NOT_EXIST") {
                 ElMessage({
                   type: "error",
                   message: "教师不存在",
-                  duration: 1500,
+                  duration: 4000,
                 });
                 this.T_ErrorMsg = "教师不存在，请重新输入";
               }
@@ -1087,7 +1087,7 @@ export default {
           ElMessage({
             type: "error",
             message: "请输入完整信息",
-            duration: 1500,
+            duration: 4000,
           });
           return;
         }
@@ -1173,7 +1173,7 @@ export default {
             ElMessage({
               type: "success",
               message: "修改成功",
-              duration: 1500,
+              duration: 4000,
             });
             this.editVisible = false;
             this.getClassList();
@@ -1181,18 +1181,18 @@ export default {
         })
         .catch((e) => {
           console.log("3", e);
-          if (e.code === "E_CODE_NOT_EXIST") {
+          if (e.data.code === "E_CODE_NOT_EXIST") {
             ElMessage({
               type: "error",
               message: "课程号不存在",
-              duration: 1500,
+              duration: 4000,
             });
             this.E_ErrorMsg = "课程号不存在，请重新输入";
-          } else if (e.code === "E_TEACHER_NOT_EXIST") {
+          } else if (e.data.code === "E_TEACHER_NOT_EXIST") {
             ElMessage({
               type: "error",
               message: "教师不存在",
-              duration: 1500,
+              duration: 4000,
             });
           }
         });
@@ -1210,7 +1210,7 @@ export default {
           ElMessage({
             type: "success",
             message: "删除成功",
-            duration: 1500,
+            duration: 4000,
           });
           this.getClassList();
         });
@@ -1336,7 +1336,7 @@ export default {
           ElMessage({
             type: "success",
             message: "分配成功",
-            duration: 1500,
+            duration: 4000,
           });
           this.multipleSelection = [];
           this.$refs.multipleTable.clearSelection();
@@ -1345,7 +1345,7 @@ export default {
           ElMessage({
             type: "error",
             message: "分配失败",
-            duration: 1500,
+            duration: 4000,
           });
         }
       });
@@ -1361,7 +1361,7 @@ export default {
             ElMessage({
               type: "success",
               message: "关联成功",
-              duration: 1500,
+              duration: 4000,
             });
             this.multipleSelection.forEach((item) => {
               item.courseIsDeleted = "0";
@@ -1371,11 +1371,11 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.code === "CODE_NOT_EXIST") {
+          if (e.data.code === "CODE_NOT_EXIST") {
             ElMessage({
               type: "error",
               message: "请先添加课程库课程",
-              duration: 1500,
+              duration: 4000,
             });
           }
         });
@@ -1407,7 +1407,7 @@ export default {
           ElMessage({
             type: "success",
             message: "更新成功",
-            duration: 1500,
+            duration: 4000,
           });
           this.isAssessment = false;
           this.multIsRespondent = "2";
