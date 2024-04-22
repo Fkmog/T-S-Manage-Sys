@@ -158,7 +158,7 @@
             }}</el-col
           >
           <el-col :span="17">{{
-            dialogDetail.programIndicators.description
+            dialogDetail.programIndicators[index2].description
           }}</el-col>
         </el-row>
         <el-col

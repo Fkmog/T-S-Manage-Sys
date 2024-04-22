@@ -86,10 +86,11 @@
                       :key="method.id"
                     >
                       <el-row class="method-detail">
-                        <el-col :span="4" class="method-weight">
+                        <el-col :span="3" class="method-weight">
                           (&nbsp;{{ method.weight }}%&nbsp;)
                         </el-col>
-                        <el-col :span="18" class="method-desc">
+                        <el-col :span="3" style="font-weight:bolder">课程目标{{method.id.replace(/^0+/, '')}}</el-col>
+                        <el-col :span="16" class="method-desc">
                           {{ method.description }}
                         </el-col>
                       </el-row>
