@@ -148,7 +148,7 @@ service.interceptors.response.use(
         ElMessage({
           type: "error",
           message: "密码错误",
-          duration: 1500,
+          duration: 4000,
         });
         return Promise.reject(error.response.data);
       } else if (error.response.data.code == "UNAUTHORIZED") {
@@ -180,7 +180,7 @@ service.interceptors.response.use(
         ElMessage({
           type: "error",
           message: error.response.data.msg,
-          duration: 1500,
+          duration: 4000,
         });
         return Promise.reject(error.response.data);
       }
@@ -191,14 +191,14 @@ service.interceptors.response.use(
         ElMessage({
           type: "error",
           message: "密码错误",
-          duration: 1500,
+          duration: 4000,
         });
         return Promise.reject(error.response.data);
       } else {
         ElMessage({
           type: "error",
           message: error.response.data.msg,
-          duration: 1500,
+          duration: 4000,
         });
         return Promise.reject(error);
       }

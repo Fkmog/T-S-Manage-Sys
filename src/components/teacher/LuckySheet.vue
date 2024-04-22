@@ -238,7 +238,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.isNotDirty();
             that.goBackandClean();
@@ -250,7 +250,7 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (error.code == "E_TEACHER_EXIST") {
             error.data.forEach(function (teacher) {
@@ -288,7 +288,7 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,标红教师已存在`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (error.code == "E_TEACHER_DUPLICATE") {
             error.data.forEach(function (teacher) {
@@ -326,7 +326,7 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,标红教师重复`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (error.code == "DATA_DUPLICATED") {
             error.data.forEach(function (teacher) {
@@ -364,13 +364,13 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,标红数据重复`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           that.count = 0;

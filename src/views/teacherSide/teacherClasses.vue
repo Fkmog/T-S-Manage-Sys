@@ -213,7 +213,7 @@ export default {
         ElMessage({
           type: "error",
           message: `未关联课程大纲，请联系课程负责人`,
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         this.$store.commit("currentInfo/setTeacherSideClassInfo", Class);

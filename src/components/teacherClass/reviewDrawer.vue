@@ -293,7 +293,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `删除成功`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               }
               this.getReviewInfo();
@@ -302,7 +302,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `删除失败`,
-                duration: 1500,
+                duration: 4000,
               });
               console.log("e", e);
             });
@@ -331,7 +331,7 @@ export default {
                 ElMessage({
                   type: "success",
                   message: `新建成功`,
-                  duration: 1500,
+                  duration: 4000,
                 });
                 let keysArray = Object.keys(this.checkStates);
                 for (const key of keysArray) {
@@ -361,19 +361,19 @@ export default {
                 ElMessage({
                   type: "error",
                   message: `新建失败,提交已存在`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               } else if (e.status === 500) {
                 ElMessage({
                   type: "error",
                   message: `提交出错，请检查填写的内容`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               } else {
                 ElMessage({
                   type: "error",
                   message: `未知错误,请联系相关人员`,
-                  duration: 1500,
+                  duration: 4000,
                 });
               }
             });
@@ -381,7 +381,7 @@ export default {
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1500,
+            duration: 4000,
           });
           return false;
         }
@@ -452,7 +452,7 @@ export default {
                   ElMessage({
                     type: "success",
                     message: `新建成功`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
                 this.getClassInfo();
@@ -462,19 +462,19 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败,提交已存在`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (e.status === 500) {
                   ElMessage({
                     type: "error",
                     message: `新建出错，请检查填写的内容`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else {
                   ElMessage({
                     type: "error",
                     message: `未知错误,请联系相关人员`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               });
@@ -488,7 +488,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `新建成功`,
-                duration: 1500,
+                duration: 4000,
               });
             }
             this.getClassInfo();
@@ -498,19 +498,19 @@ export default {
               ElMessage({
                 type: "error",
                 message: `新建失败,提交已存在`,
-                duration: 1500,
+                duration: 4000,
               });
             } else if (e.status === 500) {
               ElMessage({
                 type: "error",
                 message: `新建出错，请检查填写的内容`,
-                duration: 1500,
+                duration: 4000,
               });
             } else {
               ElMessage({
                 type: "error",
                 message: `未知错误,请联系相关人员`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           });

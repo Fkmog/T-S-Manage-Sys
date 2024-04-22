@@ -55,7 +55,7 @@
       v-model="editableTabsValue"
       type="card"
       class="activity-tab"
-      :editable="canedit ? true : false"
+      :editable="canedit"
       @tab-click="editableTabsValueChange"
       @edit="handleTabsEdit"
       id="drag-tab"
@@ -119,9 +119,11 @@
 
           <div
             v-show="
-              !(
+              (!(
                 this.identity === '教师' && this.currenteditableTabsValue == 1
-              ) && this.canedit
+              ) &&
+                this.canedit) ||
+              this.isRespondent
             "
             style="width: 100px; display: inline-block"
           >
@@ -424,12 +426,12 @@ export default {
 
       this.isValid();
       this.unsave = true;
-      if (index == "1" && this.identity == "教师") {
+      if (index == "1" && this.identity == "教师" && !this.isRespondent) {
         val.inputFlag = false;
         ElMessage({
           type: "error",
           message: "该成绩项为课程组统一，不可修改",
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         this.originActivityTitle = val.title;
@@ -479,7 +481,7 @@ export default {
           });
         }
       } else {
-        if (this.isRespondent != "2" && Number(pane.props.name) == 1) {
+        if (this.isRespondent && Number(pane.props.name) == 1) {
           console.log("the teacher can not edit the first tab content");
 
           this.hotInstance.updateSettings({
@@ -697,11 +699,15 @@ export default {
     },
     addActivities() {
       console.log("currenteditableTabsValue", this.currenteditableTabsValue);
-      if (this.currenteditableTabsValue == 1 && this.identity === "教师") {
+      if (
+        this.currenteditableTabsValue == 1 &&
+        this.identity === "教师" &&
+        !this.isRespondent
+      ) {
         ElMessage({
           type: "error",
           message: "该成绩项为课程组统一，不可修改",
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         if (this.currenteditableTabsValue == 0) {
@@ -782,7 +788,7 @@ export default {
             (self.currenteditableTabsValue === 1 ||
               self.currenteditableTabsValue === 0) &&
             self.identity == "教师" &&
-            self.isRespondent != "2"
+            self.isRespondent
           ) {
             // console.log('same');
             console.log("return false;");
@@ -798,7 +804,7 @@ export default {
             (self.currenteditableTabsValue === 1 ||
               self.currenteditableTabsValue === 0) &&
             self.identity == "教师" &&
-            self.isRespondent != "2"
+            self.isRespondent
           ) {
             // console.log('same');
             return false;
@@ -819,10 +825,7 @@ export default {
       });
 
       this.hotInstance = hotRegisterer;
-      if (
-        (this.identity == "教师" && this.isRespondent != "2") ||
-        !this.canedit
-      ) {
+      if ((this.identity == "教师" && this.isRespondent) || !this.canedit) {
         this.hotInstance.updateSettings({
           contextMenu: false,
         });
@@ -858,7 +861,7 @@ export default {
             if (that.identity != "教师") {
               cellProperties.readOnly = false;
             } else {
-              if (that.isRespondent == "2") {
+              if (that.isRespondent) {
                 cellProperties.readOnly = false;
               } else {
                 cellProperties.readOnly = true;
@@ -875,13 +878,12 @@ export default {
       this.db.items = [];
       if (this.from == "Score") {
         console.log("this is the activity from class");
-
         return request({
           url: "/classes/" + that.classInfo.classId,
           method: "get",
         }).then(function (res) {
           console.log("class Info", res);
-          that.isRespondent = res.data.isRespondent;
+          that.isRespondent = res.data.isRespondent == "2" ? true : false;
           console.log("isRespondent", that.isRespondent);
           let course = res.data;
 
@@ -1024,7 +1026,7 @@ export default {
         ElMessage({
           type: "error",
           message: `课程已审核或提交，不可以修改成绩项`,
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         let keyNum = [];
@@ -1080,7 +1082,7 @@ export default {
           ElMessage({
             type: "error",
             message: `成绩项或者分值为空`,
-            duration: 1500,
+            duration: 4000,
           });
         } else {
           if (this.from == "Score") {
@@ -1101,7 +1103,7 @@ export default {
                   ElMessage({
                     type: "success",
                     message: `保存成功`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
                 that.compareData = JSON.parse(JSON.stringify(that.db.items));
@@ -1114,7 +1116,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `保存出错，请检查填写的内容`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1123,7 +1125,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，总评未设置`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1132,7 +1134,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，有权重为空`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1141,13 +1143,13 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `更新失败，权重之和必须为100%`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else {
                   ElMessage({
                     type: "error",
                     message: `未知错误,请联系相关人员`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               });
@@ -1183,7 +1185,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `保存出错，请检查填写的内容`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1192,7 +1194,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，总评未设置`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1201,7 +1203,7 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，有权重为空`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else if (
                   error.code == "UNPROCESSABLE_ENTITY" &&
@@ -1210,13 +1212,13 @@ export default {
                   ElMessage({
                     type: "error",
                     message: `新建失败，权重和不对`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 } else {
                   ElMessage({
                     type: "error",
                     message: `未知错误,请联系相关人员`,
-                    duration: 1500,
+                    duration: 4000,
                   });
                 }
               });
@@ -1290,16 +1292,10 @@ export default {
       console.log("identity:", this.identity);
     }
     console.log("this.classInfo:", this.classInfo);
-    if (
-      (this.classInfo.status == "1" || this.classInfo.status == "4") &&
-      this.classInfo &&
-      this.identity == "教师"
-    ) {
-      this.canedit = true;
-    } else {
-      this.canedit = true;
-    }
-    console.log("this.canedit:", this.canedit);
+
+    // this.classInfo &&
+    (this.classInfo.status == "1" || this.classInfo.status == "4") &&
+      this.identity == "教师";
 
     console.log("db items:", this.db.items);
     console.log("router", this.$route.query["parentName"]);
@@ -1310,6 +1306,20 @@ export default {
     }
     console.log("from", this.from);
     this.getActivities();
+
+    if (
+      this.classInfo &&
+      (this.identity == "课程负责人" ||
+        this.identity == "学院管理员" ||
+        ((this.classInfo.status == "1" || this.classInfo.status == "4") &&
+          this.identity == "教师"))
+    ) {
+      this.canedit = true;
+    } else {
+      this.canedit = false;
+    }
+
+    console.log("this.canedit:", this.canedit);
   },
   watch: {
     dirty: {

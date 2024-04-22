@@ -334,7 +334,7 @@ export default {
             ElMessage({
               type: "success",
               message: `添加成功`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           this.dialogFormVisible = false;
@@ -345,13 +345,13 @@ export default {
             ElMessage({
               type: "error",
               message: `添加出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         });
@@ -455,7 +455,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `删除成功`,
-                duration: 1500,
+                duration: 4000,
               });
               that.getTeacherList();
               that.$refs.multipleTable.clearSelection();
@@ -467,7 +467,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `删除失败`,
-                duration: 1500,
+                duration: 4000,
               });
             }
             return localres;
@@ -535,7 +535,7 @@ export default {
             ElMessage({
               type: "success",
               message: `删除成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.getTeacherList();
           }
@@ -554,7 +554,7 @@ export default {
           ElMessage({
             type: "success",
             message: `更新成功`,
-            duration: 1500,
+            duration: 4000,
           });
           this.examEdit = {};
           this.editDialog = false;

@@ -256,7 +256,7 @@ export default {
         ElMessage({
           type: "error",
           message: "请先在成绩项表中添加成绩项",
-          duration: 1500,
+          duration: 4000,
         });
       }
       if (action === "add" && !targetName) {
@@ -347,7 +347,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: "请在成绩项表中删除此成绩项",
-                duration: 1500,
+                duration: 4000,
               });
               return;
             }
@@ -1064,7 +1064,7 @@ export default {
         ElMessage({
           type: "error",
           message: "保存出错，请检查分数",
-          duration: 1500,
+          duration: 4000,
         });
         this.errorInTable = false;
       } else {
@@ -1188,7 +1188,7 @@ export default {
             ElMessage({
               type: "success",
               message: `保存成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.goBackandClean();
             that.originData = JSON.parse(JSON.stringify(that.db.items));
@@ -1202,7 +1202,7 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (e.status == 409) {
             if (e.data.code === "E_ACTIVITY_NOT_SAME") {
@@ -1217,42 +1217,42 @@ export default {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_COLLUMN_NOT_SAME") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_STUDENT_NUM_NOT_CONSISTENT") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_SCORE_INCOMPLETE") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_ACTIVITY_NOT_SAME") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
           } else {
             ElMessage({
               type: "error",
               message: "未知错误,请联系相关人员",
-              duration: 1500,
+              duration: 4000,
             });
           }
 

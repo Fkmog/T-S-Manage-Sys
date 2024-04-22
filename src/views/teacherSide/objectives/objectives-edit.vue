@@ -77,7 +77,9 @@
                   />
                 </el-form-item>
                 <div style="margin-top: 50px">
-                  <span style="color: grey; font-size: 14px">达成度评价方式</span>
+                  <span style="color: grey; font-size: 14px"
+                    >达成度评价方式</span
+                  >
                 </div>
                 <el-row v-if="objective.assessmentMethods.length !== 0">
                   <el-col
@@ -367,14 +369,14 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.backObjectives();
           } else {
             ElMessage({
               type: "error",
               message: `更新失败`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         })
@@ -383,7 +385,7 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         });

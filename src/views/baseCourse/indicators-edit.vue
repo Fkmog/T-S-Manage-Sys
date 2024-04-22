@@ -96,7 +96,7 @@
                 <div class="closeIcon">
                   <el-icon
                     class="close-icon"
-                    @click="deleteIndicator(indicator, index1)"
+                    @click="deleteIndicator(indicator, index1,index2)"
                     ><Close
                   /></el-icon>
                 </div>
@@ -500,7 +500,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `更新成功`,
-                duration: 1500,
+                duration: 4000,
               });
               //更新副本
               this.majorListCopy = JSON.parse(JSON.stringify(this.majorList));
@@ -509,7 +509,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `更新失败`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           })
@@ -518,7 +518,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `保存出错，请检查填写的内容`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           });
@@ -623,7 +623,7 @@ export default {
       });
     },
     //删除指标点
-    deleteIndicator(indicator, index1) {
+    deleteIndicator(indicator, index1,index2) {
       this.index1 = index1;
       ElMessageBox.confirm(
         "是否确认删除指标点" + indicator.serialNum + "?",
@@ -633,10 +633,11 @@ export default {
           cancelButtonText: "取消",
           type: "warning",
         }
-      ).then(() => {
-        this.majorList[index1].indicators.pop(indicator);
-      });
-      // console.log("deleteIndicator", indicator);
+      )
+        .then(() => {
+          this.majorList[index1].indicators.splice(index2,1);
+        })
+        .catch(() => {});
     },
     //编辑支撑方式
     editSupportMethods(indicator, index1, index2) {
@@ -674,7 +675,8 @@ export default {
     //新增支持指标点
     addIndicator(searchValue, index1) {
       try {
-        let info = searchValue.split(" ");
+        console.log(searchValue);
+        let info = searchValue.split(" | ");
         // 判断选中的指标点是否已存在
         // console.log("!info", info, info.length);
         //有简称的时候 info：[毕业要求1，简称,1.1，描述]
@@ -756,38 +758,45 @@ export default {
     //远程查询实现
     querySearch(queryString, cb) {
       var allIndicators = this.allIndicators;
-      var results = queryString
-        ? allIndicators.filter(this.createStateFilter(queryString))
-        : allIndicators;
-      console.log("result", results);
+      let a = allIndicators.filter(this.createStateFilter(queryString));
+      console.log("a", a, this.createStateFilter(queryString));
+      // console.log(
+      //   "this.createStateFilter(queryString)",
+      //   this.createStateFilter(queryString)
+      // );
+      var results = allIndicators;
+      // var results = queryString
+      //   ? allIndicators.filter(this.createStateFilter(queryString))
+      //   : allIndicators;
+      // console.log("result", results);
       results.forEach((result) => {
         result.map((item) => {
           if (item.requirementName === null) {
-            console.log("sange", item);
+            // console.log("sange", item);
 
             return (item.value =
               "毕业要求" +
               item.requirementSerialNum +
-              " " +
+              " | " +
               item.indicatorSerialNum +
-              " " +
+              " | " +
               item.indicatorDescription);
           } else {
-            console.log("四个", item);
+            // console.log("四个", item);
             return (item.value =
               "毕业要求" +
               item.requirementSerialNum +
-              " " +
+              " | " +
               item.requirementName +
-              " " +
+              " | " +
               item.indicatorSerialNum +
-              " " +
+              " | " +
               item.indicatorDescription);
           }
         });
       });
       results = results[0];
-      console.log("result后", results);
+      // console.log("result后", results);
       cb(results);
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
@@ -797,9 +806,29 @@ export default {
     //实现模糊搜索
     createStateFilter(queryString) {
       return (state) => {
-        return (
-          state.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
-        );
+        // return (
+        //   state.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
+        // );
+        console.log(queryString);
+        state.forEach((item) => {
+          let all =
+            item.indicatorDescription +
+            item.indicatorId +
+            item.indicatorName +
+            item.indicatorSerialNum +
+            item.requirementId +
+            item.requirementName +
+            item.requirementSerialNum;
+          console.log("item", all.includes(queryString));
+          if (all.includes(queryString) === true) {
+            return true;
+          }
+        });
+        return false;
+        // return state.some(
+        //   (item) =>
+        //     item.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
+        // );
       };
     },
     //编辑权重
@@ -891,14 +920,6 @@ export default {
       this.keyword = data;
       this.getCopyProgram();
     },
-    // 展开行
-    // expandChange(row) {
-    //   let programId = row.programId;
-    //   getProgramCourseList(programId).then((res) => {
-    //     console.log("@", res);
-    //     this.programCourse = res.rows;
-    //   });
-    // },
     //选中被复制对象
     copyCourse(row) {
       console.log("copyCourse", row);
@@ -919,7 +940,7 @@ export default {
           ElMessage({
             type: "success",
             message: `复制成功`,
-            duration: 1500,
+            duration: 4000,
           });
           this.drawer = false;
         }

@@ -591,49 +591,49 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (e.status == 409) {
             if (e.data.code === "E_SCORE_INCOMPLETE_OR_ACTIVITY_DELETED") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_COLLUMN_NOT_SAME") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_STUDENT_NUM_NOT_CONSISTENT") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_SCORE_INCOMPLETE") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
             if (e.data.code === "E_ACTIVITY_NOT_SAME") {
               ElMessage({
                 type: "error",
                 message: e.data.msg,
-                duration: 1500,
+                duration: 4000,
               });
             }
           } else {
             ElMessage({
               type: "error",
               message: "未知错误,请联系相关人员",
-              duration: 1500,
+              duration: 4000,
             });
           }
         });
@@ -662,7 +662,7 @@ export default {
         ElMessage({
           type: "error",
           message: `课程已审核或提交，不可以修改成绩项`,
-          duration: 1500,
+          duration: 4000,
         });
       } else {
         console.log("this.db.objectives", this.db.objectives);
@@ -778,7 +778,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: "更新成功",
-                duration: 1500,
+                duration: 4000,
               });
             }
             this.compareData = JSON.parse(JSON.stringify(this.db.objectives));
@@ -788,13 +788,13 @@ export default {
               ElMessage({
                 type: "error",
                 message: `保存出错，请检查填写的内容`,
-                duration: 1500,
+                duration: 4000,
               });
             } else {
               ElMessage({
                 type: "error",
                 message: `未知错误,请联系相关人员`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           });
@@ -861,7 +861,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.goBackandClean();
           }
@@ -873,13 +873,13 @@ export default {
             ElMessage({
               type: "error",
               message: `更新出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           // console.log('postData.scores', that.postData.scores);

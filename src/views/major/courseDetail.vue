@@ -688,7 +688,7 @@ export default {
           ElMessage({
             type: "success",
             message: "分配成功",
-            duration: 1500,
+            duration: 4000,
           });
           this.currentConnectingClass = [];
           this.getBaseCourse();
@@ -696,7 +696,7 @@ export default {
           ElMessage({
             type: "error",
             message: "分配失败",
-            duration: 1500,
+            duration: 4000,
           });
         }
       });
@@ -907,7 +907,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `删除成功`,
-                duration: 1500,
+                duration: 4000,
               });
               // that.clearForm();
               that.getProgramCourse();
@@ -924,7 +924,7 @@ export default {
             ElMessage({
               type: "error",
               message: `删除失败`,
-              duration: 1500,
+              duration: 4000,
             });
             // that.clearForm();
             // that.getProgramCourse();
@@ -967,7 +967,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             that.supportingClass = [];
             that.drawercourseId = [];
@@ -988,19 +988,19 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败,课程已存在`,
-              duration: 1500,
+              duration: 4000,
             });
           } else if (e.status === 500) {
             ElMessage({
               type: "error",
               message: `新建出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           } else {
             ElMessage({
               type: "error",
               message: `未知错误,请联系相关人员`,
-              duration: 1500,
+              duration: 4000,
             });
           }
           that.drawercourseId = [];
@@ -1228,7 +1228,7 @@ export default {
         })
         .catch((e) => {
           console.log("e", e);
-          if (e.code == "PROGRAM_NOT_FIND") {
+          if (e.data.code == "PROGRAM_NOT_FIND") {
             this.hasProgram = false;
           }
         });

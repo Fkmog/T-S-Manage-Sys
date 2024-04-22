@@ -495,7 +495,7 @@ export default {
             ElMessage({
               type: "success",
               message: `新建成功`,
-              duration: 1500,
+              duration: 4000,
             });
             //成功后根据vesionId和basecouseId获取详细信息
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -503,7 +503,7 @@ export default {
             ElMessage({
               type: "error",
               message: `新建失败`,
-              duration: 1500,
+              duration: 4000,
             });
             //失败后退回basecouse页面
             that.getBaseCourse(that.pageSize, that.pageNum);
@@ -594,7 +594,7 @@ export default {
           ElMessage({
             type: "success",
             message: `新建成功`,
-            duration: 1500,
+            duration: 4000,
           });
           that.clearForm();
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -602,7 +602,7 @@ export default {
           ElMessage({
             type: "error",
             message: `新建失败`,
-            duration: 1500,
+            duration: 4000,
           });
           that.clearForm();
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -689,7 +689,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `删除成功`,
-                duration: 1500,
+                duration: 4000,
               });
 
               that.getBaseCourse(that.pageSize, that.pageNum);
@@ -697,7 +697,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `删除失败`,
-                duration: 1500,
+                duration: 4000,
               });
               that.getBaseCourse(that.pageSize, that.pageNum);
             }
@@ -751,7 +751,7 @@ export default {
           ElMessage({
             type: "success",
             message: `更新成功`,
-            duration: 1500,
+            duration: 4000,
           });
 
           that.getBaseCourse(that.pageSize, that.pageNum);
@@ -759,7 +759,7 @@ export default {
           ElMessage({
             type: "error",
             message: `更新失败`,
-            duration: 1500,
+            duration: 4000,
           });
           that.getBaseCourse(that.pageSize, that.pageNum);
         }

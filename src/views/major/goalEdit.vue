@@ -443,7 +443,7 @@ export default {
               ElMessage({
                 type: "error",
                 message: `指标点描述不能为空`,
-                duration: 1500,
+                duration: 4000,
               });
               return;
             }
@@ -456,7 +456,7 @@ export default {
           ElMessage({
             type: "error",
             message: `要求点描述不能为空`,
-            duration: 1500,
+            duration: 4000,
           });
           return;
         }
@@ -470,14 +470,14 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.backGoal();
           } else {
             ElMessage({
               type: "error",
               message: `更新失败`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         })
@@ -486,7 +486,7 @@ export default {
             ElMessage({
               type: "error",
               message: `保存出错，请检查填写的内容`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         });

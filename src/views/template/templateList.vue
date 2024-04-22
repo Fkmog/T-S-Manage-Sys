@@ -167,7 +167,7 @@ export default {
   },
   data() {
     return {
-      url:'',
+      url: "",
       departmentId: "",
       workbookList: [],
       dialogVisible: false,
@@ -195,7 +195,7 @@ export default {
   methods: {
     backSetting() {
       this.$router.push({
-        path:"/departmentSetting",
+        path: "/departmentSetting",
       });
     },
     //跳转编辑
@@ -223,7 +223,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `新建成功`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           });
@@ -261,7 +261,7 @@ export default {
             ElMessage({
               type: "success",
               message: `更新成功`,
-              duration: 1500,
+              duration: 4000,
             });
             this.getWorkbookList();
           });
@@ -282,7 +282,7 @@ export default {
             ElMessage({
               type: "success",
               message: `删除成功`,
-              duration: 1500,
+              duration: 4000,
             });
           }
         });
@@ -310,7 +310,7 @@ export default {
         ElMessage({
           type: "success",
           message: `上传成功`,
-          duration: 1500,
+          duration: 4000,
         });
         this.dialogVisible = false;
         this.getWorkbookList();

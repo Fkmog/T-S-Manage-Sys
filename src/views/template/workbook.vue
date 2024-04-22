@@ -30,7 +30,7 @@
           <el-tooltip
             class="box-item"
             effect="dark"
-            content="清除内容"
+            content="重置内容"
             placement="bottom"
             :hide-after="0"
           >
@@ -138,6 +138,7 @@ import {
   UploadFilled,
   Clock,
   DocumentDelete,
+  WarningFilled,
 } from "@element-plus/icons-vue";
 import { WorkbookByClass, editByTeacher } from "@/api/workbook";
 import { ElMessage, ElMessageBox, ElSwitch } from "element-plus";
@@ -153,6 +154,7 @@ import { Base64 } from "js-base64";
 export default {
   name: "Workbook",
   components: {
+    WarningFilled,
     UploadFilled,
     Back,
     reviewDrawer,
@@ -187,6 +189,7 @@ export default {
       canSave: false,
       submitted: false,
       preDataforBack: {},
+      noChange:true
     };
   },
   mounted() {
@@ -311,7 +314,7 @@ export default {
             }
           }
         });
-        if (_.isEqual(temp, another) || this.canSave || this.submitted) {
+        if (_.isEqual(temp, another) || this.canSave || this.submitted||this.noChange) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -370,11 +373,17 @@ export default {
     },
     // 清除内容，同时删除暂存，以及服务器内容，之后再加载一次预设信息
     clear(value, classId) {
-      ElMessageBox.confirm("是否清除所有已填写内容？（该操作不可撤回）", "注意", {
-        confirmButtonText: "确认",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
+      ElMessageBox.confirm(
+        `是否清除所有已填写内容，恢复为课程负责人预设内容？
+        该操作不可撤回`,
+        "注意",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+          icon: WarningFilled,
+        }
+      )
         .then(() => {
           console.log(value, classId);
           for (let key in value) {
@@ -388,7 +397,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `清除成功`,
-                duration: 1500,
+                duration: 4000,
               });
             }
           });
@@ -444,7 +453,7 @@ export default {
       ElMessage({
         type: "success",
         message: `临时保存成功`,
-        duration: 1500,
+        duration: 4000,
       });
       this.canSave = true;
     },
@@ -462,7 +471,7 @@ export default {
               ElMessage({
                 type: "success",
                 message: `保存成功`,
-                duration: 1500,
+                duration: 4000,
               });
               // localStorage.removeItem("classId");
               localStorage.removeItem(this.classInfo.classId);
@@ -475,7 +484,7 @@ export default {
           ElMessage({
             type: "error",
             message: `部分字段未填写完整`,
-            duration: 1500,
+            duration: 4000,
           });
         });
     },
@@ -515,7 +524,7 @@ export default {
                       ElMessage({
                         type: "warning",
                         message: `超出上传文件数量限制`,
-                        duration: 1500,
+                        duration: 4000,
                       });
                     },
                     onPreview: function (file) {
@@ -670,7 +679,8 @@ export default {
       // }
       this.$watch("value", (newValue) => {
         // 在元素值变化时执行特定的操作
-        // console.log("元素的值已经变化：", newValue);
+        console.log("元素的值已经变化：", newValue);
+        this.noChange=false
         this.saveToLocal(newValue, this.classInfo.classId);
       });
     },
