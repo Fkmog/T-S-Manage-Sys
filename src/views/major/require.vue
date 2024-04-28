@@ -4,7 +4,7 @@
       <div class="card">
         <div class="card-head">
           <span class="head-text" style="color: grey; font-size: 14px"
-            >培养目标</span
+            >毕业要求</span
           >
           <el-tooltip
             class="box-item"
@@ -20,7 +20,43 @@
           <span>待添加</span>
         </div>
         <div v-if="hasAttribute">
-          <div class="desc" style=" white-space: pre-line;">{{ goal }}</div>
+          <div
+            class="graduate-attribute"
+            v-for="attribute in requirements"
+            :key="attribute.id"
+          >
+            <div class="attribute">
+              <div class="two-digits">
+                <section class="num-title">
+                  <section class="num-wrap">
+                    <span class="title-text">{{ attribute.serialNum }}</span>
+                  </section>
+                  <section class="rotate-bar"></section>
+                </section>
+              </div>
+              <div class="attribute-content">
+                <div class="name">
+                  {{ attribute.name }}
+                </div>
+                <div class="desc">
+                  {{ attribute.description }}
+                </div>
+              </div>
+            </div>
+            <div
+              class="attribute-detail"
+              v-for="detail in attribute.programIndicators"
+              :key="detail.id"
+            >
+              <div class="detail-num">
+                {{ detail.serialNum }}
+              </div>
+              <div class="detail-content">
+                <div class="name">{{ detail.name }}</div>
+                <div class="desc">{{ detail.description }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -96,7 +132,7 @@ import { EditPen } from "@element-plus/icons-vue";
 import { checkProgram, addProgram } from "@/api/program";
 import addBtn from "@/components/general/addBtn.vue";
 export default {
-  name: "Goal",
+  name: "Require",
   components: {
     EditPen,
     addBtn,
@@ -119,7 +155,6 @@ export default {
       },
       requirements: [],
       programId: "",
-      goal: "",
     };
   },
   mounted() {
@@ -151,7 +186,7 @@ export default {
     //跳转至编辑毕业要求页面
     goEdit() {
       this.$router.push({
-        path: "/goalEdit",
+        path: "/edit",
         query: { programId: this.programId },
       });
     },
@@ -171,7 +206,6 @@ export default {
             this.programId = res.data.programId;
             this.$store.commit("major/setProgramId", this.programId);
             this.requirements = res.data.graduateAttributes;
-            this.goal = res.data.goal;
             if (this.requirements === null || this.requirements.length == 0) {
               this.hasAttribute = false;
             }
@@ -220,6 +254,10 @@ export default {
 </script>
 
 <style scoped>
+/* .content {
+  height: 100vh;
+  background-color: #f2f2f2;
+} */
 .body-check {
   display: flex;
   justify-content: center;

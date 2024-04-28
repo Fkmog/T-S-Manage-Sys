@@ -189,7 +189,7 @@ export default {
       canSave: false,
       submitted: false,
       preDataforBack: {},
-      noChange:true
+      noChange: true,
     };
   },
   mounted() {
@@ -314,7 +314,12 @@ export default {
             }
           }
         });
-        if (_.isEqual(temp, another) || this.canSave || this.submitted||this.noChange) {
+        if (
+          _.isEqual(temp, another) ||
+          this.canSave ||
+          this.submitted ||
+          this.noChange
+        ) {
           this.$router.push({ name: "TeacherClass" });
         } else {
           ElMessageBox.confirm("数据还未保存，是否仍然关闭？", "", {
@@ -680,7 +685,7 @@ export default {
       this.$watch("value", (newValue) => {
         // 在元素值变化时执行特定的操作
         console.log("元素的值已经变化：", newValue);
-        this.noChange=false
+        this.noChange = false;
         this.saveToLocal(newValue, this.classInfo.classId);
       });
     },

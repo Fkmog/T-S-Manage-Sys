@@ -106,7 +106,22 @@
             <el-table-column prop="courseType" label="课程类型" width="180" />
             <el-table-column prop="courseNature" label="课程性质" width="180" />
             <el-table-column prop="credit" label="学分" width="180" />
-            <el-table-column prop="versionName" label="版本" width="180" />
+            <el-table-column prop="versionName" label="版本" width="180">
+              <template #default="scope">
+                <el-tag v-show="scope.row.versionId" type="prime">
+                  {{ currentVersionName }}
+                </el-tag>
+                <el-tooltip content="添加课程大纲">
+                  <el-tag
+                    v-show="!scope.row.versionId"
+                    type="danger"
+                    @click.stop="addBaseCourseDetail(scope.row)"
+                  >
+                    无课程大纲
+                  </el-tag>
+                </el-tooltip>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </div>
@@ -707,70 +722,74 @@ export default {
           confirmButtonText: "确认",
           cancelButtonText: "取消",
           type: "warning",
-        }).then(() => {
-          console.log(
-            "versionId",
-            that.currentVersionId,
-            "CourseId",
-            that.courseId
-          );
+        })
+          .then(() => {
+            console.log(
+              "versionId",
+              that.currentVersionId,
+              "CourseId",
+              that.courseId
+            );
 
-          return request({
-            url: "/detail",
-            method: "post",
-            data: {
-              versionId: that.currentVersionId,
-              courseId: row.courseId,
-              departmentId: that.departmentId,
-              schoolId: that.schoolId,
-            },
-          })
-            .then(function (res) {
-              console.log(res);
-              if (res.code == "SUCCESS") {
-                ElMessage({
-                  type: "success",
-                  message: `新建成功`,
-                  duration: 4000,
-                });
-                //成功后根据vesionId和basecouseId获取详细信息
-                that.getBaseCourse(that.pageSize, that.pageNum);
-              }
+            return request({
+              url: "/detail",
+              method: "post",
+              data: {
+                versionId: that.currentVersionId,
+                courseId: row.courseId,
+                departmentId: that.departmentId,
+                schoolId: that.schoolId,
+              },
             })
-            .catch((e) => {
-              console.log("e", e);
-              if (
-                e.data.code == "UNPROCESSABLE ENTITY" &&
-                e.data.msg == "UNPROCESSABLE ENTIT"
-              ) {
-                ElMessage({
-                  type: "error",
-                  message: `没有选择课程大纲版本`,
-                  duration: 4000,
-                });
-              } else if (e.status === 409) {
-                ElMessage({
-                  type: "error",
-                  message: `新建失败,大纲版本已存在`,
-                  duration: 4000,
-                });
-              } else if (e.status === 500) {
-                ElMessage({
-                  type: "error",
-                  message: `新建出错，请检查填写的内容`,
-                  duration: 4000,
-                });
-              } else {
-                ElMessage({
-                  type: "error",
-                  message: `未知错误,请联系相关人员`,
-                  duration: 4000,
-                });
-              }
-              //失败后退回basecouse页面
-              that.getBaseCourse(that.pageSize, that.pageNum);
-            });
-        });
+              .then(function (res) {
+                console.log(res);
+                if (res.code == "SUCCESS") {
+                  ElMessage({
+                    type: "success",
+                    message: `新建成功`,
+                    duration: 4000,
+                  });
+                  //成功后根据vesionId和basecouseId获取详细信息
+                  that.getBaseCourse(that.pageSize, that.pageNum);
+                }
+              })
+              .catch((e) => {
+                console.log("e", e);
+                if (
+                  e.data.code == "UNPROCESSABLE ENTITY" &&
+                  e.data.msg == "UNPROCESSABLE ENTIT"
+                ) {
+                  ElMessage({
+                    type: "error",
+                    message: `没有选择课程大纲版本`,
+                    duration: 4000,
+                  });
+                } else if (e.status === 409) {
+                  ElMessage({
+                    type: "error",
+                    message: `新建失败,大纲版本已存在`,
+                    duration: 4000,
+                  });
+                } else if (e.status === 500) {
+                  ElMessage({
+                    type: "error",
+                    message: `新建出错，请检查填写的内容`,
+                    duration: 4000,
+                  });
+                } else {
+                  ElMessage({
+                    type: "error",
+                    message: `未知错误,请联系相关人员`,
+                    duration: 4000,
+                  });
+                }
+                //失败后退回basecouse页面
+                that.getBaseCourse(that.pageSize, that.pageNum);
+              });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       } else {
         ElMessage({
           type: "error",
@@ -837,9 +856,10 @@ export default {
       if (row.remark) {
         return !row.remark;
       }
-      if (!row.versionId) {
-        return row.versionId;
-      } else return true;
+      // if (!row.versionId) {
+      //   return row.versionId;
+      // }
+      else return true;
     },
     //根据version和courseId来确定detailId
     getDetail(courseId) {
@@ -1263,6 +1283,7 @@ export default {
     //向programe添加课程
     addBaseCourseInProgram() {
       let that = this;
+      console.log("programeInfo:", this.programeInfo);
       return request({
         url: "/baseCourse/program/add",
         method: "post",
@@ -1575,10 +1596,21 @@ export default {
             that.tableData.forEach(function (data) {
               if (data.remark) {
                 console.log("course has selected!");
-                that.$refs.drawermultipleTable.toggleRowSelection(
-                  that.tableData[data.index],
-                  true
-                );
+                // if (
+                //   that.$refs.drawermultipleTable.toggleRowSelection !==
+                //   undefined
+                // ) {
+                //   that.$refs.drawermultipleTable.toggleRowSelection(
+                //     that.tableData[data.index],
+                //     true
+                //   );
+                // }
+                // if (that.$refs.multipleTable.toggleRowSelection !== undefined) {
+                //   that.$refs.multipleTable.toggleRowSelection(
+                //     that.tableData[data.index],
+                //     true
+                //   );
+                // }
               } else {
               }
             });

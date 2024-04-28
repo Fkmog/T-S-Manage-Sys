@@ -90,6 +90,9 @@ export default {
         {
           value: "培养目标",
           path: "./goal",
+        }, {
+          value: "毕业要求",
+          path: "./require",
         },
         {
           value: "课程体系",

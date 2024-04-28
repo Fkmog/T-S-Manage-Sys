@@ -8,7 +8,9 @@ import BaseAddStudent from "@/components/student/addStudent.vue";
 import Achieve from "../views/major/achieve.vue";
 import Courses from "../views/major/course.vue";
 import Goal from "../views/major/goal.vue";
-import GoalEdit from "../views/major/goalEdit.vue";
+import GoalEdit from '../views/major/goalEdit.vue'
+import Require from "../views/major/require.vue";
+import RequireEdit from "../views/major/requireEdit.vue";
 import Manage from "../views/major/manage.vue";
 import Setting from "../views/major/setting.vue";
 import CourseDetail from '../views/major/courseDetail.vue'
@@ -203,10 +205,20 @@ const router = createRouter({
           path: "/goal",
           component: Goal,
           meta: { isMajor: true },
+        },  {
+          name: "GoalEdit",
+          path: "/goalEdit",
+          component: GoalEdit,
+          meta: { isMajor: true },
+        },{
+          name: "Require",
+          path: "/require",
+          component: Require,
+          meta: { isMajor: true },
         },
         {
           path: "/edit",
-          component: GoalEdit,
+          component: RequireEdit,
           meta: { isMajor: true },
         },
         {
